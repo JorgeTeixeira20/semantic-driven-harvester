@@ -1,0 +1,120 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdh: <urn:semantic-driven-harvester:prototype:> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sdh:ontology a owl:Ontology ;
+    rdfs:label "Ontologia do protótipo Semantic Driven Harvester"@pt ;
+    owl:versionInfo "0.1.0" .
+
+sdh:Artigo a owl:Class ;
+    rdfs:label "Artigo"@pt .
+
+sdh:Jornal a owl:Class ;
+    rdfs:label "Jornal"@pt .
+
+sdh:RecursoWeb a owl:Class ;
+    rdfs:label "Recurso Web"@pt .
+
+sdh:CapturaArquivada a owl:Class ;
+    rdfs:label "Captura Arquivada"@pt .
+
+sdh:TextoExtraido a owl:Class ;
+    rdfs:label "Texto Extraído"@pt .
+
+sdh:EntidadeMencionada a owl:Class ;
+    rdfs:label "Entidade Mencionada"@pt .
+
+sdh:Tema a owl:Class ;
+    rdfs:label "Tema"@pt .
+
+sdh:publicadoPor a owl:ObjectProperty ;
+    rdfs:label "publicado por"@pt ;
+    rdfs:domain sdh:Artigo ;
+    rdfs:range sdh:Jornal .
+
+sdh:temRecursoWeb a owl:ObjectProperty ;
+    rdfs:label "tem recurso Web"@pt ;
+    rdfs:domain sdh:Artigo ;
+    rdfs:range sdh:RecursoWeb .
+
+sdh:temCaptura a owl:ObjectProperty ;
+    rdfs:label "tem captura"@pt ;
+    rdfs:domain sdh:RecursoWeb ;
+    rdfs:range sdh:CapturaArquivada .
+
+sdh:temTextoExtraido a owl:ObjectProperty ;
+    rdfs:label "tem texto extraído"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range sdh:TextoExtraido .
+
+sdh:mencionaEntidade a owl:ObjectProperty ;
+    rdfs:label "menciona entidade"@pt ;
+    rdfs:domain sdh:Artigo ;
+    rdfs:range sdh:EntidadeMencionada .
+
+sdh:temTema a owl:ObjectProperty ;
+    rdfs:label "tem tema"@pt ;
+    rdfs:domain sdh:Artigo ;
+    rdfs:range sdh:Tema .
+
+sdh:originalURL a owl:DatatypeProperty ;
+    rdfs:label "URL original"@pt ;
+    rdfs:domain sdh:RecursoWeb ;
+    rdfs:range xsd:anyURI .
+
+sdh:tstamp a owl:DatatypeProperty ;
+    rdfs:label "timestamp original do Arquivo.pt"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:string .
+
+sdh:capturedAt a owl:DatatypeProperty ;
+    rdfs:label "capturado em"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:dateTime .
+
+sdh:archiveURL a owl:DatatypeProperty ;
+    rdfs:label "URL da captura arquivada"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:anyURI .
+
+sdh:title a owl:DatatypeProperty ;
+    rdfs:label "título"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:string .
+
+sdh:mimeType a owl:DatatypeProperty ;
+    rdfs:label "tipo MIME"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:string .
+
+sdh:contentLength a owl:DatatypeProperty ;
+    rdfs:label "tamanho do conteúdo"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:nonNegativeInteger .
+
+sdh:digest a owl:DatatypeProperty ;
+    rdfs:label "digest"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:string .
+
+sdh:encoding a owl:DatatypeProperty ;
+    rdfs:label "codificação"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:string .
+
+sdh:collection a owl:DatatypeProperty ;
+    rdfs:label "coleção"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:string .
+
+sdh:snippet a owl:DatatypeProperty ;
+    rdfs:label "excerto"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:string .
+
+sdh:filePath a owl:DatatypeProperty ;
+    rdfs:label "caminho do ficheiro"@pt ;
+    rdfs:domain sdh:TextoExtraido ;
+    rdfs:range xsd:string .

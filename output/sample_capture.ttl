@@ -1,0 +1,32 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdh: <urn:semantic-driven-harvester:prototype:> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:semantic-driven-harvester:prototype:article/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1> a sdh:Artigo ;
+    rdfs:label "Yony González é reforço para o Benfica - Benfica - Jornal Record" ;
+    sdh:publicadoPor <urn:semantic-driven-harvester:prototype:newspaper/record> ;
+    sdh:temRecursoWeb <urn:semantic-driven-harvester:prototype:resource-web/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1> .
+
+<urn:semantic-driven-harvester:prototype:capture/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191120040251> a sdh:CapturaArquivada ;
+    sdh:archiveURL "https://arquivo.pt/wayback/20191120040251/https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:anyURI ;
+    sdh:capturedAt "2019-11-20T04:02:51+00:00"^^xsd:dateTime ;
+    sdh:collection "EAWP28"^^xsd:string ;
+    sdh:contentLength "232954"^^xsd:nonNegativeInteger ;
+    sdh:digest "d9fc0cba3fb21564528a7dbce748eb0a"^^xsd:string ;
+    sdh:encoding "UTF-8"^^xsd:string ;
+    sdh:mimeType "text/html"^^xsd:string ;
+    sdh:snippet "Yony Gonz&aacute;lez &eacute; refor&ccedil;o para o <em>Benfica</em> - <em>Benfica</em> - Jornal Record Menu Record Login/Registo TV<span class=\"ellipsis\"> ... </span> j&aacute; &Uacute;ltimas not&iacute;cias Record Premium <em>Benfica</em> FC Porto Sporting Liga NOS Internacional Resultados e<span class=\"ellipsis\"> ... </span> <em>Benfica</em> Not&iacute;cias Classifica&ccedil;&atilde;o Estat&iacute;sticas FC Porto Not&iacute;cias Classifica&ccedil;&atilde;o Estat&iacute;sticas Sporting<span class=\"ellipsis\"> ... </span>"^^xsd:string ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191120040251> ;
+    sdh:title "Yony González é reforço para o Benfica - Benfica - Jornal Record"^^xsd:string ;
+    sdh:tstamp "20191120040251"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:extracted-text/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191120040251> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20191120040251_a814f4e9386e2ba9.txt"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:newspaper/record> a sdh:Jornal ;
+    rdfs:label "Record"@pt .
+
+<urn:semantic-driven-harvester:prototype:resource-web/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1> a sdh:RecursoWeb ;
+    sdh:originalURL "https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:anyURI ;
+    sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191120040251> .
+

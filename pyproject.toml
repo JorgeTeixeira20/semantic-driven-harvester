@@ -9,11 +9,13 @@ description = "Cliente simples para obter metadados e texto do Arquivo.pt"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "rdflib>=7.6,<8",
     "requests>=2.31,<3",
 ]
 
 [project.scripts]
 harvester-smoke-test = "semantic_harvester.smoke_test:main"
+harvester-rdf-sample = "semantic_harvester.rdf_mapper:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

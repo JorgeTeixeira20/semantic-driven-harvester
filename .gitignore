@@ -10,3 +10,4 @@ data/raw/texts/*
 !data/raw/texts/.gitkeep
 output/*
 !output/.gitkeep
+!output/sample_capture.ttl

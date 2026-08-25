@@ -1,11 +1,11 @@
 # Semantic Driven Harvester
 
-Primeiro vertical slice do protótipo da dissertação: pesquisar a API
-TextSearch do Arquivo.pt, guardar a resposta JSON original e descarregar o
-texto extraído de cada captura.
+Protótipo da dissertação para obter dados preservados pelo Arquivo.pt e
+representar uma captura real num pequeno grafo RDF.
 
-Nesta fase o projeto não inclui RDF, ontologias, NER, deduplicação, bases de
-dados, frontend ou LLMs.
+Estão implementados o M1 (pesquisa e texto real) e o M2 (ontologia base e
+mapeamento RDF de uma captura). O projeto ainda não inclui NER, deduplicação,
+bases de dados, frontend ou LLMs.
 
 ## Requisitos
 
@@ -75,3 +75,25 @@ downloads = client.download_extracted_texts(search.results)
 `search.results` contém os itens devolvidos pela API sem remover campos. A
 resposta completa e original fica disponível em `search.raw_response` e no
 ficheiro indicado por `search.raw_path`.
+
+## Gerar o sample RDF do M2
+
+O sample usa a captura real `20191120040251`, já obtida no M1:
+
+```bash
+python -m semantic_harvester.rdf_mapper
+```
+
+O grafo é guardado em `output/sample_capture.ttl`. Os seus identificadores são
+determinísticos e derivados do URL original e do `tstamp`.
+
+## Executar os testes
+
+Depois de gerar o sample:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Os testes carregam a ontologia e o sample com RDFLib, verificam as relações
+principais e confirmam que o ficheiro de texto referenciado existe.
