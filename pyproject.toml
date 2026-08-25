@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "semantic-driven-harvester"
+version = "0.1.0"
+description = "Cliente simples para obter metadados e texto do Arquivo.pt"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.31,<3",
+]
+
+[project.scripts]
+harvester-smoke-test = "semantic_harvester.smoke_test:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
