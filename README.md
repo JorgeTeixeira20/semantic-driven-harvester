@@ -97,3 +97,47 @@ python -m unittest discover -s tests -v
 
 Os testes carregam a ontologia e o sample com RDFLib, verificam as relações
 principais e confirmam que o ficheiro de texto referenciado existe.
+
+## Recolher o histórico temporal do artigo (M3)
+
+Para consultar todas as capturas conhecidas do artigo usado no M2, reutilizar
+textos existentes, criar o manifesto e gerar o RDF temporal:
+
+```bash
+python -m semantic_harvester.history_pipeline
+```
+
+O comando produz:
+
+- JSON original em `data/raw/version_history/`;
+- textos disponíveis em `data/raw/texts/`;
+- `data/processed/captures_manifest.jsonl`;
+- `output/article_history.ttl`.
+
+O parâmetro `maxItems` é tratado como tamanho de página, não como indicação do
+total. As páginas seguintes são consultadas através de `offset` quando
+necessário.
+
+## Executar o profiling rápido da TextSearch
+
+Para repetir as seis pesquisas exploratórias sem descarregar textos nem gerar
+RDF:
+
+```bash
+python -m semantic_harvester.api_profiling
+```
+
+As respostas originais são guardadas em `data/raw/profiling/` e o resumo é
+escrito em `output/api_profiling.csv` e `output/api_profiling.md`.
+
+## Repetir a experiência de diagnóstico da API
+
+Para executar as variantes controladas de `maxItems`, `offset` e dedup:
+
+```bash
+python -m semantic_harvester.api_diagnostics
+```
+
+Os JSON raw são guardados em `data/raw/api_diagnostics/`; os resultados ficam
+em `output/api_diagnostics.csv`, `output/api_diagnostics.md` e são discutidos
+em `docs/experiments.md`.

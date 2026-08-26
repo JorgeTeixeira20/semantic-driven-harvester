@@ -148,6 +148,108 @@ def build_sample_graph(
     return graph
 
 
+def load_manifest(manifest_path: Path) -> list[dict[str, Any]]:
+    """Carrega um manifesto JSONL produzido pelo histórico temporal."""
+
+    records: list[dict[str, Any]] = []
+    with manifest_path.open(encoding="utf-8") as manifest:
+        for line in manifest:
+            if line.strip():
+                records.append(json.loads(line))
+    return records
+
+
+def build_article_history_graph(
+    records: list[dict[str, Any]], article_title: str, project_root: Path
+) -> Graph:
+    """Mapeia todas as capturas do manifesto para um Artigo e um RecursoWeb."""
+
+    if not records:
+        raise ValueError("O manifesto de capturas está vazio")
+
+    article_ids = {str(record["article_id"]) for record in records}
+    original_urls = {str(record["original_url"]) for record in records}
+    if len(article_ids) != 1 or len(original_urls) != 1:
+        raise ValueError("O manifesto deve representar um único artigo lógico")
+
+    original_url = original_urls.pop()
+    graph = Graph()
+    graph.bind("sdh", SDH)
+    graph.bind("rdf", RDF)
+    graph.bind("rdfs", RDFS)
+    graph.bind("xsd", XSD)
+
+    newspaper = SDH["newspaper/record"]
+    article = article_uri(original_url)
+    web_resource = resource_uri(original_url)
+
+    graph.add((newspaper, RDF.type, SDH.Jornal))
+    graph.add((newspaper, RDFS.label, Literal("Record", lang="pt")))
+    graph.add((article, RDF.type, SDH.Artigo))
+    graph.add((article, RDFS.label, Literal(article_title)))
+    graph.add((article, SDH.publicadoPor, newspaper))
+    graph.add((article, SDH.temRecursoWeb, web_resource))
+    graph.add((web_resource, RDF.type, SDH.RecursoWeb))
+    graph.add(
+        (web_resource, SDH.originalURL, Literal(original_url, datatype=XSD.anyURI))
+    )
+
+    history_fields: dict[str, tuple[URIRef, URIRef]] = {
+        "archive_url": (SDH.archiveURL, XSD.anyURI),
+        "title": (SDH.title, XSD.string),
+        "digest": (SDH.digest, XSD.string),
+        "content_length": (SDH.contentLength, XSD.nonNegativeInteger),
+        "mime_type": (SDH.mimeType, XSD.string),
+        "encoding": (SDH.encoding, XSD.string),
+        "collection": (SDH.collection, XSD.string),
+        "status_code": (SDH.statusCode, XSD.integer),
+    }
+
+    for record in records:
+        tstamp = str(record["tstamp"])
+        capture = capture_uri(original_url, tstamp)
+        graph.add((web_resource, SDH.temCaptura, capture))
+        graph.add((capture, RDF.type, SDH.CapturaArquivada))
+        graph.add((capture, SDH.tstamp, Literal(tstamp, datatype=XSD.string)))
+        graph.add(
+            (
+                capture,
+                SDH.capturedAt,
+                Literal(str(record["captured_at"]), datatype=XSD.dateTime),
+            )
+        )
+
+        for manifest_field, (predicate, datatype) in history_fields.items():
+            value = record.get(manifest_field)
+            if value is None:
+                continue
+            if datatype in (XSD.integer, XSD.nonNegativeInteger):
+                literal = Literal(int(value), datatype=datatype)
+            else:
+                literal = Literal(str(value), datatype=datatype)
+            graph.add((capture, predicate, literal))
+
+        text_path_value = record.get("extracted_text_path")
+        if not record.get("text_download_success") or not text_path_value:
+            continue
+        text_path = project_root / str(text_path_value)
+        if not text_path.is_file():
+            continue
+
+        extracted_text = extracted_text_uri(original_url, tstamp)
+        graph.add((capture, SDH.temTextoExtraido, extracted_text))
+        graph.add((extracted_text, RDF.type, SDH.TextoExtraido))
+        graph.add(
+            (
+                extracted_text,
+                SDH.filePath,
+                Literal(str(text_path_value), datatype=XSD.string),
+            )
+        )
+
+    return graph
+
+
 def generate_sample(project_root: Path | None = None) -> tuple[Path, Path]:
     """Carrega dados do M1 e grava output/sample_capture.ttl."""
 
@@ -160,6 +262,21 @@ def generate_sample(project_root: Path | None = None) -> tuple[Path, Path]:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     graph.serialize(destination=output_path, format="turtle")
     return output_path, source_json
+
+
+def generate_article_history(project_root: Path | None = None) -> Path:
+    """Gera output/article_history.ttl a partir do manifesto do M3."""
+
+    root = project_root or Path(__file__).resolve().parents[2]
+    manifest_path = root / "data" / "processed" / "captures_manifest.jsonl"
+    records = load_manifest(manifest_path)
+    sample_result, _ = load_sample_result(root / "data" / "raw" / "searches")
+    graph = build_article_history_graph(records, str(sample_result["title"]), root)
+
+    output_path = root / "output" / "article_history.ttl"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    graph.serialize(destination=output_path, format="turtle")
+    return output_path
 
 
 def main() -> int:

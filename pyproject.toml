@@ -16,6 +16,9 @@ dependencies = [
 [project.scripts]
 harvester-smoke-test = "semantic_harvester.smoke_test:main"
 harvester-rdf-sample = "semantic_harvester.rdf_mapper:main"
+harvester-article-history = "semantic_harvester.history_pipeline:main"
+harvester-api-profiling = "semantic_harvester.api_profiling:main"
+harvester-api-diagnostics = "semantic_harvester.api_diagnostics:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

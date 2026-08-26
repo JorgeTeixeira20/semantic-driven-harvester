@@ -114,6 +114,11 @@ sdh:snippet a owl:DatatypeProperty ;
     rdfs:domain sdh:CapturaArquivada ;
     rdfs:range xsd:string .
 
+sdh:statusCode a owl:DatatypeProperty ;
+    rdfs:label "código de estado HTTP"@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:integer .
+
 sdh:filePath a owl:DatatypeProperty ;
     rdfs:label "caminho do ficheiro"@pt ;
     rdfs:domain sdh:TextoExtraido ;

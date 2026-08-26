@@ -1,0 +1,59 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdh: <urn:semantic-driven-harvester:prototype:> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:semantic-driven-harvester:prototype:article/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1> a sdh:Artigo ;
+    rdfs:label "Yony González é reforço para o Benfica - Benfica - Jornal Record" ;
+    sdh:publicadoPor <urn:semantic-driven-harvester:prototype:newspaper/record> ;
+    sdh:temRecursoWeb <urn:semantic-driven-harvester:prototype:resource-web/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1> .
+
+<urn:semantic-driven-harvester:prototype:capture/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191114000138> a sdh:CapturaArquivada ;
+    sdh:archiveURL "https://arquivo.pt/wayback/20191114000138/https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:anyURI ;
+    sdh:capturedAt "2019-11-14T00:01:38+00:00"^^xsd:dateTime ;
+    sdh:collection "FAWP39"^^xsd:string ;
+    sdh:contentLength "35190"^^xsd:nonNegativeInteger ;
+    sdh:digest "UGPHYE2E764JA2BKCZNKFCMEBEAY7BIV"^^xsd:string ;
+    sdh:mimeType "text/html"^^xsd:string ;
+    sdh:statusCode 200 ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191114000138> ;
+    sdh:title "https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:string ;
+    sdh:tstamp "20191114000138"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:capture/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191120040251> a sdh:CapturaArquivada ;
+    sdh:archiveURL "https://arquivo.pt/wayback/20191120040251/https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:anyURI ;
+    sdh:capturedAt "2019-11-20T04:02:51+00:00"^^xsd:dateTime ;
+    sdh:collection "EAWP28"^^xsd:string ;
+    sdh:contentLength "34452"^^xsd:nonNegativeInteger ;
+    sdh:digest "S7K7HOS4Y3WPIZBAILFX7DRUS4XDURSA"^^xsd:string ;
+    sdh:mimeType "text/html"^^xsd:string ;
+    sdh:statusCode 200 ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191120040251> ;
+    sdh:title "https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:string ;
+    sdh:tstamp "20191120040251"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:capture/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20200101205547> a sdh:CapturaArquivada ;
+    sdh:archiveURL "https://arquivo.pt/wayback/20200101205547/https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:anyURI ;
+    sdh:capturedAt "2020-01-01T20:55:47+00:00"^^xsd:dateTime ;
+    sdh:collection "FAWP40"^^xsd:string ;
+    sdh:contentLength "34389"^^xsd:nonNegativeInteger ;
+    sdh:digest "YGWYKDA4OPIHLIWQUNA5FZWRQ7QG2F4S"^^xsd:string ;
+    sdh:mimeType "text/html"^^xsd:string ;
+    sdh:statusCode 200 ;
+    sdh:title "https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:string ;
+    sdh:tstamp "20200101205547"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:extracted-text/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191114000138> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20191114000138_a814f4e9386e2ba9.txt"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:extracted-text/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191120040251> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20191120040251_a814f4e9386e2ba9.txt"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:newspaper/record> a sdh:Jornal ;
+    rdfs:label "Record"@pt .
+
+<urn:semantic-driven-harvester:prototype:resource-web/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1> a sdh:RecursoWeb ;
+    sdh:originalURL "https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica"^^xsd:anyURI ;
+    sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191114000138>,
+        <urn:semantic-driven-harvester:prototype:capture/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20191120040251>,
+        <urn:semantic-driven-harvester:prototype:capture/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1/20200101205547> .
+

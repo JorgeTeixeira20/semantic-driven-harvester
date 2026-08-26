@@ -1,0 +1,7 @@
+test,max_items_requested,max_items_reported_by_api,offset,dedup_parameters_sent,dedup_field_reported_by_api,dedup_value_reported_by_api,estimated_nr_results,results_received,distinct_original_urls,distinct_tstamps,next_page,first_url,first_tstamp,last_url,last_tstamp
+A,100,100,0,True,url,1,6721102,33,33,33,False,https://www.record.pt/sabermais/sporting,20191120063616,http://www.record.pt/internacional/paises/espanha/detalhe/yeray-alvarez-volta-aos-treinos-apos-recuperar-de-tumor-nos-testiculos.html,20170921171011
+B,100,100,100,True,url,1,6721102,0,0,0,False,,,,
+C,100,100,200,True,url,1,6721102,0,0,0,False,,,,
+D,2000,500,0,True,url,1,6721102,96,96,96,False,https://www.record.pt/sabermais/sporting,20191120063616,http://www.record.pt/modalidades/tenis/detalhe/kohlmann-acredita-que-a-alemanha-tem-boas-hipoteses-frente-a-portugal-mesmo-sem-zverevs.html,20170913234951
+E,100,100,0,False,url,2,6721102,53,46,53,False,https://www.record.pt/sabermais/sporting,20191120063616,http://www.record.pt/internacional/paises/espanha/detalhe/yeray-alvarez-volta-aos-treinos-apos-recuperar-de-tumor-nos-testiculos.html,20170921171011
+F,200,200,0,True,url,1,6721102,57,57,57,False,https://www.record.pt/sabermais/sporting,20191120063616,http://www.record.pt/internacional/paises/espanha/detalhe/valencia-ja-chegou-a-acordo-com-a-juventus-por-zaza.html,20170108221237

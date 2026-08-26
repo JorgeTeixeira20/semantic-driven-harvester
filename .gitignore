@@ -8,6 +8,17 @@ data/raw/searches/*
 !data/raw/searches/.gitkeep
 data/raw/texts/*
 !data/raw/texts/.gitkeep
+data/raw/version_history/*
+!data/raw/version_history/.gitkeep
+data/raw/profiling/*
+!data/raw/profiling/.gitkeep
+data/raw/api_diagnostics/*
+!data/raw/api_diagnostics/.gitkeep
 output/*
 !output/.gitkeep
 !output/sample_capture.ttl
+!output/article_history.ttl
+!output/api_profiling.csv
+!output/api_profiling.md
+!output/api_diagnostics.csv
+!output/api_diagnostics.md

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
-from urllib.parse import urlsplit
+from urllib.parse import urlencode, urlsplit
 
 import requests
 
@@ -32,6 +32,29 @@ class DownloadSummary:
     failed: int
     without_link: int
     files: list[Path]
+
+
+@dataclass(frozen=True)
+class VersionHistoryResponse:
+    """Uma página do histórico de versões e a sua resposta raw preservada."""
+
+    results: list[dict[str, Any]]
+    raw_response: dict[str, Any]
+    raw_path: Path
+    estimated_nr_results: int | None
+    next_page: str | None
+
+
+@dataclass(frozen=True)
+class TextDownloadResult:
+    """Resultado do acesso ao texto de uma captura individual."""
+
+    success: bool
+    path: Path | None
+    size_bytes: int
+    downloaded: bool
+    text_url: str | None
+    error: str | None = None
 
 
 class ArquivoClient:
@@ -65,6 +88,10 @@ class ArquivoClient:
         from_date: str | int | None = None,
         to_date: str | int | None = None,
         max_items: int = 20,
+        offset: int | None = None,
+        dedup_field: str | None = None,
+        dedup_value: int | None = None,
+        raw_path: Path | str | None = None,
     ) -> SearchResponse:
         """Executa uma pesquisa e guarda a resposta JSON exatamente como recebida."""
 
@@ -72,6 +99,8 @@ class ArquivoClient:
             raise ValueError("query não pode ser vazia")
         if max_items <= 0:
             raise ValueError("max_items deve ser superior a zero")
+        if offset is not None and offset < 0:
+            raise ValueError("offset não pode ser negativo")
 
         params: list[tuple[str, str | int]] = [("q", query), ("maxItems", max_items)]
         if site_search:
@@ -81,6 +110,12 @@ class ArquivoClient:
             params.append(("from", str(from_date)))
         if to_date is not None:
             params.append(("to", str(to_date)))
+        if offset is not None:
+            params.append(("offset", offset))
+        if dedup_field is not None:
+            params.append(("dedupField", dedup_field))
+        if dedup_value is not None:
+            params.append(("dedupValue", dedup_value))
 
         LOGGER.info("A pesquisar o Arquivo.pt: query=%r", query)
         response = self.session.get(self.SEARCH_URL, params=params, timeout=self.timeout)
@@ -95,14 +130,136 @@ class ArquivoClient:
         if not isinstance(results, list):
             raise RuntimeError("Resposta inesperada: 'response_items' não é uma lista")
 
-        raw_path = self._search_path(query, site_search, from_date, to_date)
-        raw_path.write_bytes(response.content)
-        LOGGER.info("Resposta original guardada em %s", raw_path)
+        destination = (
+            Path(raw_path)
+            if raw_path is not None
+            else self._search_path(query, site_search, from_date, to_date)
+        )
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(response.content)
+        LOGGER.info("Resposta original guardada em %s", destination)
 
         return SearchResponse(
             results=results,
             raw_response=payload,
+            raw_path=destination,
+        )
+
+    def version_history(
+        self,
+        *,
+        original_url: str,
+        from_date: str | int | None = None,
+        to_date: str | int | None = None,
+        max_items: int = 50,
+        offset: int = 0,
+    ) -> VersionHistoryResponse:
+        """Obtém uma página do histórico de um URL e preserva o JSON raw."""
+
+        if not original_url.strip():
+            raise ValueError("original_url não pode ser vazio")
+        if max_items <= 0:
+            raise ValueError("max_items deve ser superior a zero")
+        if offset < 0:
+            raise ValueError("offset não pode ser negativo")
+
+        params: list[tuple[str, str | int]] = [
+            ("versionHistory", original_url),
+            ("maxItems", max_items),
+            ("offset", offset),
+        ]
+        if from_date is not None:
+            params.append(("from", str(from_date)))
+        if to_date is not None:
+            params.append(("to", str(to_date)))
+
+        LOGGER.info(
+            "A consultar histórico no Arquivo.pt: url=%r offset=%d",
+            original_url,
+            offset,
+        )
+        response = self.session.get(self.SEARCH_URL, params=params, timeout=self.timeout)
+        response.raise_for_status()
+
+        try:
+            payload: dict[str, Any] = response.json()
+        except requests.exceptions.JSONDecodeError as exc:
+            raise RuntimeError("O Arquivo.pt devolveu uma resposta JSON inválida") from exc
+
+        results = payload.get("response_items", [])
+        if not isinstance(results, list):
+            raise RuntimeError("Resposta inesperada: 'response_items' não é uma lista")
+
+        raw_path = self._version_history_path(
+            original_url, from_date, to_date, max_items, offset
+        )
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
+        raw_path.write_bytes(response.content)
+        LOGGER.info("Histórico raw guardado em %s", raw_path)
+
+        estimated = payload.get("estimated_nr_results")
+        return VersionHistoryResponse(
+            results=results,
+            raw_response=payload,
             raw_path=raw_path,
+            estimated_nr_results=int(estimated) if estimated is not None else None,
+            next_page=payload.get("next_page"),
+        )
+
+    def download_extracted_text(
+        self,
+        result: dict[str, Any],
+        *,
+        skip_existing: bool = True,
+        derive_url_when_missing: bool = False,
+    ) -> TextDownloadResult:
+        """Obtém um texto sem alterar o raw e pode reutilizar um ficheiro existente."""
+
+        destination = self.texts_dir / self._text_filename(result)
+        text_url = result.get("linkToExtractedText")
+
+        if skip_existing and destination.is_file():
+            return TextDownloadResult(
+                success=True,
+                path=destination,
+                size_bytes=destination.stat().st_size,
+                downloaded=False,
+                text_url=str(text_url) if text_url else None,
+            )
+
+        if not text_url and derive_url_when_missing:
+            text_url = self._derived_extracted_text_url(result)
+        if not text_url:
+            return TextDownloadResult(
+                success=False,
+                path=None,
+                size_bytes=0,
+                downloaded=False,
+                text_url=None,
+                error="linkToExtractedText ausente",
+            )
+
+        try:
+            response = self.session.get(str(text_url), timeout=self.timeout)
+            response.raise_for_status()
+            destination.write_bytes(response.content)
+        except (requests.RequestException, OSError) as exc:
+            LOGGER.warning("Falha ao obter %s: %s", text_url, exc)
+            return TextDownloadResult(
+                success=False,
+                path=None,
+                size_bytes=0,
+                downloaded=False,
+                text_url=str(text_url),
+                error=str(exc),
+            )
+
+        return TextDownloadResult(
+            success=True,
+            path=destination,
+            size_bytes=destination.stat().st_size,
+            downloaded=True,
+            text_url=str(text_url),
         )
 
     def download_extracted_texts(
@@ -172,6 +329,35 @@ class ArquivoClient:
         )
         short_hash = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]
         return self.searches_dir / f"search_{now}_{short_hash}.json"
+
+    def _version_history_path(
+        self,
+        original_url: str,
+        from_date: str | int | None,
+        to_date: str | int | None,
+        max_items: int,
+        offset: int,
+    ) -> Path:
+        url_hash = hashlib.sha256(original_url.encode("utf-8")).hexdigest()[:16]
+        date_range = f"{from_date or 'all'}-{to_date or 'all'}"
+        safe_range = "".join(
+            character if character.isalnum() or character == "-" else "_"
+            for character in date_range
+        )
+        filename = (
+            f"version_history_{url_hash}_{safe_range}_"
+            f"offset-{offset:06d}_max-{max_items}.json"
+        )
+        return self.data_dir / "version_history" / filename
+
+    @staticmethod
+    def _derived_extracted_text_url(result: dict[str, Any]) -> str | None:
+        original_url = result.get("originalURL")
+        tstamp = result.get("tstamp")
+        if not original_url or not tstamp:
+            return None
+        query = urlencode({"m": f"{original_url}/{tstamp}"})
+        return f"https://arquivo.pt/textextracted?{query}"
 
     @staticmethod
     def _text_filename(result: dict[str, Any]) -> str:
