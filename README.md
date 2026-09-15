@@ -89,14 +89,18 @@ determinísticos e derivados do URL original e do `tstamp`.
 
 ## Executar os testes
 
-Depois de gerar o sample:
+Com o ambiente instalado e ativo, sem executar previamente a pipeline:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-Os testes carregam a ontologia e o sample com RDFLib, verificam as relações
-principais e confirmam que o ficheiro de texto referenciado existe.
+Os testes unitários funcionam offline e usam apenas a ontologia versionada e
+fixtures sintéticas em `tests/fixtures/`. Geram JSON raw, textos, manifestos e
+Turtle em diretórios temporários, sem depender de `data/raw/`, `data/processed/`
+ou `output/`. As chamadas HTTP são simuladas e as ligações de rede bloqueadas.
+Os valores das fixtures são fictícios, não são dados empíricos do Arquivo.pt.
+O smoke test real acima é uma execução manual separada desta suite.
 
 ## Recolher o histórico temporal do artigo (M3)
 

@@ -1,126 +1,182 @@
 from __future__ import annotations
 
 import json
-import tempfile
 import unittest
-from pathlib import Path
 
-from rdflib import Graph, RDF
+from rdflib import Graph, Literal, RDF, XSD
+from rdflib.compare import isomorphic
 
 from semantic_harvester.arquivo_client import ArquivoClient
-from semantic_harvester.rdf_mapper import SDH, capture_uri, resource_uri
+from semantic_harvester.history_pipeline import (
+    build_manifest_records, collect_all_captures, write_manifest,
+)
+from semantic_harvester.rdf_mapper import (
+    SDH, article_uri, build_article_history_graph, capture_uri,
+    extracted_text_uri, load_manifest, resource_uri,
+)
+from tests.support import FIXTURES, ORIGINAL_URL, OfflineTestCase
 
 
-class FakeResponse:
-    def __init__(self, content: bytes) -> None:
-        self.content = content
-
-    def json(self) -> dict:
-        return json.loads(self.content)
-
-    def raise_for_status(self) -> None:
-        return None
-
-
-class FakeSession:
-    def __init__(self, response: FakeResponse) -> None:
-        self.response = response
-        self.headers: dict[str, str] = {}
-
-    def get(self, *args, **kwargs) -> FakeResponse:
-        return self.response
-
-
-class HistoryPipelineTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.project_root = Path(__file__).resolve().parents[1]
-        manifest_path = (
-            cls.project_root / "data" / "processed" / "captures_manifest.jsonl"
+class HistoryPipelineTests(OfflineTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.raw_content = (FIXTURES / "version_history/sample_history.json").read_bytes()
+        self.payload = json.loads(self.raw_content)
+        self.text_content = (FIXTURES / "texts/sample_text.txt").read_bytes()
+        self.session = self.fixture_session(
+            (ArquivoClient.SEARCH_URL, self.raw_content),
+            *((capture["linkToExtractedText"], self.text_content)
+              for capture in self.payload["response_items"]),
         )
-        cls.records = [
-            json.loads(line)
-            for line in manifest_path.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
-        cls.graph = Graph().parse(
-            cls.project_root / "output" / "article_history.ttl",
-            format="turtle",
+        self.client = ArquivoClient(data_dir=self.root / "responses", session=self.session)
+        self.captures, self.raw_paths, self.estimated = collect_all_captures(
+            self.client, original_url=ORIGINAL_URL,
+        )
+        self.records = build_manifest_records(self.client, self.captures, self.root)
+        self.manifest_path = self.root / "captures.jsonl"
+        write_manifest(self.records, self.manifest_path)
+        self.graph = build_article_history_graph(
+            load_manifest(self.manifest_path), self.captures[0]["title"], self.root,
         )
 
     def test_version_history_raw_is_processable(self) -> None:
-        raw_paths = sorted(
-            (self.project_root / "data" / "raw" / "version_history").glob(
-                "*.json"
-            )
-        )
-        self.assertTrue(raw_paths)
-        payloads = [json.loads(path.read_bytes()) for path in raw_paths]
-        self.assertTrue(any(payload.get("response_items") for payload in payloads))
-        self.assertTrue(
-            all("estimated_nr_results" in payload for payload in payloads)
-        )
+        self.assertEqual(self.captures, self.payload["response_items"])
+        self.assertEqual(len(self.captures), 2)
+        self.assertEqual(self.estimated, 2)
+        self.assertEqual(dict(self.session.calls[0][1]["params"]), {
+            "versionHistory": ORIGINAL_URL, "maxItems": 50, "offset": 0,
+        })
 
     def test_version_history_preserves_raw_bytes(self) -> None:
-        raw_content = (
-            b'{ "estimated_nr_results": 1, "next_page": "next", '
-            b'"response_items": [{"tstamp": "20200101000000"}] }'
+        self.assertEqual(len(self.raw_paths), 1)
+        self.assertEqual(self.raw_paths[0].read_bytes(), self.raw_content)
+
+    def test_version_history_pagination(self) -> None:
+        pages = [
+            {"estimated_nr_results": "2",
+             "next_page": "https://archive.example.test/next",
+             "response_items": self.captures[:1]},
+            {"estimated_nr_results": "2", "next_page": None,
+             "response_items": self.captures[1:]},
+        ]
+        contents = [json.dumps(page, ensure_ascii=False).encode("utf-8") for page in pages]
+        session = self.fixture_session(
+            *((ArquivoClient.SEARCH_URL, content) for content in contents),
         )
-        with tempfile.TemporaryDirectory() as temporary_directory:
-            client = ArquivoClient(
-                data_dir=Path(temporary_directory),
-                session=FakeSession(FakeResponse(raw_content)),
-            )
-            response = client.version_history(
-                original_url="https://example.test/article", max_items=1
-            )
-            self.assertEqual(response.raw_path.read_bytes(), raw_content)
-            self.assertEqual(response.results[0]["tstamp"], "20200101000000")
-            self.assertEqual(response.estimated_nr_results, 1)
-            self.assertEqual(response.next_page, "next")
+        client = ArquivoClient(data_dir=self.root / "paginated", session=session)
+        captures, paths, estimated = collect_all_captures(
+            client, original_url=ORIGINAL_URL, page_size=1,
+        )
+        self.assertEqual(captures, self.captures)
+        self.assertEqual(estimated, 2)
+        self.assertEqual(
+            [dict(call[1]["params"])["offset"] for call in session.calls], [0, 1],
+        )
+        self.assertEqual([path.read_bytes() for path in paths], contents)
 
     def test_all_captures_share_article_id(self) -> None:
-        self.assertTrue(self.records)
-        self.assertEqual(len({record["article_id"] for record in self.records}), 1)
+        self.assertEqual(len(self.records), 2)
+        self.assertEqual({record["article_id"] for record in self.records}, {
+            "b366ac3c8369c859429913e0d91bc312b2af8a516af137d73dd785506ec94f87",
+        })
+        self.assertEqual({record["original_url"] for record in self.records}, {ORIGINAL_URL})
         self.assertEqual(
-            len({record["original_url"] for record in self.records}), 1
+            {record["tstamp"] for record in self.records},
+            {"20200101000000", "20200202030405"},
         )
+
+    def test_manifest_metadata_matches_source(self) -> None:
+        self.assertEqual(load_manifest(self.manifest_path), self.records)
+        fields = {
+            "original_url": "originalURL", "tstamp": "tstamp",
+            "archive_url": "linkToArchive", "title": "title", "digest": "digest",
+            "content_length": "contentLength", "mime_type": "mimeType",
+            "encoding": "encoding", "collection": "collection",
+        }
+        for record, capture in zip(self.records, self.captures, strict=True):
+            for target, source in fields.items():
+                self.assertEqual(record[target], capture[source], target)
+            self.assertEqual(record["status_code"], 200)
+            self.assertTrue(record["text_download_success"])
+            self.assertTrue(record["text_downloaded_now"])
+            self.assertEqual(record["text_size_bytes"], len(self.text_content))
+            self.assertIsNone(record["text_error"])
+        self.assertEqual([record["captured_at"] for record in self.records], [
+            "2020-01-01T00:00:00Z", "2020-02-02T03:04:05Z",
+        ])
 
     def test_rdf_identifiers_are_deterministic(self) -> None:
-        record = self.records[0]
-        original_url = record["original_url"]
-        tstamp = record["tstamp"]
-        self.assertEqual(resource_uri(original_url), resource_uri(original_url))
-        self.assertEqual(
-            capture_uri(original_url, tstamp), capture_uri(original_url, tstamp)
+        rebuilt = build_article_history_graph(
+            list(reversed(self.records)), self.captures[0]["title"], self.root,
         )
+        self.assertTrue(isomorphic(rebuilt, self.graph))
+        self.assertEqual(set(self.graph.subjects(RDF.type, SDH.CapturaArquivada)), {
+            capture_uri(ORIGINAL_URL, "20200101000000"),
+            capture_uri(ORIGINAL_URL, "20200202030405"),
+        })
 
     def test_history_graph_has_expected_instance_counts(self) -> None:
-        articles = set(self.graph.subjects(RDF.type, SDH.Artigo))
-        resources = set(self.graph.subjects(RDF.type, SDH.RecursoWeb))
-        captures = set(self.graph.subjects(RDF.type, SDH.CapturaArquivada))
-        texts = set(self.graph.subjects(RDF.type, SDH.TextoExtraido))
+        for rdf_class, count in (
+            (SDH.Artigo, 1), (SDH.Jornal, 1), (SDH.RecursoWeb, 1),
+            (SDH.CapturaArquivada, 2), (SDH.TextoExtraido, 2),
+        ):
+            self.assertEqual(len(set(self.graph.subjects(RDF.type, rdf_class))), count)
+        self.assertEqual(len(self.graph), 38)
 
-        self.assertEqual(len(articles), 1)
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(len(captures), len(self.records))
-        self.assertEqual(
-            len(texts),
-            sum(record["text_download_success"] for record in self.records),
+    def test_history_graph_links_and_capture_metadata(self) -> None:
+        resource = resource_uri(ORIGINAL_URL)
+        self.assertIn((article_uri(ORIGINAL_URL), SDH.temRecursoWeb, resource), self.graph)
+        self.assertIn(
+            (article_uri(ORIGINAL_URL), SDH.publicadoPor, SDH["newspaper/record"]),
+            self.graph,
         )
+        for record in self.records:
+            capture = capture_uri(ORIGINAL_URL, record["tstamp"])
+            text = extracted_text_uri(ORIGINAL_URL, record["tstamp"])
+            self.assertIn((resource, SDH.temCaptura, capture), self.graph)
+            self.assertEqual(list(self.graph.objects(capture, SDH.temTextoExtraido)), [text])
+            self.assertIn((text, RDF.type, SDH.TextoExtraido), self.graph)
+            for field, predicate, datatype in (
+                ("tstamp", SDH.tstamp, XSD.string),
+                ("captured_at", SDH.capturedAt, XSD.dateTime),
+                ("archive_url", SDH.archiveURL, XSD.anyURI),
+                ("title", SDH.title, XSD.string),
+                ("digest", SDH.digest, XSD.string),
+                ("content_length", SDH.contentLength, XSD.nonNegativeInteger),
+                ("mime_type", SDH.mimeType, XSD.string),
+                ("encoding", SDH.encoding, XSD.string),
+                ("collection", SDH.collection, XSD.string),
+                ("status_code", SDH.statusCode, XSD.integer),
+            ):
+                self.assertIn(
+                    (capture, predicate, Literal(record[field], datatype=datatype)),
+                    self.graph,
+                )
 
     def test_every_rdf_text_points_to_real_file(self) -> None:
-        for text in self.graph.subjects(RDF.type, SDH.TextoExtraido):
+        texts = list(self.graph.subjects(RDF.type, SDH.TextoExtraido))
+        self.assertEqual(len(texts), 2)
+        for text in texts:
             file_path = self.graph.value(text, SDH.filePath)
             self.assertIsNotNone(file_path)
-            self.assertTrue((self.project_root / str(file_path)).is_file())
+            path = self.root / str(file_path)
+            self.assertTrue(path.is_file())
+            self.assertEqual(path.read_bytes(), self.text_content)
+
+    def test_existing_text_is_reused_without_request_or_byte_changes(self) -> None:
+        request_count = len(self.session.calls)
+        records = build_manifest_records(self.client, self.captures, self.root)
+        self.assertEqual(len(self.session.calls), request_count)
+        for original, reused in zip(self.records, records, strict=True):
+            self.assertEqual(reused, {**original, "text_downloaded_now": False})
+            self.assertEqual(
+                (self.root / reused["extracted_text_path"]).read_bytes(), self.text_content,
+            )
 
     def test_generated_turtle_can_be_loaded_again(self) -> None:
-        reloaded = Graph().parse(
-            self.project_root / "output" / "article_history.ttl",
-            format="turtle",
-        )
-        self.assertEqual(len(reloaded), len(self.graph))
+        path = self.root / "history.ttl"
+        self.graph.serialize(destination=path, format="turtle")
+        self.assertTrue(isomorphic(Graph().parse(path, format="turtle"), self.graph))
 
 
 if __name__ == "__main__":

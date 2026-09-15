@@ -1,0 +1,18 @@
+{
+  "estimated_nr_results": 1,
+  "response_items": [
+    {
+      "title": "Artigo sintético para testes",
+      "originalURL": "https://news.example.test/articles/synthetic",
+      "tstamp": "20200101000000",
+      "linkToArchive": "https://archive.example.test/20200101000000/https://news.example.test/articles/synthetic",
+      "linkToExtractedText": "https://archive.example.test/text/20200101000000",
+      "mimeType": "text/html",
+      "contentLength": "1234",
+      "digest": "SYNTHETIC-DIGEST-A",
+      "encoding": "UTF-8",
+      "collection": "SYNTHETIC-TESTS",
+      "snippet": "Texto <em>sintético</em> sem origem empírica."
+    }
+  ]
+}
