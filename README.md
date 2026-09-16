@@ -1,16 +1,27 @@
 # Semantic Driven Harvester
 
-Protótipo da dissertação para obter dados preservados pelo Arquivo.pt e
-representar uma captura real num pequeno grafo RDF.
+Protótipo de uma dissertação de Mestrado para obter dados preservados pelo
+Arquivo.pt e representar recursos Web e capturas temporais em RDF.
 
-Estão implementados o M1 (pesquisa e texto real) e o M2 (ontologia base e
-mapeamento RDF de uma captura). O projeto ainda não inclui NER, deduplicação,
-bases de dados, frontend ou LLMs.
+Estão implementados o M1 (pesquisa e texto real), o M2 (ontologia base e
+mapeamento RDF de uma captura) e o M3 (histórico temporal de um artigo), além
+do profiling e diagnóstico da TextSearch. O projeto ainda não inclui NER,
+deduplicação local/semântica, bases de dados, frontend ou LLMs; o cliente permite
+configurar os parâmetros de deduplicação da API.
+
+## Contexto e colaboração
+
+- [AGENTS.md](AGENTS.md): instruções canónicas e mapa para qualquer agente de IA.
+- [Estado do projeto](docs/PROJECT_STATUS.md): marcos, implementação, limitações e próximos passos propostos.
+- [Observações](docs/observations.md): resultados históricos de M1/M3.
+- [Experiências](docs/experiments.md): diagnóstico, interpretação e decisões metodológicas.
+- [Fixtures de teste](tests/fixtures/README.md): dados sintéticos e isolamento offline.
 
 ## Requisitos
 
 - Python 3.11 ou superior
-- acesso à Internet
+- acesso à Internet para instalar dependências e executar recolhas reais;
+  a suite unitária funciona offline após a instalação
 
 ## Instalação
 
@@ -52,7 +63,9 @@ falhas e localizações dos ficheiros.
   `tstamp` e por um hash curto do URL original.
 
 Estes artefactos são dados de execução e estão ignorados pelo Git. Os ficheiros
-`.gitkeep` mantêm a estrutura de diretórios no repositório.
+`.gitkeep` mantêm a estrutura de diretórios no repositório. Um clone não inclui
+os raw; os relatórios, manifesto e RDF versionados descrevem execuções históricas
+e podem referenciar textos ausentes. Ver o [estado do projeto](docs/PROJECT_STATUS.md).
 
 ## Utilização do cliente
 
@@ -78,7 +91,9 @@ ficheiro indicado por `search.raw_path`.
 
 ## Gerar o sample RDF do M2
 
-O sample usa a captura real `20191120040251`, já obtida no M1:
+O sample usa a captura real `20191120040251` da execução histórica M1. Este
+comando exige localmente o JSON dessa captura em `data/raw/searches/` e o
+respetivo texto em `data/raw/texts/`; os raw não acompanham o clone:
 
 ```bash
 python -m semantic_harvester.rdf_mapper
@@ -104,12 +119,16 @@ O smoke test real acima é uma execução manual separada desta suite.
 
 ## Recolher o histórico temporal do artigo (M3)
 
-Para consultar todas as capturas conhecidas do artigo usado no M2, reutilizar
-textos existentes, criar o manifesto e gerar o RDF temporal:
+Para recolher o histórico devolvido por versionHistory para o artigo usado no
+M2, reutilizar textos existentes, criar o manifesto e gerar o RDF temporal:
 
 ```bash
 python -m semantic_harvester.history_pipeline
 ```
+
+Este comando faz chamadas reais à API. A etapa final de geração RDF também
+exige o JSON M1 da captura selecionada, usado para obter o título do artigo.
+Não executar este comando para satisfazer os testes unitários.
 
 O comando produz:
 
