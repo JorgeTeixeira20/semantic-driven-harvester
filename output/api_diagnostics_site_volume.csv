@@ -1,0 +1,10 @@
+query,trial,max_items_requested,max_items_reported_by_api,dedup_field_reported_by_api,dedup_value_reported_by_api,estimated_nr_results,results_received,page_full,distinct_original_urls,next_page
+Sporting,1,20,20,url,2,6366674,5,False,5,False
+Sporting,2,20,20,url,2,6468098,3,False,3,False
+Sporting,3,20,20,url,2,6464286,7,False,7,False
+futebol,1,20,20,url,2,6494908,2,False,2,False
+futebol,2,20,20,url,2,6494908,2,False,2,False
+futebol,3,20,20,url,2,6494908,2,False,2,False
+desporto,1,20,20,url,2,6478714,2,False,2,False
+desporto,2,20,20,url,2,6463849,2,False,2,False
+desporto,3,20,20,url,2,6478714,2,False,2,False

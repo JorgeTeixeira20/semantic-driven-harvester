@@ -179,3 +179,20 @@ resultados ficam em `output/api_diagnostics_offset.csv`,
 `output/api_diagnostics_offset.md` e são discutidos em `docs/experiments.md`.
 Este comando pode demorar por chamada (a query não usa `siteSearch`); em caso
 de timeout ou erro 500 pontual da API, repetir a execução.
+
+## Repetir a Experiência 3 (volume de queries genéricas em record.pt)
+
+Para repetir o teste de volume — queries específicas vs. genéricas dentro de
+`siteSearch=record.pt`, com repetições por query para observar variação
+entre pedidos idênticos:
+
+```bash
+python -m semantic_harvester.api_diagnostics_site_volume
+```
+
+Os JSON raw são guardados em `data/raw/api_diagnostics_site_volume/`; os
+resultados ficam em `output/api_diagnostics_site_volume.csv`,
+`output/api_diagnostics_site_volume.md` e são discutidos em
+`docs/experiments.md`. Este comando faz 9 pedidos reais e pode demorar
+vários minutos; em caso de timeout ou erro 500 pontual da API, repetir a
+execução.

@@ -74,6 +74,22 @@ garantias sobre a API atual. Detalhes e decisões permanecem nas fontes:
   uma limitação geral de `offset`. Uma tentativa preliminar (`Sporting`, sem
   `siteSearch`, dedup `url/1` explícito) não chegou a produzir página cheia;
   os seus raw e relatórios ficaram preservados com o prefixo/sufixo `pilot`.
+- [Experiência 3 — volume de queries genéricas](experiments.md),
+  [relatório](../output/api_diagnostics_site_volume.md) e
+  [CSV](../output/api_diagnostics_site_volume.csv), executados em 17 de
+  setembro de 2026: com `siteSearch=record.pt` e `maxItems=20`, nem a query
+  específica `Sporting` (3, 5 e 7 resultados em três tentativas) nem as
+  genéricas `futebol`/`desporto` (2 resultados em todas as tentativas)
+  encheram a página. Um termo genérico não resolveu o problema de página
+  incompleta enquanto a pesquisa continuar restrita ao site — o fator que
+  permitiu página cheia na Experiência 2 parece estar ligado à ausência de
+  `siteSearch`, não à generalidade do termo. Pedidos idênticos e
+  consecutivos também devolveram contagens diferentes de `results_received`
+  e `estimated_nr_results` (ex.: `Sporting` variou entre 3 e 7), evidenciando
+  que a API TextSearch não é determinística por pedido nesta janela de
+  observação — o que limita a validade de comparações baseadas numa única
+  amostra por variante nas experiências anteriores, embora as diferenças de
+  maior magnitude aí observadas excedam esta variação.
 
 `docs/experiments.md` já contém hipóteses, interpretação, questões abertas e
 decisões metodológicas. Não existe um ADR ou documento de arquitetura separado;
@@ -145,6 +161,22 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    incluindo 100 e 200. Este passo informa o protocolo de recolha do passo A:
    verificar se a página anterior veio cheia antes de descartar `offset` como
    mecanismo de paginação.
+
+   **Teste de volume adicional, concluído em 2026-09-17** (Experiência 3 em
+   `experiments.md`), antes de iniciar o passo A: testou se trocar uma query
+   específica por um termo genérico (`futebol`, `desporto`) ajuda a encher a
+   página quando a pesquisa continua restrita a `siteSearch=record.pt`
+   (restrição necessária para o corpus do Record). Resultado: nem a query
+   específica (`Sporting`) nem as genéricas encheram `maxItems=20` em
+   nenhuma das nove tentativas (3 repetições por query); o termo genérico
+   não resolveu o problema. Foi também observada variação entre pedidos
+   idênticos e consecutivos (`Sporting` devolveu 3, 5 e 7 resultados em três
+   tentativas), indicando que a API não é determinística por pedido nesta
+   janela de observação. Implicação para o passo A: não assumir que
+   `siteSearch=record.pt` devolverá páginas cheias com nenhuma query testada
+   até agora; considerar várias queries pequenas (por ano, secção,
+   jogador/equipa) em vez de poucas queries genéricas, e repetir pedidos
+   antes de tirar conclusões de uma única amostra.
 2. **A** — generalizar a colheita e o mapeamento RDF (hoje restritos a uma
    única captura fixa em `rdf_mapper.py`) para um corpus real de vários artigos
    do jornal Record, incluindo uma regra explícita de classificação

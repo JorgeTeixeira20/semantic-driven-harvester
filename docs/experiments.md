@@ -327,3 +327,147 @@ Para o protocolo de recolha do Caminho A (corpus real de vários artigos):
 - preservar evidência de tentativas preliminares (como os `pilot_*` desta
   experiência) em vez de as descartar, por documentarem parte do processo de
   seleção da pesquisa.
+
+## Experiência 3 — Volume de queries genéricas em siteSearch=record.pt
+
+### Objetivo
+
+Testar, antes de iniciar o Caminho A, se substituir uma query específica
+(nome de jogador/equipa) por um termo genérico (`futebol`, `desporto`)
+aumenta a probabilidade de uma página cheia quando a pesquisa continua
+restrita a `siteSearch=record.pt` — restrição que o Caminho A precisa de
+manter, porque o corpus visado é especificamente de artigos do Record. A
+Experiência 2 tinha mostrado página cheia sem `siteSearch`; esta experiência
+verifica se esse resultado se mantém com a pesquisa restrita ao site.
+
+### Hipótese
+
+- Um termo genérico, por cobrir mais páginas do site, poderá preencher
+  `maxItems` mais facilmente do que um nome específico como `Sporting`
+  (Experiência 1: 33 de 100 pedidos).
+
+### Observação preliminar sobre instabilidade
+
+Antes de formalizar o teste, sondagens diretas à API (fora do módulo,
+parâmetros idênticos, pedidos consecutivos, sem raw preservado) mostraram
+contagens diferentes de `results_received` e `estimated_nr_results` para o
+mesmo pedido repetido: `Sporting` devolveu 6, depois 4, depois 6 resultados
+em três pedidos seguidos; `futebol` (sem `siteSearch`) devolveu 2 e depois
+17. Por esta razão, o teste formal repete cada query `TRIALS=3` vezes com os
+mesmos parâmetros, em vez de usar uma única amostra por query.
+
+### Configuração
+
+Execução realizada em 17 de setembro de 2026 com
+`src/semantic_harvester/api_diagnostics_site_volume.py`:
+
+```text
+siteSearch = record.pt (o cliente inclui também www.record.pt)
+from = 2015
+to = 2020
+maxItems = 20
+dedupField/dedupValue = (nenhum enviado; defaults da API)
+queries = Sporting, futebol, desporto
+tentativas por query = 3
+```
+
+As respostas foram guardadas byte a byte em
+`data/raw/api_diagnostics_site_volume/`.
+
+### Resultados
+
+| Query | Tentativa | maxItems pedido/API | dedup reportado pela API | estimated | recebidos | página cheia |
+| --- | ---: | ---: | --- | ---: | ---: | --- |
+| Sporting | 1 | 20/20 | url/2 | 6 366 674 | 5 | não |
+| Sporting | 2 | 20/20 | url/2 | 6 468 098 | 3 | não |
+| Sporting | 3 | 20/20 | url/2 | 6 464 286 | 7 | não |
+| futebol | 1 | 20/20 | url/2 | 6 494 908 | 2 | não |
+| futebol | 2 | 20/20 | url/2 | 6 494 908 | 2 | não |
+| futebol | 3 | 20/20 | url/2 | 6 494 908 | 2 | não |
+| desporto | 1 | 20/20 | url/2 | 6 478 714 | 2 | não |
+| desporto | 2 | 20/20 | url/2 | 6 463 849 | 2 | não |
+| desporto | 3 | 20/20 | url/2 | 6 478 714 | 2 | não |
+
+Resumo por query: `Sporting` recebeu entre 3 e 7 (de 20); `futebol` recebeu
+exatamente 2 nas três tentativas; `desporto` recebeu exatamente 2 nas três
+tentativas. Nenhuma das nove tentativas encheu a página pedida
+(`maxItems=20`).
+
+### Observações
+
+- Nenhuma das três queries, com `siteSearch=record.pt`, encheu a página em
+  nenhuma das três tentativas — nem a específica (`Sporting`), nem as
+  genéricas (`futebol`, `desporto`).
+- `Sporting` variou entre tentativas idênticas nesta execução formal (3, 5,
+  7), confirmando instabilidade por pedido também dentro do módulo de
+  diagnóstico, não apenas nas sondagens preliminares.
+- `futebol` e `desporto` foram estáveis (2/2/2) dentro desta execução, ao
+  contrário da variação observada informalmente antes de escrever o módulo
+  (2 e depois 17). Não foi possível determinar, com estas nove tentativas,
+  em que condições a variação ocorre ou não.
+- `estimated_nr_results` variou ligeiramente entre tentativas da mesma query
+  (ex.: `Sporting` entre 6 366 674 e 6 468 098), reforçando a decisão já
+  tomada de não o tratar como contagem fiável.
+- O `dedupField`/`dedupValue` default nesta execução foi sempre `url`/`2`,
+  consistente com a Experiência 1 (teste E) e diferente do `title`/`2`
+  observado na Experiência 2 (sem `siteSearch`). Isto é consistente com a
+  hipótese, ainda não confirmada, de que o default de `dedupField` depende
+  da presença de `siteSearch`.
+
+### Interpretação
+
+- Nesta execução, trocar uma query específica por um termo genérico não
+  resolveu o problema de página incompleta enquanto a pesquisa continuar
+  restrita a `siteSearch=record.pt`. O fator que permitiu página cheia na
+  Experiência 2 parece estar ligado à ausência de `siteSearch` (ou a outra
+  variável não isolada), não apenas à generalidade do termo de pesquisa.
+- A variação de `results_received` para pedidos idênticos (`Sporting`: 3, 5,
+  7) mostra que a contagem de resultados devolvida pela API não é uma
+  propriedade estável da combinação de parâmetros nesta janela de
+  observação. Isto limita a validade de qualquer comparação baseada numa
+  única amostra por variante, incluindo nas Experiências 1 e 2: as
+  diferenças observadas entre variantes podem estar parcialmente
+  confundidas com esta variação por pedido, embora as diferenças de maior
+  magnitude (ex.: 0 vs. 20 resultados, ou 33 vs. 96) sejam maiores do que a
+  variação aqui observada (3 a 7).
+- Não é possível, com esta amostra, distinguir se a variação reflete
+  alterações reais no índice, comportamento de cache/balanceamento de carga,
+  ou amostragem interna da API.
+
+### Conclusões suportadas
+
+- Para as três queries testadas, com `siteSearch=record.pt` e
+  `maxItems=20`, nenhuma tentativa (de nove) encheu a página.
+- Um termo genérico (`futebol`, `desporto`) não produziu, nesta execução,
+  mais resultados do que o termo específico `Sporting`; pelo contrário,
+  `Sporting` obteve mais resultados (3–7) do que `futebol`/`desporto`
+  (2 em todas as tentativas).
+- Pedidos idênticos e consecutivos à mesma query podem devolver contagens
+  diferentes de `results_received` e `estimated_nr_results`; a API TextSearch
+  não é determinística por pedido nesta janela de observação.
+
+Continuam sem resposta:
+
+- se existe alguma query ou combinação de parâmetros que encha uma página
+  com `siteSearch=record.pt` de forma estável;
+- a causa da variação de resultados entre pedidos idênticos (índice, cache,
+  balanceamento de carga, ou amostragem interna);
+- se o default de `dedupField` depende da presença de `siteSearch` ou de
+  outro fator.
+
+### Decisão
+
+Para o protocolo de recolha do Caminho A:
+
+- não assumir que uma query "mais ampla" resolve, por si só, o problema de
+  página incompleta dentro de `siteSearch=record.pt`; esta experiência não
+  encontrou nenhuma combinação estável que a preenchesse;
+- planear a recolha para páginas tipicamente incompletas quando restrita ao
+  site (ex.: várias queries pequenas — por ano, por secção, por
+  jogador/equipa — em vez de poucas queries genéricas com `maxItems` grande);
+  isto é uma implicação prática desta experiência, não uma solução já
+  testada;
+- repetir pedidos idênticos pelo menos uma vez antes de tirar conclusões
+  sobre uma query ou combinação específica, dado a instabilidade observada;
+- continuar a registar os parâmetros reportados pela API e a preservar o raw
+  de cada tentativa, para permitir revisitar a variação observada.
