@@ -512,10 +512,10 @@ termos, não como uma cobertura representativa do jornal Record.
 | Faceta | Termos propostos | Nº de termos | Justificação |
 | --- | --- | ---: | --- |
 | Modalidade | `futebol`, `basquetebol`, `andebol` | 3 | Modalidades com cobertura regular no Record; futebol como modalidade dominante, as outras duas para alguma diversidade fora do futebol. |
-| Clube | `Benfica`, `Sporting`, `Porto` | 3 | Os três clubes de futebol mais cobertos pela imprensa desportiva portuguesa; reutilizam queries já exploradas nas Experiências 1–3 (Sporting) e no M1 (Benfica). **Limitação assumida:** os três são clubes de futebol, o que enviesa esta faceta para essa modalidade. |
+| Clube | `Benfica`, `Sporting`, `Porto`, `SC Braga` | 4 | Os três clubes de futebol mais cobertos pela imprensa desportiva portuguesa, mais o SC Braga como quarto grande clube nacional; reutilizam queries já exploradas nas Experiências 1–3 (Sporting) e no M1 (Benfica). **Limitação assumida:** os quatro são clubes de futebol, o que enviesa esta faceta para essa modalidade. |
 | Atleta conhecido | `Cristiano Ronaldo`, `Bruno Fernandes`, `Telma Monteiro` | 3 | Dois futebolistas amplamente cobertos pelo Record (incluindo período de ligação a clubes portugueses) e uma atleta de outra modalidade (judo), para reduzir a sobreposição total com a faceta "clube". |
 
-Total: **9 termos de pesquisa distintos**. Estes termos são candidatos a
+Total: **10 termos de pesquisa distintos**. Estes termos são candidatos a
 validar/ajustar com o autor antes de qualquer execução; não são o resultado
 de uma seleção sistemática do conteúdo real do Record.
 
@@ -571,15 +571,15 @@ estabilidade):
 | Faceta | Termos | Pedidos base (2×) | Pedidos condicionais (offset, se página cheia) |
 | --- | ---: | ---: | --- |
 | Modalidade | 3 | 6 | até 6 (se todas as 6 respostas vierem cheias) |
-| Clube | 3 | 6 | até 6 |
+| Clube | 4 | 8 | até 8 |
 | Atleta conhecido | 3 | 6 | até 6 |
-| **Total** | **9** | **18** | **até 18** |
+| **Total** | **10** | **20** | **até 20** |
 
-**Estimativa: mínimo 18 pedidos reais à API, máximo teórico 36** (se todas as
-18 respostas base vierem com página cheia, o que a Experiência 3 não
+**Estimativa: mínimo 20 pedidos reais à API, máximo teórico 40** (se todas as
+20 respostas base vierem com página cheia, o que a Experiência 3 não
 observou em nenhuma das suas 9 tentativas com uma restrição de site
 equivalente). O cenário mais provável, à luz da Experiência 3, é próximo do
-mínimo de 18, com poucos ou nenhum pedido condicional de offset.
+mínimo de 20, com poucos ou nenhum pedido condicional de offset.
 
 ### Agregação e deduplicação entre queries
 
@@ -622,7 +622,7 @@ pedidos, sem chamadas adicionais à API:
 
 ### Limitações explícitas desta proposta
 
-- A lista de termos (9) é uma amostra intencional, não uma cobertura
+- A lista de termos (10) é uma amostra intencional, não uma cobertura
   sistemática das modalidades, clubes ou atletas do Record; outras escolhas
   de termos são igualmente válidas e não foram testadas.
 - A faceta "clube" está enviesada para futebol; não foi incluído nenhum
