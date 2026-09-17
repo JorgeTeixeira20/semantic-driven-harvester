@@ -182,21 +182,18 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    do jornal Record, incluindo uma regra explícita de classificação
    Artigo/redirecionamento.
 
-   **Protocolo de queries proposto em 2026-09-17, revisto em 2026-09-17,
-   por validar — sem execução ainda.** Ver "Protocolo de queries para o
-   corpus do Caminho A" em `experiments.md`. Duas fases: Fase 1 (TextSearch,
-   descoberta) e Fase 2 (`version_history` por artigo único descoberto,
+   **Protocolo de queries: dimensionamento decidido em 2026-09-17 (Opção 2
+   — Moderada).** Ver "Protocolo de queries para o corpus do Caminho A" em
+   `experiments.md`. Duas fases: Fase 1 (TextSearch, descoberta; 13 termos —
+   4 modalidades, 4 clubes, 5 atletas conhecidos —, 2 repetições/termo,
+   26–52 pedidos) e Fase 2 (`version_history` por artigo único descoberto,
    generalizando `history_pipeline.py`/`collect_all_captures()` de um único
-   URL hardcoded para vários — adicionada nesta revisão porque a versão
-   anterior só cobria a descoberta, sem profundidade temporal por artigo).
-   Três opções de dimensionamento por escolher (autor + Jorge), de 10 a 14
-   termos e de 2 a 3 repetições/termo: Fase 1 entre 20–40 e 42–84 pedidos
-   conforme a opção; Fase 2 depende de `N` (artigos únicos descobertos),
-   desconhecido até correr a Fase 1 — um ponto de verificação decide se
-   avançar para a Fase 2 depois de `N` ser conhecido. Explicitamente uma
-   amostra pequena e não exaustiva, não uma cobertura sistemática do
-   Record. Aguarda validação do autor e do Jorge antes de qualquer recolha
-   em massa.
+   URL hardcoded para vários; custo `≈N`, `N` só conhecido depois da Fase
+   1). Explicitamente uma amostra pequena e não exaustiva, não uma
+   cobertura sistemática do Record. A Fase 1 está a ser executada nesta
+   sessão; a Fase 2 continua a exigir confirmação explícita do autor sobre
+   o valor de `N` antes de avançar (ponto de verificação em
+   `experiments.md`).
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com

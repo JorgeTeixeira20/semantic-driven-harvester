@@ -18,6 +18,8 @@ data/raw/api_diagnostics_offset/*
 !data/raw/api_diagnostics_offset/.gitkeep
 data/raw/api_diagnostics_site_volume/*
 !data/raw/api_diagnostics_site_volume/.gitkeep
+data/raw/corpus_queries/*
+!data/raw/corpus_queries/.gitkeep
 output/*
 !output/.gitkeep
 !output/sample_capture.ttl
@@ -32,3 +34,6 @@ output/*
 !output/api_diagnostics_offset_pilot.md
 !output/api_diagnostics_site_volume.csv
 !output/api_diagnostics_site_volume.md
+!output/corpus_phase1_per_term.csv
+!output/corpus_phase1_captures.csv
+!output/corpus_phase1_aggregation.md

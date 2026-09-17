@@ -196,3 +196,24 @@ resultados ficam em `output/api_diagnostics_site_volume.csv`,
 `docs/experiments.md`. Este comando faz 9 pedidos reais e pode demorar
 vários minutos; em caso de timeout ou erro 500 pontual da API, repetir a
 execução.
+
+## Fase 1 do corpus do Caminho A (descoberta via TextSearch)
+
+Para correr a Fase 1 do protocolo de queries decidido em
+`docs/experiments.md` ("Protocolo de queries para o corpus do Caminho A",
+Opção 2 — Moderada: 13 termos, 2 repetições por termo):
+
+```bash
+python -m semantic_harvester.corpus_phase1
+```
+
+Os JSON raw são guardados em `data/raw/corpus_queries/`; os resultados
+(estatísticas por termo, capturas agregadas/deduplicadas por
+`(originalURL, tstamp)` e o resumo com `N`) ficam em
+`output/corpus_phase1_per_term.csv`, `output/corpus_phase1_captures.csv` e
+`output/corpus_phase1_aggregation.md`. Este comando faz cerca de 26 pedidos
+reais (mais offset condicional se alguma página vier cheia) e pode demorar
+vários minutos; tem novas tentativas automáticas para timeouts/erros 500
+pontuais da API. **Não avança para a Fase 2 (`version_history`)** — essa
+etapa exige confirmação explícita do valor de `N` (ver
+`docs/experiments.md`).

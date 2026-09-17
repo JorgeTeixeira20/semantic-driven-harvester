@@ -472,11 +472,12 @@ Para o protocolo de recolha do Caminho A:
 - continuar a registar os parâmetros reportados pela API e a preservar o raw
   de cada tentativa, para permitir revisitar a variação observada.
 
-## Protocolo de queries para o corpus do Caminho A (proposta — por validar, sem execução)
+## Protocolo de queries para o corpus do Caminho A
 
-**Estado: proposta escrita para validação do autor. Nenhum pedido à API foi
-feito para esta secção; os números abaixo são estimativas de contagem de
-pedidos, não resultados observados.**
+**Estado em 2026-09-17: dimensionamento decidido (Opção 2, 13 termos, 2
+repetições) — Fase 1 (TextSearch) a executar nesta sessão. Fase 2
+(`version_history`) continua por autorizar; ver "Ponto de verificação" nos
+Próximos passos.**
 
 Este protocolo é uma ferramenta operacional de recolha — uma grelha de termos
 de pesquisa a combinar com `siteSearch=record.pt` — e não deve ser confundida
@@ -507,17 +508,18 @@ não-determinismo observado na Experiência 3. O corpus resultante deve ser
 descrito na dissertação como uma amostra intencional destas facetas e destes
 termos, não como uma cobertura representativa do jornal Record.
 
-### Facetas e termos propostos
+### Facetas e termos — decisão final (Opção 2, ver "Decisão de dimensionamento" abaixo)
 
-| Faceta | Termos propostos | Nº de termos | Justificação |
+| Faceta | Termos | Nº de termos | Justificação |
 | --- | --- | ---: | --- |
-| Modalidade | `futebol`, `basquetebol`, `andebol` | 3 | Modalidades com cobertura regular no Record; futebol como modalidade dominante, as outras duas para alguma diversidade fora do futebol. |
+| Modalidade | `futebol`, `basquetebol`, `andebol`, `voleibol` | 4 | Modalidades com cobertura regular no Record; futebol como modalidade dominante, as outras três para alguma diversidade fora do futebol. |
 | Clube | `Benfica`, `Sporting`, `Porto`, `SC Braga` | 4 | Os três clubes de futebol mais cobertos pela imprensa desportiva portuguesa, mais o SC Braga como quarto grande clube nacional; reutilizam queries já exploradas nas Experiências 1–3 (Sporting) e no M1 (Benfica). **Limitação assumida:** os quatro são clubes de futebol, o que enviesa esta faceta para essa modalidade. |
-| Atleta conhecido | `Cristiano Ronaldo`, `Bruno Fernandes`, `Telma Monteiro` | 3 | Dois futebolistas amplamente cobertos pelo Record (incluindo período de ligação a clubes portugueses) e uma atleta de outra modalidade (judo), para reduzir a sobreposição total com a faceta "clube". |
+| Atleta conhecido | `Cristiano Ronaldo`, `Bruno Fernandes`, `Telma Monteiro`, `João Félix`, `Nelson Évora` | 5 | Três futebolistas amplamente cobertos pelo Record e duas atletas de outras modalidades (judo, atletismo), para reduzir a sobreposição total com a faceta "clube". |
 
-Total: **10 termos de pesquisa distintos**. Estes termos são candidatos a
-validar/ajustar com o autor antes de qualquer execução; não são o resultado
-de uma seleção sistemática do conteúdo real do Record.
+Total: **13 termos de pesquisa distintos**. Esta lista é a decisão final do
+autor e do Jorge (Opção 2 — Moderada, 2026-09-17); não é o resultado de uma
+seleção sistemática do conteúdo real do Record, continua a ser uma amostra
+deliberada (ver "Âmbito" acima).
 
 ### Intervalo temporal
 
@@ -575,16 +577,16 @@ estimativa.
 
 | Faceta | Termos | Pedidos base (2×) | Pedidos condicionais (offset, se página cheia) |
 | --- | ---: | ---: | --- |
-| Modalidade | 3 | 6 | até 6 (se todas as 6 respostas vierem cheias) |
+| Modalidade | 4 | 8 | até 8 (se todas as 8 respostas vierem cheias) |
 | Clube | 4 | 8 | até 8 |
-| Atleta conhecido | 3 | 6 | até 6 |
-| **Total** | **10** | **20** | **até 20** |
+| Atleta conhecido | 5 | 10 | até 10 |
+| **Total** | **13** | **26** | **até 26** |
 
-**Estimativa: mínimo 20 pedidos reais à API, máximo teórico 40** (se todas as
-20 respostas base vierem com página cheia, o que a Experiência 3 não
+**Estimativa: mínimo 26 pedidos reais à API, máximo teórico 52** (se todas as
+26 respostas base vierem com página cheia, o que a Experiência 3 não
 observou em nenhuma das suas 9 tentativas com uma restrição de site
 equivalente). O cenário mais provável, à luz da Experiência 3, é próximo do
-mínimo de 20, com poucos ou nenhum pedido condicional de offset.
+mínimo de 26, com poucos ou nenhum pedido condicional de offset.
 
 ### Agregação e deduplicação entre queries
 
@@ -689,7 +691,7 @@ rendimento das queries. O que pode ser dito sem executar nada:
 
 ### Limitações explícitas desta proposta
 
-- A lista de termos (10) é uma amostra intencional, não uma cobertura
+- A lista de termos (13) é uma amostra intencional, não uma cobertura
   sistemática das modalidades, clubes ou atletas do Record; outras escolhas
   de termos são igualmente válidas e não foram testadas.
 - A faceta "clube" está enviesada para futebol; não foi incluído nenhum
@@ -703,64 +705,52 @@ rendimento das queries. O que pode ser dito sem executar nada:
   apenas assume essas limitações como dadas e desenha a recolha em torno
   delas.
 
-### Opções de dimensionamento (a escolher pelo autor e pelo Jorge)
+### Decisão de dimensionamento: Opção 2 (Moderada) — decidido em 2026-09-17
 
 A Experiência 3 mostrou contagens baixas por pedido (2–7 de `maxItems=20`)
 dentro de `siteSearch=record.pt`. Depois de deduplicar entre facetas
 sobrepostas (ex.: "Cristiano Ronaldo" pode surgir também em "futebol" e em
-"Sporting"), o corpus único resultante da Opção 1 pode ficar pequeno. As três
-opções abaixo trocam mais pedidos à API por uma amostra maior; nenhuma foi
-executada. Os termos adicionais das Opções 2 e 3 são sugestões, não uma
-seleção validada — a escolha final dos termos, tal como na tabela original,
-cabe ao autor.
+"Sporting"), o corpus único resultante da opção mínima podia ficar pequeno.
+Foram apresentadas três opções ao autor e ao Jorge; **a escolha final foi a
+Opção 2 (Moderada)**, já refletida na tabela de termos acima (13 termos: 4
+modalidades, 4 clubes, 5 atletas conhecidos, 2 repetições/termo).
 
-| Opção | Modalidades | Clubes | Atletas conhecidos | Total termos | Repetições/termo |
-| --- | --- | --- | --- | ---: | ---: |
-| 1 — Manter | futebol, basquetebol, andebol | Benfica, Sporting, Porto, SC Braga | Cristiano Ronaldo, Bruno Fernandes, Telma Monteiro | 10 | 2 |
-| 2 — Moderada | + voleibol (4) | (sem alteração, 4) | + João Félix, Nelson Évora (5) | 13 | 2 |
-| 3 — Maior | + voleibol (4) | + Vitória de Guimarães (5) | + João Félix, Nelson Évora (5) | 14 | 3 |
+Registo das três opções consideradas, por referência histórica:
 
-Estimativa de pedidos por opção (Fase 1 = TextSearch, conforme a secção
-"Estimativa de pedidos (Fase 1)"; Fase 2 = `version_history`, conforme a
-secção anterior — `N` desconhecido até executar a Fase 1, teto teórico
-`= pedidos_base_Fase1 × maxItems(50)`):
+| Opção | Modalidades | Clubes | Atletas conhecidos | Total termos | Repetições/termo | Fase 1 (min–max) |
+| --- | --- | --- | --- | ---: | ---: | --- |
+| 1 — Manter | futebol, basquetebol, andebol | Benfica, Sporting, Porto, SC Braga | Cristiano Ronaldo, Bruno Fernandes, Telma Monteiro | 10 | 2 | 20–40 |
+| **2 — Moderada (escolhida)** | + voleibol (4) | (sem alteração, 4) | + João Félix, Nelson Évora (5) | 13 | 2 | 26–52 |
+| 3 — Maior | + voleibol (4) | + Vitória de Guimarães (5) | + João Félix, Nelson Évora (5) | 14 | 3 | 42–84 |
 
-| Opção | Fase 1 base (termos × repetições) | Fase 1 contingente (offset, até) | Fase 1 total (min–max) | Fase 2 (`N`, desconhecido) | Fase 2 teto teórico |
-| --- | ---: | ---: | --- | --- | ---: |
-| 1 — Manter | 20 | 20 | 20–40 | ≈ N artigos únicos | ≤ 1000 |
-| 2 — Moderada | 26 | 26 | 26–52 | ≈ N artigos únicos | ≤ 1300 |
-| 3 — Maior | 42 | 42 | 42–84 | ≈ N artigos únicos | ≤ 2100 |
+Para a Opção 2, o teto teórico da Fase 2 (`version_history`) continua a ser
+`26 × 50 = 1300` pedidos no limite matemático absoluto (zero sobreposição
+entre pedidos da Fase 1) — não uma previsão; o valor real de `N` só é
+conhecido depois de executar a Fase 1 e a agregação (ver "Ponto de
+verificação" abaixo).
 
-O teto teórico da Fase 2 é uma bound matemática (assume zero sobreposição
-entre pedidos), não uma previsão — a Experiência 3 sugere que o valor real
-de `N` deverá ficar muito abaixo desse teto. O aumento de opção 1 para 3
-multiplica por ~2 os pedidos garantidos da Fase 1 (mais repetições e mais
-termos), na expectativa de que isso também aumente `N`, mas essa relação não
-foi medida.
+### Próximos passos
 
-**Este protocolo não escolhe uma opção.** Fica para decisão do autor e do
-Jorge antes de qualquer execução.
-
-### Próximos passos (após validação)
-
-1. Validar com o autor e o Jorge a opção de dimensionamento (secção
-   anterior), a lista de termos correspondente e o intervalo temporal.
-2. Implementar a recolha da Fase 1 (TextSearch) seguindo exatamente os
-   parâmetros e a contingência de offset descritos, preservando raw por
-   faceta/termo/repetição.
+1. ~~Validar com o autor e o Jorge a opção de dimensionamento, a lista de
+   termos correspondente e o intervalo temporal.~~ **Concluído em
+   2026-09-17: Opção 2.**
+2. Implementar e correr a recolha da Fase 1 (TextSearch) seguindo
+   exatamente os parâmetros e a contingência de offset descritos,
+   preservando raw por faceta/termo/repetição.
 3. Implementar a agregação/deduplicação descrita acima como um passo
    separado e testável, antes de qualquer mapeamento RDF do corpus.
 4. Ponto de verificação: confirmar o valor real de `N` (artigos únicos
-   descobertos) antes de avançar para a Fase 2; decidir aí se `N` está
-   dentro do esperado ou se implica rever o dimensionamento.
+   descobertos) e documentar os resultados nesta secção. **Parar aqui até
+   o autor confirmar `N` — não avançar para a Fase 2 sem essa confirmação
+   explícita.**
 5. Implementar a Fase 2 (`version_history` por artigo único), generalizando
    `collect_all_captures()`/`run_history_pipeline()` de um único URL
    hardcoded para a lista de artigos únicos descoberta — reaproveitando a
    lógica de paginação já testada, sem a alterar.
 6. Só depois disso, aplicar a regra de classificação Artigo/redirecionamento
-   e prosseguir com o resto do Caminho A. (Ver nota em aberto na secção
-   anterior sobre correr a Fase 2 antes ou depois desta classificação.)
+   e prosseguir com o resto do Caminho A. (Ver nota em aberto acima sobre
+   correr a Fase 2 antes ou depois desta classificação.)
 
-Esta secção não deve ser executada como recolha em massa sem validação
-explícita do autor, dado o custo de pedidos reais e a não-determinismo já
-observada.
+A Fase 2 (passo 5) não deve ser executada sem validação explícita do valor
+de `N` obtido no passo 4, dado o custo de pedidos reais e a não-determinismo
+já observada.
