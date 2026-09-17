@@ -182,16 +182,21 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    do jornal Record, incluindo uma regra explícita de classificação
    Artigo/redirecionamento.
 
-   **Protocolo de queries proposto em 2026-09-17, por validar — sem
-   execução ainda.** Ver "Protocolo de queries para o corpus do Caminho A"
-   em `experiments.md`: 10 termos de pesquisa
-   (3 modalidades, 4 clubes incluindo SC Braga, 3 atletas conhecidos),
-   `siteSearch=record.pt`, `from=2015`/`to=2020`, 2 pedidos por termo
-   (mínimo 20 pedidos, máximo teórico 40 com offset condicional), com plano
-   de agregação/deduplicação por
-   `(originalURL, tstamp)` entre queries diferentes. Explicitamente uma
+   **Protocolo de queries proposto em 2026-09-17, revisto em 2026-09-17,
+   por validar — sem execução ainda.** Ver "Protocolo de queries para o
+   corpus do Caminho A" em `experiments.md`. Duas fases: Fase 1 (TextSearch,
+   descoberta) e Fase 2 (`version_history` por artigo único descoberto,
+   generalizando `history_pipeline.py`/`collect_all_captures()` de um único
+   URL hardcoded para vários — adicionada nesta revisão porque a versão
+   anterior só cobria a descoberta, sem profundidade temporal por artigo).
+   Três opções de dimensionamento por escolher (autor + Jorge), de 10 a 14
+   termos e de 2 a 3 repetições/termo: Fase 1 entre 20–40 e 42–84 pedidos
+   conforme a opção; Fase 2 depende de `N` (artigos únicos descobertos),
+   desconhecido até correr a Fase 1 — um ponto de verificação decide se
+   avançar para a Fase 2 depois de `N` ser conhecido. Explicitamente uma
    amostra pequena e não exaustiva, não uma cobertura sistemática do
-   Record. Aguarda validação do autor antes de qualquer recolha em massa.
+   Record. Aguarda validação do autor e do Jorge antes de qualquer recolha
+   em massa.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com

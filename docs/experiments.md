@@ -566,7 +566,12 @@ estabilidade):
   proposta — isso seria decidido caso a caso se o cenário ocorrer, dado que a
   Experiência 3 não encontrou nenhuma página cheia em `siteSearch=record.pt`.
 
-### Estimativa de pedidos
+### Estimativa de pedidos (Fase 1 — descoberta via TextSearch)
+
+Esta secção cobre só os pedidos de descoberta (TextSearch). Os pedidos de
+`version_history` por artigo único descoberto (Fase 2) são uma etapa
+adicional, descrita depois da agregação/deduplicação, com a sua própria
+estimativa.
 
 | Faceta | Termos | Pedidos base (2×) | Pedidos condicionais (offset, se página cheia) |
 | --- | ---: | ---: | --- |
@@ -620,6 +625,68 @@ pedidos, sem chamadas adicionais à API:
    agregação, sobre a lista já deduplicada por identidade de captura — não
    é resolvida por este protocolo de queries.
 
+### Profundidade temporal: version_history por artigo (Fase 2)
+
+**Isto não estava explícito na versão anterior desta proposta.** A versão
+anterior descrevia apenas a descoberta de artigos via TextSearch (Fase 1),
+sem dizer o que acontece depois por artigo. Sem este passo, o corpus final
+teria só a captura devolvida pela TextSearch por artigo — tipicamente uma
+única captura —, sem profundidade temporal nenhuma. Como a caracterização
+temporal por artigo é metade do objetivo da dissertação segundo o RPD (a
+outra metade sendo a estrutural), este passo é necessário, não opcional.
+
+O M3 já resolveu este problema para um único artigo: `history_pipeline.py`
+usa `ArquivoClient.version_history()` para obter, sem restrição de datas, o
+histórico completo de capturas de um `originalURL`, com paginação por
+`offset` já implementada em `collect_all_captures()` (repete pedidos
+enquanto a página vier cheia e houver `next_page`, parando quando a página
+vem incompleta ou vazia — a mesma lógica de paragem validada pela
+Experiência 2). Hoje esta função só é chamada uma vez, para o URL fixo
+`SAMPLE_ORIGINAL_URL` em `rdf_mapper.py`.
+
+**Adição ao protocolo:** depois de agregar/deduplicar as capturas
+descobertas pela Fase 1 (secção anterior), correr `collect_all_captures()`
+uma vez por cada `originalURL` único resultante — generalizando
+`run_history_pipeline()`/`collect_all_captures()` de "um artigo hardcoded"
+para "a lista de artigos únicos descoberta por este protocolo", sem alterar
+a lógica de paginação já testada. Isto é trabalho de implementação (loop
+sobre vários URLs em vez de um), não uma experiência nova.
+
+**Nota em aberto, não decidida aqui:** a Fase 2 podia correr sobre todos os
+`originalURL` únicos da Fase 1, ou só sobre os já classificados como
+`Artigo` (depois da regra Artigo/redirecionamento referida no ponto 8
+acima), o que pouparia pedidos de `version_history` gastos em páginas de
+secção/redirecionamento. Esta proposta não decide a ordem; fica como opção
+a validar com o autor quando a regra de classificação for implementada.
+
+#### Estimativa de pedidos (Fase 2 — version_history)
+
+Ao contrário da Fase 1, o número de pedidos da Fase 2 depende de `N`, o
+número de `originalURL` únicos descobertos — que só é conhecido depois de
+executar a Fase 1 e a agregação. Não é inventado um valor de `N` aqui,
+consistente com a limitação já registada abaixo sobre não prever o
+rendimento das queries. O que pode ser dito sem executar nada:
+
+- **Pedidos por artigo:** no mínimo 1 (`collect_all_captures` com
+  `page_size=50`, sem restrição de datas); mais 1 por cada página adicional
+  cheia, só se esse artigo tiver mais de 50 capturas no histórico. O único
+  artigo já observado (M3) teve 3 capturas — muito abaixo de 50 — pelo que
+  históricos com paginação são esperados como exceção, não a norma, mas não
+  há dados sobre os artigos que este protocolo vai descobrir.
+- **Total da Fase 2 ≈ N** pedidos, no cenário sem paginação adicional (o
+  mais provável, à luz do M3).
+- **Teto teórico absoluto:** o número de itens devolvidos na Fase 1 não pode
+  exceder `pedidos_TextSearch × maxItems(50)`; logo `N` (que é ≤ esse total,
+  porque a deduplicação só pode reduzir, nunca aumentar, o número de URLs
+  únicos) está limitado por esse mesmo valor. Este teto é uma bound
+  matemática, não uma previsão realista — a Experiência 3 mostrou
+  contagens muito abaixo de `maxItems` em todos os pedidos testados.
+- **Ponto de verificação proposto:** correr primeiro a Fase 1 completa
+  (descoberta + agregação/deduplicação), confirmar o valor real de `N`, e só
+  depois decidir/confirmar se avançar para a Fase 2 com esse número de
+  pedidos. Isto evita comprometer à partida um orçamento de pedidos para a
+  Fase 2 baseado numa previsão não validada.
+
 ### Limitações explícitas desta proposta
 
 - A lista de termos (10) é uma amostra intencional, não uma cobertura
@@ -636,15 +703,63 @@ pedidos, sem chamadas adicionais à API:
   apenas assume essas limitações como dadas e desenha a recolha em torno
   delas.
 
+### Opções de dimensionamento (a escolher pelo autor e pelo Jorge)
+
+A Experiência 3 mostrou contagens baixas por pedido (2–7 de `maxItems=20`)
+dentro de `siteSearch=record.pt`. Depois de deduplicar entre facetas
+sobrepostas (ex.: "Cristiano Ronaldo" pode surgir também em "futebol" e em
+"Sporting"), o corpus único resultante da Opção 1 pode ficar pequeno. As três
+opções abaixo trocam mais pedidos à API por uma amostra maior; nenhuma foi
+executada. Os termos adicionais das Opções 2 e 3 são sugestões, não uma
+seleção validada — a escolha final dos termos, tal como na tabela original,
+cabe ao autor.
+
+| Opção | Modalidades | Clubes | Atletas conhecidos | Total termos | Repetições/termo |
+| --- | --- | --- | --- | ---: | ---: |
+| 1 — Manter | futebol, basquetebol, andebol | Benfica, Sporting, Porto, SC Braga | Cristiano Ronaldo, Bruno Fernandes, Telma Monteiro | 10 | 2 |
+| 2 — Moderada | + voleibol (4) | (sem alteração, 4) | + João Félix, Nelson Évora (5) | 13 | 2 |
+| 3 — Maior | + voleibol (4) | + Vitória de Guimarães (5) | + João Félix, Nelson Évora (5) | 14 | 3 |
+
+Estimativa de pedidos por opção (Fase 1 = TextSearch, conforme a secção
+"Estimativa de pedidos (Fase 1)"; Fase 2 = `version_history`, conforme a
+secção anterior — `N` desconhecido até executar a Fase 1, teto teórico
+`= pedidos_base_Fase1 × maxItems(50)`):
+
+| Opção | Fase 1 base (termos × repetições) | Fase 1 contingente (offset, até) | Fase 1 total (min–max) | Fase 2 (`N`, desconhecido) | Fase 2 teto teórico |
+| --- | ---: | ---: | --- | --- | ---: |
+| 1 — Manter | 20 | 20 | 20–40 | ≈ N artigos únicos | ≤ 1000 |
+| 2 — Moderada | 26 | 26 | 26–52 | ≈ N artigos únicos | ≤ 1300 |
+| 3 — Maior | 42 | 42 | 42–84 | ≈ N artigos únicos | ≤ 2100 |
+
+O teto teórico da Fase 2 é uma bound matemática (assume zero sobreposição
+entre pedidos), não uma previsão — a Experiência 3 sugere que o valor real
+de `N` deverá ficar muito abaixo desse teto. O aumento de opção 1 para 3
+multiplica por ~2 os pedidos garantidos da Fase 1 (mais repetições e mais
+termos), na expectativa de que isso também aumente `N`, mas essa relação não
+foi medida.
+
+**Este protocolo não escolhe uma opção.** Fica para decisão do autor e do
+Jorge antes de qualquer execução.
+
 ### Próximos passos (após validação)
 
-1. Validar com o autor a lista de termos e o intervalo temporal acima.
-2. Implementar a recolha seguindo exatamente os parâmetros e a contingência
-   de offset descritos, preservando raw por faceta/termo/repetição.
+1. Validar com o autor e o Jorge a opção de dimensionamento (secção
+   anterior), a lista de termos correspondente e o intervalo temporal.
+2. Implementar a recolha da Fase 1 (TextSearch) seguindo exatamente os
+   parâmetros e a contingência de offset descritos, preservando raw por
+   faceta/termo/repetição.
 3. Implementar a agregação/deduplicação descrita acima como um passo
    separado e testável, antes de qualquer mapeamento RDF do corpus.
-4. Só depois disso, aplicar a regra de classificação Artigo/redirecionamento
-   e prosseguir com o resto do Caminho A.
+4. Ponto de verificação: confirmar o valor real de `N` (artigos únicos
+   descobertos) antes de avançar para a Fase 2; decidir aí se `N` está
+   dentro do esperado ou se implica rever o dimensionamento.
+5. Implementar a Fase 2 (`version_history` por artigo único), generalizando
+   `collect_all_captures()`/`run_history_pipeline()` de um único URL
+   hardcoded para a lista de artigos únicos descoberta — reaproveitando a
+   lógica de paginação já testada, sem a alterar.
+6. Só depois disso, aplicar a regra de classificação Artigo/redirecionamento
+   e prosseguir com o resto do Caminho A. (Ver nota em aberto na secção
+   anterior sobre correr a Fase 2 antes ou depois desta classificação.)
 
 Esta secção não deve ser executada como recolha em massa sem validação
 explícita do autor, dado o custo de pedidos reais e a não-determinismo já
