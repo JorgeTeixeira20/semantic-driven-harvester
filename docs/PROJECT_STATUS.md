@@ -181,6 +181,16 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    única captura fixa em `rdf_mapper.py`) para um corpus real de vários artigos
    do jornal Record, incluindo uma regra explícita de classificação
    Artigo/redirecionamento.
+
+   **Protocolo de queries proposto em 2026-09-17, por validar — sem
+   execução ainda.** Ver "Protocolo de queries para o corpus do Caminho A"
+   em `experiments.md`: 9 termos de pesquisa (3 modalidades, 3 clubes, 3
+   atletas conhecidos), `siteSearch=record.pt`, `from=2015`/`to=2020`,
+   2 pedidos por termo (mínimo 18 pedidos, máximo teórico 36 com offset
+   condicional), com plano de agregação/deduplicação por
+   `(originalURL, tstamp)` entre queries diferentes. Explicitamente uma
+   amostra pequena e não exaustiva, não uma cobertura sistemática do
+   Record. Aguarda validação do autor antes de qualquer recolha em massa.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com

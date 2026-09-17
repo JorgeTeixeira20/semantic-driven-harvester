@@ -471,3 +471,181 @@ Para o protocolo de recolha do Caminho A:
   sobre uma query ou combinação específica, dado a instabilidade observada;
 - continuar a registar os parâmetros reportados pela API e a preservar o raw
   de cada tentativa, para permitir revisitar a variação observada.
+
+## Protocolo de queries para o corpus do Caminho A (proposta — por validar, sem execução)
+
+**Estado: proposta escrita para validação do autor. Nenhum pedido à API foi
+feito para esta secção; os números abaixo são estimativas de contagem de
+pedidos, não resultados observados.**
+
+Este protocolo é uma ferramenta operacional de recolha — uma grelha de termos
+de pesquisa a combinar com `siteSearch=record.pt` — e não deve ser confundida
+com conceitos da ontologia como `EntidadeMencionada` ou `Tema`
+([ontology/semantic_harvester.ttl](../ontology/semantic_harvester.ttl)), que
+são categorias do modelo de dados final, não termos de pesquisa. Não
+corresponde a uma "árvore de conhecimento": é apenas a lista de queries a
+enviar à API TextSearch para popular o corpus do Caminho A.
+
+### Motivação
+
+A Experiência 3 mostrou que, dentro de `siteSearch=record.pt`, nem uma query
+específica (`Sporting`) nem termos genéricos (`futebol`, `desporto`) enchem
+uma página, e que pedidos idênticos e consecutivos podem devolver contagens
+diferentes. Isto significa que não é viável construir o corpus com uma ou
+duas queries largas: é necessário combinar várias queries pequenas, cobrindo
+diferentes dimensões do conteúdo do Record, e agregar/deduplicar os
+resultados no fim.
+
+### Âmbito: amostra deliberada, não exaustiva
+
+Consistente com a regra do [AGENTS.md](../AGENTS.md) de não generalizar
+conclusões de uma amostra para toda a API ou, aqui, para todo o Record: esta
+proposta não pretende cobrir todas as modalidades, clubes, atletas ou anos
+cobertos pelo Record. É uma amostra pequena e deliberada, dimensionada pelo
+prazo de 31 de outubro de 2026 e pelo custo de repetir pedidos por causa da
+não-determinismo observado na Experiência 3. O corpus resultante deve ser
+descrito na dissertação como uma amostra intencional destas facetas e destes
+termos, não como uma cobertura representativa do jornal Record.
+
+### Facetas e termos propostos
+
+| Faceta | Termos propostos | Nº de termos | Justificação |
+| --- | --- | ---: | --- |
+| Modalidade | `futebol`, `basquetebol`, `andebol` | 3 | Modalidades com cobertura regular no Record; futebol como modalidade dominante, as outras duas para alguma diversidade fora do futebol. |
+| Clube | `Benfica`, `Sporting`, `Porto` | 3 | Os três clubes de futebol mais cobertos pela imprensa desportiva portuguesa; reutilizam queries já exploradas nas Experiências 1–3 (Sporting) e no M1 (Benfica). **Limitação assumida:** os três são clubes de futebol, o que enviesa esta faceta para essa modalidade. |
+| Atleta conhecido | `Cristiano Ronaldo`, `Bruno Fernandes`, `Telma Monteiro` | 3 | Dois futebolistas amplamente cobertos pelo Record (incluindo período de ligação a clubes portugueses) e uma atleta de outra modalidade (judo), para reduzir a sobreposição total com a faceta "clube". |
+
+Total: **9 termos de pesquisa distintos**. Estes termos são candidatos a
+validar/ajustar com o autor antes de qualquer execução; não são o resultado
+de uma seleção sistemática do conteúdo real do Record.
+
+### Intervalo temporal
+
+Um único intervalo, aplicado a todos os termos: `from=2015`, `to=2020`
+(o mesmo já usado nas Experiências 1–3, por continuidade e comparabilidade).
+Não se propõe testar vários intervalos por termo nesta amostra — isso
+multiplicaria os pedidos sem necessidade clara, dado que o problema
+identificado (página incompleta) não foi associado ao intervalo temporal em
+nenhuma experiência anterior.
+
+### Parâmetros comuns por pedido
+
+```text
+siteSearch = record.pt (o cliente inclui também www.record.pt)
+from = 2015
+to = 2020
+maxItems = 50
+dedupField = url
+dedupValue = 1
+```
+
+`maxItems=50` (maior do que os 20 usados nas Experiências 2–3) pede mais
+resultados por pedido sem custar pedidos adicionais; dado que a Experiência 3
+não encontrou nenhuma combinação que enchesse `maxItems=20` dentro de
+`siteSearch=record.pt`, não há indicação de que 50 vá gerar mais chamadas de
+paginação do que 20 geraria. `dedupField=url`/`dedupValue=1` explícitos
+seguem a decisão da Experiência 1 (queremos URLs únicos por pedido, ao
+contrário das Experiências 2–3, que omitiram propositadamente o dedup para
+testar o preenchimento de página).
+
+### Pedidos por termo e contingência de offset
+
+Dado o achado da Experiência 3 de repetir pedidos idênticos antes de tirar
+conclusões, e para tirar partido da própria não-determinismo (repetições
+podem trazer artigos diferentes da mesma query, não só confirmar
+estabilidade):
+
+- cada termo é pedido **2 vezes** (pedido inicial + 1 repetição) com os
+  mesmos parâmetros — **pedidos base**;
+- se uma dessas respostas vier com página cheia (`results_received ==
+  maxItems`), pede-se também `offset=maxItems` para essa combinação
+  específica, seguindo a decisão da Experiência 2 de só usar `offset` depois
+  de confirmar página cheia — **pedido condicional**;
+- se a resposta ao offset também vier cheia, repete-se o mesmo critério
+  (mais offset), mas não se propõe um limite superior de páginas nesta
+  proposta — isso seria decidido caso a caso se o cenário ocorrer, dado que a
+  Experiência 3 não encontrou nenhuma página cheia em `siteSearch=record.pt`.
+
+### Estimativa de pedidos
+
+| Faceta | Termos | Pedidos base (2×) | Pedidos condicionais (offset, se página cheia) |
+| --- | ---: | ---: | --- |
+| Modalidade | 3 | 6 | até 6 (se todas as 6 respostas vierem cheias) |
+| Clube | 3 | 6 | até 6 |
+| Atleta conhecido | 3 | 6 | até 6 |
+| **Total** | **9** | **18** | **até 18** |
+
+**Estimativa: mínimo 18 pedidos reais à API, máximo teórico 36** (se todas as
+18 respostas base vierem com página cheia, o que a Experiência 3 não
+observou em nenhuma das suas 9 tentativas com uma restrição de site
+equivalente). O cenário mais provável, à luz da Experiência 3, é próximo do
+mínimo de 18, com poucos ou nenhum pedido condicional de offset.
+
+### Agregação e deduplicação entre queries
+
+Vários termos desta grelha podem devolver a mesma captura (ex.: um artigo
+sobre Cristiano Ronaldo pode surgir tanto na query `futebol` como em
+`Cristiano Ronaldo`). A agregação é feita offline, depois de todos os
+pedidos, sem chamadas adicionais à API:
+
+1. Preservar o raw de cada pedido byte a byte, com um nome que identifique
+   faceta, termo e número da repetição (ex.:
+   `data/raw/corpus_queries/<faceta>_<termo>_rep<N>.json`), seguindo o
+   padrão já usado em `api_diagnostics.py` e módulos seguintes.
+2. Ler todos os `response_items` de todos os ficheiros raw e anotar cada
+   item com a proveniência (faceta, termo, repetição, ficheiro de origem).
+3. Identidade de captura: `(originalURL, tstamp)`, o mesmo par já usado em
+   `rdf_mapper.py` para gerar IDs determinísticos de `CapturaArquivada`. Não
+   introduzir um novo critério de identidade paralelo.
+4. Identidade de artigo/recurso: `originalURL`, o mesmo campo já usado para
+   `article_id` em `history_pipeline.py`, partilhado por todas as capturas
+   do mesmo URL.
+5. Quando o mesmo par `(originalURL, tstamp)` aparecer em mais do que um
+   ficheiro raw, manter uma única captura no corpus agregado, mas registar a
+   união das proveniências (quais faceta/termo a devolveram) como metadado
+   de recolha — não é um campo da ontologia, apenas informação sobre o
+   processo, útil para caracterizar a amostra na dissertação.
+6. Se os campos do mesmo `(originalURL, tstamp)` diferirem entre ocorrências
+   (já observado no M3 entre `TextSearch` e `versionHistory` para a mesma
+   captura), preservar ambas as versões raw e sinalizar a divergência, em
+   vez de escolher uma automaticamente — consistente com a forma como essa
+   divergência já foi tratada no M3.
+7. Capturas distintas do mesmo `originalURL` (tstamps diferentes) não são
+   deduplicadas nesta etapa: várias capturas por artigo já são o
+   comportamento esperado e desejado do modelo (`RecursoWeb` →
+   `CapturaArquivada`). A redução de redundância textual entre capturas do
+   mesmo artigo é explicitamente o âmbito do Caminho D, não desta agregação.
+8. A classificação `Artigo` vs. página de secção/redirecionamento (já
+   identificada como pendente no plano do Caminho A) acontece depois desta
+   agregação, sobre a lista já deduplicada por identidade de captura — não
+   é resolvida por este protocolo de queries.
+
+### Limitações explícitas desta proposta
+
+- A lista de termos (9) é uma amostra intencional, não uma cobertura
+  sistemática das modalidades, clubes ou atletas do Record; outras escolhas
+  de termos são igualmente válidas e não foram testadas.
+- A faceta "clube" está enviesada para futebol; não foi incluído nenhum
+  clube identificado principalmente com outra modalidade.
+- Não é feita nenhuma previsão do número de artigos únicos que este protocolo
+  vai produzir — a Experiência 3 mostrou que a contagem de resultados por
+  pedido varia mesmo para parâmetros idênticos, pelo que qualquer estimativa
+  de rendimento seria inventada, não uma medição.
+- Este protocolo não resolve, nem tenta resolver, a causa da não-determinismo
+  da API nem a razão de `siteSearch=record.pt` limitar tanto os resultados;
+  apenas assume essas limitações como dadas e desenha a recolha em torno
+  delas.
+
+### Próximos passos (após validação)
+
+1. Validar com o autor a lista de termos e o intervalo temporal acima.
+2. Implementar a recolha seguindo exatamente os parâmetros e a contingência
+   de offset descritos, preservando raw por faceta/termo/repetição.
+3. Implementar a agregação/deduplicação descrita acima como um passo
+   separado e testável, antes de qualquer mapeamento RDF do corpus.
+4. Só depois disso, aplicar a regra de classificação Artigo/redirecionamento
+   e prosseguir com o resto do Caminho A.
+
+Esta secção não deve ser executada como recolha em massa sem validação
+explícita do autor, dado o custo de pedidos reais e a não-determinismo já
+observada.
