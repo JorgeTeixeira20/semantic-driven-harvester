@@ -103,17 +103,66 @@ e bloqueio de rede. As [fixtures](../tests/fixtures/README.md) são sintéticas.
 Passar esta suite verifica o comportamento local testado, não reproduz as
 experiências reais nem valida disponibilidade/completude do Arquivo.pt.
 
-## Trabalho em aberto e próximo passo provável
+## Trabalho em aberto e plano acordado (setembro 2026)
 
-Não há um roadmap posterior formalizado nos ficheiros versionados. Permanecem
-as questões de recuperação listadas em `experiments.md` e a ausência dos raw
-necessários para reproduzir os artefactos históricos.
+Esta secção substitui a proposta anterior por um plano já discutido e acordado
+com o autor, à luz do Relatório Pré-Dissertação (RPD, "Motor de colheita de
+informação orientado por ontologias", setembro de 2025, partilhado fora do
+repositório) e do estado real da implementação. O RPD é usado como referência
+do problema, objetivos e âmbito originalmente propostos, não como especificação
+técnica imutável: os pontos abaixo assinalados como "decisão de âmbito" são
+reduções conscientes face ao RPD, feitas por razões de tempo, e devem ser
+justificadas como tal na dissertação, não apresentadas como o RPD original.
 
-**Proposta, não decisão já tomada:** antes de ampliar o corpus, definir o âmbito
-e protocolo da próxima experiência, usando as decisões existentes sobre
-parâmetros e comparação de conjuntos, e definir como preservar os raw fora do
-Git. Recuperar artefactos ou realizar novas recolhas deve ser uma tarefa explícita;
-não é necessário para desenvolver ou executar a suite unitária.
+**Prazo-alvo:** entregar a dissertação até 31 de outubro de 2026 (objetivo do
+autor; sujeito a fatores externos como reuniões e aprovação do orientador).
+
+**Sequência de trabalho acordada:**
+
+1. **C (curto)** — nova experiência controlada e pequena, focada especificamente
+   em saber se `offset` permite paginar quando a primeira página vem
+   efetivamente cheia. Na Experiência 1 (`experiments.md`), nenhuma variante
+   devolveu tantos resultados quanto o `maxItems` pedido, pelo que `offset=100`
+   e `offset=200` devolverem 0 pode refletir apenas a ausência de mais
+   resultados materializados para aquela pesquisa específica, não uma
+   limitação geral da API. Este passo informa o protocolo de recolha do passo A.
+2. **A** — generalizar a colheita e o mapeamento RDF (hoje restritos a uma
+   única captura fixa em `rdf_mapper.py`) para um corpus real de vários artigos
+   do jornal Record, incluindo uma regra explícita de classificação
+   Artigo/redirecionamento.
+3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
+   âmbito:** heurística de similaridade textual simples (não `digest` isolado,
+   não embeddings), aplicada à escala do corpus produzido em A; comparação com
+   trabalho relacionado (ver abaixo) sustenta que isto já é mais rigoroso do
+   que o precedente conhecido. Deteção de equivalência semântica mais
+   sofisticada (ex.: embeddings) fica como trabalho futuro, condicional a
+   tempo disponível.
+4. **B** — povoamento de `EntidadeMencionada`/`Tema` (definidos na ontologia
+   desde o início, nunca usados em código). **Decisão de âmbito:** caracterização
+   descritiva/quantitativa (contagens, frequências), não uma avaliação formal
+   de precisão do reconhecimento; a considerar um vocabulário fechado
+   (clubes/competições/jogadores) em vez de um NER genérico em português.
+5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
+   **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
+   construída cedo (não deixada para o fim) para reduzir o risco de ficar sem
+   este entregável; uma interface mais interativa fica condicional a sobrar tempo.
+
+**Trabalho relacionado consultado:** *Major Minors* (Martins & Costa, Prémio
+Arquivo.pt 2021, também referido no RPD) deduplica apenas por título exato
+(94.309 URIs → 48.949 títulos não repetidos, segundo a sua "Descrição Sumária
+do Trabalho") e não parece modelar histórico temporal por artigo; a extração
+de entidades usa aparentemente vocabulário fechado por categoria, não NER
+genérico. Estas leituras vêm de documentos externos consultados pontualmente,
+não de inspeção do código deles.
+
+**Nota operacional:** este ambiente de execução remoto tem `arquivo.pt`
+bloqueado pela política de rede do sandbox. Passos que exigem chamadas reais
+à API (C, A, D, B) devem ser executados numa sessão local do Claude Code ou
+diretamente no terminal local, nunca aqui.
+
+Continuam por resolver as questões de recuperação listadas em `experiments.md`
+e a ausência dos raw necessários para reproduzir os artefactos históricos
+anteriores a este plano.
 
 Atualizar este documento quando mudar o estado implementado, a validação ou
 as limitações; manter resultados detalhados e decisões nas fontes acima.
