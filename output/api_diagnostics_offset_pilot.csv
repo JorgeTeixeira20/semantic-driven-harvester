@@ -1,0 +1,4 @@
+test,max_items_requested,max_items_reported_by_api,offset,dedup_field_reported_by_api,dedup_value_reported_by_api,estimated_nr_results,results_received,page_full,distinct_original_urls,distinct_tstamps,next_page,first_url,first_tstamp,last_url,last_tstamp
+G,20,20,0,url,1,108054864,13,False,13,12,False,http://www.sporting.pt/,20160211055158,http://sportingtv.pt.to/,20190914034528
+H,20,20,20,url,1,108211542,12,False,12,12,False,https://pt.wikipedia.org/wiki/Sporting_Clube_de_Portugal,20180407053844,http://sportingvintage.blogspot.com/,20191005133946
+I,20,20,40,url,1,108211542,5,False,5,5,False,http://sportingforever.blogspot.com/,20180716160812,http://sportingtap.blogspot.com/,20190323101910

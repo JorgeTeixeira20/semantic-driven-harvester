@@ -61,6 +61,19 @@ garantias sobre a API atual. Detalhes e decisões permanecem nas fontes:
   e 200 devolveram zero itens; pedidos maxItems 100/200/2000 devolveram
   33/57/96 itens. O pedido 2000 foi reportado como 500 pela API. Omitir dedup
   acionou defaults `url/2`, não desativou deduplicação.
+- [Experiência 2 — offset com página cheia](experiments.md),
+  [relatório](../output/api_diagnostics_offset.md) e
+  [CSV](../output/api_diagnostics_offset.csv), executados em 17 de setembro
+  de 2026: para a query `futebol` sem `siteSearch` e sem dedup explícito
+  (`maxItems=20`, 2015–2020), as cinco janelas testadas (offsets 0, 20, 40,
+  100 e 200) vieram todas cheias (20/20) com `next_page` presente e
+  resultados distintos das janelas anteriores — incluindo nos offsets 100 e
+  200, que na Experiência 1 tinham devolvido zero. Isto é consistente com a
+  hipótese de que aquele resultado vazio refletia o esgotamento dos
+  resultados materializados para a pesquisa específica da Experiência 1, não
+  uma limitação geral de `offset`. Uma tentativa preliminar (`Sporting`, sem
+  `siteSearch`, dedup `url/1` explícito) não chegou a produzir página cheia;
+  os seus raw e relatórios ficaram preservados com o prefixo/sufixo `pilot`.
 
 `docs/experiments.md` já contém hipóteses, interpretação, questões abertas e
 decisões metodológicas. Não existe um ADR ou documento de arquitetura separado;
@@ -119,13 +132,19 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
 
 **Sequência de trabalho acordada:**
 
-1. **C (curto)** — nova experiência controlada e pequena, focada especificamente
-   em saber se `offset` permite paginar quando a primeira página vem
-   efetivamente cheia. Na Experiência 1 (`experiments.md`), nenhuma variante
-   devolveu tantos resultados quanto o `maxItems` pedido, pelo que `offset=100`
-   e `offset=200` devolverem 0 pode refletir apenas a ausência de mais
+1. **C (curto) — concluído em 2026-09-17.** Nova experiência controlada e
+   pequena (Experiência 2 em `experiments.md`), focada especificamente em
+   saber se `offset` permite paginar quando a primeira página vem
+   efetivamente cheia. Na Experiência 1, nenhuma variante devolveu tantos
+   resultados quanto o `maxItems` pedido, pelo que `offset=100` e
+   `offset=200` devolverem 0 podia refletir apenas a ausência de mais
    resultados materializados para aquela pesquisa específica, não uma
-   limitação geral da API. Este passo informa o protocolo de recolha do passo A.
+   limitação geral da API. Resultado: com uma pesquisa que preencheu
+   genuinamente `maxItems=20` (`futebol`, sem `siteSearch`, sem dedup
+   explícito), `offset` paginou corretamente em todas as janelas testadas,
+   incluindo 100 e 200. Este passo informa o protocolo de recolha do passo A:
+   verificar se a página anterior veio cheia antes de descartar `offset` como
+   mecanismo de paginação.
 2. **A** — generalizar a colheita e o mapeamento RDF (hoje restritos a uma
    única captura fixa em `rdf_mapper.py`) para um corpus real de vários artigos
    do jornal Record, incluindo uma regra explícita de classificação

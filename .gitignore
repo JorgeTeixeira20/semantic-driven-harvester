@@ -14,6 +14,8 @@ data/raw/profiling/*
 !data/raw/profiling/.gitkeep
 data/raw/api_diagnostics/*
 !data/raw/api_diagnostics/.gitkeep
+data/raw/api_diagnostics_offset/*
+!data/raw/api_diagnostics_offset/.gitkeep
 output/*
 !output/.gitkeep
 !output/sample_capture.ttl
@@ -22,3 +24,7 @@ output/*
 !output/api_profiling.md
 !output/api_diagnostics.csv
 !output/api_diagnostics.md
+!output/api_diagnostics_offset.csv
+!output/api_diagnostics_offset.md
+!output/api_diagnostics_offset_pilot.csv
+!output/api_diagnostics_offset_pilot.md

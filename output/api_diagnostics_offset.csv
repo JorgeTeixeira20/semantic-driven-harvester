@@ -1,0 +1,6 @@
+test,max_items_requested,max_items_reported_by_api,offset,dedup_field_reported_by_api,dedup_value_reported_by_api,estimated_nr_results,results_received,page_full,distinct_original_urls,distinct_tstamps,next_page,first_url,first_tstamp,last_url,last_tstamp
+G,20,20,0,title,2,286123167,20,True,13,20,True,http://www.futebol365.pt/,20160210203525,http://www.futebol.desportoaveiro.pt/,20160210203526
+H,20,20,20,title,2,286123167,20,True,14,17,True,http://portal-futebol.blogspot.com/,20190320080020,http://futeboltotal-victor.blogspot.com/,20190901093101
+I,20,20,40,title,2,286123167,20,True,17,20,True,http://www.portalfutebol.net/,20160204173835,http://www.afutebollisboa.org/,20160204130944
+J,20,20,100,title,2,245042486,20,True,18,19,True,http://www.afguarda.pt/,20181013091047,http://www.afviseu.org/,20150408103302
+K,20,20,200,title,2,232123711,20,True,20,19,True,http://www.espn.com.br/futebol/resultados,20181023151422,https://www.publico.pt/futebol0,20191011120712

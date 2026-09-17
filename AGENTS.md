@@ -21,8 +21,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   e preservação dos bytes de JSON/texto.
 - `history_pipeline.py`: paginação, textos, manifesto JSONL e métricas.
 - `rdf_mapper.py`: IDs determinísticos, grafos de sample/histórico e Turtle.
-- `smoke_test.py`, `api_profiling.py`, `api_diagnostics.py`: execuções reais
-  manuais; estes módulos também estão em `src/semantic_harvester/`.
+- `smoke_test.py`, `api_profiling.py`, `api_diagnostics.py`,
+  `api_diagnostics_offset.py`: execuções reais manuais; estes módulos também
+  estão em `src/semantic_harvester/`.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -55,6 +56,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.history_pipeline` | Rede; recolhe histórico; a geração RDF final também exige o JSON M1 selecionado. |
 | `python -m semantic_harvester.api_profiling` | Rede; grava raw e relatórios. |
 | `python -m semantic_harvester.api_diagnostics` | Rede; grava raw e relatórios. |
+| `python -m semantic_harvester.api_diagnostics_offset` | Rede; grava raw e relatórios. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.

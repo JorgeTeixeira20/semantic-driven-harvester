@@ -164,3 +164,18 @@ python -m semantic_harvester.api_diagnostics
 Os JSON raw são guardados em `data/raw/api_diagnostics/`; os resultados ficam
 em `output/api_diagnostics.csv`, `output/api_diagnostics.md` e são discutidos
 em `docs/experiments.md`.
+
+## Repetir a Experiência 2 (offset com página cheia)
+
+Para repetir o teste de paginação por `offset` quando a primeira página vem
+efetivamente cheia:
+
+```bash
+python -m semantic_harvester.api_diagnostics_offset
+```
+
+Os JSON raw são guardados em `data/raw/api_diagnostics_offset/`; os
+resultados ficam em `output/api_diagnostics_offset.csv`,
+`output/api_diagnostics_offset.md` e são discutidos em `docs/experiments.md`.
+Este comando pode demorar por chamada (a query não usa `siteSearch`); em caso
+de timeout ou erro 500 pontual da API, repetir a execução.
