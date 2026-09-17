@@ -1,0 +1,27 @@
+facet,query,repetition,requests_made,results_received
+modalidade,futebol,1,1,21
+modalidade,futebol,2,1,21
+modalidade,basquetebol,1,1,20
+modalidade,basquetebol,2,1,20
+modalidade,andebol,1,1,21
+modalidade,andebol,2,1,21
+modalidade,voleibol,1,1,19
+modalidade,voleibol,2,1,19
+clube,Benfica,1,1,19
+clube,Benfica,2,1,19
+clube,Sporting,1,1,20
+clube,Sporting,2,1,20
+clube,Porto,1,1,16
+clube,Porto,2,1,16
+clube,SC Braga,1,1,3
+clube,SC Braga,2,1,3
+atleta,Cristiano Ronaldo,1,1,20
+atleta,Cristiano Ronaldo,2,1,20
+atleta,Bruno Fernandes,1,1,15
+atleta,Bruno Fernandes,2,1,15
+atleta,Telma Monteiro,1,1,6
+atleta,Telma Monteiro,2,1,6
+atleta,João Félix,1,1,12
+atleta,João Félix,2,1,12
+atleta,Nelson Évora,1,1,8
+atleta,Nelson Évora,2,1,8

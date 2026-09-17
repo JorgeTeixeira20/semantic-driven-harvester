@@ -182,18 +182,24 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    do jornal Record, incluindo uma regra explícita de classificação
    Artigo/redirecionamento.
 
-   **Protocolo de queries: dimensionamento decidido em 2026-09-17 (Opção 2
-   — Moderada).** Ver "Protocolo de queries para o corpus do Caminho A" em
-   `experiments.md`. Duas fases: Fase 1 (TextSearch, descoberta; 13 termos —
-   4 modalidades, 4 clubes, 5 atletas conhecidos —, 2 repetições/termo,
-   26–52 pedidos) e Fase 2 (`version_history` por artigo único descoberto,
-   generalizando `history_pipeline.py`/`collect_all_captures()` de um único
-   URL hardcoded para vários; custo `≈N`, `N` só conhecido depois da Fase
-   1). Explicitamente uma amostra pequena e não exaustiva, não uma
-   cobertura sistemática do Record. A Fase 1 está a ser executada nesta
-   sessão; a Fase 2 continua a exigir confirmação explícita do autor sobre
-   o valor de `N` antes de avançar (ponto de verificação em
-   `experiments.md`).
+   **Protocolo de queries: Opção 2 (Moderada) decidida e Fase 1 executada
+   em 2026-09-17.** Ver "Protocolo de queries para o corpus do Caminho A"
+   em `experiments.md`. Fase 1 (TextSearch, descoberta; 13 termos — 4
+   modalidades, 4 clubes, 5 atletas conhecidos —, 2 repetições/termo): 26
+   pedidos reais, nenhuma página cheia, **N = 159 artigos únicos**
+   confirmado por `(originalURL, tstamp)`/`originalURL`, com 20 capturas
+   encontradas por mais do que uma query (maioritariamente por conteúdo de
+   navegação partilhado — menu de modalidades —, não relevância temática
+   real; ver observações em `experiments.md`) e 20 divergências de
+   metadados, todas isoladas ao campo `snippet` (esperado, não um problema
+   de qualidade). Raw em `data/raw/corpus_queries/`; relatórios em
+   `output/corpus_phase1_*`. Explicitamente uma amostra pequena e não
+   exaustiva, não uma cobertura sistemática do Record. **Execução parou no
+   ponto de verificação, como combinado:** a Fase 2 (`version_history` por
+   artigo único, generalizando `history_pipeline.py`/
+   `collect_all_captures()` de um único URL hardcoded para os 159
+   descobertos; custo `≈N`) não deve começar sem confirmação explícita do
+   autor sobre `N = 159`.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com

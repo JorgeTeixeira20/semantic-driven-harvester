@@ -474,10 +474,11 @@ Para o protocolo de recolha do Caminho A:
 
 ## Protocolo de queries para o corpus do Caminho A
 
-**Estado em 2026-09-17: dimensionamento decidido (Opção 2, 13 termos, 2
-repetições) — Fase 1 (TextSearch) a executar nesta sessão. Fase 2
-(`version_history`) continua por autorizar; ver "Ponto de verificação" nos
-Próximos passos.**
+**Estado em 2026-09-17: Fase 1 (TextSearch) concluída — 26 pedidos reais,
+N = 159 artigos únicos confirmado (ver "Resultados da Fase 1" abaixo). A
+execução PAROU no ponto de verificação, como pedido: a Fase 2
+(`version_history`) continua por autorizar e não deve começar sem
+confirmação explícita do autor sobre `N = 159`.**
 
 Este protocolo é uma ferramenta operacional de recolha — uma grelha de termos
 de pesquisa a combinar com `siteSearch=record.pt` — e não deve ser confundida
@@ -729,28 +730,135 @@ entre pedidos da Fase 1) — não uma previsão; o valor real de `N` só é
 conhecido depois de executar a Fase 1 e a agregação (ver "Ponto de
 verificação" abaixo).
 
+### Resultados da Fase 1 (execução real, 2026-09-17)
+
+Execução real de `src/semantic_harvester/corpus_phase1.py`, implementando
+exatamente os parâmetros descritos acima. Raw preservado byte a byte em
+`data/raw/corpus_queries/` (26 ficheiros); relatórios em
+`output/corpus_phase1_per_term.csv`, `output/corpus_phase1_captures.csv` e
+`output/corpus_phase1_aggregation.md`.
+
+#### Resumo
+
+- Pedidos reais efetuados: **26** (mínimo previsto; nenhuma página veio
+  cheia em nenhum dos 26 pedidos base, pelo que não houve pedidos
+  condicionais de offset — consistente com a Experiência 3, agora também
+  observado com `maxItems=50` em vez de 20).
+- Itens brutos recebidos antes de deduplicar: 400.
+- Capturas únicas por `(originalURL, tstamp)`: 160.
+- **N = 159 artigos únicos por `originalURL`.**
+- Capturas encontradas por mais do que uma query: 20.
+- Divergências de metadados para a mesma `(originalURL, tstamp)`: 20.
+- Um artigo (`.../sporting/detalhe/zahavi-espera-contacto-leonino-692448.html`)
+  já apareceu com dois `tstamp` distintos (`20170228223739` e
+  `20180413194101`) mesmo antes da Fase 2 — uma amostra de profundidade
+  temporal já visível na própria descoberta.
+
+#### Pedidos e resultados por termo
+
+| Faceta | Termo | Resultados (rep 1 / rep 2) |
+| --- | --- | ---: |
+| modalidade | futebol | 21 / 21 |
+| modalidade | basquetebol | 20 / 20 |
+| modalidade | andebol | 21 / 21 |
+| modalidade | voleibol | 19 / 19 |
+| clube | Benfica | 19 / 19 |
+| clube | Sporting | 20 / 20 |
+| clube | Porto | 16 / 16 |
+| clube | SC Braga | 3 / 3 |
+| atleta | Cristiano Ronaldo | 20 / 20 |
+| atleta | Bruno Fernandes | 15 / 15 |
+| atleta | Telma Monteiro | 6 / 6 |
+| atleta | João Félix | 12 / 12 |
+| atleta | Nelson Évora | 8 / 8 |
+
+Tabela completa por pedido em `output/corpus_phase1_per_term.csv`.
+
+#### Observações
+
+- **Nenhuma página veio cheia** (máximo observado: 21 de `maxItems=50`,
+  mínimo: 3, para `SC Braga`). Confirma, com `maxItems=50`, o mesmo padrão
+  que a Experiência 3 tinha observado com `maxItems=20` dentro de
+  `siteSearch=record.pt`: aumentar `maxItems` não aproximou a página de
+  vir cheia.
+- **Repetição 1 e repetição 2 foram byte a byte idênticas para todos os 13
+  termos** (verificado por comparação direta do raw de 6 termos
+  escolhidos ao acaso, incluindo os de maior e menor volume; os restantes
+  têm a mesma contagem exata rep1/rep2 na tabela acima). Isto contrasta
+  com a Experiência 3, onde pedidos idênticos e consecutivos devolveram
+  contagens diferentes (`Sporting`: 3, 5, 7). Não foi identificada a causa
+  desta diferença de comportamento entre as duas execuções — possíveis
+  fatores não isolados incluem `maxItems` (50 aqui vs. 20 na Experiência 3),
+  `dedupField`/`dedupValue` explícitos (aqui `url`/`1` vs. omitidos na
+  Experiência 3) ou simplesmente variação temporal do lado da API. Fica
+  como questão em aberto, não resolvida por esta execução.
+- **A única causa de divergência de metadados observada foi o campo
+  `snippet`.** Nas 20 capturas divergentes, todos os outros campos
+  (`digest`, `title`, `contentLength`, `tstamp`, etc.) foram idênticos
+  entre queries; só o excerto destacado (`snippet`, com `<em>` à volta do
+  termo pesquisado) variou conforme a query. Isto é o comportamento
+  esperado de um campo de pesquisa (o excerto reflete a query, não o
+  documento), não uma inconsistência de metadados como a observada no M3
+  entre `TextSearch` e `versionHistory` (que envolvia `digest`,
+  `contentLength` e `title`, não apenas o snippet). As duas situações não
+  devem ser tratadas como o mesmo fenómeno.
+- **A maioria das capturas encontradas por várias queries parece dever-se a
+  conteúdo repetido em todas as páginas do site (menu de navegação com os
+  nomes das modalidades), não a relevância temática real.** Ex.:
+  "andebol;basquetebol;voleibol" aparecem juntas em 6 das 20 capturas
+  multi-query, porque estes três nomes de modalidade surgem lado a lado no
+  menu de navegação do Record em qualquer página. Duas páginas de perfil de
+  jogador ("YEBDA - Saber Mais", "ze pedro - Saber Mais") também foram
+  devolvidas por `andebol;basquetebol;voleibol`, sem relação de conteúdo
+  aparente com essas modalidades. Isto sugere que a pesquisa da API
+  considera o HTML completo da página (incluindo menus e blocos fixos), não
+  só o corpo do artigo — relevante para interpretar `N` como "artigos
+  únicos descobertos", não como "artigos relevantes para a query que os
+  encontrou", e para a regra de classificação Artigo/redirecionamento (as
+  páginas "Saber Mais" não são artigos).
+
+#### Interpretação
+
+- `N = 159` é o valor real confirmado nesta execução, não uma estimativa.
+  Fica muito abaixo do teto teórico de 1300 pedidos da Fase 2, como a
+  Experiência 3 sugeria.
+- A ausência de páginas cheias reforça a decisão já tomada de não desenhar
+  a Fase 1 à volta de `offset`: com esta configuração, a paginação nunca foi
+  necessária.
+- A estabilidade rep1/rep2 (idênticas) nesta execução, depois da
+  instabilidade observada na Experiência 3, não permite concluir que a API
+  se tornou determinística — apenas que, nesta janela de observação e com
+  estes parâmetros, os pedidos repetidos coincidiram. Não deve ser assumido
+  como garantia para execuções futuras.
+- A sobreposição por conteúdo de navegação (não temático) significa que os
+  159 artigos não devem ser lidos como "159 artigos sobre as respetivas
+  queries"; são 159 páginas distintas devolvidas por pelo menos uma das 13
+  queries, algumas por relevância de conteúdo, outras por texto de menu
+  partilhado. A classificação Artigo/redirecionamento (pendente) vai
+  precisar de lidar com isto, incluindo páginas de perfil ("Saber Mais").
+
+**N confirmado: 159. A implementação e a agregação (passos 2–4) estão
+concluídas. Conforme pedido, a execução PARA aqui — a Fase 2
+(`version_history`) só avança com confirmação explícita do autor sobre
+este valor de `N`.**
+
 ### Próximos passos
 
 1. ~~Validar com o autor e o Jorge a opção de dimensionamento, a lista de
    termos correspondente e o intervalo temporal.~~ **Concluído em
    2026-09-17: Opção 2.**
-2. Implementar e correr a recolha da Fase 1 (TextSearch) seguindo
-   exatamente os parâmetros e a contingência de offset descritos,
-   preservando raw por faceta/termo/repetição.
-3. Implementar a agregação/deduplicação descrita acima como um passo
-   separado e testável, antes de qualquer mapeamento RDF do corpus.
-4. Ponto de verificação: confirmar o valor real de `N` (artigos únicos
-   descobertos) e documentar os resultados nesta secção. **Parar aqui até
-   o autor confirmar `N` — não avançar para a Fase 2 sem essa confirmação
-   explícita.**
+2. ~~Implementar e correr a recolha da Fase 1 (TextSearch).~~ **Concluído em
+   2026-09-17: 26 pedidos, ver "Resultados da Fase 1" acima.**
+3. ~~Implementar a agregação/deduplicação.~~ **Concluído em 2026-09-17:
+   `output/corpus_phase1_captures.csv`.**
+4. ~~Ponto de verificação: confirmar o valor real de `N`.~~ **Concluído em
+   2026-09-17: N = 159. Aguarda confirmação explícita do autor antes do
+   passo 5.**
 5. Implementar a Fase 2 (`version_history` por artigo único), generalizando
    `collect_all_captures()`/`run_history_pipeline()` de um único URL
    hardcoded para a lista de artigos únicos descoberta — reaproveitando a
-   lógica de paginação já testada, sem a alterar.
+   lógica de paginação já testada, sem a alterar. **Não iniciar sem
+   confirmação explícita do autor sobre `N = 159`.**
 6. Só depois disso, aplicar a regra de classificação Artigo/redirecionamento
-   e prosseguir com o resto do Caminho A. (Ver nota em aberto acima sobre
-   correr a Fase 2 antes ou depois desta classificação.)
-
-A Fase 2 (passo 5) não deve ser executada sem validação explícita do valor
-de `N` obtido no passo 4, dado o custo de pedidos reais e a não-determinismo
-já observada.
+   (ver observação acima sobre páginas "Saber Mais" e conteúdo de
+   navegação) e prosseguir com o resto do Caminho A.
