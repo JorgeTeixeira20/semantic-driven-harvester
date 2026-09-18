@@ -341,6 +341,74 @@ class BuildCorpusGraphTests(OfflineTestCase):
             len(set(graph.subjects(RDF.type, SDH.Jornal))), 1,
         )
 
+    def test_resumes_without_repeating_already_processed_articles(self) -> None:
+        """Regressão: sem isto, uma retoma reprocessava todos os artigos desde
+        o início (incluindo novas tentativas de rede para os já concluídos),
+        nunca avançando o suficiente entre cortes por falta de memória."""
+
+        raw_dir = self.root / "data" / "raw"
+        version_history_dir = raw_dir / "version_history"
+        output_dir = self.root / "output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        url_a = "https://news.example.test/articles/retoma-a"
+        url_b = "https://news.example.test/articles/retoma-b"
+        capture_a = {
+            "originalURL": url_a, "tstamp": "20200101000000",
+            "title": "Artigo A", "linkToArchive": "https://archive.example.test/ra",
+            "linkToExtractedText": "https://archive.example.test/text/ra",
+            "mimeType": "text/html", "contentLength": 111, "digest": "DIGEST-RA",
+            "encoding": "UTF-8", "collection": "SYNTHETIC", "statusCode": 200,
+        }
+        capture_b = {
+            "originalURL": url_b, "tstamp": "20200303000000",
+            "title": "Artigo B", "linkToArchive": "https://archive.example.test/rb",
+            "linkToExtractedText": "https://archive.example.test/text/rb",
+            "mimeType": "text/html", "contentLength": 222, "digest": "DIGEST-RB",
+            "encoding": "UTF-8", "collection": "SYNTHETIC", "statusCode": 200,
+        }
+        write_version_history_raw(version_history_dir, url_a, offset=0, response_items=[capture_a])
+        write_version_history_raw(version_history_dir, url_b, offset=0, response_items=[capture_b])
+
+        classification_csv = output_dir / "corpus_classification.csv"
+        with classification_csv.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=["original_url", "title", "captures", "is_artigo", "reason"],
+            )
+            writer.writeheader()
+            writer.writerow({
+                "original_url": url_a, "title": "Artigo A",
+                "captures": "1", "is_artigo": "True", "reason": "artigo",
+            })
+            writer.writerow({
+                "original_url": url_b, "title": "Artigo B",
+                "captures": "1", "is_artigo": "True", "reason": "artigo",
+            })
+
+        text_content = b"texto sintetico"
+        first_session = self.fixture_session(
+            ("https://archive.example.test/text/ra", text_content),
+            ("https://archive.example.test/text/rb", text_content),
+        )
+        first_client = ArquivoClient(data_dir=raw_dir, session=first_session)
+        first_graph, first_results = build_corpus_graph(self.root, client=first_client)
+
+        self.assertEqual(len(first_results), 2)
+        self.assertEqual(len(set(first_graph.subjects(RDF.type, SDH.Artigo))), 2)
+
+        # Sessão sem respostas preparadas: qualquer pedido HTTP nesta segunda
+        # chamada falha a asserção da fixture, provando que nada foi repetido.
+        second_session = self.fixture_session()
+        second_client = ArquivoClient(data_dir=raw_dir, session=second_session)
+        second_graph, second_results = build_corpus_graph(self.root, client=second_client)
+
+        self.assertEqual(len(second_results), 2)
+        self.assertEqual({r.original_url for r in second_results}, {url_a, url_b})
+        self.assertEqual(len(set(second_graph.subjects(RDF.type, SDH.Artigo))), 2)
+        self.assertIn((article_uri(url_a), RDF.type, SDH.Artigo), second_graph)
+        self.assertIn((article_uri(url_b), RDF.type, SDH.Artigo), second_graph)
+
 
 if __name__ == "__main__":
     unittest.main()

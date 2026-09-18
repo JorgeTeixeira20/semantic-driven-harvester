@@ -21,6 +21,16 @@ estas variantes para um único identificador antes de mapear,
 `original_url`) e o artigo perderia essas capturas. `normalize_for_grouping()`
 resolve isto reatribuindo o `originalURL` canónico às variantes cosméticas,
 preservando todas as capturas reais.
+
+Segundo achado, também documentado em `docs/experiments.md`: a execução
+real revelou uma taxa de falha alta nos downloads de texto (muitos 404 e
+ligações cortadas para capturas de ~2017), tornando cada sessão lenta. Sem
+retomar por artigo, cada nova tentativa reprocessava todos os artigos desde
+o início — incluindo novas tentativas para downloads já falhados — e nunca
+ultrapassava os primeiros ~20 artigos antes do corte seguinte. A execução é
+por isso retomável por artigo: `build_corpus_graph()` salta os artigos já
+presentes em `output/corpus_rdf_report.csv` e os seus triplos já
+preservados em `data/processed/corpus_articles_triples.nt`.
 """
 
 from __future__ import annotations
@@ -31,7 +41,7 @@ import json
 import logging
 import re
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Any
 
@@ -135,6 +145,40 @@ class ArticleGraphResult:
     error: str | None
 
 
+RESULT_FIELDS = tuple(f.name for f in fields(ArticleGraphResult))
+
+
+def article_result_from_row(row: dict[str, str]) -> ArticleGraphResult:
+    return ArticleGraphResult(
+        original_url=row["original_url"],
+        captures_used=int(row["captures_used"]),
+        captures_url_variants_normalized=int(row["captures_url_variants_normalized"]),
+        captures_dropped_mismatched_url=int(row["captures_dropped_mismatched_url"]),
+        texts_downloaded_now=int(row["texts_downloaded_now"]),
+        texts_reused=int(row["texts_reused"]),
+        texts_failed=int(row["texts_failed"]),
+        error=row["error"] or None,
+    )
+
+
+def load_already_processed(report_csv: Path) -> dict[str, ArticleGraphResult]:
+    """Permite retomar sem repetir artigos já processados (sucesso ou falha).
+
+    Sem isto, cada retoma reprocessava todos os artigos desde o início,
+    incluindo novas tentativas para todos os downloads de texto já falhados
+    nas execuções anteriores — na prática, ficava sempre preso nos primeiros
+    ~20 artigos antes do próximo corte por memória (ver docs/experiments.md).
+    """
+
+    if not report_csv.is_file():
+        return {}
+    processed: dict[str, ArticleGraphResult] = {}
+    with report_csv.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            processed[row["original_url"]] = article_result_from_row(row)
+    return processed
+
+
 def build_one_article_graph(
     client: ArquivoClient,
     original_url: str,
@@ -186,14 +230,6 @@ def build_one_article_graph(
     )
 
 
-def write_report_csv(results: list[ArticleGraphResult], path: Path) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(asdict(results[0])))
-        writer.writeheader()
-        writer.writerows(asdict(result) for result in results)
-
-
 def write_summary_markdown(
     results: list[ArticleGraphResult], graph_size: int, path: Path
 ) -> None:
@@ -215,12 +251,14 @@ def write_summary_markdown(
         "`Artigo` em `output/corpus_classification.csv`. As capturas foram "
         "reconstruídas a partir do raw de `version_history` já preservado "
         "pela Fase 2 (`data/raw/version_history/`), sem pedidos novos; só o "
-        "download dos textos extraídos fez pedidos reais à API.\n",
+        "download dos textos extraídos fez pedidos reais à API. A execução é "
+        "retomável por artigo (`output/corpus_rdf_report.csv`); estes números "
+        "agregam todas as sessões até à conclusão, não só a última.\n",
         "## Resumo\n",
         f"- Artigos mapeados com sucesso: {len(successes)} de {len(results)}",
         f"- Artigos com falha (raw em falta ou manifesto inválido): {len(failures)}",
         f"- Total de capturas incluídas no grafo: {total_captures}",
-        f"- Textos descarregados nesta execução: {total_downloaded}",
+        f"- Textos descarregados (soma de todas as sessões): {total_downloaded}",
         f"- Textos reutilizados (já existentes em `data/raw/texts/`): {total_reused}",
         f"- Textos indisponíveis (falha ou 404): {total_failed}",
         f"- Triplos no grafo final (`output/corpus_articles.ttl`): {graph_size}",
@@ -253,11 +291,33 @@ def build_corpus_graph(
     project_root: Path | None = None,
     client: ArquivoClient | None = None,
 ) -> tuple[Graph, list[ArticleGraphResult]]:
+    """Retomável por artigo: uma execução interrompida pode ser repetida sem
+    repetir pedidos de rede para artigos já processados (sucesso ou falha).
+
+    Cada artigo concluído é escrito de imediato em `report_csv` (uma linha,
+    com flush) e os triplos do seu grafo são acrescentados a `triples_path`
+    em N-Triples (uma linha por triplo, também com flush) — formato
+    apendável sem reescrever o ficheiro inteiro, ao contrário de Turtle. O
+    grafo Turtle final e o relatório em Markdown são sempre regenerados a
+    partir destes dois ficheiros acumulados, nunca só da sessão atual.
+    """
+
     root = project_root or Path(__file__).resolve().parents[2]
     classification_csv = root / "output" / "corpus_classification.csv"
     version_history_dir = root / "data" / "raw" / "version_history"
+    report_csv = root / "output" / "corpus_rdf_report.csv"
+    triples_path = root / "data" / "processed" / "corpus_articles_triples.nt"
 
     articles = load_retained_articles(classification_csv)
+    already = load_already_processed(report_csv)
+    pending = [row for row in articles if row["original_url"] not in already]
+
+    LOGGER.info(
+        "Grafo RDF: %d artigos no total, %d já concluídos numa execução "
+        "anterior, %d por processar nesta sessão.",
+        len(articles), len(already), len(pending),
+    )
+
     if client is None:
         # Timeout por omissão do ArquivoClient (10s/30s), não o (15s/120s)
         # copiado sem justificação das Fases 1-2: download de texto por
@@ -266,40 +326,69 @@ def build_corpus_graph(
         # penduradas/cortadas (ver docs/experiments.md).
         client = ArquivoClient(data_dir=root / "data" / "raw")
 
+    results: list[ArticleGraphResult] = list(already.values())
+
+    if pending:
+        report_csv.parent.mkdir(parents=True, exist_ok=True)
+        triples_path.parent.mkdir(parents=True, exist_ok=True)
+        write_header = not report_csv.is_file()
+
+        with report_csv.open("a", encoding="utf-8", newline="") as report_handle:
+            with triples_path.open("a", encoding="utf-8") as triples_handle:
+                writer = csv.DictWriter(report_handle, fieldnames=list(RESULT_FIELDS))
+                if write_header:
+                    writer.writeheader()
+
+                start = time.monotonic()
+                for index, row in enumerate(pending, start=1):
+                    url = row["original_url"]
+                    title = row["title"]
+                    graph, result = build_one_article_graph(
+                        client, url, title, version_history_dir, root
+                    )
+                    if graph is not None:
+                        triples_handle.write(graph.serialize(format="nt"))
+                        triples_handle.write("\n")
+                        triples_handle.flush()
+
+                    results.append(result)
+                    writer.writerow(asdict(result))
+                    report_handle.flush()
+
+                    if index % PROGRESS_EVERY == 0 or index == len(pending):
+                        elapsed = time.monotonic() - start
+                        rate = elapsed / index
+                        remaining = (len(pending) - index) * rate
+                        failures_so_far = sum(1 for r in results if r.error)
+                        captures_so_far = sum(r.captures_used for r in results)
+                        LOGGER.info(
+                            "Progresso: %d/%d pendentes nesta sessão "
+                            "(%d/%d no total), %d capturas processadas (total), "
+                            "%.0fs decorridos nesta sessão, ~%.0fs restantes "
+                            "nesta sessão, %d falhas até agora.",
+                            index,
+                            len(pending),
+                            len(already) + index,
+                            len(articles),
+                            captures_so_far,
+                            elapsed,
+                            remaining,
+                            failures_so_far,
+                        )
+    else:
+        LOGGER.info(
+            "Todos os %d artigos já tinham sido processados numa execução "
+            "anterior; nada a fazer nesta sessão.",
+            len(articles),
+        )
+
     combined = Graph()
     combined.bind("sdh", SDH)
     combined.bind("rdf", RDF)
     combined.bind("rdfs", RDFS)
     combined.bind("xsd", XSD)
-
-    results: list[ArticleGraphResult] = []
-    start = time.monotonic()
-    for index, row in enumerate(articles, start=1):
-        url = row["original_url"]
-        title = row["title"]
-        graph, result = build_one_article_graph(
-            client, url, title, version_history_dir, root
-        )
-        if graph is not None:
-            combined += graph
-        results.append(result)
-
-        if index % PROGRESS_EVERY == 0 or index == len(articles):
-            elapsed = time.monotonic() - start
-            rate = elapsed / index
-            remaining = (len(articles) - index) * rate
-            failures_so_far = sum(1 for r in results if r.error)
-            captures_so_far = sum(r.captures_used for r in results)
-            LOGGER.info(
-                "Progresso: %d/%d artigos, %d capturas processadas, "
-                "%.0fs decorridos, ~%.0fs restantes, %d falhas até agora.",
-                index,
-                len(articles),
-                captures_so_far,
-                elapsed,
-                remaining,
-                failures_so_far,
-            )
+    if triples_path.is_file():
+        combined.parse(location=str(triples_path), format="nt")
 
     return combined, results
 
@@ -312,7 +401,6 @@ def run(project_root: Path | None = None) -> tuple[Graph, list[ArticleGraphResul
     output_path.parent.mkdir(parents=True, exist_ok=True)
     graph.serialize(destination=output_path, format="turtle")
 
-    write_report_csv(results, root / "output" / "corpus_rdf_report.csv")
     write_summary_markdown(results, len(graph), root / "output" / "corpus_rdf_summary.md")
     return graph, results
 
