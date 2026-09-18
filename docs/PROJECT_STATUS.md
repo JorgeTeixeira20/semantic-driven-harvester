@@ -184,8 +184,8 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    do jornal Record, incluindo uma regra explícita de classificação
    Artigo/redirecionamento.
 
-   **Protocolo de queries: Opção 2 (Moderada) decidida e Fase 1 executada
-   em 2026-09-17.** Ver "Protocolo de queries para o corpus do Caminho A"
+   **Protocolo de queries: Opção 2 (Moderada); Fase 1 e Fase 2 executadas
+   em 2026-09-17/18.** Ver "Protocolo de queries para o corpus do Caminho A"
    em `experiments.md`. Fase 1 (TextSearch, descoberta; 13 termos — 4
    modalidades, 4 clubes, 5 atletas conhecidos —, 2 repetições/termo): 26
    pedidos reais, nenhuma página cheia, **N = 159 artigos únicos**
@@ -196,12 +196,7 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    metadados, todas isoladas ao campo `snippet` (esperado, não um problema
    de qualidade). Raw em `data/raw/corpus_queries/`; relatórios em
    `output/corpus_phase1_*`. Explicitamente uma amostra pequena e não
-   exaustiva, não uma cobertura sistemática do Record. **Execução parou no
-   ponto de verificação, como combinado:** a Fase 2 (`version_history` por
-   artigo único, generalizando `history_pipeline.py`/
-   `collect_all_captures()` de um único URL hardcoded para os 159
-   descobertos; custo `≈N`) não deve começar sem confirmação explícita do
-   autor sobre `N = 159`.
+   exaustiva, não uma cobertura sistemática do Record.
 
    **Correção de bug em `collect_all_captures()`, 2026-09-18.** A função
    parava a paginação quando `len(captures) >= estimated_nr_results`,
@@ -212,8 +207,26 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    duas condições já validadas (página incompleta, sem `next_page`).
    `estimated_total` continua a ser recolhido para relatório, só deixou de
    decidir a paragem. Teste de regressão acrescentado
-   (`test_pagination_ignores_low_estimated_total`); suite completa com 24
-   testes, todos a passar. Detalhe em `experiments.md`.
+   (`test_pagination_ignores_low_estimated_total`).
+
+   **Fase 2 (`version_history` por artigo único, generalizando
+   `history_pipeline.py`/`collect_all_captures()` já corrigida), executada
+   em 2026-09-18 depois de autorizada pelo autor:** 159/159 artigos
+   processados, **0 falhas**, 287 pedidos reais (159 + paginação),
+   **7 572 capturas** no total, **125 de 159 artigos (78,6%) com mais do
+   que uma captura**. Execução rápida (109s) — `version_history` consulta
+   um URL exato, não pesquisa de texto livre, pelo que a lentidão das
+   experiências anteriores não se generaliza a este tipo de pedido. Raw em
+   `data/raw/version_history/`; relatórios em `output/corpus_phase2_*`.
+   **Achado relevante para o passo 6:** os 13 artigos com mais de 100
+   capturas (até 1282) não são artigos noticiosos — são páginas
+   `/sabermais/<nome>` (perfis) e páginas de secção/hub sem `/detalhe/`, o
+   que dá evidência concreta do que a classificação Artigo/redirecionamento
+   precisa de filtrar; ver detalhe em `experiments.md`.
+
+   **Falta o passo 6** (classificação Artigo/redirecionamento e resto do
+   Caminho A — mapeamento RDF do corpus, download de textos das capturas
+   retidas), ainda não implementado.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com

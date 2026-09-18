@@ -474,11 +474,12 @@ Para o protocolo de recolha do Caminho A:
 
 ## Protocolo de queries para o corpus do Caminho A
 
-**Estado em 2026-09-17: Fase 1 (TextSearch) concluída — 26 pedidos reais,
-N = 159 artigos únicos confirmado (ver "Resultados da Fase 1" abaixo). A
-execução PAROU no ponto de verificação, como pedido: a Fase 2
-(`version_history`) continua por autorizar e não deve começar sem
-confirmação explícita do autor sobre `N = 159`.**
+**Estado em 2026-09-18: Fase 1 e Fase 2 concluídas.** Fase 1: 26 pedidos,
+N = 159 artigos únicos. Fase 2 (autorizada pelo autor após confirmação de
+`N` e da correção do passo 4b): 159/159 artigos processados, 0 falhas,
+7 572 capturas, 125 artigos com mais do que uma captura — ver "Resultados
+da Fase 2" abaixo. **Falta o passo 6 (classificação Artigo/redirecionamento
+e resto do Caminho A), ainda não implementado.**
 
 Este protocolo é uma ferramenta operacional de recolha — uma grelha de termos
 de pesquisa a combinar com `siteSearch=record.pt` — e não deve ser confundida
@@ -895,8 +896,101 @@ sem chamadas à API real.
 
 Esta correção precede e é pré-requisito da Fase 2: sem ela, os 159 artigos
 da Fase 2 arriscavam profundidade temporal subestimada de forma
-silenciosa, para artigos onde a estimativa da API fosse baixa. A Fase 2
-continua sem execução; ver "Próximos passos" abaixo.
+silenciosa, para artigos onde a estimativa da API fosse baixa.
+
+### Resultados da Fase 2 (execução real, 2026-09-18)
+
+Execução real de `src/semantic_harvester/corpus_phase2.py` sobre os 159
+`originalURL` únicos da Fase 1, autorizada pelo autor depois da confirmação
+de `N = 159` e da correção do passo 4b. Raw preservado byte a byte em
+`data/raw/version_history/` (convenção já usada pelo M3); resultados em
+`output/corpus_phase2_history.csv` (uma linha por artigo) e
+`output/corpus_phase2_summary.md`.
+
+#### Resumo
+
+- Artigos processados: **159/159**, sem falhas.
+- Pedidos reais efetuados (todos os artigos, incluindo paginação): **287**.
+- Duração total: **109 segundos** — muito mais rápido do que a Fase 1
+  (26 pedidos, ~15–20 minutos), porque `version_history` consulta um URL
+  exato em vez de pesquisa de texto livre; a lentidão das fases anteriores
+  não se generaliza a este tipo de pedido.
+- Total de capturas encontradas: **7 572**.
+- Artigos com mais do que uma captura: **125 de 159 (78,6%)** — profundidade
+  temporal real na maioria da amostra, não só no caso isolado do M3.
+
+#### Distribuição de capturas por artigo
+
+| Capturas por artigo | Nº de artigos | % |
+| --- | ---: | ---: |
+| 1 | 34 | 21,4% |
+| 2–5 | 75 | 47,2% |
+| 6–10 | 15 | 9,4% |
+| 11–20 | 11 | 6,9% |
+| 21–50 | 8 | 5,0% |
+| 51–100 | 3 | 1,9% |
+| 101–500 | 8 | 5,0% |
+| 501+ | 5 | 3,1% |
+
+Distribuição completa (uma linha por contagem exata) em
+`output/corpus_phase2_summary.md`.
+
+#### Observações
+
+- **Os 13 artigos com mais de 100 capturas (101–500 e 501+) não parecem ser
+  artigos noticiosos.** Inspeção direta dos títulos confirma um padrão: são
+  páginas persistentes do site, não notícias pontuais — 6 páginas
+  `/sabermais/<nome>` ("Saber Mais: Futebol" com 1282 capturas, "Saber
+  Mais: Sporting" com 1084, "Saber Mais: Cristiano Ronaldo" com 306, "Saber
+  Mais: João Félix" com 119, "Saber Mais: Porto" com 118, "Saber Mais:
+  Bruno Fernandes" com 143) e 3 páginas de secção/hub sem `/detalhe/`
+  ("Benfica - Jornal Record" com 916, "Basquetebol - Jornal Record" com
+  829, "Voleibol - Jornal Record", listagem de resultados, com 822). As
+  restantes 4 são sub-páginas multimédia com `/detalhe/` na URL mas
+  conteúdo não textual (fotogaleria com 472 capturas, vídeos com 162, 162 e
+  135 capturas) — o padrão `/detalhe/` já identificado no profiling
+  exploratório (`output/api_profiling.md`) como "apenas um indicador", não
+  uma garantia, confirma-se aqui: nem toda a URL com `/detalhe/` é um
+  artigo de texto.
+- Estes 13 URLs são re-arquivados ordens de magnitude mais vezes do que um
+  artigo isolado (M3: 3 capturas; mediana desta amostra: muito menor do que
+  100), provavelmente por serem páginas persistentes/atualizadas em vez de
+  publicações pontuais — hipótese consistente com os dados, não confirmada
+  por inspeção do conteúdo real de cada captura.
+- Entre os dois URLs devolvidos com esquemas diferentes (`http://` vs.
+  `https://`) para a mesma página (`.../yuri-ribeiro-apresenta-se-aos-
+  adeptos-do-rio-ave.html`), ambos têm exatamente 162 capturas — o esquema
+  do URL não impediu a paginação, mas confirma que `originalURL` distingue
+  `http://` de `https://` como artigos diferentes, duplicando esta página
+  no corpus agregado. Só este par foi encontrado nos 159 artigos; não é
+  generalizado como problema sistemático desta amostra.
+- Nenhuma falha em 159 artigos e 287 pedidos — mais estável do que as
+  Experiências 1–3, mas sobre uma pesquisa por URL exato, não por texto
+  livre; não deve ser lido como evidência de estabilidade geral da API.
+
+#### Interpretação
+
+- A hipótese central do Caminho A (profundidade temporal como resultado
+  real do corpus, não só do artigo único do M3) fica sustentada por esta
+  execução: 78,6% dos 159 artigos têm mais do que uma captura, com uma
+  cauda longa de páginas muito republicadas.
+- Ao mesmo tempo, a cauda longa é um problema de qualidade concreto para a
+  classificação Artigo/redirecionamento (passo 6, ainda pendente): sem
+  filtrar as páginas `/sabermais/` e de secção, a "profundidade temporal"
+  do corpus ficaria inflacionada por 13 URLs que não são artigos,
+  totalizando sozinhos milhares das 7 572 capturas. Esta classificação
+  precisa de lidar explicitamente com este padrão, não só com o critério
+  genérico já previsto.
+- A correção do passo 4b (não usar `estimated_nr_results` para parar a
+  paginação) foi confirmada como necessária na prática: vários destes
+  artigos têm centenas de capturas, exigindo várias páginas reais de
+  `version_history` — exatamente o cenário em que uma estimativa baixa e
+  não fiável poderia ter cortado a recolha prematuramente.
+
+**Fase 2 concluída. N = 159 artigos processados, 0 falhas, 7 572 capturas,
+125 artigos com profundidade temporal (>1 captura). O corpus bruto
+(descoberta + histórico) está pronto para a classificação
+Artigo/redirecionamento (passo 6), que ainda não foi implementada.**
 
 ### Próximos passos
 
@@ -913,11 +1007,12 @@ continua sem execução; ver "Próximos passos" abaixo.
 4b. ~~Corrigir a condição de paragem por `estimated_nr_results` em
    `collect_all_captures()` antes de a reutilizar à escala da Fase 2.~~
    **Concluído em 2026-09-18: ver secção anterior.**
-5. Implementar a Fase 2 (`version_history` por artigo único), generalizando
-   `collect_all_captures()`/`run_history_pipeline()` (já corrigida, passo
-   4b) de um único URL hardcoded para a lista de 159 artigos únicos
-   descoberta. **Não iniciar sem confirmação explícita do autor sobre
-   `N = 159`.**
-6. Só depois disso, aplicar a regra de classificação Artigo/redirecionamento
-   (ver observação acima sobre páginas "Saber Mais" e conteúdo de
-   navegação) e prosseguir com o resto do Caminho A.
+5. ~~Implementar e correr a Fase 2 (`version_history` por artigo único).~~
+   **Concluído em 2026-09-18: 159/159 artigos, 0 falhas, 7 572 capturas —
+   ver "Resultados da Fase 2" acima.**
+6. Aplicar a regra de classificação Artigo/redirecionamento — agora com
+   evidência concreta sobre o que filtrar: páginas `/sabermais/`, páginas
+   de secção/hub sem `/detalhe/`, e considerar separar sub-páginas
+   multimédia (`fotogalerias/`, `videos/`) de artigos de texto — e
+   prosseguir com o resto do Caminho A (mapeamento RDF do corpus,
+   descarregar textos das capturas retidas).
