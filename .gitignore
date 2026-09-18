@@ -41,3 +41,6 @@ output/*
 !output/corpus_phase2_summary.md
 !output/corpus_classification.csv
 !output/corpus_classification_summary.md
+!output/corpus_articles.ttl
+!output/corpus_rdf_report.csv
+!output/corpus_rdf_summary.md

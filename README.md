@@ -258,3 +258,22 @@ no esquema (`http://`/`https://`), aplica a regra documentada em
 artigo") e escreve `output/corpus_classification.csv` (uma linha por
 recurso, com a razão da classificação) e
 `output/corpus_classification_summary.md`.
+
+## Grafo RDF do corpus (passo final do Caminho A)
+
+Depois da classificação, para mapear os artigos retidos para um único
+grafo RDF, com as suas capturas históricas e textos extraídos:
+
+```bash
+python -m semantic_harvester.corpus_rdf
+```
+
+Não repete pedidos de `version_history` — reconstrói as capturas de cada
+artigo a partir do raw já preservado pela Fase 2
+(`data/raw/version_history/`). Só faz pedidos novos à API para descarregar
+os textos extraídos de cada captura, reutilizando os que já existirem em
+`data/raw/texts/`. Regista progresso a cada 10 artigos em
+`output/corpus_rdf_progress.log` e no terminal. Grava o grafo combinado em
+`output/corpus_articles.ttl` (não sobrescreve `output/sample_capture.ttl`
+nem `output/article_history.ttl`, do M2/M3) e relatórios em
+`output/corpus_rdf_report.csv`/`output/corpus_rdf_summary.md`.

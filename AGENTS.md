@@ -32,6 +32,10 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
 - `corpus_classification.py`: passo 6 do protocolo (classificação
   Artigo/redirecionamento), trabalha só sobre os CSV já gerados pelas
   Fases 1–2; não faz pedidos à API, corre offline.
+- `corpus_rdf.py`: passo final do Caminho A — grafo RDF único dos artigos
+  retidos, reconstruindo capturas do raw já preservado pela Fase 2 (sem
+  repetir pedidos de `version_history`) e descarregando/reutilizando só os
+  textos extraídos.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -69,6 +73,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_phase1` | Rede; ~26 pedidos (Fase 1 do Caminho A); grava raw e relatórios. |
 | `python -m semantic_harvester.corpus_phase2` | Rede; ~159+ pedidos (Fase 2 do Caminho A, um artigo de cada vez); execução longa; retoma automaticamente se interrompida. |
 | `python -m semantic_harvester.corpus_classification` | Sem rede; lê os CSV das Fases 1–2 e classifica Artigo/redirecionamento (passo 6). |
+| `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.
