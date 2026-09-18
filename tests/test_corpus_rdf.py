@@ -11,7 +11,8 @@ from rdflib import RDF
 from semantic_harvester.arquivo_client import ArquivoClient
 from semantic_harvester.corpus_rdf import (
     build_corpus_graph, build_one_article_graph, load_captures_from_raw,
-    load_retained_articles, url_hash16,
+    load_retained_articles, normalize_captures_to_canonical_url,
+    normalize_for_grouping, url_hash16,
 )
 from semantic_harvester.rdf_mapper import SDH, article_uri, capture_uri
 from tests.support import FIXTURES, ORIGINAL_URL, OfflineTestCase
@@ -40,6 +41,69 @@ class UrlHashTests(unittest.TestCase):
         url = "https://www.record.pt/exemplo"
         expected = hashlib.sha256(url.encode("utf-8")).hexdigest()[:16]
         self.assertEqual(url_hash16(url), expected)
+
+
+class NormalizeForGroupingTests(unittest.TestCase):
+    """Casos reais observados no raw de version_history da Fase 2/passo final."""
+
+    def test_scheme_variant_normalizes_the_same(self) -> None:
+        a = normalize_for_grouping("http://www.record.pt/futebol/detalhe/x.html")
+        b = normalize_for_grouping("https://www.record.pt/futebol/detalhe/x.html")
+        self.assertEqual(a, b)
+
+    def test_double_slash_variant_normalizes_the_same(self) -> None:
+        a = normalize_for_grouping("http://www.record.pt/entrevistas/detalhe/x.html")
+        b = normalize_for_grouping("http://www.record.pt/entrevistas//detalhe/x.html")
+        self.assertEqual(a, b)
+
+    def test_trailing_slash_variant_normalizes_the_same(self) -> None:
+        a = normalize_for_grouping("http://www.record.pt/sporting/detalhe/x.html")
+        b = normalize_for_grouping("http://www.record.pt/sporting/detalhe/x.html/")
+        self.assertEqual(a, b)
+
+    def test_different_path_does_not_normalize_the_same(self) -> None:
+        a = normalize_for_grouping("http://www.record.pt/futebol/detalhe/x.html")
+        b = normalize_for_grouping("http://www.record.pt/futebol/detalhe/y.html")
+        self.assertNotEqual(a, b)
+
+
+class NormalizeCapturesToCanonicalUrlTests(unittest.TestCase):
+    def test_rewrites_cosmetic_variants_and_keeps_all_captures(self) -> None:
+        canonical = "http://www.record.pt/entrevistas/detalhe/exemplo.html"
+        captures = [
+            {"originalURL": canonical, "tstamp": "3"},
+            {"originalURL": "http://www.record.pt/entrevistas//detalhe/exemplo.html",
+             "tstamp": "2"},
+            {"originalURL": "https://www.record.pt/entrevistas/detalhe/exemplo.html",
+             "tstamp": "1"},
+        ]
+
+        normalized, dropped, rewritten = normalize_captures_to_canonical_url(
+            captures, canonical
+        )
+
+        self.assertEqual(dropped, 0)
+        self.assertEqual(rewritten, 2)
+        self.assertEqual(len(normalized), 3)
+        self.assertTrue(all(c["originalURL"] == canonical for c in normalized))
+        self.assertEqual([c["tstamp"] for c in normalized], ["3", "2", "1"])
+
+    def test_drops_captures_for_an_unrelated_url(self) -> None:
+        canonical = "http://www.record.pt/futebol/detalhe/exemplo.html"
+        captures = [
+            {"originalURL": canonical, "tstamp": "1"},
+            {"originalURL": "http://www.record.pt/futebol/detalhe/outro-artigo.html",
+             "tstamp": "2"},
+        ]
+
+        normalized, dropped, rewritten = normalize_captures_to_canonical_url(
+            captures, canonical
+        )
+
+        self.assertEqual(dropped, 1)
+        self.assertEqual(rewritten, 0)
+        self.assertEqual(len(normalized), 1)
+        self.assertEqual(normalized[0]["tstamp"], "1")
 
 
 class LoadCapturesFromRawTests(OfflineTestCase):
@@ -158,6 +222,57 @@ class BuildOneArticleGraphTests(OfflineTestCase):
         self.assertIsNone(graph)
         self.assertIsNotNone(result.error)
         self.assertEqual(result.captures_used, 0)
+
+
+class BuildOneArticleGraphWithUrlVariantsTests(OfflineTestCase):
+    """Regressão: version_history devolvendo variantes cosméticas de originalURL
+    não deve rejeitar o manifesto (caso real encontrado em 32 dos 127 artigos
+    retidos — ver docs/experiments.md)."""
+
+    def test_scheme_and_slash_variants_are_merged_into_one_article(self) -> None:
+        canonical = "http://www.record.pt/entrevistas/detalhe/exemplo-sintetico.html"
+        raw_dir = self.root / "data" / "raw"
+        version_history_dir = raw_dir / "version_history"
+
+        def item(url: str, tstamp: str) -> dict:
+            return {
+                "originalURL": url, "tstamp": tstamp,
+                "title": url, "linkToArchive": f"https://archive.example.test/{tstamp}",
+                "linkToExtractedText": f"https://archive.example.test/text/{tstamp}",
+                "mimeType": "text/html", "contentLength": 100, "digest": f"DIGEST-{tstamp}",
+                "encoding": "UTF-8", "collection": "SYNTHETIC", "statusCode": 200,
+            }
+
+        response_items = [
+            item(canonical, "20171025042728"),
+            item(canonical.replace("/entrevistas/", "/entrevistas//"), "20171013025023"),
+            item(canonical.replace("http://", "https://"), "20171006052208"),
+        ]
+        write_version_history_raw(version_history_dir, canonical, offset=0, response_items=response_items)
+
+        session = self.fixture_session(
+            *((it["linkToExtractedText"], b"texto sintetico") for it in response_items),
+        )
+        client = ArquivoClient(data_dir=raw_dir, session=session)
+
+        graph, result = build_one_article_graph(
+            client, canonical, "Artigo sintético", version_history_dir, self.root,
+        )
+
+        self.assertIsNone(result.error)
+        self.assertEqual(result.captures_used, 3)
+        self.assertEqual(result.captures_url_variants_normalized, 2)
+        self.assertEqual(result.captures_dropped_mismatched_url, 0)
+        self.assertEqual(
+            len(set(graph.subjects(RDF.type, SDH.CapturaArquivada))), 3,
+        )
+        self.assertEqual(
+            len(set(graph.subjects(RDF.type, SDH.Artigo))), 1,
+        )
+        for tstamp in ("20171025042728", "20171013025023", "20171006052208"):
+            self.assertIn(
+                (capture_uri(canonical, tstamp), RDF.type, SDH.CapturaArquivada), graph,
+            )
 
 
 class BuildCorpusGraphTests(OfflineTestCase):

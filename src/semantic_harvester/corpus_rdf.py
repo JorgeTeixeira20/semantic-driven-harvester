@@ -10,6 +10,17 @@ reconstruída a partir desses ficheiros. O único pedido novo à API por
 artigo é o download do texto extraído de cada captura
 (`build_manifest_records()`, que já reutiliza texto existente em
 `data/raw/texts/` via `skip_existing=True`).
+
+Achado durante a implementação, documentado em `docs/experiments.md`: o
+`version_history` de um único `originalURL` pode devolver capturas cujo
+próprio campo `originalURL` difere em esquema (`http`/`https`) ou em barras
+duplicadas/finais no caminho — variantes cosméticas da mesma página, com
+`tstamp` genuinamente distintos entre si (não duplicados). Sem normalizar
+estas variantes para um único identificador antes de mapear,
+`build_article_history_graph()` rejeita o manifesto (exige um único
+`original_url`) e o artigo perderia essas capturas. `normalize_for_grouping()`
+resolve isto reatribuindo o `originalURL` canónico às variantes cosméticas,
+preservando todas as capturas reais.
 """
 
 from __future__ import annotations
@@ -18,6 +29,7 @@ import csv
 import hashlib
 import json
 import logging
+import re
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -60,6 +72,46 @@ def load_captures_from_raw(
     return captures
 
 
+def normalize_for_grouping(url: str) -> str:
+    """Remove esquema, colapsa barras repetidas e uma barra final.
+
+    Usado só para decidir se dois URLs são a mesma página modulo variação
+    cosmética — nunca para gerar identificadores (esses continuam a usar o
+    `originalURL` canónico tal como veio da descoberta/classificação).
+    """
+
+    scheme_stripped = url.split("://", 1)[-1]
+    collapsed = re.sub(r"/{2,}", "/", scheme_stripped)
+    return collapsed.rstrip("/")
+
+
+def normalize_captures_to_canonical_url(
+    captures: list[dict[str, Any]], canonical_url: str
+) -> tuple[list[dict[str, Any]], int, int]:
+    """Reatribui `originalURL` ao valor canónico quando só varia em esquema/barras.
+
+    Descarta (e conta) capturas cujo `originalURL` nem sequer seja uma
+    variante cosmética do URL canónico — não observado nos dados desta
+    execução, mas evita misturar um recurso diferente por engano. Devolve
+    `(capturas_normalizadas, descartadas, variantes_reescritas)`.
+    """
+
+    canonical_normalized = normalize_for_grouping(canonical_url)
+    normalized: list[dict[str, Any]] = []
+    dropped = 0
+    rewritten = 0
+    for capture in captures:
+        capture_url = str(capture.get("originalURL", ""))
+        if normalize_for_grouping(capture_url) != canonical_normalized:
+            dropped += 1
+            continue
+        if capture_url != canonical_url:
+            capture = {**capture, "originalURL": canonical_url}
+            rewritten += 1
+        normalized.append(capture)
+    return normalized, dropped, rewritten
+
+
 def load_retained_articles(classification_csv: Path) -> list[dict[str, str]]:
     """Lê a classificação do passo 6 e devolve só os artigos retidos."""
 
@@ -75,6 +127,8 @@ def load_retained_articles(classification_csv: Path) -> list[dict[str, str]]:
 class ArticleGraphResult:
     original_url: str
     captures_used: int
+    captures_url_variants_normalized: int
+    captures_dropped_mismatched_url: int
     texts_downloaded_now: int
     texts_reused: int
     texts_failed: int
@@ -89,17 +143,30 @@ def build_one_article_graph(
     project_root: Path,
 ) -> tuple[Graph | None, ArticleGraphResult]:
     try:
-        captures = load_captures_from_raw(original_url, version_history_dir)
+        raw_captures = load_captures_from_raw(original_url, version_history_dir)
     except FileNotFoundError as exc:
         LOGGER.error("%s", exc)
-        return None, ArticleGraphResult(original_url, 0, 0, 0, 0, str(exc))
+        return None, ArticleGraphResult(original_url, 0, 0, 0, 0, 0, 0, str(exc))
+
+    captures, dropped, variants_normalized = normalize_captures_to_canonical_url(
+        raw_captures, original_url
+    )
+    if dropped:
+        LOGGER.warning(
+            "%s: %d captura(s) descartada(s) por originalURL não ser variante "
+            "cosmética do URL canónico.",
+            original_url,
+            dropped,
+        )
 
     records = build_manifest_records(client, captures, project_root)
     try:
         graph = build_article_history_graph(records, title, project_root)
     except ValueError as exc:
         LOGGER.error("Falha ao mapear %s: %s", original_url, exc)
-        return None, ArticleGraphResult(original_url, len(records), 0, 0, 0, str(exc))
+        return None, ArticleGraphResult(
+            original_url, len(records), variants_normalized, dropped, 0, 0, 0, str(exc)
+        )
 
     downloaded_now = sum(1 for r in records if r["text_downloaded_now"])
     reused = sum(
@@ -110,6 +177,8 @@ def build_one_article_graph(
     return graph, ArticleGraphResult(
         original_url=original_url,
         captures_used=len(records),
+        captures_url_variants_normalized=variants_normalized,
+        captures_dropped_mismatched_url=dropped,
         texts_downloaded_now=downloaded_now,
         texts_reused=reused,
         texts_failed=failed,
@@ -134,6 +203,11 @@ def write_summary_markdown(
     total_downloaded = sum(r.texts_downloaded_now for r in successes)
     total_reused = sum(r.texts_reused for r in successes)
     total_failed = sum(r.texts_failed for r in successes)
+    total_variants = sum(r.captures_url_variants_normalized for r in successes)
+    total_dropped = sum(r.captures_dropped_mismatched_url for r in results)
+    articles_with_variants = sum(
+        1 for r in successes if r.captures_url_variants_normalized > 0
+    )
 
     lines = [
         "# Grafo RDF do corpus do Caminho A (passo final)\n",
@@ -150,6 +224,11 @@ def write_summary_markdown(
         f"- Textos reutilizados (já existentes em `data/raw/texts/`): {total_reused}",
         f"- Textos indisponíveis (falha ou 404): {total_failed}",
         f"- Triplos no grafo final (`output/corpus_articles.ttl`): {graph_size}",
+        f"- Capturas com `originalURL` normalizado (variante de esquema ou "
+        f"barras da mesma página): {total_variants}, em {articles_with_variants} "
+        "artigos",
+        f"- Capturas descartadas por `originalURL` não ser variante cosmética "
+        f"do URL canónico: {total_dropped}",
     ]
 
     if failures:
