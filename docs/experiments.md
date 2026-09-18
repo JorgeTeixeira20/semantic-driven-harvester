@@ -474,12 +474,16 @@ Para o protocolo de recolha do Caminho A:
 
 ## Protocolo de queries para o corpus do Caminho A
 
-**Estado em 2026-09-18: Fase 1 e Fase 2 concluídas.** Fase 1: 26 pedidos,
-N = 159 artigos únicos. Fase 2 (autorizada pelo autor após confirmação de
-`N` e da correção do passo 4b): 159/159 artigos processados, 0 falhas,
-7 572 capturas, 125 artigos com mais do que uma captura — ver "Resultados
-da Fase 2" abaixo. **Falta o passo 6 (classificação Artigo/redirecionamento
-e resto do Caminho A), ainda não implementado.**
+**Estado em 2026-09-18: Fases 1, 2 e passo 6 (classificação) concluídos.**
+Fase 1: 26 pedidos, N = 159 artigos únicos. Fase 2 (autorizada pelo autor
+após confirmação de `N` e da correção do passo 4b): 159/159 artigos
+processados, 0 falhas, 7 572 capturas, 125 artigos com mais do que uma
+captura. Passo 6: regra de classificação Artigo/redirecionamento aplicada
+sobre os dados já recolhidos (sem pedidos novos à API); 158 recursos
+distintos depois de normalizar http/https, **127 classificados como
+Artigo** — ver "Classificação Artigo vs. redirecionamento/não-artigo"
+abaixo. **Falta o resto do Caminho A** (mapeamento RDF do corpus, download
+de texto das capturas retidas), ainda não implementado.
 
 Este protocolo é uma ferramenta operacional de recolha — uma grelha de termos
 de pesquisa a combinar com `siteSearch=record.pt` — e não deve ser confundida
@@ -1010,9 +1014,143 @@ Artigo/redirecionamento (passo 6), que ainda não foi implementada.**
 5. ~~Implementar e correr a Fase 2 (`version_history` por artigo único).~~
    **Concluído em 2026-09-18: 159/159 artigos, 0 falhas, 7 572 capturas —
    ver "Resultados da Fase 2" acima.**
-6. Aplicar a regra de classificação Artigo/redirecionamento — agora com
-   evidência concreta sobre o que filtrar: páginas `/sabermais/`, páginas
-   de secção/hub sem `/detalhe/`, e considerar separar sub-páginas
-   multimédia (`fotogalerias/`, `videos/`) de artigos de texto — e
-   prosseguir com o resto do Caminho A (mapeamento RDF do corpus,
-   descarregar textos das capturas retidas).
+6. ~~Aplicar a regra de classificação Artigo/redirecionamento.~~
+   **Concluído em 2026-09-18 — ver secção seguinte.**
+
+## Classificação Artigo vs. redirecionamento/não-artigo (passo 6)
+
+### Objetivo
+
+Decidir, para os 159 artigos únicos das Fases 1–2, quais ficam classificados
+como `Artigo` (candidatos ao resto do Caminho A: download de texto,
+mapeamento RDF) e quais são excluídos por serem páginas de
+referência/secção/redirecionamento, não publicações editoriais. A regra
+deve usar apenas sinais já documentados nas Fases 1–2, não critérios novos
+sem justificação nos dados reais.
+
+### Evidência disponível, recapitulada
+
+- **Padrão de URL `/detalhe/` sozinho não chega** (Experiência de profiling,
+  `output/api_profiling.md`, e confirmado de novo abaixo).
+- **13 artigos com mais de 100 capturas** (`output/corpus_phase2_history.csv`),
+  todos confirmados por título como páginas `/sabermais/<nome>` (6) ou de
+  secção/hub sem `/detalhe/` (3) ou sub-páginas multimédia com `/detalhe/`
+  mas conteúdo não editorial (4) — ver "Resultados da Fase 2" acima.
+- **Conteúdo de menu de navegação partilhado** (Fase 1): algumas capturas
+  foram devolvidas por várias queries de modalidade em simultâneo
+  (`andebol;basquetebol;voleibol` e semelhantes).
+
+### Sinal investigado e descartado: sobreposição de queries de modalidade
+
+Antes de propor a regra final, testou-se se "devolvido por ≥3 queries de
+modalidade distintas" (o sinal de menu de navegação da Fase 1) seria um
+bom critério de exclusão. Cruzando esse sinal com o número de capturas da
+Fase 2:
+
+| Título | Queries de modalidade | Capturas |
+| --- | ---: | ---: |
+| YEBDA - Saber Mais - Record | 3 | 3 |
+| ze pedro - Saber Mais - Record | 3 | 1 |
+| Zainadine cortou mal a bola... | 3 | 135 |
+| Zungu aproveitou distração... | 3 | 73 |
+| Zagreb foi 'abaixo'... | 3 | 31 |
+| **Danny deixa Zenit: «Respeito a decisão...»** | **4** | **3** |
+| **Pep Guardiola: «Eu e o Zidane...»** | **4** | **2** |
+| **Alaphilippe vence segunda etapa...** | **4** | **2** |
+
+As duas últimas linhas (destacadas) têm `snippet` de menu de navegação
+(confirmado na Fase 1), mas título, `/detalhe/` e conteúdo consistentes com
+artigos noticiosos reais — "Danny deixa Zenit" é uma notícia de
+transferência, "Alaphilippe vence..." é uma notícia de ciclismo (e tem duas
+capturas distintas na própria Fase 1, sinal de artigo genuíno republicado).
+**Este sinal produz falsos positivos em artigos reais e foi descartado como
+critério de classificação.** A observação da Fase 1 sobre conteúdo de menu
+partilhado mantém-se válida como descrição do comportamento da API, mas não
+se traduz numa regra de exclusão fiável.
+
+### Achado adicional durante a análise: páginas "Object moved"
+
+Ao preparar a regra, encontraram-se **13 artigos com o título exato
+`Object moved`**, todos em URLs do padrão antigo
+`record.pt/<secção>/interior.aspx?content_id=...`. Este título é o próprio
+texto de uma página de redirecionamento HTTP arquivada, não conteúdo
+editorial — o sinal mais direto e inequívoco encontrado para
+"redirecionamento" desde que a Experiência de profiling levantou a
+distinção. Nenhum destes 13 se sobrepõe às páginas `/sabermais/` ou aos
+outliers de capturas.
+
+### Normalização http/https antes de classificar
+
+A Fase 2 encontrou um par de URLs para a mesma página
+(`.../yuri-ribeiro-apresenta-se-aos-adeptos-do-rio-ave.html`), um `http://`
+e outro `https://`, com **conjuntos de `tstamp` idênticos** (162/162,
+diferença simétrica zero — verificado por comparação direta do raw
+preservado). Isto confirma que são a mesma página, não duas capturas
+diferentes. **Decisão:** antes de classificar, agrupar `originalURL` que só
+diferem no esquema (removendo `http://`/`https://` do início) e manter um
+único identificador canónico, preferindo `https://` quando existir essa
+variante (convenção atual do site; a escolha é arbitrária entre variantes
+idênticas, dado que os dados confirmam serem a mesma página). Isto reduz os
+159 artigos da Fase 1 para **158 recursos distintos**.
+
+### Regra proposta
+
+Depois da normalização de esquema, um recurso é classificado como `Artigo`
+**apenas se nenhuma** das três condições seguintes se verificar (qualquer
+uma delas classifica como não-artigo/redirecionamento):
+
+1. `/sabermais/` está presente no caminho do URL → página de
+   referência/perfil.
+2. O `title` da captura mais recente é exatamente (ou começa por)
+   `"Object moved"` → página de redirecionamento arquivada.
+3. O número de capturas devolvido pela Fase 2 (`version_history`) é
+   **superior a 100** → página persistente/reutilizada, não uma publicação
+   editorial pontual. O limiar de 100 não é arbitrário: a distribuição real
+   (`output/corpus_phase2_summary.md`) tem um intervalo vazio entre 74 e 117
+   capturas — o artigo com mais capturas abaixo do limiar tem 73, o próximo
+   valor observado é 118. Todos os 13 recursos acima desse intervalo vazio
+   foram confirmados por título como não-artigos.
+
+`/detalhe/` não faz parte da regra: está presente na maioria dos artigos
+mantidos (115 de 127, ver abaixo), mas páginas AMP legítimas
+(`.../amp/<slug>`) não o têm e são notícias reais (ex.: "Jorge Jesus assina
+com Pini Zahavi", "Zinchenko elogia Bernardo Silva..."), confirmando de novo
+que não é um critério fiável isoladamente.
+
+### Resultados da aplicação (execução real sobre os dados já recolhidos)
+
+- Recursos distintos depois da normalização de esquema: **158** (159 − 1
+  par http/https fundido).
+- Excluídos por `/sabermais/`: **12**.
+- Excluídos por `Object moved`: **13**.
+- Excluídos por capturas > 100 (não já contados acima): **6**.
+- **Classificados como `Artigo`: 127 de 158 (80,4%)**.
+
+Exemplos de cada categoria:
+
+| Categoria | Exemplo | Capturas |
+| --- | --- | ---: |
+| Artigo (mantido) | "Carlos Xistra castigado por erro no golo do P. Ferreira frente ao Sporting" | 3 |
+| Artigo (mantido, AMP, sem `/detalhe/`) | "Jorge Jesus assina com Pini Zahavi" | 2 |
+| Excluído — `/sabermais/` | "Saber Mais: Cristiano Ronaldo" | 306 |
+| Excluído — `Object moved` | `record.pt/Futebol/Nacional/1a_liga/Benfica/interior.aspx?content_id=930690` | 3 |
+| Excluído — capturas>100 | "Benfica - Jornal Record" (página de secção) | 916 |
+
+### Limitações conhecidas desta regra
+
+- O limiar de 100 capturas foi calibrado no intervalo vazio observado nesta
+  amostra de 158 recursos; não é validado noutra amostra ou escala maior.
+- Pelo menos um caso conhecido não é capturado pela regra: "SC Braga x
+  Vitória SC - Record Jogos em Direto" (`/jogos-em-direto/live/...`, 10
+  capturas) é uma página de acompanhamento ao vivo, não uma notícia
+  convencional, mas não aciona nenhuma das três condições. Não foi
+  encontrada evidência suficiente (só este exemplo) para justificar uma
+  quarta regra específica para `/jogos-em-direto/`; fica registado como
+  falso negativo conhecido, não resolvido.
+- A regra não distingue sub-páginas multimédia (`fotogalerias/`, `videos/`)
+  de artigos de texto dentro do conjunto mantido como `Artigo`, exceto
+  quando essas sub-páginas também excedem o limiar de capturas — algumas
+  podem ter poucas capturas e continuar classificadas como `Artigo` sem
+  serem texto editorial. Não investigado nesta iteração.
+- Não usa `estimated_nr_results` nem qualquer sinal já rejeitado noutras
+  experiências.

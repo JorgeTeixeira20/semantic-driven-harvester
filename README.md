@@ -241,3 +241,20 @@ o comando outra vez retoma automaticamente a partir dos artigos ainda não
 presentes em `output/corpus_phase2_history.csv`. Não descarrega textos nem
 gera RDF — isso fica para depois da classificação Artigo/redirecionamento
 (ver `docs/experiments.md`).
+
+## Classificação Artigo/redirecionamento (passo 6 do Caminho A)
+
+Depois da Fase 2, para classificar os artigos descobertos como `Artigo` ou
+excluí-los por serem páginas de referência/secção/redirecionamento:
+
+```bash
+python -m semantic_harvester.corpus_classification
+```
+
+Não faz pedidos à API — lê `output/corpus_phase1_captures.csv` e
+`output/corpus_phase2_history.csv`, normaliza `originalURL` que só diferem
+no esquema (`http://`/`https://`), aplica a regra documentada em
+`docs/experiments.md` ("Classificação Artigo vs. redirecionamento/não-
+artigo") e escreve `output/corpus_classification.csv` (uma linha por
+recurso, com a razão da classificação) e
+`output/corpus_classification_summary.md`.

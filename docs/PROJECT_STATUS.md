@@ -118,15 +118,16 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 24 testes nos dois módulos de `tests/`.
+pacote conforme o README. Existem 32 testes em três módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
 relações/contagens RDF, ficheiros de texto, reutilização, preservação de
-bytes e releitura de Turtle.
+bytes, releitura de Turtle e a classificação Artigo/redirecionamento
+(`test_corpus_classification.py`, incluindo a normalização http/https).
 
 Última validação em **2026-09-18**, com o Python 3.13.1 do ambiente virtual:
-`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **24 testes,
+`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **32 testes,
 todos passaram (`OK`)**, sem chamadas à API real.
 
 [tests/support.py](../tests/support.py) fornece respostas simuladas, temporários
@@ -224,9 +225,33 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    que dá evidência concreta do que a classificação Artigo/redirecionamento
    precisa de filtrar; ver detalhe em `experiments.md`.
 
-   **Falta o passo 6** (classificação Artigo/redirecionamento e resto do
-   Caminho A — mapeamento RDF do corpus, download de textos das capturas
-   retidas), ainda não implementado.
+   **Passo 6 (classificação Artigo/redirecionamento) implementado e
+   aplicado em 2026-09-18**, sobre os dados já recolhidos, sem pedidos
+   novos à API — `src/semantic_harvester/corpus_classification.py`. Regra
+   com três sinais, cada um justificado por evidência já documentada:
+   `/sabermais/` no URL (página de referência/perfil), `title` igual a
+   "Object moved" (página de redirecionamento arquivada — achado novo
+   desta análise, 13 casos), e mais de 100 capturas na Fase 2 (página
+   persistente, não editorial pontual — limiar calibrado num intervalo
+   vazio real da distribuição, entre 74 e 117 capturas). Um sinal candidato
+   da Fase 1 (sobreposição de ≥3 queries de modalidade) foi testado e
+   **rejeitado** por produzir falsos positivos em artigos reais (ex.:
+   "Danny deixa Zenit..."). Antes de classificar, normaliza `originalURL`
+   que só diferem no esquema http/https (par identificado na Fase 2, com
+   conjuntos de `tstamp` idênticos), reduzindo os 159 artigos a 158
+   recursos distintos. Resultado: **127 de 158 (80,4%) classificados como
+   Artigo**; 12 excluídos por `/sabermais/`, 13 por `Object moved`, 6 por
+   capturas acima do limiar. 8 testes novos (unitários sobre `classify()` e
+   de integração sobre `classify_corpus()`, com CSV sintéticos, incluindo o
+   caso http/https); suite completa com 32 testes, todos a passar.
+   Relatórios em `output/corpus_classification.csv` e
+   `output/corpus_classification_summary.md`; detalhe e limitações
+   conhecidas (ex.: páginas `/jogos-em-direto/` não cobertas pela regra)
+   em `experiments.md`.
+
+   **Falta o resto do Caminho A** (mapeamento RDF do corpus a partir dos
+   127 artigos retidos, download de textos das capturas), ainda não
+   implementado.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com

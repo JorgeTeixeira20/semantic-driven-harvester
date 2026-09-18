@@ -29,6 +29,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   Fase 2 (profundidade temporal via `version_history`, um artigo de cada
   vez) do protocolo de queries do Caminho A descrito em
   `docs/experiments.md`.
+- `corpus_classification.py`: passo 6 do protocolo (classificação
+  Artigo/redirecionamento), trabalha só sobre os CSV já gerados pelas
+  Fases 1–2; não faz pedidos à API, corre offline.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -65,6 +68,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.api_diagnostics_site_volume` | Rede; 9 pedidos; grava raw e relatórios. |
 | `python -m semantic_harvester.corpus_phase1` | Rede; ~26 pedidos (Fase 1 do Caminho A); grava raw e relatórios. |
 | `python -m semantic_harvester.corpus_phase2` | Rede; ~159+ pedidos (Fase 2 do Caminho A, um artigo de cada vez); execução longa; retoma automaticamente se interrompida. |
+| `python -m semantic_harvester.corpus_classification` | Sem rede; lê os CSV das Fases 1–2 e classifica Artigo/redirecionamento (passo 6). |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.
