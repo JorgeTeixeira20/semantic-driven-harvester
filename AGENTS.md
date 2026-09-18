@@ -23,10 +23,12 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
 - `rdf_mapper.py`: IDs determinísticos, grafos de sample/histórico e Turtle.
 - `smoke_test.py`, `api_profiling.py`, `api_diagnostics.py`,
   `api_diagnostics_offset.py`, `api_diagnostics_site_volume.py`,
-  `corpus_phase1.py`: execuções reais manuais; estes módulos também estão em
-  `src/semantic_harvester/`. `corpus_phase1.py` implementa a Fase 1
-  (descoberta via TextSearch) do protocolo de queries do Caminho A descrito
-  em `docs/experiments.md`.
+  `corpus_phase1.py`, `corpus_phase2.py`: execuções reais manuais; estes
+  módulos também estão em `src/semantic_harvester/`. `corpus_phase1.py`
+  implementa a Fase 1 (descoberta via TextSearch) e `corpus_phase2.py` a
+  Fase 2 (profundidade temporal via `version_history`, um artigo de cada
+  vez) do protocolo de queries do Caminho A descrito em
+  `docs/experiments.md`.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -62,6 +64,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.api_diagnostics_offset` | Rede; grava raw e relatórios. |
 | `python -m semantic_harvester.api_diagnostics_site_volume` | Rede; 9 pedidos; grava raw e relatórios. |
 | `python -m semantic_harvester.corpus_phase1` | Rede; ~26 pedidos (Fase 1 do Caminho A); grava raw e relatórios. |
+| `python -m semantic_harvester.corpus_phase2` | Rede; ~159+ pedidos (Fase 2 do Caminho A, um artigo de cada vez); execução longa; retoma automaticamente se interrompida. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.

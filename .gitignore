@@ -37,3 +37,5 @@ output/*
 !output/corpus_phase1_per_term.csv
 !output/corpus_phase1_captures.csv
 !output/corpus_phase1_aggregation.md
+!output/corpus_phase2_history.csv
+!output/corpus_phase2_summary.md

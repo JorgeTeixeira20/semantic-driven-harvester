@@ -217,3 +217,27 @@ vários minutos; tem novas tentativas automáticas para timeouts/erros 500
 pontuais da API. **Não avança para a Fase 2 (`version_history`)** — essa
 etapa exige confirmação explícita do valor de `N` (ver
 `docs/experiments.md`).
+
+## Fase 2 do corpus do Caminho A (profundidade temporal via version_history)
+
+Depois de confirmado o valor de `N` (artigos únicos) da Fase 1, para correr
+a Fase 2 — o histórico completo de cada artigo, sem restrição de datas:
+
+```bash
+python -m semantic_harvester.corpus_phase2
+```
+
+Lê os `originalURL` únicos de `output/corpus_phase1_captures.csv` e chama
+`version_history()` (via `collect_all_captures()`, já corrigida para não
+depender de `estimated_nr_results`) uma vez por artigo, com paginação por
+offset só quando a página anterior vier cheia. O JSON raw é guardado em
+`data/raw/version_history/` (convenção já usada pelo M3); os resultados
+ficam em `output/corpus_phase2_history.csv` (uma linha por artigo, escrita
+incrementalmente) e `output/corpus_phase2_summary.md`. Regista progresso a
+cada 10 artigos em `output/corpus_phase2_progress.log` e no terminal. Esta é
+a execução mais longa do projeto (potencialmente 159+ pedidos, um por
+artigo, mais paginação onde houver histórico); se for interrompida, correr
+o comando outra vez retoma automaticamente a partir dos artigos ainda não
+presentes em `output/corpus_phase2_history.csv`. Não descarrega textos nem
+gera RDF — isso fica para depois da classificação Artigo/redirecionamento
+(ver `docs/experiments.md`).
