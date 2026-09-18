@@ -259,7 +259,12 @@ def build_corpus_graph(
 
     articles = load_retained_articles(classification_csv)
     if client is None:
-        client = ArquivoClient(data_dir=root / "data" / "raw", timeout=(15.0, 120.0))
+        # Timeout por omissão do ArquivoClient (10s/30s), não o (15s/120s)
+        # copiado sem justificação das Fases 1-2: download de texto por
+        # tstamp é um pedido direto, não pesquisa de texto livre, e um
+        # read_timeout de 120s revelou-se demasiado tolerante a ligações
+        # penduradas/cortadas (ver docs/experiments.md).
+        client = ArquivoClient(data_dir=root / "data" / "raw")
 
     combined = Graph()
     combined.bind("sdh", SDH)
