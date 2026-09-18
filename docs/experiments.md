@@ -842,6 +842,62 @@ concluídas. Conforme pedido, a execução PARA aqui — a Fase 2
 (`version_history`) só avança com confirmação explícita do autor sobre
 este valor de `N`.**
 
+### Correção de bug em collect_all_captures() antes da Fase 2 (2026-09-18)
+
+**Problema identificado pelo autor:** `collect_all_captures()`, em
+`history_pipeline.py` (a função que a Fase 2 reutiliza tal e qual para
+percorrer o `version_history` de cada artigo), tinha uma condição de
+paragem da paginação que contradizia a decisão já registada na Experiência
+1 — "não usar `estimated_nr_results` como contagem fiável, dado que é
+instável e não representa o número real de resultados acessíveis":
+
+```python
+if estimated_total is not None and len(captures) >= estimated_total:
+    break
+```
+
+Este código foi escrito no M3, antes da Experiência 1 caracterizar a
+instabilidade de `estimated_nr_results`. Com um único artigo (M3), passou
+despercebido. À escala de 159 artigos na Fase 2, se a estimativa da API
+fosse demasiado baixa para algum artigo, a recolha desse artigo pararia
+silenciosamente antes de esgotar as páginas reais, sem qualquer aviso —
+enfraquecendo de forma invisível a profundidade temporal, que é metade do
+objetivo do Caminho A.
+
+**Verificação de testes existentes:** nenhum teste em
+`tests/test_history_pipeline.py` dependia especificamente desta condição
+para parar a paginação. `test_version_history_pagination` usa duas páginas
+em que `next_page=None` já ocorre exatamente na mesma página em que a
+condição do `estimated_total` também dispararia, pelo que o resultado do
+teste (2 pedidos, 2 capturas) não muda com a remoção. Confirmado correndo a
+suite antes e depois da alteração, sem diferenças.
+
+**Correção aplicada:** removida a condição `len(captures) >=
+estimated_total` de `collect_all_captures()`. `estimated_total` continua a
+ser recolhido e devolvido (para reportar na dissertação), mas deixa de
+decidir quando parar; só as duas condições já validadas nas Experiências 2
+e 3 param a paginação — página incompleta (`len(page.results) <
+page_size`) ou ausência de `next_page`.
+
+**Teste de regressão acrescentado:**
+`test_pagination_ignores_low_estimated_total` (novo, em
+`tests/test_history_pipeline.py`) simula três páginas com
+`estimated_nr_results=1` em todas (uma estimativa deliberadamente baixa),
+mas com `next_page` presente nas duas primeiras e capturas reais nas três.
+Confirma-se que a paginação continua até à terceira página (3 capturas, 3
+pedidos com offsets `[0, 1, 2]`) e não para na primeira, como pararia com o
+código antigo. Verificado que este teste falha (`1 != 3`, com respostas por
+consumir) contra o código anterior à correção e passa depois dela.
+
+**Suite completa:** `.venv/Scripts/python.exe -m unittest discover -s
+tests -v` — **24 testes** (23 anteriores + 1 novo), todos passaram (`OK`),
+sem chamadas à API real.
+
+Esta correção precede e é pré-requisito da Fase 2: sem ela, os 159 artigos
+da Fase 2 arriscavam profundidade temporal subestimada de forma
+silenciosa, para artigos onde a estimativa da API fosse baixa. A Fase 2
+continua sem execução; ver "Próximos passos" abaixo.
+
 ### Próximos passos
 
 1. ~~Validar com o autor e o Jorge a opção de dimensionamento, a lista de
@@ -854,11 +910,14 @@ este valor de `N`.**
 4. ~~Ponto de verificação: confirmar o valor real de `N`.~~ **Concluído em
    2026-09-17: N = 159. Aguarda confirmação explícita do autor antes do
    passo 5.**
+4b. ~~Corrigir a condição de paragem por `estimated_nr_results` em
+   `collect_all_captures()` antes de a reutilizar à escala da Fase 2.~~
+   **Concluído em 2026-09-18: ver secção anterior.**
 5. Implementar a Fase 2 (`version_history` por artigo único), generalizando
-   `collect_all_captures()`/`run_history_pipeline()` de um único URL
-   hardcoded para a lista de artigos únicos descoberta — reaproveitando a
-   lógica de paginação já testada, sem a alterar. **Não iniciar sem
-   confirmação explícita do autor sobre `N = 159`.**
+   `collect_all_captures()`/`run_history_pipeline()` (já corrigida, passo
+   4b) de um único URL hardcoded para a lista de 159 artigos únicos
+   descoberta. **Não iniciar sem confirmação explícita do autor sobre
+   `N = 159`.**
 6. Só depois disso, aplicar a regra de classificação Artigo/redirecionamento
    (ver observação acima sobre páginas "Saber Mais" e conteúdo de
    navegação) e prosseguir com o resto do Caminho A.

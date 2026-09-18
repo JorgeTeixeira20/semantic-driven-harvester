@@ -74,6 +74,44 @@ class HistoryPipelineTests(OfflineTestCase):
         )
         self.assertEqual([path.read_bytes() for path in paths], contents)
 
+    def test_pagination_ignores_low_estimated_total(self) -> None:
+        """estimated_nr_results não deve parar a paginação (Experiência 1).
+
+        Regressão para o bug corrigido em 2026-09-18: collect_all_captures()
+        usava `len(captures) >= estimated_total` como condição de paragem,
+        apesar de a Experiência 1 já ter mostrado que a estimativa da API
+        não é uma contagem fiável. Com `estimated_nr_results=1` reportado em
+        todas as páginas mas 3 capturas reais disponíveis (páginas cheias
+        com `next_page`, seguidas de uma página final sem `next_page`), a
+        paginação deve continuar até à terceira página, não parar depois da
+        primeira. `fixture_session` falha o teste se alguma das três
+        respostas preparadas ficar por consumir.
+        """
+        pages = [
+            {"estimated_nr_results": "1",
+             "next_page": "https://archive.example.test/next",
+             "response_items": [self.captures[0]]},
+            {"estimated_nr_results": "1",
+             "next_page": "https://archive.example.test/next",
+             "response_items": [self.captures[1]]},
+            {"estimated_nr_results": "1", "next_page": None,
+             "response_items": [self.captures[0]]},
+        ]
+        contents = [json.dumps(page, ensure_ascii=False).encode("utf-8") for page in pages]
+        session = self.fixture_session(
+            *((ArquivoClient.SEARCH_URL, content) for content in contents),
+        )
+        client = ArquivoClient(data_dir=self.root / "low-estimate", session=session)
+        captures, paths, estimated = collect_all_captures(
+            client, original_url=ORIGINAL_URL, page_size=1,
+        )
+        self.assertEqual(len(captures), 3)
+        self.assertEqual(estimated, 1)
+        self.assertEqual(
+            [dict(call[1]["params"])["offset"] for call in session.calls], [0, 1, 2],
+        )
+        self.assertEqual(len(paths), 3)
+
     def test_all_captures_share_article_id(self) -> None:
         self.assertEqual(len(self.records), 2)
         self.assertEqual({record["article_id"] for record in self.records}, {

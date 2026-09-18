@@ -56,7 +56,16 @@ def collect_all_captures(
     to_date: str | int | None = None,
     page_size: int = 50,
 ) -> tuple[list[dict[str, Any]], list[Path], int | None]:
-    """Percorre páginas enquanto houver resultados, sem confiar só em maxItems."""
+    """Percorre páginas enquanto houver resultados, sem confiar só em maxItems.
+
+    Não usa `estimated_nr_results` como critério de paragem: a Experiência 1
+    (`docs/experiments.md`) mostrou que a estimativa da API não é uma
+    contagem fiável de resultados acessíveis. `estimated_total` continua a
+    ser recolhido e devolvido para fins de relatório, mas só as duas
+    condições validadas nas Experiências 2 e 3 decidem parar a paginação:
+    página incompleta (`len(page.results) < page_size`) ou ausência de
+    `next_page`.
+    """
 
     captures: list[dict[str, Any]] = []
     raw_paths: list[Path] = []
@@ -77,8 +86,6 @@ def collect_all_captures(
         captures.extend(page.results)
 
         if not page.results:
-            break
-        if estimated_total is not None and len(captures) >= estimated_total:
             break
         if len(page.results) < page_size:
             break

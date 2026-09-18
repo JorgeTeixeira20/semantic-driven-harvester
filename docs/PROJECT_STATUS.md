@@ -118,13 +118,15 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 23 testes nos dois módulos de `tests/`.
-Cobrem processamento TextSearch/versionHistory, paginação, metadados do manifesto,
-IDs, `article_id` comum, ontologia, relações/contagens RDF, ficheiros de texto,
-reutilização, preservação de bytes e releitura de Turtle.
+pacote conforme o README. Existem 24 testes nos dois módulos de `tests/`.
+Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
+dependência de `estimated_nr_results` como condição de paragem, corrigida em
+2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
+relações/contagens RDF, ficheiros de texto, reutilização, preservação de
+bytes e releitura de Turtle.
 
-Última validação em **2026-09-16**, com o Python 3.13.1 do ambiente virtual:
-`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **23 testes,
+Última validação em **2026-09-18**, com o Python 3.13.1 do ambiente virtual:
+`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **24 testes,
 todos passaram (`OK`)**, sem chamadas à API real.
 
 [tests/support.py](../tests/support.py) fornece respostas simuladas, temporários
@@ -200,6 +202,18 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    `collect_all_captures()` de um único URL hardcoded para os 159
    descobertos; custo `≈N`) não deve começar sem confirmação explícita do
    autor sobre `N = 159`.
+
+   **Correção de bug em `collect_all_captures()`, 2026-09-18.** A função
+   parava a paginação quando `len(captures) >= estimated_nr_results`,
+   contrariando a decisão da Experiência 1 de não confiar nessa estimativa;
+   escrito no M3, com um único artigo, o risco de paragem silenciosa antes
+   de esgotar as páginas reais passou despercebido, mas seria significativo
+   à escala dos 159 artigos da Fase 2. Removida essa condição; ficam só as
+   duas condições já validadas (página incompleta, sem `next_page`).
+   `estimated_total` continua a ser recolhido para relatório, só deixou de
+   decidir a paragem. Teste de regressão acrescentado
+   (`test_pagination_ignores_low_estimated_total`); suite completa com 24
+   testes, todos a passar. Detalhe em `experiments.md`.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com
