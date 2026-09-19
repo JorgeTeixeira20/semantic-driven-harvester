@@ -1473,7 +1473,9 @@ falha foi timeout ou ligação cortada (não 404). Se muitas forem recuperadas, 
 passa a ter mais pares comparáveis e menos capturas na Camada 2 (teto
 teórico 864/941 = 91,8% de disponibilidade, não uma previsão). Exige pedidos
 novos à API (até 324) e uma alteração de código, porque a retoma atual é por
-artigo e não por captura. Opções: **(i) retentar primeiro (recomendada, dado
+artigo e não por captura (o script de retentativa e a proposta de
+integração no grafo estão descritos na secção "Retentativa dos textos por
+timeout ou ligação cortada", no fim deste documento). Opções: **(i) retentar primeiro (recomendada, dado
 que 80,8% das falhas não indicam ausência)**; **(ii) avançar com os 540
 textos atuais** e documentar a limitação.
 
@@ -1508,3 +1510,146 @@ captura sem texto entre duas com texto; grupo de `digest` igual sem texto
    corpus?
 5. Retentar as 324 capturas antes de implementar D, ou avançar já com 540
    textos?
+
+## Retentativa dos textos por timeout ou ligação cortada (preparada, não executada)
+
+**Estado em 2026-09-19: script escrito e testado; NÃO foi executado.** Será
+corrido pelo autor localmente, fora do Claude Code (cortes de memória), e só
+depois se avança para o Caminho D. Este passo responde à questão prévia da
+proposta do Caminho D ("retentar as 324 capturas antes de implementar?").
+
+### Lista de candidatas (preservada)
+
+`output/corpus_text_retry_candidates.csv` (versionado) contém as **324
+capturas** cuja última falha registada em `output/corpus_rdf_progress.log` foi
+timeout de leitura (318), ligação cortada (5) ou timeout de ligação (1) — a
+análise de "Causa real dos 401 textos indisponíveis" acima, que foi feita com
+um script ad hoc não versionado. A lista foi regenerada em 2026-09-19 com a
+mesma lógica sobre `output/corpus_articles.ttl`, o log e o raw de
+`version_history`, e verificada: 324 linhas, 324 pares `(originalURL, tstamp)`
+únicos, distribuição idêntica à documentada, **89 artigos** afetados. Colunas:
+`original_url` (canónico, tal como no grafo), `tstamp`,
+`last_failure_category`, `attempts_logged` (nº de linhas de falha no log) e
+`status_code` (do raw de `version_history`).
+
+Expectativa, não garantia: 12 das 324 têm `statusCode` diferente de 200 (10 com
+302, 2 com 404) e nenhuma das 35 capturas não-200 do corpus obteve texto até
+agora, pelo que é provável que estas 12 falhem de novo.
+
+### Desenho do script (`src/semantic_harvester/corpus_text_retry.py`)
+
+Isolado e simples; não reescreve a resumibilidade de `corpus_rdf.py`.
+
+- **Entrada:** a lista de candidatas acima.
+- **Tentativas:** `ArquivoClient.download_extracted_text()` diretamente (com
+  `skip_existing=True`, pelo que um texto já em cache conta como sucesso sem
+  pedido), até **3 tentativas** por captura com espera crescente de **10 s e
+  20 s** entre elas. Reaproveita o padrão das Fases 1–2 (3 tentativas, 10 s),
+  com espera crescente em vez de fixa. Um **HTTP 404 não é retentado** (resposta
+  definitiva). Timeout do cliente: o padrão do `ArquivoClient` (10 s/30 s), o
+  mesmo de `corpus_rdf.py` depois da correção. Pior caso teórico de duração:
+  cada captura a esgotar 3 × 30 s + 30 s de espera ≈ 120 s, ou seja, até
+  cerca de 10,8 h para as 324 — um limite máximo, não uma previsão.
+- **Resumível por captura:** cada resultado (sucesso ou falha definitiva
+  depois de todas as tentativas) é escrito com flush em
+  `output/corpus_text_retry_report.csv`; uma nova execução salta as capturas já
+  presentes. Para retentar uma falha definitiva, apaga-se a sua linha.
+- **Relatório:** `outcome` (`success`, `success_cached`, `failed`), `cause`
+  (as categorias da análise: `timeout_de_leitura`, `timeout_de_ligacao`,
+  `ligacao_cortada`, `http_404`, `outro_http`, `outros`), `attempts`, último
+  `error`, `text_path` e `size_bytes`. Resumo em
+  `output/corpus_text_retry_summary.md`; log de progresso (a cada 10 capturas)
+  em `output/corpus_text_retry_progress.log` (não versionado).
+- **Isolamento:** não lê nem escreve `output/corpus_rdf_report.csv`, os
+  triplos em `data/processed/` nem o grafo. O único efeito nos dados do corpus é
+  acrescentar textos a `data/raw/texts/`, com o nome que `corpus_rdf.py` usa
+  (as capturas vão com o `originalURL` canónico).
+
+Testes (`tests/test_corpus_text_retry.py`, 11 testes, fixtures sintéticas e
+uma sessão HTTP simulada que consegue levantar erros de rede): sucesso à
+primeira tentativa; sucesso após falhas transitórias com espera crescente
+(10 s, 20 s); falha persistente registada com a causa; 404 não retentado; texto
+já em cache sem pedido; relatório escrito captura a captura; segunda chamada
+sem repetir capturas concluídas; retoma só da captura em falta após uma
+interrupção; não toca no relatório RDF, no grafo nem nos triplos; erro claro
+se faltar a lista; categorias de erro. Suite completa: 58 testes, todos a
+passar.
+
+Como correr (no terminal do autor, com o ambiente ativo):
+`python -m semantic_harvester.corpus_text_retry`. Depois, versionar
+`output/corpus_text_retry_report.csv` e `output/corpus_text_retry_summary.md`
+(os textos em `data/raw/texts/` não são versionados).
+
+### Proposta: como os textos recuperados entram no grafo (por validar)
+
+**O problema.** Depois da retentativa, os textos ficam só em cache
+(`data/raw/texts/`). `corpus_rdf.py` salta os artigos já presentes em
+`output/corpus_rdf_report.csv` e o grafo Turtle é regenerado a partir dos
+triplos acumulados em `data/processed/corpus_articles_triples.nt`; por isso,
+voltar a correr `corpus_rdf.py` tal como está **não altera nada** (127 de 127
+artigos saltados) e os textos novos nunca entrariam no grafo nem em
+`corpus_rdf_report.csv`.
+
+**Constatação que condiciona a solução:** os 324 candidatos estão em **89 dos
+127 artigos (70%)**. Reprocessar "só os artigos afetados" não é, portanto, uma
+fração pequena.
+
+Alternativas consideradas:
+
+1. **Cirurgia nos ficheiros de retoma** (apagar as linhas afetadas de
+   `corpus_rdf_report.csv` e os seus triplos do `.nt`, e correr `corpus_rdf.py`).
+   Contras: apagar triplos por artigo num `.nt` apendável é propenso a erro
+   (os triplos do `Jornal` são partilhados) e é edição manual de outputs; e a
+   reexecução tentaria **de novo a rede** para as capturas ainda sem texto
+   desses até 89 artigos (404 e novas falhas), com uma tentativa e os
+   problemas de duração e memória já vistos.
+2. **Reconstrução completa offline (recomendada).** Acrescentar a
+   `corpus_rdf.py` um modo `--rebuild-offline`: um cliente só de cache (um
+   texto conta como disponível se o ficheiro existir em `data/raw/texts/`; caso
+   contrário fica indisponível **sem qualquer pedido**) e reprocessamento dos
+   127 artigos a partir do raw de `version_history`, da classificação e da
+   cache, com o mesmo código de produção (`build_one_article_graph()`). É
+   determinístico, sem rede, e demora segundos. Fluxo: (i) guardar cópia do
+   `.nt` atual (o Turtle, o relatório e o resumo já estão no Git); (ii)
+   reconstruir; (iii) verificar; (iv) versionar os outputs.
+3. **Acrescento pontual de triplos** (gerar só os triplos `TextoExtraido` das
+   capturas recuperadas e anexá-los ao `.nt`, que é apendável). Mais leve, mas
+   duplica a lógica de `build_article_history_graph()` e deixa
+   `corpus_rdf_report.csv` (contagens por artigo) desatualizado, exigindo
+   reescrevê-lo à parte; risco de divergência entre o grafo e o código de
+   produção.
+4. **Não atualizar o grafo e ler os textos da cache no Caminho D.** Rejeitada:
+   o grafo (entregável do Caminho A) e as análises passariam a divergir.
+
+**Recomendação: alternativa 2.** Verificações de aceitação a fazer depois da
+reconstrução (propostas, não implementadas):
+
+- 127 artigos, 941 capturas e 12 735 triplos base inalterados, exceto o
+  acrescento de textos;
+- `TextoExtraido` no novo grafo = 540 + nº de capturas recuperadas
+  (`success` + `success_cached` no relatório da retentativa), e cada
+  `filePath` existe em disco;
+- **todos os triplos do grafo antigo continuam no novo** e a diferença
+  contém apenas triplos de `TextoExtraido` (tipo, `filePath`,
+  `temTextoExtraido`) — deteta uma cache incompleta ou corrompida, que de
+  outro modo daria menos textos em silêncio;
+- o Turtle relê sem erros.
+
+Ressalvas: (a) em modo offline todos os textos contam como "reutilizados", pelo
+que as colunas `texts_downloaded_now`/`texts_reused` do relatório perdem
+significado (já só a soma era informativa, ver "Ressalvas sobre estes
+números"); a causa das falhas continua nos relatórios e logs; (b) a
+reconstrução exige a cache local completa, daí a verificação de inclusão;
+(c) exige uma alteração de código e testes (cliente só de cache,
+`--rebuild-offline`, teste sintético em que um texto aparece na cache entre
+duas construções e só os triplos desse texto são acrescentados) — **não
+implementada; aguarda validação**.
+
+### Sequência prevista
+
+1. O autor corre `corpus_text_retry` localmente e versiona o relatório e o
+   resumo.
+2. Valida-se a alternativa de integração e implementa-se; reconstrução offline
+   do grafo com as verificações acima.
+3. Só então se avança para a implementação do Caminho D, com a
+   disponibilidade de textos real e conhecida.

@@ -277,3 +277,21 @@ os textos extraídos de cada captura, reutilizando os que já existirem em
 `output/corpus_articles.ttl` (não sobrescreve `output/sample_capture.ttl`
 nem `output/article_history.ttl`, do M2/M3) e relatórios em
 `output/corpus_rdf_report.csv`/`output/corpus_rdf_summary.md`.
+
+## Retentar os textos que falharam por timeout (antes do Caminho D)
+
+Para retentar as 324 capturas cuja última falha foi timeout ou ligação
+cortada (lista em `output/corpus_text_retry_candidates.csv`):
+
+```bash
+python -m semantic_harvester.corpus_text_retry
+```
+
+Faz até 3 tentativas por captura com espera crescente (um 404 não é
+retentado), é resumível por captura e regista o resultado em
+`output/corpus_text_retry_report.csv` (e um resumo em
+`output/corpus_text_retry_summary.md`). Só acrescenta textos a
+`data/raw/texts/`: **não altera** `output/corpus_rdf_report.csv` nem o grafo;
+a integração dos textos recuperados no grafo é um passo separado (ver
+`docs/experiments.md`). Para retentar uma falha definitiva, apagar a sua
+linha do relatório.

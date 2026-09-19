@@ -45,3 +45,6 @@ output/*
 !output/corpus_articles.ttl
 !output/corpus_rdf_report.csv
 !output/corpus_rdf_summary.md
+!output/corpus_text_retry_candidates.csv
+!output/corpus_text_retry_report.csv
+!output/corpus_text_retry_summary.md

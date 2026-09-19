@@ -32,6 +32,10 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
 - `corpus_classification.py`: passo 6 do protocolo (classificação
   Artigo/redirecionamento), trabalha só sobre os CSV já gerados pelas
   Fases 1–2; não faz pedidos à API, corre offline.
+- `corpus_text_retry.py`: retentativa isolada, resumível por captura, dos
+  textos que falharam por timeout/ligação cortada (lista em
+  `output/corpus_text_retry_candidates.csv`); não toca no grafo nem em
+  `corpus_rdf_report.csv`.
 - `corpus_rdf.py`: passo final do Caminho A — grafo RDF único dos artigos
   retidos, reconstruindo capturas do raw já preservado pela Fase 2 (sem
   repetir pedidos de `version_history`) e descarregando/reutilizando só os
@@ -73,6 +77,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_phase1` | Rede; ~26 pedidos (Fase 1 do Caminho A); grava raw e relatórios. |
 | `python -m semantic_harvester.corpus_phase2` | Rede; ~159+ pedidos (Fase 2 do Caminho A, um artigo de cada vez); execução longa; retoma automaticamente se interrompida. |
 | `python -m semantic_harvester.corpus_classification` | Sem rede; lê os CSV das Fases 1–2 e classifica Artigo/redirecionamento (passo 6). |
+| `python -m semantic_harvester.corpus_text_retry` | Rede (até 324 capturas, várias tentativas cada); resumível por captura; grava textos em `data/raw/texts/` e `output/corpus_text_retry_report.csv`. |
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais

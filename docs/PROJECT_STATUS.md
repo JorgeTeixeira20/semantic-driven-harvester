@@ -120,7 +120,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 47 testes em quatro módulos de `tests/`.
+pacote conforme o README. Existem 58 testes em cinco módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -128,10 +128,12 @@ relações/contagens RDF, ficheiros de texto, reutilização, preservação de
 bytes, releitura de Turtle, a classificação Artigo/redirecionamento
 (`test_corpus_classification.py`, incluindo a normalização http/https) e
 o mapeamento RDF do corpus (`test_corpus_rdf.py`: reconstrução do raw,
-normalização de `originalURL`, fusão de artigos e retoma sem repetir pedidos).
+normalização de `originalURL`, fusão de artigos e retoma sem repetir pedidos) e a
+retentativa de textos (`test_corpus_text_retry.py`: tentativas com espera crescente,
+404 não retentado, retoma por captura).
 
 Última validação em **2026-09-19**, com o Python 3.13.1 do ambiente virtual:
-`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **47 testes,
+`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **58 testes,
 todos passaram (`OK`)**, sem chamadas à API real.
 
 [tests/support.py](../tests/support.py) fornece respostas simuladas, temporários
@@ -272,6 +274,16 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    real; os 324 timeouts/ligações cortadas não foram retentados de forma
    sistemática, pelo que a disponibilidade de 57,4% pode estar subestimada
    (teto teórico 91,8%). Detalhe em `experiments.md`.
+
+   **Preparada (2026-09-19), não executada:** retentativa das 324 capturas
+   cuja última falha foi timeout/ligação cortada (89 artigos afetados) —
+   `src/semantic_harvester/corpus_text_retry.py`, lista em
+   `output/corpus_text_retry_candidates.csv`, resumível por captura, isolada do
+   grafo. Será corrida pelo autor localmente. Proposta (por validar, não
+   implementada) de como os textos recuperados entram no grafo: reconstrução
+   offline do grafo a partir da cache, com verificação de que o grafo antigo
+   fica contido no novo; ver `experiments.md`. Sem isto, correr `corpus_rdf.py`
+   outra vez não incorpora os textos novos (salta os 127 artigos já feitos).
 
    O Caminho D não foi iniciado.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
