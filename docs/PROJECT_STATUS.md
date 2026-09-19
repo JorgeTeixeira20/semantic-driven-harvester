@@ -97,8 +97,10 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 
 ## Limitações e problemas conhecidos
 
-- Em 2026-09-16, `data/raw/` contém apenas `.gitkeep`. O Git ignora as respostas
-  e textos reais; o clone não inclui esses artefactos. As afirmações de
+- Em 2026-09-16, `data/raw/` continha apenas `.gitkeep`; desde então o corpus do
+  Caminho A foi recolhido localmente, mas o Git continua a ignorar as respostas
+  e textos reais (incluindo os 540 textos referenciados por
+  `output/corpus_articles.ttl`); o clone não inclui esses artefactos. As afirmações de
   preservação nas observações descrevem a execução histórica, não disponibilidade atual.
 - O [manifesto](../data/processed/captures_manifest.jsonl) e os Turtle em
   `output/` continuam versionados, mas referenciam textos atualmente ausentes.
@@ -118,16 +120,18 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 32 testes em três módulos de `tests/`.
+pacote conforme o README. Existem 47 testes em quatro módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
 relações/contagens RDF, ficheiros de texto, reutilização, preservação de
-bytes, releitura de Turtle e a classificação Artigo/redirecionamento
-(`test_corpus_classification.py`, incluindo a normalização http/https).
+bytes, releitura de Turtle, a classificação Artigo/redirecionamento
+(`test_corpus_classification.py`, incluindo a normalização http/https) e
+o mapeamento RDF do corpus (`test_corpus_rdf.py`: reconstrução do raw,
+normalização de `originalURL`, fusão de artigos e retoma sem repetir pedidos).
 
-Última validação em **2026-09-18**, com o Python 3.13.1 do ambiente virtual:
-`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **32 testes,
+Última validação em **2026-09-19**, com o Python 3.13.1 do ambiente virtual:
+`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **47 testes,
 todos passaram (`OK`)**, sem chamadas à API real.
 
 [tests/support.py](../tests/support.py) fornece respostas simuladas, temporários
@@ -249,9 +253,23 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    conhecidas (ex.: páginas `/jogos-em-direto/` não cobertas pela regra)
    em `experiments.md`.
 
-   **Falta o resto do Caminho A** (mapeamento RDF do corpus a partir dos
-   127 artigos retidos, download de textos das capturas), ainda não
-   implementado.
+   **Mapeamento RDF do corpus (passo final) concluído em 2026-09-19 —
+   Caminho A concluído.** `src/semantic_harvester/corpus_rdf.py` mapeia os
+   127 artigos retidos para `output/corpus_articles.ttl`, reconstruindo as
+   capturas do raw de `version_history` já preservado (sem repetir esses
+   pedidos) e descarregando só os textos. Números verificados por soma do
+   relatório e releitura do Turtle: **127/127 artigos, 941 capturas, 540
+   textos disponíveis (57,4%) e 401 indisponíveis (42,6%), 12 735 triplos**
+   (127 `Artigo`, 1 `Jornal`, 127 `RecursoWeb`, 941 `CapturaArquivada`, 540
+   `TextoExtraido`); 32 artigos sem nenhum texto e 30 com todos. A descarga
+   final foi corrida pelo autor fora do Claude Code, por cortes de memória
+   do sistema. Três bugs encontrados e corrigidos (variantes cosméticas de
+   `originalURL` em 32 artigos, timeout excessivo, ausência de retoma por
+   artigo). Ressalva: os 401 textos indisponíveis misturam 404, ligações
+   cortadas e timeouts, com uma tentativa por sessão por artigo; parte pode
+   ser transitória e não foi retentada. Detalhe em `experiments.md`.
+
+   O Caminho D não foi iniciado.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com

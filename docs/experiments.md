@@ -474,16 +474,13 @@ Para o protocolo de recolha do Caminho A:
 
 ## Protocolo de queries para o corpus do Caminho A
 
-**Estado em 2026-09-18: Fases 1, 2 e passo 6 (classificação) concluídos.**
-Fase 1: 26 pedidos, N = 159 artigos únicos. Fase 2 (autorizada pelo autor
-após confirmação de `N` e da correção do passo 4b): 159/159 artigos
-processados, 0 falhas, 7 572 capturas, 125 artigos com mais do que uma
-captura. Passo 6: regra de classificação Artigo/redirecionamento aplicada
-sobre os dados já recolhidos (sem pedidos novos à API); 158 recursos
-distintos depois de normalizar http/https, **127 classificados como
-Artigo** — ver "Classificação Artigo vs. redirecionamento/não-artigo"
-abaixo. **Falta o resto do Caminho A** (mapeamento RDF do corpus, download
-de texto das capturas retidas), ainda não implementado.
+**Estado em 2026-09-19: Caminho A concluído** (descoberta, profundidade
+temporal, classificação e mapeamento RDF). Fase 1: 26 pedidos, N = 159
+artigos únicos. Fase 2: 159/159 artigos, 0 falhas, 7 572 capturas, 125
+artigos com mais do que uma captura. Passo 6: 158 recursos distintos depois
+de normalizar http/https, 127 classificados como Artigo. Mapeamento RDF: 127
+artigos, 941 capturas, 540 textos disponíveis (401 indisponíveis), 12 735
+triplos — ver "Mapeamento RDF do corpus" no fim deste documento.
 
 Este protocolo é uma ferramenta operacional de recolha — uma grelha de termos
 de pesquisa a combinar com `siteSearch=record.pt` — e não deve ser confundida
@@ -1154,3 +1151,120 @@ Exemplos de cada categoria:
   serem texto editorial. Não investigado nesta iteração.
 - Não usa `estimated_nr_results` nem qualquer sinal já rejeitado noutras
   experiências.
+
+## Mapeamento RDF do corpus (passo final do Caminho A)
+
+### Objetivo e método
+
+Mapear os 127 artigos classificados como `Artigo` (passo 6) para um único
+grafo RDF, com as suas capturas históricas e textos extraídos, sem repetir
+pedidos de `version_history`: as capturas de cada artigo foram
+reconstruídas a partir do raw já preservado pela Fase 2
+(`data/raw/version_history/`) e só o download dos textos extraídos
+(`build_manifest_records()`, que reutiliza texto já existente em
+`data/raw/texts/`) fez pedidos novos à API. Implementação em
+`src/semantic_harvester/corpus_rdf.py`; o mapeamento por artigo reutiliza
+`build_article_history_graph()` (`rdf_mapper.py`) sem alterações.
+
+A descarga foi concluída pelo autor no seu terminal, fora do Claude Code,
+depois de várias sessões dentro do Claude Code terem sido interrompidas
+pela proteção de memória do sistema (não por erro do código). Os números
+abaixo foram verificados a partir dos ficheiros produzidos, não observados
+em direto.
+
+### Resultados finais (verificados)
+
+Conferidos por soma direta de `output/corpus_rdf_report.csv` e por releitura
+de `output/corpus_articles.ttl` com RDFLib:
+
+- Artigos mapeados com sucesso: **127 de 127**, 0 falhas.
+- Capturas no grafo: **941** (igual à soma das capturas dos 127 artigos em
+  `output/corpus_classification.csv`).
+- Textos extraídos disponíveis: **540 de 941 (57,4%)**; indisponíveis: **401
+  (42,6%)**. 32 artigos não têm nenhum texto disponível e 30 têm todos.
+- Triplos no grafo final: **12 735**. Instâncias: 127 `Artigo`, 1 `Jornal`,
+  127 `RecursoWeb`, 941 `CapturaArquivada`, 540 `TextoExtraido`.
+- Capturas com `originalURL` normalizado (variante de esquema/barras):
+  **189, em 32 artigos** (os mesmos 32 identificados antes da correção);
+  descartadas por não serem variante cosmética: 0.
+
+Saídas: `output/corpus_articles.ttl` (grafo final),
+`output/corpus_rdf_report.csv` (uma linha por artigo),
+`output/corpus_rdf_summary.md`. Não foram alterados
+`output/sample_capture.ttl` nem `output/article_history.ttl` (M2/M3).
+
+### Ressalvas sobre estes números
+
+- A divisão "descarregados" (281) vs "reutilizados" (259) depende das
+  sessões: um texto obtido numa sessão interrompida conta como reutilizado
+  na sessão seguinte. Só a soma (540 disponíveis) é significativa.
+- Os 401 textos indisponíveis misturam causas que o relatório não
+  distingue: nos logs observados aparecem HTTP 404, ligações cortadas
+  (`RemoteDisconnected`) e timeouts. Cada texto teve **uma tentativa por
+  sessão em que o artigo foi processado, sem novas tentativas dentro da
+  mesma sessão**, e um artigo concluído não é reprocessado; parte das falhas
+  pode por isso ser transitória e não foi retentada. Não se pode afirmar que
+  os 401 sejam todos ausências reais no Arquivo.pt.
+- Existem 5 ficheiros em `data/raw/texts/` não referenciados pelo grafo
+  (545 no disco vs 540 no grafo). Um dos três prefixos de hash foi
+  confirmado como o URL `https://` de um artigo com variantes (descarregado
+  antes da correção de `originalURL`, quando o nome do ficheiro ainda usava a
+  variante); os outros dois são consistentes com a mesma origem mas não
+  foram resolvidos individualmente. São inofensivos (não referenciados) e
+  não estão versionados.
+
+### Bugs encontrados durante a execução e correções
+
+1. **`originalURL` heterogéneo dentro do `version_history` de um artigo**
+   (commit `db55d8c`). O `version_history` de um URL devolve capturas cujo
+   próprio `originalURL` difere em esquema (`http`/`https`), barras
+   duplicadas ou barra final. `build_article_history_graph()` exige um único
+   `original_url` e rejeitava o manifesto. Afeta 32 de 127 artigos (25%). Nos
+   casos inspecionados os `tstamp` das variantes são distintos e
+   intercalados com os do URL canónico (não duplicados), pelo que descartá-las
+   subestimaria a profundidade temporal. Correção: reatribuir o `originalURL`
+   canónico às variantes que só diferem em esquema/barras
+   (`normalize_for_grouping()`), descartando e contando as que nem isso são
+   (0 nesta execução). Verificado que a normalização agrupa todas as variantes
+   dos 127 artigos.
+2. **Timeout excessivo nos downloads de texto** (commit `0f8b8c6`). O cliente
+   usava `timeout=(15, 120)`, copiado das Fases 1–2 sem justificação; houve
+   intervalos de até 519 s entre entradas do log. Passou a usar o padrão do
+   `ArquivoClient` (10 s/30 s). Não se mediu o ganho de forma controlada.
+3. **Execução sem memória entre sessões** (commit `5035bd0`). Cada retoma
+   recomeçava no artigo 1 e repetia as tentativas de rede já falhadas, pelo
+   que ficava presa por volta do artigo 20 antes de cada corte. A execução
+   passou a ser retomável por artigo (relatório CSV incremental e triplos em
+   N-Triples apendáveis, `data/processed/corpus_articles_triples.nt`, não
+   versionado). Teste de regressão que prova que uma segunda chamada não faz
+   pedidos para artigos já concluídos.
+
+### Observações não quantificadas
+
+- Num artigo inspecionado, o `title` devolvido por `version_history` era o
+  próprio URL e havia capturas com `statusCode` 302; noutro, capturas de 2022
+  e 2023, fora da janela 2015–2020 da Fase 1 (esperado, pois `version_history`
+  não restringe datas). Não foi medida a frequência destes fenómenos no
+  corpus. O rótulo `rdfs:label` de cada `Artigo` vem do título da Fase 1
+  (TextSearch); o `sdh:title` de cada captura vem de `version_history`, como no
+  M3.
+- As capturas com `statusCode` 302 ou sem texto ficam no grafo como
+  `CapturaArquivada` sem `TextoExtraido`; não foi aplicado nenhum filtro por
+  captura (só a classificação ao nível do artigo).
+
+### Limitações
+
+- Amostra deliberada de 13 termos (Opção 2) sobre `record.pt` 2015–2020; o
+  corpus não é representativo do jornal Record.
+- 42,6% das capturas sem texto disponível limitam qualquer análise textual
+  posterior (Caminhos D e B).
+- A classificação Artigo tem falsos negativos conhecidos (ex.:
+  `/jogos-em-direto/`) e não distingue conteúdo multimédia de texto.
+- O `.ttl` referencia 540 ficheiros em `data/raw/texts/` que não acompanham
+  um clone (raw ignorado pelo Git).
+
+### Estado do Caminho A
+
+Concluídos: descoberta (Fase 1), profundidade temporal (Fase 2),
+classificação Artigo/redirecionamento (passo 6) e mapeamento RDF. O Caminho D
+(redução de redundância) não foi iniciado.
