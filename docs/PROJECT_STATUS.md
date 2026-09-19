@@ -265,9 +265,13 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    final foi corrida pelo autor fora do Claude Code, por cortes de memória
    do sistema. Três bugs encontrados e corrigidos (variantes cosméticas de
    `originalURL` em 32 artigos, timeout excessivo, ausência de retoma por
-   artigo). Ressalva: os 401 textos indisponíveis misturam 404, ligações
-   cortadas e timeouts, com uma tentativa por sessão por artigo; parte pode
-   ser transitória e não foi retentada. Detalhe em `experiments.md`.
+   artigo). Ressalva: dos 401 textos indisponíveis, 318 (79,3%) falharam por timeout
+   de leitura, 77 (19,2%) por HTTP 404, 5 por ligação cortada e 1 por timeout
+   de ligação (reconstruído a partir do log de progresso, reconcilia
+   exatamente; ver `experiments.md`). Só o 404 é compatível com ausência
+   real; os 324 timeouts/ligações cortadas não foram retentados de forma
+   sistemática, pelo que a disponibilidade de 57,4% pode estar subestimada
+   (teto teórico 91,8%). Detalhe em `experiments.md`.
 
    O Caminho D não foi iniciado.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de

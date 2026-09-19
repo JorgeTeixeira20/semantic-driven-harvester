@@ -1198,13 +1198,63 @@ Saídas: `output/corpus_articles.ttl` (grafo final),
 - A divisão "descarregados" (281) vs "reutilizados" (259) depende das
   sessões: um texto obtido numa sessão interrompida conta como reutilizado
   na sessão seguinte. Só a soma (540 disponíveis) é significativa.
-- Os 401 textos indisponíveis misturam causas que o relatório não
-  distingue: nos logs observados aparecem HTTP 404, ligações cortadas
-  (`RemoteDisconnected`) e timeouts. Cada texto teve **uma tentativa por
-  sessão em que o artigo foi processado, sem novas tentativas dentro da
-  mesma sessão**, e um artigo concluído não é reprocessado; parte das falhas
-  pode por isso ser transitória e não foi retentada. Não se pode afirmar que
-  os 401 sejam todos ausências reais no Arquivo.pt.
+- **Causa real dos 401 textos indisponíveis** (análise posterior, 2026-09-19,
+  sem pedidos novos à API). O relatório não guarda o erro de cada texto; a
+  distinção foi reconstruída a partir das linhas `WARNING: Falha ao obter ...`
+  de `output/corpus_rdf_progress.log` (não versionado), que acumula todas as
+  sessões (Claude Code interrompido + terminal do autor). Método: analisar o
+  parâmetro `m` de cada URL `textextracted` do log para obter `(originalURL,
+  tstamp)`, normalizar o URL com `normalize_for_grouping()` e cruzar com as
+  capturas do grafo sem `TextoExtraido`; a categoria vem da mensagem de erro.
+  A análise foi feita com um script ad hoc, **não versionado** (este passo não
+  alterou código); pode ser versionado se for útil.
+
+  Reconciliação: das 555 linhas de falha no log, todas foram analisadas (0
+  não analisáveis, 0 com formato de URL diferente), correspondendo a 441
+  capturas distintas = **401 sem texto no grafo final + 40 que falharam pelo
+  menos uma vez e acabaram por ter texto**. Cada uma das 401 tem pelo menos
+  uma linha no log, pelo que os números reconciliam **exatamente**. A
+  categoria de cada uma das 401 é a do **último** erro registado:
+
+  | Causa (última tentativa registada) | Capturas | % das 401 |
+  | --- | ---: | ---: |
+  | Timeout de leitura (`Read timed out`) | 318 | 79,3% |
+  | HTTP 404 | 77 | 19,2% |
+  | Ligação cortada (`RemoteDisconnected`/`Connection aborted`) | 5 | 1,2% |
+  | Timeout de ligação (`ConnectTimeoutError`) | 1 | 0,2% |
+  | Outros | 0 | 0% |
+
+  Ressalvas desta reconstrução: (a) as linhas de sucesso não são registadas;
+  a "recuperação" das 40 é inferida por a captura constar do grafo final;
+  (b) o log não distingue sessões nem guarda o resultado final por captura,
+  pelo que "última tentativa registada" assume que é a definitiva; (c) 343
+  das 401 tiveram uma única tentativa, 27 duas, 16 três, 11 quatro e 4 cinco
+  (as repetições vêm de artigos reprocessados após interrupções, não de uma
+  política de retentativa); 24 das 401 tiveram tentativas de mais do que uma
+  categoria; (d) nas mensagens de timeout de leitura o limite reportado é 30 s
+  em 370 linhas, 10 s em 14 e 15 s em 2 (o valor de 15 s é compatível com a sessão
+  anterior à correção do timeout, mas não foi verificado linha a linha).
+
+  Cruzamento com o `statusCode` do raw de `version_history`: as 540 capturas
+  com texto têm todas `statusCode` 200; das 401 sem texto, 366 têm 200, 32
+  têm 302, 2 têm 404 e 1 tem 301. Ou seja, **nenhuma das 35 capturas com
+  `statusCode` diferente de 200 tem texto**, o que é coerente com serem
+  respostas sem conteúdo de artigo. Dos 77 erros 404, 54 são de capturas com
+  `statusCode` 200, 22 de capturas 302 e 1 de uma 301.
+
+  Interpretação, com limites: o 404 (19,2%) é o único sinal claramente
+  compatível com ausência real do texto. **Os timeouts e ligações cortadas
+  (324 capturas, 80,8% das 401) não são evidência de ausência**, apenas de
+  que o pedido não foi concluído numa única tentativa. Se todos fossem
+  transitórios, a disponibilidade poderia subir dos 57,4% atuais para um
+  teto teórico de 864/941 (91,8%); é um teto, não uma previsão. Há alguma
+  evidência de que retentar ajuda: das 361 capturas cuja última falha
+  registada foi timeout ou ligação cortada, 37 (10,2%) foram depois obtidas
+  (31 após timeout de leitura, 5 após ligação cortada, 1 após timeout de
+  ligação; mais 3 após 404). Este valor **não é uma taxa de recuperação**:
+  só foram retentadas as capturas cujo artigo foi reprocessado após uma
+  interrupção, por isso é um limite inferior enviesado. Não foi feita nenhuma
+  nova tentativa; fazê-la exigiria pedidos novos à API.
 - Existem 5 ficheiros em `data/raw/texts/` não referenciados pelo grafo
   (545 no disco vs 540 no grafo). Um dos três prefixos de hash foi
   confirmado como o URL `https://` de um artigo com variantes (descarregado
