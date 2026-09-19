@@ -1318,3 +1318,193 @@ Saídas: `output/corpus_articles.ttl` (grafo final),
 Concluídos: descoberta (Fase 1), profundidade temporal (Fase 2),
 classificação Artigo/redirecionamento (passo 6) e mapeamento RDF. O Caminho D
 (redução de redundância) não foi iniciado.
+
+## Caminho D — redução de redundância entre capturas (proposta, por validar)
+
+**Estado: proposta para validação do autor e do Jorge. Nada foi
+implementado e não foram feitos pedidos à API.** As estatísticas abaixo foram
+calculadas sobre dados já recolhidos (`output/corpus_articles.ttl`, raw de
+`version_history`, textos em `data/raw/texts/`) com scripts ad hoc não
+versionados; são exploratórias, não uma calibração.
+
+### Decisões já tomadas (PROJECT_STATUS.md)
+
+Heurística de **similaridade textual simples**, aplicada ao corpus produzido
+no Caminho A; não `digest` isolado, não embeddings (esses ficam como trabalho
+futuro). Esta proposta não reabre essa decisão; decide como a aplicar e o que
+fazer com as capturas sem texto.
+
+### Evidência disponível
+
+**Estrutura do corpus** (127 artigos, 941 capturas):
+
+| Situação | Artigos |
+| --- | ---: |
+| Só 1 captura (nada a comparar) | 31 |
+| Nenhuma captura com texto | 32 |
+| Exatamente 1 captura com texto | 37 |
+| 2 ou mais capturas com texto | 58 |
+
+Só os 58 artigos com 2+ textos têm pares comparáveis: **445 pares
+temporalmente consecutivos** (6 013 pares se comparados todos contra todos).
+Dos 127, 69 (32 sem texto + 37 com um só) não têm nada que possa ser
+comparado por texto.
+
+**Capturas sem texto: 401 (42,6%)** — 340 em artigos que têm pelo menos um
+texto e 61 nos 32 artigos sem nenhum. Nenhuma das 35 capturas com
+`statusCode` diferente de 200 tem texto.
+
+**O `digest` como sinal.** Dentro do mesmo artigo há 21 grupos de capturas
+com `digest` igual, correspondendo a 44 capturas "redundantes por digest" (n−1
+por grupo): 14 grupos só de capturas sem texto (34 capturas), 3 grupos só com
+texto (4 capturas) e 4 grupos mistos (6 capturas). Testado contra os textos
+reais: dos 3 grupos de `digest` igual com 2+ textos, os 3 tinham texto
+idêntico (amostra demasiado pequena para concluir precisão); por outro lado,
+dos 16 grupos de textos **byte a byte idênticos** dentro de um artigo, **13
+(81%) tinham mais do que um `digest` distinto**. Ou seja, o `digest` parece ter
+precisão alta mas cobertura baixa: deixaria escapar a maior parte das
+duplicações reais, o que sustenta a decisão de usar texto. Ressalva
+adicional: no M3 o `digest` da mesma captura diferiu entre TextSearch e
+`versionHistory` (`observations.md`), pelo que a sua fiabilidade não está
+estabelecida.
+
+**O texto extraído inclui o "chrome" do site** (menus, login, secções), como
+mostra o início de um texto real: "... - Judo - Jornal Record Menu Record
+Login/Registo TV Assinar E-Paper Notificações ...". Os 540 textos têm entre
+2 165 e 15 191 bytes (mediana 8 658), nenhum vazio. Medição exploratória de
+similaridade (Jaccard sobre conjuntos de palavras do texto completo, sem
+remover o chrome):
+
+| Amostra | n | mín. | p10 | mediana | p90 | máx. |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Artigos diferentes (pares aleatórios, semente 0) | 384 | 0,109 | 0,224 | 0,336 | 0,405 | 0,521 |
+| Mesmo artigo, capturas consecutivas | 445 | 0,434 | 0,551 | 0,641 | 0,812 | 1,000 |
+
+Dos 445 pares consecutivos, 53 têm similaridade ≥ 0,80, 29 ≥ 0,90, 25 ≥ 0,99
+e 22 são exatamente 1,0. Duas consequências: (1) existe um "piso" de
+similaridade de cerca de 0,34 entre artigos sem relação, devido ao chrome,
+pelo que um limiar tem de ficar bem acima dele; (2) como o chrome também varia
+no tempo, a maioria das capturas consecutivas do mesmo artigo (mediana 0,64)
+**não** parece quase-duplicada por texto completo — o rendimento esperado com
+esta medição simples é baixo (cerca de 6,5% dos pares consecutivos com texto
+≥ 0,90). Isto pode mudar se o chrome for removido.
+
+### Proposta de desenho
+
+**1. Não destrutivo.** A redução não apaga capturas do grafo nem do raw. Uma
+captura redundante continua a atestar que o texto estava inalterado naquele
+momento, e a caracterização temporal é metade do objetivo da dissertação;
+apagá-la perderia essa evidência. O resultado de D é uma **anotação** de cada
+captura (representante ou redundante, com o representante e a similaridade) e
+uma métrica derivada: nº de **versões textuais distintas** por artigo,
+comparado com o nº de capturas.
+
+**2. Primeira iteração fora da ontologia.** A anotação sai para
+`output/corpus_redundancy.csv` (uma linha por captura) e um resumo em
+Markdown. Não se altera `ontology/semantic_harvester.ttl` nesta iteração:
+representar isto em RDF exigiria novas propriedades (por exemplo, uma relação
+captura → captura representante e um valor de similaridade), o que é uma
+mudança de ontologia a explicar e validar antes (AGENTS.md). Fica como
+decisão posterior.
+
+**3. Pré-processamento do texto.** Normalizar (Unicode, minúsculas, espaços).
+Para o chrome, duas variantes a comparar na calibração: (a) nenhuma remoção
+(referência); (b) remover unidades (n-gramas de palavras) presentes numa
+fração alta das capturas **de artigos diferentes** — critério derivado do
+corpus, sem regras manuais por site. A fração de corte não é fixada agora.
+
+**4. Medida.** Jaccard sobre palavras ou n-gramas de palavras (a medida já
+usada na exploração acima, por continuidade). A escolha entre conjuntos de
+palavras e n-gramas fica para a calibração; igualdade exata do texto
+normalizado é o nível trivial.
+
+**5. Estratégia de comparação.** Por artigo, em ordem temporal, cada captura
+com texto é comparada com o **último representante retido**, não só com a
+anterior, para evitar que uma cadeia de pequenas alterações funda versões
+muito diferentes entre si (A≈B, B≈C, mas A≉C). O custo não é a razão (6 013
+pares são triviais); é semântica. A variante "comparar com a captura
+consecutiva" é calculada em paralelo como análise de sensibilidade.
+
+**6. Limiar por calibração, não por decreto.** Não se propõe um valor. Passos:
+(i) recalcular a distribuição de similaridades com a variante de
+pré-processamento escolhida; (ii) os autores rotulam manualmente uma amostra de
+pares em cada faixa ("mesma versão" / "texto alterado"); (iii) fixar o limiar
+onde os rótulos se separam e publicar a tabela de sensibilidade (nº de
+redundantes por limiar). Na medição exploratória há 25 pares ≥ 0,99, apenas 4
+entre 0,90 e 0,99 e 24 entre 0,80 e 0,90, o que sugere uma separação nítida no
+topo, mas não dispensa a rotulagem.
+
+### Capturas sem texto — decisão proposta
+
+Não podem ser comparadas por similaridade textual. Alternativas consideradas:
+
+- **A. Manter todas, sem qualquer redução (recomendada como resultado
+  principal).** É a opção mais segura. Custo: as 401 capturas (42,6%) não
+  contribuem para nenhuma redução, e o resultado de D aplica-se só às 540 com
+  texto.
+- **B. Critério mais fraco (mesmo `digest` e mesmo `contentLength` dentro do
+  artigo) para as sem texto.** Rejeitada como critério de redução, pelas
+  razões: reintroduziria o `digest` isolado exatamente onde não o podemos
+  verificar contra texto; a sua fiabilidade não está estabelecida (M3); o
+  ganho máximo é pequeno — 44 capturas (4,7% de 941) por digest, das quais só
+  34 estão em grupos totalmente sem texto e 6 em grupos mistos.
+- **Solução proposta (A com anotação, em camadas separadas):**
+  - **Camada 1 (texto):** pares em que ambas têm texto → similaridade. É o
+    único resultado que se apresenta como redução de redundância.
+  - **Camada 2 (sem texto):** todas mantidas. Em paralelo, **anotam-se, sem
+    remover**, os grupos de capturas sem texto do mesmo artigo com `digest` e
+    `contentLength` iguais como "candidatas a redundância por digest, não
+    verificadas por texto". Reportam-se à parte (nunca somadas ao resultado da
+    Camada 1) como limite superior do que um critério fraco deduziria (34
+    capturas em 14 grupos só sem texto; 6 em 4 grupos mistos, onde a captura
+    sem texto tem o mesmo `digest` de uma com texto). Estas contagens são
+    por `digest` apenas; exigir também `contentLength` igual não foi medido e
+    só pode reduzi-las.
+  - **Artigos sem nenhum texto (32 artigos, 61 capturas):** declarados "não
+    avaliáveis" no resumo, todas as capturas mantidas.
+  - **Capturas com `statusCode` ≠ 200 (35, nenhuma com texto):** ficam na
+    Camada 2. Não são um problema de redundância mas de conteúdo; são apenas
+    contabilizadas à parte.
+
+### Questão prévia: retentar os textos por timeout?
+
+Antes de implementar D importa decidir se se retentam as **324 capturas** cuja
+falha foi timeout ou ligação cortada (não 404). Se muitas forem recuperadas, D
+passa a ter mais pares comparáveis e menos capturas na Camada 2 (teto
+teórico 864/941 = 91,8% de disponibilidade, não uma previsão). Exige pedidos
+novos à API (até 324) e uma alteração de código, porque a retoma atual é por
+artigo e não por captura. Opções: **(i) retentar primeiro (recomendada, dado
+que 80,8% das falhas não indicam ausência)**; **(ii) avançar com os 540
+textos atuais** e documentar a limitação.
+
+### Saídas e testes previstos
+
+`output/corpus_redundancy.csv` (por captura: artigo, `tstamp`, tem texto,
+camada, representante, similaridade, rótulo), resumo em Markdown com contagens
+por camada e tabela de sensibilidade ao limiar. Testes unitários com
+fixtures sintéticas: textos idênticos, quase idênticos, diferentes; cadeia de
+alterações (A≈B, B≈C, A≉C); artigo com uma só captura; artigo sem texto;
+captura sem texto entre duas com texto; grupo de `digest` igual sem texto
+(anotado, não removido).
+
+### Limitações
+
+- Similaridade textual não prova equivalência semântica (AGENTS.md); "mesma
+  versão" significa apenas "texto extraído suficientemente semelhante".
+- O limiar é um julgamento dos autores, calibrado nesta amostra de 127
+  artigos (13 termos, `record.pt`, 2015–2020), e não generaliza ao Record.
+- A medição exploratória usa texto completo com chrome e uma medida simples;
+  resultados finais dependem do pré-processamento escolhido.
+- 69 dos 127 artigos não têm pares comparáveis por texto; a redução só pode
+  ser afirmada para os 58 restantes.
+
+### Decisões pedidas para validar
+
+1. Camadas 1 e 2 como descritas (nenhuma redução sem texto; anotação por
+   digest só como candidata)?
+2. Anotação em CSV nesta iteração, ontologia depois?
+3. Comparar com o último representante (com sensibilidade à consecutiva)?
+4. Calibrar o limiar por rotulagem manual, com o filtro de chrome derivado do
+   corpus?
+5. Retentar as 324 capturas antes de implementar D, ou avançar já com 540
+   textos?
