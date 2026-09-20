@@ -6,15 +6,18 @@ import json
 import unittest
 from pathlib import Path
 
-from rdflib import RDF
+from rdflib import RDF, XSD, Graph, Literal
 
 from semantic_harvester.arquivo_client import ArquivoClient
 from semantic_harvester.corpus_rdf import (
-    build_corpus_graph, build_one_article_graph, load_captures_from_raw,
-    load_retained_articles, normalize_captures_to_canonical_url,
-    normalize_for_grouping, url_hash16,
+    CacheOnlyClient, build_corpus_graph, build_one_article_graph,
+    load_captures_from_raw, load_retained_articles, main as corpus_rdf_main,
+    normalize_captures_to_canonical_url, normalize_for_grouping,
+    rebuild_graph_offline, rebuild_offline, url_hash16,
 )
-from semantic_harvester.rdf_mapper import SDH, article_uri, capture_uri
+from semantic_harvester.rdf_mapper import (
+    SDH, article_uri, capture_uri, extracted_text_uri,
+)
 from tests.support import FIXTURES, ORIGINAL_URL, OfflineTestCase
 
 
@@ -408,6 +411,211 @@ class BuildCorpusGraphTests(OfflineTestCase):
         self.assertEqual(len(set(second_graph.subjects(RDF.type, SDH.Artigo))), 2)
         self.assertIn((article_uri(url_a), RDF.type, SDH.Artigo), second_graph)
         self.assertIn((article_uri(url_b), RDF.type, SDH.Artigo), second_graph)
+
+
+REBUILD_URL = "https://news.example.test/articles/reconstrucao"
+REBUILD_TSTAMPS = ("20200101000000", "20200202000000")
+
+
+class OfflineRebuildTestCase(OfflineTestCase):
+    """Raiz sintética com um artigo de duas capturas e uma cache de textos vazia."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.raw_dir = self.root / "data" / "raw"
+        self.output_dir = self.root / "output"
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        items = [
+            {
+                "originalURL": REBUILD_URL, "tstamp": tstamp, "title": REBUILD_URL,
+                "linkToArchive": f"https://archive.example.test/{tstamp}",
+                "mimeType": "text/html", "contentLength": 100,
+                "digest": f"DIGEST-{tstamp}", "encoding": "UTF-8",
+                "collection": "SYNTHETIC", "statusCode": 200,
+            }
+            for tstamp in REBUILD_TSTAMPS
+        ]
+        write_version_history_raw(
+            self.raw_dir / "version_history", REBUILD_URL, offset=0, response_items=items,
+        )
+        with (self.output_dir / "corpus_classification.csv").open(
+            "w", encoding="utf-8", newline=""
+        ) as handle:
+            writer = csv.DictWriter(
+                handle, fieldnames=["original_url", "title", "captures", "is_artigo", "reason"],
+            )
+            writer.writeheader()
+            writer.writerow({
+                "original_url": REBUILD_URL, "title": "Artigo de reconstrução",
+                "captures": "2", "is_artigo": "True", "reason": "artigo",
+            })
+        (self.raw_dir / "texts").mkdir(parents=True, exist_ok=True)
+
+    def cache_text(self, tstamp: str, content: bytes = b"texto sintetico") -> Path:
+        name = ArquivoClient._text_filename({"originalURL": REBUILD_URL, "tstamp": tstamp})
+        path = self.raw_dir / "texts" / name
+        path.write_bytes(content)
+        return path
+
+    def write_retry_report(self, *outcomes: str) -> None:
+        with (self.output_dir / "corpus_text_retry_report.csv").open(
+            "w", encoding="utf-8", newline=""
+        ) as handle:
+            writer = csv.DictWriter(handle, fieldnames=["original_url", "tstamp", "outcome"])
+            writer.writeheader()
+            for tstamp, outcome in zip(REBUILD_TSTAMPS, outcomes):
+                writer.writerow({"original_url": REBUILD_URL, "tstamp": tstamp, "outcome": outcome})
+
+    def snapshot(self) -> dict[str, bytes]:
+        return {
+            str(path.relative_to(self.root)): path.read_bytes()
+            for path in sorted(self.root.rglob("*"))
+            if path.is_file() and path.parts[-2] != "version_history"
+        }
+
+
+class CacheOnlyClientTests(OfflineRebuildTestCase):
+    def test_cached_text_is_available_without_any_request(self) -> None:
+        cached = self.cache_text(REBUILD_TSTAMPS[0], b"ja na cache")
+        client = CacheOnlyClient(data_dir=self.raw_dir)
+
+        result = client.download_extracted_text(
+            {"originalURL": REBUILD_URL, "tstamp": REBUILD_TSTAMPS[0]},
+            skip_existing=True, derive_url_when_missing=True,
+        )
+
+        self.assertTrue(result.success)
+        self.assertFalse(result.downloaded)
+        self.assertEqual(result.path, cached)
+        self.assertEqual(result.size_bytes, len(b"ja na cache"))
+
+    def test_missing_text_is_unavailable_without_any_request(self) -> None:
+        client = CacheOnlyClient(data_dir=self.raw_dir)
+
+        result = client.download_extracted_text(
+            {"originalURL": REBUILD_URL, "tstamp": REBUILD_TSTAMPS[0]},
+            skip_existing=True, derive_url_when_missing=True,
+        )
+
+        self.assertFalse(result.success)
+        self.assertIsNone(result.path)
+        self.assertIn("offline", result.error)
+
+    def test_the_underlying_session_refuses_network(self) -> None:
+        client = CacheOnlyClient(data_dir=self.raw_dir)
+        with self.assertRaises(RuntimeError):
+            client.session.get("https://arquivo.pt/textextracted?m=x")
+
+
+class RebuildGraphOfflineTests(OfflineRebuildTestCase):
+    def test_new_cached_text_adds_only_that_texts_triples(self) -> None:
+        """Um texto aparece na cache entre duas construções: só os triplos desse
+        texto são acrescentados (o teste proposto em docs/experiments.md)."""
+
+        self.cache_text(REBUILD_TSTAMPS[0])
+        first, first_results = rebuild_graph_offline(self.root)
+        self.assertEqual(len(set(first.subjects(RDF.type, SDH.TextoExtraido))), 1)
+        self.assertEqual(first_results[0].texts_failed, 1)
+
+        new_path = self.cache_text(REBUILD_TSTAMPS[1])
+        second, second_results = rebuild_graph_offline(self.root)
+
+        self.assertEqual(len(first - second), 0)
+        added = set(second - first)
+        capture = capture_uri(REBUILD_URL, REBUILD_TSTAMPS[1])
+        text = extracted_text_uri(REBUILD_URL, REBUILD_TSTAMPS[1])
+        relative = new_path.relative_to(self.root).as_posix()
+        self.assertEqual(added, {
+            (capture, SDH.temTextoExtraido, text),
+            (text, RDF.type, SDH.TextoExtraido),
+            (text, SDH.filePath, Literal(relative, datatype=XSD.string)),
+        })
+        self.assertEqual(second_results[0].texts_failed, 0)
+        self.assertEqual(second_results[0].texts_downloaded_now, 0)
+        self.assertEqual(second_results[0].texts_reused, 2)
+
+
+class RebuildOfflineTests(OfflineRebuildTestCase):
+    def check_map(self, checks) -> dict[str, bool | None]:
+        return {check.name: check.passed for check in checks}
+
+    def test_first_rebuild_writes_outputs_that_reload_identically(self) -> None:
+        self.cache_text(REBUILD_TSTAMPS[0])
+
+        checks, results, graph = rebuild_offline(self.root)
+
+        self.assertNotIn(False, self.check_map(checks).values())
+        reloaded = Graph().parse(self.output_dir / "corpus_articles.ttl", format="turtle")
+        self.assertEqual(set(reloaded), set(graph))
+        with (self.output_dir / "corpus_rdf_report.csv").open(encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual((rows[0]["texts_reused"], rows[0]["texts_failed"]), ("1", "1"))
+        summary = (self.output_dir / "corpus_rdf_summary.md").read_text(encoding="utf-8")
+        self.assertIn("offline", summary)
+        # Uma retoma normal encontra tudo concluído e reconstrói o mesmo grafo.
+        resumed, _ = build_corpus_graph(self.root)
+        self.assertEqual(set(resumed), set(graph))
+
+    def test_recovered_text_is_incorporated_and_all_checks_pass(self) -> None:
+        self.cache_text(REBUILD_TSTAMPS[0])
+        rebuild_offline(self.root)
+        before = Graph().parse(self.output_dir / "corpus_articles.ttl", format="turtle")
+
+        self.cache_text(REBUILD_TSTAMPS[1])
+        self.write_retry_report("failed", "success")
+        checks, _, _ = rebuild_offline(self.root)
+
+        states = self.check_map(checks)
+        self.assertEqual(states["textos_esperados"], True)
+        self.assertEqual(states["antigo_contido_no_novo"], True)
+        self.assertEqual(states["diferenca_so_textos"], True)
+        self.assertNotIn(False, states.values())
+        after = Graph().parse(self.output_dir / "corpus_articles.ttl", format="turtle")
+        self.assertEqual(len(before - after), 0)
+        self.assertEqual(len(after - before), 3)
+
+    def test_check_only_does_not_write_anything(self) -> None:
+        self.cache_text(REBUILD_TSTAMPS[0])
+        rebuild_offline(self.root)
+        self.cache_text(REBUILD_TSTAMPS[1])
+        before = self.snapshot()
+
+        checks, _, _ = rebuild_offline(self.root, apply=False)
+
+        self.assertNotIn(False, self.check_map(checks).values())
+        self.assertEqual(self.snapshot(), before)
+
+    def test_failed_verification_leaves_existing_outputs_untouched(self) -> None:
+        self.cache_text(REBUILD_TSTAMPS[0])
+        removable = self.cache_text(REBUILD_TSTAMPS[1])
+        rebuild_offline(self.root)
+        # Cache incompleta: um texto que estava no grafo antigo desapareceu.
+        removable.unlink()
+        before = self.snapshot()
+
+        checks, _, new_graph = rebuild_offline(self.root)
+
+        states = self.check_map(checks)
+        self.assertEqual(states["antigo_contido_no_novo"], False)
+        self.assertEqual(len(set(new_graph.subjects(RDF.type, SDH.TextoExtraido))), 1)
+        self.assertEqual(self.snapshot(), before)
+
+    def test_unexpected_text_count_fails_the_retry_report_check(self) -> None:
+        self.cache_text(REBUILD_TSTAMPS[0])
+        rebuild_offline(self.root)
+        self.cache_text(REBUILD_TSTAMPS[1])
+        # O relatório afirma 0 recuperadas, mas apareceu um texto novo.
+        self.write_retry_report("failed", "failed")
+
+        checks, _, _ = rebuild_offline(self.root, apply=False)
+
+        self.assertEqual(self.check_map(checks)["textos_esperados"], False)
+
+    def test_check_only_requires_rebuild_offline(self) -> None:
+        with self.assertRaises(SystemExit) as raised:
+            corpus_rdf_main(["--check-only"])
+        self.assertEqual(raised.exception.code, 2)
 
 
 if __name__ == "__main__":

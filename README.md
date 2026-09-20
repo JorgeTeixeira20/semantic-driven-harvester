@@ -295,3 +295,23 @@ retentado), é resumível por captura e regista o resultado em
 a integração dos textos recuperados no grafo é um passo separado (ver
 `docs/experiments.md`). Para retentar uma falha definitiva, apagar a sua
 linha do relatório.
+
+## Reconstruir o grafo do corpus offline (depois da retentativa)
+
+Depois de `corpus_text_retry`, os textos recuperados só estão em cache;
+`corpus_rdf` salta os artigos já concluídos. Para os incorporar no grafo sem
+qualquer pedido à API:
+
+```bash
+python -m semantic_harvester.corpus_rdf --rebuild-offline --check-only   # só verifica
+python -m semantic_harvester.corpus_rdf --rebuild-offline                # verifica e substitui
+```
+
+Reconstrói os artigos retidos a partir do raw de `version_history`, da
+classificação e da cache de textos (`data/raw/texts/`), corre as verificações
+(artigos, capturas, contagem de textos face à retentativa, grafo antigo
+contido no novo, diferença só de `TextoExtraido`, ficheiros existentes,
+Turtle relido) e **só substitui** `output/corpus_articles.ttl`,
+`output/corpus_rdf_report.csv`, `output/corpus_rdf_summary.md` e
+`data/processed/corpus_articles_triples.nt` se todas passarem (cópia prévia do
+`.nt` em `data/processed/corpus_articles_triples.nt.pre-rebuild`).

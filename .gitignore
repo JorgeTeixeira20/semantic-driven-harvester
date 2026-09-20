@@ -48,3 +48,4 @@ output/*
 !output/corpus_text_retry_candidates.csv
 !output/corpus_text_retry_report.csv
 !output/corpus_text_retry_summary.md
+data/processed/corpus_articles_triples.nt.pre-rebuild

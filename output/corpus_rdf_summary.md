@@ -1,16 +1,16 @@
 # Grafo RDF do corpus do Caminho A (passo final)
 
-Execução real sobre os 127 artigos classificados como `Artigo` em `output/corpus_classification.csv`. As capturas foram reconstruídas a partir do raw de `version_history` já preservado pela Fase 2 (`data/raw/version_history/`), sem pedidos novos; só o download dos textos extraídos fez pedidos reais à API. A execução é retomável por artigo (`output/corpus_rdf_report.csv`); estes números agregam todas as sessões até à conclusão, não só a última.
+Reconstrução **offline** sobre os 127 artigos classificados como `Artigo` em `output/corpus_classification.csv`, a partir do raw de `version_history` (`data/raw/version_history/`) e da cache de textos (`data/raw/texts/`), **sem qualquer pedido à API**. Um texto conta como disponível se o ficheiro existir na cache. Inclui os textos recuperados pela retentativa (`output/corpus_text_retry_report.csv`).
 
 ## Resumo
 
 - Artigos mapeados com sucesso: 127 de 127
 - Artigos com falha (raw em falta ou manifesto inválido): 0
 - Total de capturas incluídas no grafo: 941
-- Textos descarregados (soma de todas as sessões): 281
-- Textos reutilizados (já existentes em `data/raw/texts/`): 259
-- Textos indisponíveis (falha ou 404): 401
-- Triplos no grafo final (`output/corpus_articles.ttl`): 12735
+- Textos disponíveis (ficheiro na cache): 789
+- Textos indisponíveis (sem ficheiro na cache): 152
+- A divisão histórica descarregados/reutilizados não é preservada numa reconstrução offline (todos contam como reutilizados); só o total disponível é informativo.
+- Triplos no grafo final (`output/corpus_articles.ttl`): 13482
 - Capturas com `originalURL` normalizado (variante de esquema ou barras da mesma página): 189, em 32 artigos
 - Capturas descartadas por `originalURL` não ser variante cosmética do URL canónico: 0
 

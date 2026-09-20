@@ -78,6 +78,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_phase2` | Rede; ~159+ pedidos (Fase 2 do Caminho A, um artigo de cada vez); execução longa; retoma automaticamente se interrompida. |
 | `python -m semantic_harvester.corpus_classification` | Sem rede; lê os CSV das Fases 1–2 e classifica Artigo/redirecionamento (passo 6). |
 | `python -m semantic_harvester.corpus_text_retry` | Rede (até 324 capturas, várias tentativas cada); resumível por captura; grava textos em `data/raw/texts/` e `output/corpus_text_retry_report.csv`. |
+| `python -m semantic_harvester.corpus_rdf --rebuild-offline [--check-only]` | Sem rede; reconstrói o grafo dos artigos retidos a partir do raw e da cache de textos, verifica e só então substitui os outputs. |
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais

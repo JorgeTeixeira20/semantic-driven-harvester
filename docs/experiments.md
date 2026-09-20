@@ -474,13 +474,14 @@ Para o protocolo de recolha do Caminho A:
 
 ## Protocolo de queries para o corpus do Caminho A
 
-**Estado em 2026-09-19: Caminho A concluído** (descoberta, profundidade
-temporal, classificação e mapeamento RDF). Fase 1: 26 pedidos, N = 159
-artigos únicos. Fase 2: 159/159 artigos, 0 falhas, 7 572 capturas, 125
-artigos com mais do que uma captura. Passo 6: 158 recursos distintos depois
-de normalizar http/https, 127 classificados como Artigo. Mapeamento RDF: 127
-artigos, 941 capturas, 540 textos disponíveis (401 indisponíveis), 12 735
-triplos — ver "Mapeamento RDF do corpus" no fim deste documento.
+**Estado em 2026-09-20: Caminho A concluído, com a retentativa dos textos e a
+reconstrução do grafo feitas.** Fase 1: 26 pedidos, N = 159 artigos únicos.
+Fase 2: 159/159 artigos, 0 falhas, 7 572 capturas, 125 artigos com mais do que
+uma captura. Passo 6: 158 recursos distintos depois de normalizar http/https,
+127 classificados como Artigo. Mapeamento RDF final: 127 artigos, 941
+capturas, **789 textos disponíveis (83,8%) e 152 indisponíveis (16,2%)**,
+13 482 triplos — ver "Resultados da retentativa e reconstrução do grafo" no
+fim deste documento (substitui os 540/401 anteriores à retentativa).
 
 Este protocolo é uma ferramenta operacional de recolha — uma grelha de termos
 de pesquisa a combinar com `siteSearch=record.pt` — e não deve ser confundida
@@ -1172,7 +1173,12 @@ pela proteção de memória do sistema (não por erro do código). Os números
 abaixo foram verificados a partir dos ficheiros produzidos, não observados
 em direto.
 
-### Resultados finais (verificados)
+### Resultados iniciais (verificados; anteriores à retentativa dos textos)
+
+**Estes números (540 textos disponíveis, 401 indisponíveis, 12 735 triplos) são
+anteriores à retentativa e à reconstrução do grafo; os números finais estão em
+"Resultados da retentativa e reconstrução do grafo", no fim deste
+documento.**
 
 Conferidos por soma direta de `output/corpus_rdf_report.csv` e por releitura
 de `output/corpus_articles.ttl` com RDFLib:
@@ -1306,12 +1312,14 @@ Saídas: `output/corpus_articles.ttl` (grafo final),
 
 - Amostra deliberada de 13 termos (Opção 2) sobre `record.pt` 2015–2020; o
   corpus não é representativo do jornal Record.
-- 42,6% das capturas sem texto disponível limitam qualquer análise textual
+- Na versão anterior à retentativa, 42,6% das capturas não tinham texto; nos
+  números finais são 16,2% (152 de 941), o que ainda limita a análise textual
   posterior (Caminhos D e B).
 - A classificação Artigo tem falsos negativos conhecidos (ex.:
   `/jogos-em-direto/`) e não distingue conteúdo multimédia de texto.
-- O `.ttl` referencia 540 ficheiros em `data/raw/texts/` que não acompanham
-  um clone (raw ignorado pelo Git).
+- O `.ttl` referencia ficheiros em `data/raw/texts/` (540 na versão anterior à
+  retentativa, 789 nos números finais) que não acompanham um clone (raw
+  ignorado pelo Git).
 
 ### Estado do Caminho A
 
@@ -1479,6 +1487,10 @@ timeout ou ligação cortada", no fim deste documento). Opções: **(i) retentar
 que 80,8% das falhas não indicam ausência)**; **(ii) avançar com os 540
 textos atuais** e documentar a limitação.
 
+**Resolvida em 2026-09-20:** a retentativa foi feita (249 das 324 recuperadas) e
+o grafo foi reconstruído com 789 textos; ver "Atualização com os textos finais"
+abaixo e "Resultados da retentativa e reconstrução do grafo".
+
 ### Saídas e testes previstos
 
 `output/corpus_redundancy.csv` (por captura: artigo, `tstamp`, tem texto,
@@ -1508,14 +1520,72 @@ captura sem texto entre duas com texto; grupo de `digest` igual sem texto
 3. Comparar com o último representante (com sensibilidade à consecutiva)?
 4. Calibrar o limiar por rotulagem manual, com o filtro de chrome derivado do
    corpus?
-5. Retentar as 324 capturas antes de implementar D, ou avançar já com 540
-   textos?
+5. ~~Retentar as 324 capturas antes de implementar D, ou avançar já com 540
+   textos?~~ **Resolvida: retentativa feita, 789 textos.**
 
-## Retentativa dos textos por timeout ou ligação cortada (preparada, não executada)
+### Atualização com os textos finais (2026-09-20)
 
-**Estado em 2026-09-19: script escrito e testado; NÃO foi executado.** Será
-corrido pelo autor localmente, fora do Claude Code (cortes de memória), e só
-depois se avança para o Caminho D. Este passo responde à questão prévia da
+Os números acima foram calculados com 540 textos, antes da retentativa. Com
+os 789 textos finais (mesmos métodos, scripts ad hoc não versionados;
+medição exploratória com a mesma semente):
+
+| Medida | 540 textos | 789 textos |
+| --- | ---: | ---: |
+| Artigos sem nenhum texto | 32 | 2 |
+| Artigos com exatamente 1 texto | 37 | 41 |
+| Artigos com 2+ textos (comparáveis) | 58 | **84** |
+| Pares consecutivos com texto | 445 | **664** |
+| Pares todos-contra-todos | 6 013 | 9 796 |
+| Capturas sem texto | 401 (42,6%) | **152 (16,2%)** |
+| — em artigos com algum texto | 340 | 150 |
+| — em artigos sem nenhum texto | 61 | 2 |
+| Grupos de `digest` igual (dentro do artigo) | 21 | 21 |
+| Capturas redundantes por `digest` | 44 | 44 |
+| — grupos só com texto | 3 grupos, 4 capt. | 9 grupos, 12 capt. |
+| — grupos só sem texto | 14 grupos, 34 capt. | 3 grupos, 23 capt. |
+| — grupos mistos | 4 grupos, 6 capt. | 9 grupos, 9 capt. |
+| Grupos de textos byte a byte idênticos | 16 | 28 |
+| — com mais de um `digest` distinto | 13 (81%) | **23 (82%)** |
+| Grupos de `digest` igual com 2+ textos: texto idêntico | 3 de 3 | **9 de 9** |
+| Tamanho dos textos (mín./mediana/máx., bytes) | 2 165 / 8 658 / 15 191 | 2 165 / 8 095 / 21 721 |
+
+Similaridade exploratória (Jaccard de palavras, texto completo com chrome):
+
+| Amostra | n | mín. | p10 | mediana | p90 | máx. |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Artigos diferentes (pares aleatórios, semente 0) | 388 | 0,155 | 0,221 | 0,334 | 0,411 | 0,520 |
+| Mesmo artigo, capturas consecutivas | 664 | 0,434 | 0,561 | 0,655 | 0,995 | 1,000 |
+
+Dos 664 pares consecutivos: 129 têm similaridade ≥ 0,80, 81 ≥ 0,90 (12,2%), 70
+≥ 0,99 e 64 são exatamente 1,0 (11 entre 0,90 e 0,99 e 48 entre 0,80 e 0,90).
+
+Consequências para a proposta:
+
+- O desenho não muda; o que muda é a dimensão. A Camada 1 (comparação por
+  texto) passa a cobrir 84 artigos e 664 pares consecutivos em vez de 58 e
+  445, e a Camada 2 (sem texto) encolhe de 401 para 152 capturas (16,2%): 150
+  em artigos que têm algum texto e 2 em 2 artigos sem nenhum.
+- O limite superior do que um critério fraco por `digest` deduziria nas
+  capturas sem texto desce de 40 para 32 capturas (23 em 3 grupos sem texto e
+  9 em 9 grupos mistos), 3,4% do corpus. Reforça a recomendação de não o usar
+  como critério de redução.
+- A evidência contra o `digest` como critério principal mantém-se: 23 dos 28
+  grupos de textos byte a byte idênticos (82%) têm mais de um `digest`.
+- O rendimento esperado com texto completo sobe (12,2% dos pares consecutivos
+  ≥ 0,90, contra 6,5% antes), mas continua condicionado pelo chrome do site e
+  o limiar continua a exigir calibração por rotulagem manual, não a ser
+  fixado por estes números.
+- A "questão prévia" (retentar as 324 capturas) está resolvida: ver "Resultados
+  da retentativa e reconstrução do grafo". As 35 capturas com `statusCode` ≠
+  200 continuam todas sem texto e ficam na Camada 2.
+
+## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
+
+**Estado em 2026-09-20: script escrito e testado em 2026-09-19 e executado pelo
+autor localmente, fora do Claude Code (cortes de memória): 249 recuperadas, 75
+falhas definitivas. A alternativa 2 de integração foi implementada e aplicada;
+ver "Resultados da retentativa e reconstrução do grafo".** Só depois disto se
+avança para o Caminho D. Este passo responde à questão prévia da
 proposta do Caminho D ("retentar as 324 capturas antes de implementar?").
 
 ### Lista de candidatas (preservada)
@@ -1580,7 +1650,7 @@ Como correr (no terminal do autor, com o ambiente ativo):
 `output/corpus_text_retry_report.csv` e `output/corpus_text_retry_summary.md`
 (os textos em `data/raw/texts/` não são versionados).
 
-### Proposta: como os textos recuperados entram no grafo (por validar)
+### Proposta: como os textos recuperados entram no grafo (validada; alternativa 2 implementada em 2026-09-20)
 
 **O problema.** Depois da retentativa, os textos ficam só em cache
 (`data/raw/texts/`). `corpus_rdf.py` salta os artigos já presentes em
@@ -1642,8 +1712,8 @@ números"); a causa das falhas continua nos relatórios e logs; (b) a
 reconstrução exige a cache local completa, daí a verificação de inclusão;
 (c) exige uma alteração de código e testes (cliente só de cache,
 `--rebuild-offline`, teste sintético em que um texto aparece na cache entre
-duas construções e só os triplos desse texto são acrescentados) — **não
-implementada; aguarda validação**.
+duas construções e só os triplos desse texto são acrescentados) — **implementada
+em 2026-09-20** (`--rebuild-offline`).
 
 ### Sequência prevista
 
@@ -1653,3 +1723,116 @@ implementada; aguarda validação**.
    do grafo com as verificações acima.
 3. Só então se avança para a implementação do Caminho D, com a
    disponibilidade de textos real e conhecida.
+
+## Resultados da retentativa e reconstrução do grafo (números finais do Caminho A, 2026-09-20)
+
+**Estado: retentativa executada pelo autor; grafo reconstruído offline e
+verificado.** Estes são os números finais do Caminho A e substituem os
+anteriores à retentativa (540 textos/401 indisponíveis), que ficam como
+histórico nas secções acima.
+
+### Retentativa (corrida pelo autor, fora do Claude Code)
+
+Das 324 candidatas: **249 recuperadas (76,9%)** e **75 falhas definitivas
+(23,1%)** (`output/corpus_text_retry_report.csv`; verificado por soma direta
+do relatório: 324 pares únicos, o mesmo conjunto da lista de candidatas).
+
+- Por categoria de falha original: 243 das 318 de timeout de leitura
+  recuperadas (76,4%); as 5 de ligação cortada e a de timeout de ligação
+  recuperadas todas.
+- Das 249 recuperadas, 188 à 1.ª tentativa, 36 à 2.ª e 25 à 3.ª: 61 (24,5%)
+  precisaram de repetição, o que justifica a política de várias tentativas.
+- Das 75 falhas: **51 são HTTP 404** (41 à 1.ª tentativa, 9 à 2.ª e 1 à 3.ª;
+  o 404 não é retentado, pelo que as tentativas anteriores falharam por
+  timeout) e **24 são timeouts de leitura persistentes** (3 tentativas cada).
+  Estão em 35 artigos.
+- Todas as 249 recuperadas são capturas com `statusCode` 200. As 12
+  candidatas com `statusCode` diferente de 200 (10 com 302, 2 com 404)
+  falharam todas, como se previa.
+
+Duas correções às estimativas anteriores: (a) o teto teórico de 91,8% era
+otimista, porque 51 das falhas que o log registava como timeout escondiam um
+404 (ausência real); o resultado real é 83,8% (789/941); (b) os 10,2% de
+"recuperação" da análise das falhas eram um limite inferior muito enviesado;
+numa retentativa sistemática a recuperação observada foi 76,9%.
+
+### Reconstrução offline (implementada em `corpus_rdf.py`)
+
+`python -m semantic_harvester.corpus_rdf --rebuild-offline` (com
+`--check-only` para só verificar): `CacheOnlyClient` (um texto está
+disponível se o ficheiro existir em `data/raw/texts/`; nunca faz pedidos, a
+sessão HTTP levanta erro se for usada), `rebuild_graph_offline()` (reutiliza
+`build_one_article_graph()` e o resto do código de produção, sem duplicar
+lógica), `verify_rebuild()` e `rebuild_offline()`. Reconstrói os 127 artigos em
+memória (cerca de 5 s), corre as verificações e **só substitui os outputs se
+todas passarem**; antes de escrever copia o `.nt` para
+`data/processed/corpus_articles_triples.nt.pre-rebuild` (não versionado).
+
+Verificações de aceitação (as da proposta), executadas primeiro em
+`--check-only` e depois na aplicação; todas **OK**:
+
+| Verificação | Resultado |
+| --- | --- |
+| `artigos` | 127 `Artigo`, 127 retidos, 0 com erro |
+| `capturas` | 941 `CapturaArquivada`, 941 esperadas pela classificação |
+| `textos_esperados` | 789 `TextoExtraido` = 540 no grafo antigo + 249 recuperadas |
+| `antigo_contido_no_novo` | 12 735 triplos antigos, 0 ausentes do novo |
+| `diferenca_so_textos` | 747 triplos acrescentados, 0 que não são de `TextoExtraido` |
+| `filepaths_existem` | 789 caminhos, 0 sem ficheiro em disco |
+| `turtle_reler` | relido, 13 482 triplos, iguais aos do grafo em memória |
+
+Verificação independente depois da escrita, contra o Turtle do commit
+anterior (`git show HEAD:output/corpus_articles.ttl`): 0 triplos antigos
+ausentes, 747 acrescentados (= 249 textos × 3 triplos: `rdf:type`, `filePath`,
+`temTextoExtraido`), e uma retoma normal (`build_corpus_graph()`) reconstrói
+exatamente o mesmo grafo a partir do `.nt` novo.
+
+Testes: 10 novos em `tests/test_corpus_rdf.py` (cliente só de cache sem
+pedidos; o teste proposto, em que um texto aparece na cache entre duas
+construções e só os 3 triplos desse texto são acrescentados; escrita e
+releitura; recuperação incorporada com todas as verificações OK; `--check-only`
+sem escrever nada; verificação falhada, por cache incompleta, que deixa os
+ficheiros intactos; contagem de textos incoerente com o relatório da
+retentativa; validação do argumento). Suite completa: **68 testes, todos a
+passar**.
+
+### Números finais do Caminho A
+
+| Medida | Antes da retentativa | Final |
+| --- | ---: | ---: |
+| Artigos mapeados | 127 | 127 |
+| Capturas no grafo | 941 | 941 |
+| Textos disponíveis | 540 (57,4%) | **789 (83,8%)** |
+| Capturas sem texto | 401 (42,6%) | **152 (16,2%)** |
+| Triplos | 12 735 | **13 482** |
+| Artigos sem nenhum texto | 32 | **2** |
+| Artigos com todos os textos | 30 | **77** |
+
+Instâncias no grafo final: 127 `Artigo`, 1 `Jornal`, 127 `RecursoWeb`, 941
+`CapturaArquivada`, 789 `TextoExtraido`. Capturas com `originalURL`
+normalizado: 189 em 32 artigos (inalterado).
+
+As **152 capturas sem texto**: 128 HTTP 404 (77 da recolha original + 51 da
+retentativa) e 24 timeouts de leitura persistentes. Só os 24 não são evidência
+de ausência. Por `statusCode`: as 789 com texto são todas 200; das 152 sem
+texto, 117 são 200, 32 são 302, 2 são 404 e 1 é 301 — **as 35 capturas com
+`statusCode` diferente de 200 continuam todas sem texto**.
+
+### Ressalvas
+
+- Numa reconstrução offline todos os textos contam como "reutilizados": em
+  `output/corpus_rdf_report.csv` `texts_downloaded_now` é 0 e `texts_reused`
+  é o nº de textos disponíveis por artigo. A divisão histórica
+  descarregados/reutilizados (281/259) só existe no relatório do commit
+  `72c7afb` e já não era informativa. Só o total disponível é significativo.
+- 24 capturas (2,6%) ficam com timeout persistente após 3 tentativas; não foram
+  retentadas mais e não se pode afirmar que o texto não exista.
+- `data/raw/texts/` tem 794 ficheiros para 789 textos no grafo: os mesmos 5
+  ficheiros órfãos já descritos (não referenciados, inofensivos, não
+  versionados).
+- A reconstrução exige a cache local completa; a verificação
+  `antigo_contido_no_novo` é a salvaguarda (uma cache incompleta em
+  outra máquina faria a reconstrução falhar em vez de perder textos em
+  silêncio).
+- A retentativa foi corrida pelo autor; os números foram verificados a partir
+  dos ficheiros produzidos, não observados em direto.

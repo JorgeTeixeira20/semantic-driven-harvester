@@ -31,15 +31,25 @@ ultrapassava os primeiros ~20 artigos antes do corte seguinte. A execução é
 por isso retomável por artigo: `build_corpus_graph()` salta os artigos já
 presentes em `output/corpus_rdf_report.csv` e os seus triplos já
 preservados em `data/processed/corpus_articles_triples.nt`.
+
+Terceiro ponto: textos obtidos depois de um artigo ter sido dado como concluído
+(por exemplo, pela retentativa em `corpus_text_retry.py`) não entram no grafo
+por esta retoma. `--rebuild-offline` reconstrói o grafo de todos os artigos a
+partir do raw, da classificação e da cache de textos, sem qualquer pedido à
+API (`CacheOnlyClient`), com o mesmo código de produção, e só substitui os
+outputs se todas as verificações de `verify_rebuild()` passarem.
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
 import json
 import logging
 import re
+import shutil
+import tempfile
 import time
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
@@ -47,7 +57,7 @@ from typing import Any
 
 from rdflib import RDF, RDFS, Graph, XSD
 
-from .arquivo_client import ArquivoClient
+from .arquivo_client import ArquivoClient, TextDownloadResult
 from .history_pipeline import build_manifest_records
 from .rdf_mapper import SDH, build_article_history_graph
 
@@ -230,8 +240,51 @@ def build_one_article_graph(
     )
 
 
+def _summary_intro(n_articles: int, rebuilt_offline: bool) -> list[str]:
+    if rebuilt_offline:
+        return [
+            f"Reconstrução **offline** sobre os {n_articles} artigos "
+            "classificados como `Artigo` em `output/corpus_classification.csv`, "
+            "a partir do raw de `version_history` (`data/raw/version_history/`) "
+            "e da cache de textos (`data/raw/texts/`), **sem qualquer pedido à "
+            "API**. Um texto conta como disponível se o ficheiro existir na "
+            "cache. Inclui os textos recuperados pela retentativa "
+            "(`output/corpus_text_retry_report.csv`).\n"
+        ]
+    return [
+        f"Execução real sobre os {n_articles} artigos classificados como "
+        "`Artigo` em `output/corpus_classification.csv`. As capturas foram "
+        "reconstruídas a partir do raw de `version_history` já preservado "
+        "pela Fase 2 (`data/raw/version_history/`), sem pedidos novos; só o "
+        "download dos textos extraídos fez pedidos reais à API. A execução é "
+        "retomável por artigo (`output/corpus_rdf_report.csv`); estes números "
+        "agregam todas as sessões até à conclusão, não só a última.\n"
+    ]
+
+
+def _summary_text_lines(
+    downloaded: int, reused: int, failed: int, rebuilt_offline: bool
+) -> list[str]:
+    if rebuilt_offline:
+        return [
+            f"- Textos disponíveis (ficheiro na cache): {downloaded + reused}",
+            f"- Textos indisponíveis (sem ficheiro na cache): {failed}",
+            "- A divisão histórica descarregados/reutilizados não é preservada "
+            "numa reconstrução offline (todos contam como reutilizados); só o "
+            "total disponível é informativo.",
+        ]
+    return [
+        f"- Textos descarregados (soma de todas as sessões): {downloaded}",
+        f"- Textos reutilizados (já existentes em `data/raw/texts/`): {reused}",
+        f"- Textos indisponíveis (falha ou 404): {failed}",
+    ]
+
+
 def write_summary_markdown(
-    results: list[ArticleGraphResult], graph_size: int, path: Path
+    results: list[ArticleGraphResult],
+    graph_size: int,
+    path: Path,
+    rebuilt_offline: bool = False,
 ) -> None:
     successes = [r for r in results if r.error is None]
     failures = [r for r in results if r.error is not None]
@@ -247,20 +300,14 @@ def write_summary_markdown(
 
     lines = [
         "# Grafo RDF do corpus do Caminho A (passo final)\n",
-        f"Execução real sobre os {len(results)} artigos classificados como "
-        "`Artigo` em `output/corpus_classification.csv`. As capturas foram "
-        "reconstruídas a partir do raw de `version_history` já preservado "
-        "pela Fase 2 (`data/raw/version_history/`), sem pedidos novos; só o "
-        "download dos textos extraídos fez pedidos reais à API. A execução é "
-        "retomável por artigo (`output/corpus_rdf_report.csv`); estes números "
-        "agregam todas as sessões até à conclusão, não só a última.\n",
+        *_summary_intro(len(results), rebuilt_offline),
         "## Resumo\n",
         f"- Artigos mapeados com sucesso: {len(successes)} de {len(results)}",
         f"- Artigos com falha (raw em falta ou manifesto inválido): {len(failures)}",
         f"- Total de capturas incluídas no grafo: {total_captures}",
-        f"- Textos descarregados (soma de todas as sessões): {total_downloaded}",
-        f"- Textos reutilizados (já existentes em `data/raw/texts/`): {total_reused}",
-        f"- Textos indisponíveis (falha ou 404): {total_failed}",
+        *_summary_text_lines(
+            total_downloaded, total_reused, total_failed, rebuilt_offline
+        ),
         f"- Triplos no grafo final (`output/corpus_articles.ttl`): {graph_size}",
         f"- Capturas com `originalURL` normalizado (variante de esquema ou "
         f"barras da mesma página): {total_variants}, em {articles_with_variants} "
@@ -393,6 +440,227 @@ def build_corpus_graph(
     return combined, results
 
 
+class _OfflineSession:
+    """Sessão que recusa qualquer pedido: garante que a reconstrução não usa rede."""
+
+    def __init__(self) -> None:
+        self.headers: dict[str, str] = {}
+
+    def get(self, url: str, **kwargs: Any) -> Any:
+        raise RuntimeError(f"Pedido de rede em modo offline: {url}")
+
+
+class CacheOnlyClient(ArquivoClient):
+    """Cliente cujos downloads de texto só consultam `data/raw/texts/`.
+
+    Um texto é "disponível" se o ficheiro existir na cache; caso contrário
+    fica indisponível sem qualquer pedido. Permite reutilizar
+    `build_manifest_records()` e `build_one_article_graph()` tal como estão.
+    """
+
+    def __init__(self, data_dir: Path | str = Path("data/raw")) -> None:
+        super().__init__(data_dir=data_dir, session=_OfflineSession())
+
+    def download_extracted_text(
+        self,
+        result: dict[str, Any],
+        *,
+        skip_existing: bool = True,
+        derive_url_when_missing: bool = False,
+    ) -> TextDownloadResult:
+        destination = self.texts_dir / self._text_filename(result)
+        if destination.is_file():
+            return TextDownloadResult(
+                success=True,
+                path=destination,
+                size_bytes=destination.stat().st_size,
+                downloaded=False,
+                text_url=None,
+            )
+        return TextDownloadResult(
+            success=False,
+            path=None,
+            size_bytes=0,
+            downloaded=False,
+            text_url=None,
+            error="texto não disponível na cache (modo offline)",
+        )
+
+
+def rebuild_graph_offline(
+    project_root: Path | None = None,
+) -> tuple[Graph, list[ArticleGraphResult]]:
+    """Reconstrói o grafo de todos os artigos retidos sem qualquer pedido à API.
+
+    Usa o raw de `version_history`, a classificação e a cache de textos. É a
+    forma de incorporar no grafo textos obtidos depois de os artigos terem
+    sido dados como concluídos (`docs/experiments.md`).
+    """
+
+    root = project_root or Path(__file__).resolve().parents[2]
+    articles = load_retained_articles(root / "output" / "corpus_classification.csv")
+    client = CacheOnlyClient(data_dir=root / "data" / "raw")
+    version_history_dir = root / "data" / "raw" / "version_history"
+
+    combined = Graph()
+    combined.bind("sdh", SDH)
+    combined.bind("rdf", RDF)
+    combined.bind("rdfs", RDFS)
+    combined.bind("xsd", XSD)
+
+    results: list[ArticleGraphResult] = []
+    for row in articles:
+        graph, result = build_one_article_graph(
+            client, row["original_url"], row["title"], version_history_dir, root
+        )
+        if graph is not None:
+            combined += graph
+        results.append(result)
+    return combined, results
+
+
+@dataclass(frozen=True)
+class Check:
+    name: str
+    passed: bool | None
+    detail: str
+
+
+def _count(graph: Graph, rdf_class: Any) -> int:
+    return len(set(graph.subjects(RDF.type, rdf_class)))
+
+
+def _recovered_by_retry(retry_report: Path) -> int:
+    with retry_report.open(encoding="utf-8", newline="") as handle:
+        return sum(1 for row in csv.DictReader(handle) if row["outcome"] != "failed")
+
+
+def verify_rebuild(
+    root: Path,
+    new_graph: Graph,
+    results: list[ArticleGraphResult],
+    old_graph: Graph | None,
+) -> list[Check]:
+    """Verificações de aceitação da reconstrução (`docs/experiments.md`)."""
+
+    checks: list[Check] = []
+    retained = load_retained_articles(root / "output" / "corpus_classification.csv")
+    errors = [r for r in results if r.error is not None]
+
+    n_articles = _count(new_graph, SDH.Artigo)
+    checks.append(Check(
+        "artigos",
+        n_articles == len(retained) and not errors,
+        f"{n_articles} Artigo no grafo; {len(retained)} retidos na classificação; "
+        f"{len(errors)} com erro",
+    ))
+
+    expected_captures = sum(int(row["captures"]) for row in retained)
+    n_captures = _count(new_graph, SDH.CapturaArquivada)
+    checks.append(Check(
+        "capturas",
+        n_captures == expected_captures == sum(r.captures_used for r in results),
+        f"{n_captures} CapturaArquivada; {expected_captures} esperadas pela "
+        "classificação",
+    ))
+
+    new_texts = _count(new_graph, SDH.TextoExtraido)
+    retry_report = root / "output" / "corpus_text_retry_report.csv"
+    if old_graph is None or not retry_report.is_file():
+        checks.append(Check(
+            "textos_esperados", None,
+            "saltada: falta o grafo antigo ou o relatório da retentativa",
+        ))
+    else:
+        old_texts = _count(old_graph, SDH.TextoExtraido)
+        recovered = _recovered_by_retry(retry_report)
+        checks.append(Check(
+            "textos_esperados",
+            new_texts == old_texts + recovered,
+            f"{new_texts} TextoExtraido no novo; {old_texts} no antigo + "
+            f"{recovered} recuperadas pela retentativa = {old_texts + recovered}",
+        ))
+
+    if old_graph is None:
+        checks.append(Check("antigo_contido_no_novo", None, "saltada: sem grafo antigo"))
+        checks.append(Check("diferenca_so_textos", None, "saltada: sem grafo antigo"))
+    else:
+        missing = old_graph - new_graph
+        checks.append(Check(
+            "antigo_contido_no_novo",
+            len(missing) == 0,
+            f"{len(old_graph)} triplos no antigo; {len(missing)} ausentes do novo",
+        ))
+        text_subjects = set(new_graph.subjects(RDF.type, SDH.TextoExtraido))
+        added = new_graph - old_graph
+        unexpected = [
+            triple for triple in added
+            if triple[1] != SDH.temTextoExtraido and triple[0] not in text_subjects
+        ]
+        checks.append(Check(
+            "diferenca_so_textos",
+            not unexpected,
+            f"{len(added)} triplos acrescentados; {len(unexpected)} que não são "
+            "de TextoExtraido",
+        ))
+
+    missing_files = [
+        str(path) for path in new_graph.objects(None, SDH.filePath)
+        if not (root / str(path)).is_file()
+    ]
+    checks.append(Check(
+        "filepaths_existem",
+        not missing_files,
+        f"{new_texts} caminhos de texto; {len(missing_files)} sem ficheiro em disco",
+    ))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        probe = Path(tmp) / "corpus_articles.ttl"
+        new_graph.serialize(destination=probe, format="turtle")
+        try:
+            reparsed = Graph().parse(probe, format="turtle")
+            roundtrip = set(reparsed) == set(new_graph)
+            detail = f"relido: {len(reparsed)} triplos; iguais aos do grafo em memória: {roundtrip}"
+        except Exception as exc:  # noqa: BLE001 - qualquer erro de leitura é falha da verificação
+            roundtrip, detail = False, f"erro ao reler o Turtle: {exc}"
+    checks.append(Check("turtle_reler", roundtrip, detail))
+    return checks
+
+
+def rebuild_offline(
+    project_root: Path | None = None, *, apply: bool = True
+) -> tuple[list[Check], list[ArticleGraphResult], Graph]:
+    """Reconstrói, verifica e só depois (se tudo passar e `apply`) substitui os outputs.
+
+    Se alguma verificação falhar, os ficheiros existentes ficam intactos.
+    """
+
+    root = project_root or Path(__file__).resolve().parents[2]
+    ttl_path = root / "output" / "corpus_articles.ttl"
+    report_csv = root / "output" / "corpus_rdf_report.csv"
+    triples_path = root / "data" / "processed" / "corpus_articles_triples.nt"
+
+    old_graph = Graph().parse(ttl_path, format="turtle") if ttl_path.is_file() else None
+    new_graph, results = rebuild_graph_offline(root)
+    checks = verify_rebuild(root, new_graph, results, old_graph)
+
+    if apply and all(check.passed is not False for check in checks):
+        if triples_path.is_file():
+            shutil.copy2(triples_path, triples_path.with_name(triples_path.name + ".pre-rebuild"))
+        triples_path.parent.mkdir(parents=True, exist_ok=True)
+        new_graph.serialize(destination=triples_path, format="nt", encoding="utf-8")
+        with report_csv.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(RESULT_FIELDS))
+            writer.writeheader()
+            writer.writerows(asdict(result) for result in results)
+        new_graph.serialize(destination=ttl_path, format="turtle")
+        write_summary_markdown(
+            results, len(new_graph), root / "output" / "corpus_rdf_summary.md",
+            rebuilt_offline=True,
+        )
+    return checks, results, new_graph
+
+
 def run(project_root: Path | None = None) -> tuple[Graph, list[ArticleGraphResult]]:
     root = project_root or Path(__file__).resolve().parents[2]
     graph, results = build_corpus_graph(root)
@@ -405,7 +673,27 @@ def run(project_root: Path | None = None) -> tuple[Graph, list[ArticleGraphResul
     return graph, results
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="python -m semantic_harvester.corpus_rdf",
+        description=__doc__.splitlines()[0],
+    )
+    parser.add_argument(
+        "--rebuild-offline",
+        action="store_true",
+        help="reconstrói o grafo dos artigos retidos a partir do raw e da cache "
+        "de textos, sem pedidos à API, e só substitui os outputs se todas as "
+        "verificações passarem",
+    )
+    parser.add_argument(
+        "--check-only",
+        action="store_true",
+        help="com --rebuild-offline: só reconstrói e verifica, sem escrever",
+    )
+    args = parser.parse_args(argv)
+    if args.check_only and not args.rebuild_offline:
+        parser.error("--check-only só faz sentido com --rebuild-offline")
+
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s: %(message)s",
@@ -418,6 +706,21 @@ def main() -> int:
             ),
         ],
     )
+    if args.rebuild_offline:
+        checks, results, graph = rebuild_offline(apply=not args.check_only)
+        for check in checks:
+            state = "SALTADA" if check.passed is None else "OK" if check.passed else "FALHOU"
+            print(f"[{state}] {check.name}: {check.detail}")
+        if any(check.passed is False for check in checks):
+            print("Verificações falhadas: nenhum ficheiro foi alterado.")
+            return 1
+        if args.check_only:
+            print("Verificações OK (--check-only): nenhum ficheiro foi alterado.")
+        else:
+            print("Verificações OK: outputs substituídos (cópia do .nt em "
+                  "data/processed/corpus_articles_triples.nt.pre-rebuild).")
+        return 0
+
     graph, results = run()
     successes = [r for r in results if r.error is None]
     print(f"Artigos mapeados: {len(successes)} de {len(results)}")

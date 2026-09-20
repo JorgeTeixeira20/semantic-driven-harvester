@@ -99,7 +99,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 
 - Em 2026-09-16, `data/raw/` continha apenas `.gitkeep`; desde então o corpus do
   Caminho A foi recolhido localmente, mas o Git continua a ignorar as respostas
-  e textos reais (incluindo os 540 textos referenciados por
+  e textos reais (incluindo os 789 textos referenciados por
   `output/corpus_articles.ttl`); o clone não inclui esses artefactos. As afirmações de
   preservação nas observações descrevem a execução histórica, não disponibilidade atual.
 - O [manifesto](../data/processed/captures_manifest.jsonl) e os Turtle em
@@ -120,7 +120,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 58 testes em cinco módulos de `tests/`.
+pacote conforme o README. Existem 68 testes em cinco módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -128,12 +128,13 @@ relações/contagens RDF, ficheiros de texto, reutilização, preservação de
 bytes, releitura de Turtle, a classificação Artigo/redirecionamento
 (`test_corpus_classification.py`, incluindo a normalização http/https) e
 o mapeamento RDF do corpus (`test_corpus_rdf.py`: reconstrução do raw,
-normalização de `originalURL`, fusão de artigos e retoma sem repetir pedidos) e a
+normalização de `originalURL`, fusão de artigos, retoma sem repetir pedidos e
+reconstrução offline com verificações) e a
 retentativa de textos (`test_corpus_text_retry.py`: tentativas com espera crescente,
 404 não retentado, retoma por captura).
 
-Última validação em **2026-09-19**, com o Python 3.13.1 do ambiente virtual:
-`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **58 testes,
+Última validação em **2026-09-20**, com o Python 3.13.1 do ambiente virtual:
+`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **68 testes,
 todos passaram (`OK`)**, sem chamadas à API real.
 
 [tests/support.py](../tests/support.py) fornece respostas simuladas, temporários
@@ -255,37 +256,35 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    conhecidas (ex.: páginas `/jogos-em-direto/` não cobertas pela regra)
    em `experiments.md`.
 
-   **Mapeamento RDF do corpus (passo final) concluído em 2026-09-19 —
-   Caminho A concluído.** `src/semantic_harvester/corpus_rdf.py` mapeia os
-   127 artigos retidos para `output/corpus_articles.ttl`, reconstruindo as
-   capturas do raw de `version_history` já preservado (sem repetir esses
-   pedidos) e descarregando só os textos. Números verificados por soma do
-   relatório e releitura do Turtle: **127/127 artigos, 941 capturas, 540
-   textos disponíveis (57,4%) e 401 indisponíveis (42,6%), 12 735 triplos**
-   (127 `Artigo`, 1 `Jornal`, 127 `RecursoWeb`, 941 `CapturaArquivada`, 540
-   `TextoExtraido`); 32 artigos sem nenhum texto e 30 com todos. A descarga
-   final foi corrida pelo autor fora do Claude Code, por cortes de memória
-   do sistema. Três bugs encontrados e corrigidos (variantes cosméticas de
-   `originalURL` em 32 artigos, timeout excessivo, ausência de retoma por
-   artigo). Ressalva: dos 401 textos indisponíveis, 318 (79,3%) falharam por timeout
-   de leitura, 77 (19,2%) por HTTP 404, 5 por ligação cortada e 1 por timeout
-   de ligação (reconstruído a partir do log de progresso, reconcilia
-   exatamente; ver `experiments.md`). Só o 404 é compatível com ausência
-   real; os 324 timeouts/ligações cortadas não foram retentados de forma
-   sistemática, pelo que a disponibilidade de 57,4% pode estar subestimada
-   (teto teórico 91,8%). Detalhe em `experiments.md`.
+   **Mapeamento RDF do corpus (passo final) concluído em 2026-09-19; retentativa
+   dos textos e reconstrução do grafo concluídas em 2026-09-20 — Caminho A
+   concluído.** `src/semantic_harvester/corpus_rdf.py` mapeia os 127 artigos
+   retidos para `output/corpus_articles.ttl`, reconstruindo as capturas do raw
+   de `version_history` já preservado (sem repetir esses pedidos). Depois da
+   retentativa dos textos que tinham falhado por timeout ou ligação cortada
+   (`corpus_text_retry.py`, corrida pelo autor fora do Claude Code: 249 das 324
+   candidatas recuperadas, 75 falhas definitivas), o grafo foi reconstruído
+   offline (`--rebuild-offline`, sem pedidos à API) e verificado. **Números
+   finais: 127/127 artigos, 941 capturas, 789 textos disponíveis (83,8%) e 152
+   indisponíveis (16,2%), 13 482 triplos** (127 `Artigo`, 1 `Jornal`, 127
+   `RecursoWeb`, 941 `CapturaArquivada`, 789 `TextoExtraido`); 2 artigos sem
+   nenhum texto e 77 com todos. Antes da retentativa eram 540 textos (57,4%),
+   401 indisponíveis, 12 735 triplos, 32 artigos sem nenhum texto. Verificações
+   (todas OK, também confirmadas contra o Turtle do commit anterior): 941
+   capturas, textos = 540 + 249, todos os triplos antigos contidos no novo e a
+   diferença só de `TextoExtraido` (747 = 249 × 3), ficheiros de texto
+   existentes, Turtle relido. Causa das 152 sem texto: 128 HTTP 404 (77 da
+   recolha original + 51 descobertos na retentativa) e 24 timeouts de leitura
+   persistentes (os únicos que não são evidência de ausência); as 35 capturas
+   com `statusCode` diferente de 200 continuam todas sem texto. Três bugs
+   encontrados e corrigidos na descarga (variantes cosméticas de `originalURL`
+   em 32 artigos, timeout excessivo, ausência de retoma por artigo).
+   Ressalva: na reconstrução offline as colunas `texts_downloaded_now`/
+   `texts_reused` do relatório perdem a divisão histórica (todos "reutilizados").
+   Detalhe em `experiments.md`.
 
-   **Preparada (2026-09-19), não executada:** retentativa das 324 capturas
-   cuja última falha foi timeout/ligação cortada (89 artigos afetados) —
-   `src/semantic_harvester/corpus_text_retry.py`, lista em
-   `output/corpus_text_retry_candidates.csv`, resumível por captura, isolada do
-   grafo. Será corrida pelo autor localmente. Proposta (por validar, não
-   implementada) de como os textos recuperados entram no grafo: reconstrução
-   offline do grafo a partir da cache, com verificação de que o grafo antigo
-   fica contido no novo; ver `experiments.md`. Sem isto, correr `corpus_rdf.py`
-   outra vez não incorpora os textos novos (salta os 127 artigos já feitos).
-
-   O Caminho D não foi iniciado.
+   O Caminho D não foi iniciado (proposta de desenho em `experiments.md`,
+   com os números atualizados para os 789 textos).
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com
