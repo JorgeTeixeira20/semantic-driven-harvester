@@ -97,11 +97,22 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 
 ## Limitações e problemas conhecidos
 
-- Em 2026-09-16, `data/raw/` continha apenas `.gitkeep`; desde então o corpus do
-  Caminho A foi recolhido localmente, mas o Git continua a ignorar as respostas
-  e textos reais (incluindo os 789 textos referenciados por
-  `output/corpus_articles.ttl`); o clone não inclui esses artefactos. As afirmações de
-  preservação nas observações descrevem a execução histórica, não disponibilidade atual.
+- O Git continua a ignorar `data/raw/` e o `data/processed/corpus_articles_triples.nt`
+  (ver `.gitignore`); um clone deste repositório não inclui esses artefactos,
+  incluindo os 789 textos referenciados por `output/corpus_articles.ttl`. As
+  afirmações de preservação nas observações descrevem a execução histórica,
+  não disponibilidade automática a partir de um novo checkout.
+- **Preservação do raw fora do Git (decisão tomada em 2026-09-24):** a pasta
+  `data/` de cada máquina usada no projeto está copiada no Google Drive do
+  autor, em `tese-record/`, separada por origem para preservar proveniência
+  (`data-raw-mac-m1-m3/` e `data-raw-windows-caminho-a/`, cada uma contendo a
+  pasta `data/` completa dessa máquina). Contagens de ficheiros verificadas
+  contra o esperado antes da cópia: Mac (`data/raw/texts/`) 13 ficheiros (11
+  do M1 + 1 novo do M3 + `.gitkeep`); Windows (`data/raw/texts/`) 795 (794
+  textos reais, 540 originais + 249 recuperados na retentativa, + `.gitkeep`).
+  Isto resolve a proposta em aberto desde o início do projeto de definir como
+  preservar os raw fora do Git; recuperar ou consultar essas cópias continua a
+  ser uma tarefa manual e explícita, não automática a partir de um clone.
 - O [manifesto](../data/processed/captures_manifest.jsonl) e os Turtle em
   `output/` continuam versionados, mas referenciam textos atualmente ausentes.
   Não é possível revalidar integralmente os resultados históricos só com este checkout.
