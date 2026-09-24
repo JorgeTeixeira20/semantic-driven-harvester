@@ -1,0 +1,688 @@
+"""Caminho D — anotação de redundância entre capturas do mesmo artigo.
+
+Implementa o desenho de `docs/experiments.md` ("Caminho D — redução de
+redundância entre capturas"). Não faz pedidos à API e não altera o grafo nem
+o raw: lê `output/corpus_articles.ttl` e os textos referenciados por
+`sdh:filePath` e escreve uma **anotação** por captura.
+
+- **Camada 1** (captura com texto e `statusCode` 200): por artigo, em ordem
+  temporal, cada captura é comparada com o **último representante retido**;
+  é redundante se a similaridade for ≥ limiar, senão passa a representante.
+  Em paralelo, como análise de sensibilidade, a variante que compara só com a
+  captura com texto consecutiva.
+- **Camada 2** (sem texto, ou `statusCode` ≠ 200): todas mantidas. Anotam-se
+  à parte, nunca somados à Camada 1, os grupos com `digest` e
+  `contentLength` iguais dentro do artigo, como candidatas não verificadas
+  por texto.
+- **Não avaliáveis**: capturas de artigos sem nenhum texto utilizável.
+
+Similaridade: Jaccard sobre conjuntos de palavras (`\\w+`) do texto
+normalizado (Unicode NFC, minúsculas, espaços colapsados), sem remover o
+"chrome" do site. É a medida da exploração documentada; esta tokenização
+reproduz os números aí publicados.
+
+O limiar **não** é fixado aqui: sem `--limiar`, a Camada 1 fica
+`pendente_limiar` no CSV, o resumo publica a tabela de sensibilidade para uma
+grelha de limiares e é gerada uma amostra de pares, espalhada por faixas de
+similaridade, para rotulagem manual.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import random
+import re
+import statistics
+import unicodedata
+from collections import defaultdict
+from dataclasses import dataclass
+from pathlib import Path
+
+from rdflib import RDF, Graph
+
+from .rdf_mapper import SDH
+
+SENSITIVITY_THRESHOLDS = (0.50, 0.60, 0.70, 0.80, 0.85, 0.90, 0.95, 0.99, 1.00)
+
+# Faixas só para espalhar a amostra de rotulagem; não são limiares propostos.
+SAMPLE_BANDS = (("baixa", 0.0, 0.70), ("media", 0.70, 0.90), ("alta", 0.90, 1.0))
+SAMPLE_SUBBIN_WIDTH = 0.05
+SAMPLE_PER_BAND = 20
+SAMPLE_SEED = 0
+SAMPLE_DIFF_WORDS = 25
+
+LAYER_TEXT = "1_texto"
+LAYER_NO_TEXT = "2_sem_texto"
+LAYER_NOT_EVALUABLE = "nao_avaliavel"
+
+LABEL_REPRESENTATIVE = "representante"
+LABEL_REDUNDANT = "redundante"
+LABEL_PENDING = "pendente_limiar"
+LABEL_KEPT_NO_TEXT = "mantida_sem_texto"
+LABEL_DIGEST_CANDIDATE = "candidata_digest_nao_verificada"
+LABEL_DIGEST_CANDIDATE_MIXED = "candidata_digest_nao_verificada_grupo_misto"
+
+CSV_FIELDS = (
+    "artigo",
+    "tstamp",
+    "tem_texto",
+    "status_code",
+    "camada",
+    "representante",
+    "similaridade",
+    "rotulo",
+    "limiar",
+    "sim_consecutiva",
+    "digest",
+    "content_length",
+    "grupo_digest",
+)
+
+_WORD_RE = re.compile(r"\w+")
+_SPACE_RE = re.compile(r"\s+")
+
+
+@dataclass(frozen=True)
+class Capture:
+    article: str
+    tstamp: str
+    digest: str
+    content_length: int
+    status_code: int | None
+    text: str | None
+
+    @property
+    def has_text(self) -> bool:
+        return self.text is not None
+
+    @property
+    def in_layer1(self) -> bool:
+        return self.text is not None and self.status_code == 200
+
+
+def normalize_text(text: str) -> str:
+    text = unicodedata.normalize("NFC", text).lower()
+    return _SPACE_RE.sub(" ", text).strip()
+
+
+def word_set(text: str) -> frozenset[str]:
+    return frozenset(_WORD_RE.findall(normalize_text(text)))
+
+
+def jaccard(a: frozenset[str], b: frozenset[str]) -> float:
+    union = a | b
+    if not union:
+        return 1.0
+    return len(a & b) / len(union)
+
+
+# --- Camada 1 ---------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Assignment:
+    representative: int
+    similarity: float | None
+    redundant: bool
+
+
+def assign_last_representative(
+    words: list[frozenset[str]], threshold: float
+) -> list[Assignment]:
+    """Compara cada captura com o último representante retido (ponto 5 do desenho)."""
+
+    result: list[Assignment] = []
+    current = None
+    for index, tokens in enumerate(words):
+        if current is None:
+            result.append(Assignment(index, None, False))
+            current = index
+            continue
+        similarity = jaccard(words[current], tokens)
+        if similarity >= threshold:
+            result.append(Assignment(current, similarity, True))
+        else:
+            result.append(Assignment(index, similarity, False))
+            current = index
+    return result
+
+
+def assign_consecutive(
+    words: list[frozenset[str]], threshold: float
+) -> list[Assignment]:
+    """Variante de sensibilidade: compara só com a captura com texto anterior.
+
+    O representante de uma redundante é o início da cadeia, o que permite a
+    fusão A≈B, B≈C, A≉C que a estratégia principal evita.
+    """
+
+    result: list[Assignment] = []
+    for index, tokens in enumerate(words):
+        if index == 0:
+            result.append(Assignment(0, None, False))
+            continue
+        similarity = jaccard(words[index - 1], tokens)
+        if similarity >= threshold:
+            result.append(Assignment(result[index - 1].representative, similarity, True))
+        else:
+            result.append(Assignment(index, similarity, False))
+    return result
+
+
+def consecutive_similarities(words: list[frozenset[str]]) -> list[float | None]:
+    return [None] + [jaccard(a, b) for a, b in zip(words, words[1:])]
+
+
+# --- Camada 2 ---------------------------------------------------------------
+
+
+def digest_annotations(captures: list[Capture]) -> dict[int, tuple[str, str]]:
+    """Grupos (`digest`, `contentLength`) iguais no artigo que incluem capturas da Camada 2.
+
+    Devolve, por índice de captura da Camada 2 num grupo com 2+ membros,
+    `(grupo, rótulo)`. Num grupo só da Camada 2 a primeira (em ordem
+    temporal) fica como referência e as restantes são candidatas; num grupo
+    misto (com uma captura da Camada 1) todas as da Camada 2 são candidatas.
+    Nada é removido: é só uma anotação.
+    """
+
+    groups: dict[tuple[str, int], list[int]] = defaultdict(list)
+    for index, capture in enumerate(captures):
+        groups[(capture.digest, capture.content_length)].append(index)
+
+    annotations: dict[int, tuple[str, str]] = {}
+    for (digest, length), members in groups.items():
+        if len(members) < 2:
+            continue
+        no_text = [i for i in members if not captures[i].in_layer1]
+        if not no_text:
+            continue
+        group_id = f"{digest}|{length}"
+        mixed = len(no_text) < len(members)
+        for position, index in enumerate(no_text):
+            if mixed:
+                label = LABEL_DIGEST_CANDIDATE_MIXED
+            elif position == 0:
+                label = LABEL_KEPT_NO_TEXT
+            else:
+                label = LABEL_DIGEST_CANDIDATE
+            annotations[index] = (group_id, label)
+    return annotations
+
+
+# --- Anotação por captura ---------------------------------------------------
+
+
+def _fmt(value: float | None) -> str:
+    return "" if value is None else f"{value:.6f}"
+
+
+def annotate_article(
+    captures: list[Capture], threshold: float | None
+) -> list[dict[str, str]]:
+    """Uma linha por captura do artigo (capturas já em ordem temporal)."""
+
+    layer1 = [i for i, c in enumerate(captures) if c.in_layer1]
+    words = [word_set(captures[i].text or "") for i in layer1]
+    consecutive = consecutive_similarities(words)
+    assignments = (
+        assign_last_representative(words, threshold) if threshold is not None else None
+    )
+    digest = digest_annotations(captures)
+    position_in_layer1 = {index: pos for pos, index in enumerate(layer1)}
+
+    rows: list[dict[str, str]] = []
+    for index, capture in enumerate(captures):
+        row = {
+            "artigo": capture.article,
+            "tstamp": capture.tstamp,
+            "tem_texto": str(capture.has_text),
+            "status_code": "" if capture.status_code is None else str(capture.status_code),
+            "camada": "",
+            "representante": "",
+            "similaridade": "",
+            "rotulo": "",
+            "limiar": "" if threshold is None else f"{threshold:g}",
+            "sim_consecutiva": "",
+            "digest": capture.digest,
+            "content_length": str(capture.content_length),
+            "grupo_digest": "",
+        }
+        if index in position_in_layer1:
+            pos = position_in_layer1[index]
+            row["camada"] = LAYER_TEXT
+            row["sim_consecutiva"] = _fmt(consecutive[pos])
+            if assignments is not None:
+                assignment = assignments[pos]
+                row["representante"] = captures[layer1[assignment.representative]].tstamp
+                row["similaridade"] = _fmt(assignment.similarity)
+                row["rotulo"] = LABEL_REDUNDANT if assignment.redundant else LABEL_REPRESENTATIVE
+            elif pos == 0:
+                # A primeira captura com texto é representante para qualquer limiar.
+                row["representante"] = capture.tstamp
+                row["rotulo"] = LABEL_REPRESENTATIVE
+            else:
+                row["rotulo"] = LABEL_PENDING
+        else:
+            row["camada"] = LAYER_NO_TEXT if layer1 else LAYER_NOT_EVALUABLE
+            group_id, label = digest.get(index, ("", LABEL_KEPT_NO_TEXT))
+            row["grupo_digest"] = group_id
+            row["rotulo"] = label
+        rows.append(row)
+    return rows
+
+
+# --- Leitura do corpus ------------------------------------------------------
+
+
+def load_corpus(ttl_path: Path, project_root: Path) -> dict[str, list[Capture]]:
+    """Capturas por artigo (`originalURL`), em ordem temporal, a partir do Turtle."""
+
+    graph = Graph().parse(ttl_path, format="turtle")
+    corpus: dict[str, list[Capture]] = {}
+    for web_resource in graph.subjects(RDF.type, SDH.RecursoWeb):
+        article = str(graph.value(web_resource, SDH.originalURL))
+        captures = []
+        for capture in graph.objects(web_resource, SDH.temCaptura):
+            text = None
+            text_node = graph.value(capture, SDH.temTextoExtraido)
+            if text_node is not None:
+                file_path = project_root / str(graph.value(text_node, SDH.filePath))
+                if not file_path.is_file():
+                    raise FileNotFoundError(f"Texto referenciado no grafo em falta: {file_path}")
+                text = file_path.read_text(encoding="utf-8")
+            status = graph.value(capture, SDH.statusCode)
+            captures.append(
+                Capture(
+                    article=article,
+                    tstamp=str(graph.value(capture, SDH.tstamp)),
+                    digest=str(graph.value(capture, SDH.digest)),
+                    content_length=int(graph.value(capture, SDH.contentLength)),
+                    status_code=None if status is None else int(status),
+                    text=text,
+                )
+            )
+        corpus[article] = sorted(captures, key=lambda c: c.tstamp)
+    return dict(sorted(corpus.items()))
+
+
+# --- Sensibilidade, distribuição e amostra ----------------------------------
+
+
+@dataclass(frozen=True)
+class SensitivityRow:
+    threshold: float
+    redundant_last_rep: int
+    redundant_consecutive: int
+    versions_last_rep: int
+    versions_consecutive: int
+    disagreements: int
+    articles_with_redundant: int
+
+
+def sensitivity_table(
+    layer1_words: dict[str, list[frozenset[str]]],
+    thresholds: tuple[float, ...] = SENSITIVITY_THRESHOLDS,
+) -> list[SensitivityRow]:
+    rows = []
+    for threshold in thresholds:
+        red_last = red_cons = disagree = articles = 0
+        versions_last = versions_cons = 0
+        for words in layer1_words.values():
+            last = assign_last_representative(words, threshold)
+            cons = assign_consecutive(words, threshold)
+            n_last = sum(a.redundant for a in last)
+            red_last += n_last
+            red_cons += sum(a.redundant for a in cons)
+            versions_last += len(words) - n_last
+            versions_cons += sum(not a.redundant for a in cons)
+            disagree += sum(
+                a.redundant != b.redundant or a.representative != b.representative
+                for a, b in zip(last, cons)
+            )
+            articles += n_last > 0
+        rows.append(
+            SensitivityRow(
+                threshold, red_last, red_cons, versions_last, versions_cons,
+                disagree, articles,
+            )
+        )
+    return rows
+
+
+@dataclass(frozen=True)
+class Pair:
+    article: str
+    tstamp_a: str
+    tstamp_b: str
+    similarity: float
+    only_a: list[str]
+    only_b: list[str]
+
+
+def _ordered_difference(text: str, other: frozenset[str]) -> list[str]:
+    seen: dict[str, None] = {}
+    for word in _WORD_RE.findall(normalize_text(text)):
+        if word not in other:
+            seen.setdefault(word, None)
+    return list(seen)
+
+
+def consecutive_pairs(corpus: dict[str, list[Capture]]) -> list[Pair]:
+    pairs = []
+    for article, captures in corpus.items():
+        layer1 = [c for c in captures if c.in_layer1]
+        for a, b in zip(layer1, layer1[1:]):
+            words_a, words_b = word_set(a.text or ""), word_set(b.text or "")
+            pairs.append(
+                Pair(
+                    article, a.tstamp, b.tstamp, jaccard(words_a, words_b),
+                    _ordered_difference(a.text or "", words_b),
+                    _ordered_difference(b.text or "", words_a),
+                )
+            )
+    return pairs
+
+
+def _band_of(similarity: float) -> str:
+    for name, low, high in SAMPLE_BANDS:
+        if low <= similarity < high or (high == 1.0 and similarity == 1.0):
+            return name
+    raise ValueError(similarity)
+
+
+def _subbin_of(similarity: float) -> float:
+    # 1,0 exato fica numa sub-faixa própria para não dominar a faixa alta.
+    if similarity == 1.0:
+        return 1.0
+    return int(similarity / SAMPLE_SUBBIN_WIDTH + 1e-9) * SAMPLE_SUBBIN_WIDTH
+
+
+def label_sample(
+    pairs: list[Pair], per_band: int = SAMPLE_PER_BAND, seed: int = SAMPLE_SEED
+) -> list[tuple[str, Pair]]:
+    """Amostra estratificada por faixa, repartida em rotação pelas sub-faixas de 0,05."""
+
+    rng = random.Random(seed)
+    sample: list[tuple[str, Pair]] = []
+    for band, _low, _high in SAMPLE_BANDS:
+        subbins: dict[float, list[Pair]] = defaultdict(list)
+        for pair in pairs:
+            if _band_of(pair.similarity) == band:
+                subbins[_subbin_of(pair.similarity)].append(pair)
+        pools = []
+        for key in sorted(subbins):
+            pool = sorted(subbins[key], key=lambda p: (p.article, p.tstamp_b))
+            rng.shuffle(pool)
+            pools.append(pool)
+        chosen: list[Pair] = []
+        while len(chosen) < per_band and any(pools):
+            for pool in pools:
+                if pool and len(chosen) < per_band:
+                    chosen.append(pool.pop())
+        chosen.sort(key=lambda p: p.similarity)
+        sample.extend((band, pair) for pair in chosen)
+    return sample
+
+
+def describe(values: list[float]) -> dict[str, float]:
+    ordered = sorted(values)
+    n = len(ordered)
+    return {
+        "n": n,
+        "min": ordered[0],
+        "p10": ordered[int(0.1 * n)],
+        "mediana": statistics.median(ordered),
+        "p90": ordered[int(0.9 * n)],
+        "max": ordered[-1],
+    }
+
+
+# --- Saídas -----------------------------------------------------------------
+
+
+def write_redundancy_csv(rows: list[dict[str, str]], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(CSV_FIELDS))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def write_sample_csv(sample: list[tuple[str, Pair]], path: Path) -> None:
+    fields = (
+        "par_id", "faixa", "artigo", "tstamp_a", "tstamp_b", "similaridade",
+        "n_palavras_so_a", "n_palavras_so_b", "palavras_so_a", "palavras_so_b",
+        "rotulo_manual", "notas",
+    )
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(fields))
+        writer.writeheader()
+        for number, (band, pair) in enumerate(sample, start=1):
+            writer.writerow({
+                "par_id": number,
+                "faixa": band,
+                "artigo": pair.article,
+                "tstamp_a": pair.tstamp_a,
+                "tstamp_b": pair.tstamp_b,
+                "similaridade": _fmt(pair.similarity),
+                "n_palavras_so_a": len(pair.only_a),
+                "n_palavras_so_b": len(pair.only_b),
+                "palavras_so_a": " ".join(pair.only_a[:SAMPLE_DIFF_WORDS]),
+                "palavras_so_b": " ".join(pair.only_b[:SAMPLE_DIFF_WORDS]),
+                "rotulo_manual": "",
+                "notas": "",
+            })
+
+
+def _num(value: float) -> str:
+    return f"{value:.3f}".replace(".", ",")
+
+
+def write_summary_markdown(
+    corpus: dict[str, list[Capture]],
+    rows: list[dict[str, str]],
+    pairs: list[Pair],
+    sensitivity: list[SensitivityRow],
+    sample: list[tuple[str, Pair]],
+    threshold: float | None,
+    path: Path,
+) -> None:
+    captures = [c for cs in corpus.values() for c in cs]
+    layer1 = [r for r in rows if r["camada"] == LAYER_TEXT]
+    layer2 = [r for r in rows if r["camada"] == LAYER_NO_TEXT]
+    not_evaluable = [r for r in rows if r["camada"] == LAYER_NOT_EVALUABLE]
+    no_text_rows = layer2 + not_evaluable
+
+    layer1_counts = {a: sum(c.in_layer1 for c in cs) for a, cs in corpus.items()}
+    situations = [
+        ("Só 1 captura", sum(len(cs) == 1 for cs in corpus.values())),
+        ("Nenhuma captura com texto (não avaliáveis)",
+         sum(n == 0 for n in layer1_counts.values())),
+        ("Exatamente 1 captura com texto", sum(n == 1 for n in layer1_counts.values())),
+        ("2 ou mais capturas com texto (comparáveis)",
+         sum(n >= 2 for n in layer1_counts.values())),
+    ]
+
+    def groups(label: str) -> tuple[int, int]:
+        members = [r for r in no_text_rows if r["rotulo"] == label]
+        return len({(r["artigo"], r["grupo_digest"]) for r in members}), len(members)
+
+    pure_groups, pure_candidates = groups(LABEL_DIGEST_CANDIDATE)
+    mixed_groups, mixed_candidates = groups(LABEL_DIGEST_CANDIDATE_MIXED)
+    status_not_200 = [c for c in captures if c.status_code != 200]
+
+    lines = [
+        "# Caminho D — anotação de redundância entre capturas\n",
+        "Execução real, sem pedidos à API, sobre `output/corpus_articles.ttl` e os "
+        "textos em `data/raw/texts/`. Nada foi removido do grafo nem do raw: o "
+        "resultado é uma anotação por captura em `output/corpus_redundancy.csv`. "
+        "Similaridade: Jaccard de conjuntos de palavras (`\\w+`) do texto "
+        "normalizado (NFC, minúsculas, espaços), sem remover o chrome do site.\n",
+    ]
+    if threshold is None:
+        lines.append(
+            "**Limiar: não fixado, pendente de rotulagem manual.** As capturas da "
+            "Camada 1 que dependem do limiar estão marcadas `pendente_limiar` no CSV; "
+            "a tabela de sensibilidade abaixo mostra o efeito de cada limiar "
+            "candidato. Depois da rotulagem, `--limiar X` preenche o CSV.\n"
+        )
+    else:
+        lines.append(f"**Limiar aplicado no CSV: {_num(threshold)}.**\n")
+
+    lines += [
+        "## Estrutura do corpus\n",
+        f"- Artigos: {len(corpus)}; capturas: {len(captures)}; capturas com texto: "
+        f"{sum(c.has_text for c in captures)}",
+        "",
+        "| Situação | Artigos |",
+        "| --- | ---: |",
+        *(f"| {name} | {count} |" for name, count in situations),
+        "",
+        "## Contagens por camada\n",
+        "| Camada | Capturas |",
+        "| --- | ---: |",
+        f"| Camada 1 — com texto e `statusCode` 200 | {len(layer1)} |",
+        f"| Camada 2 — sem texto, em artigos com algum texto | {len(layer2)} |",
+        f"| Não avaliáveis — artigos sem nenhum texto | {len(not_evaluable)} |",
+        f"| Total | {len(rows)} |",
+        "",
+        f"- Capturas com `statusCode` ≠ 200: {len(status_not_200)}, das quais "
+        f"{sum(c.has_text for c in status_not_200)} com texto; todas fora da "
+        "Camada 1 (contabilizadas à parte, não são redundância).",
+        "",
+        "### Camada 2 — candidatas por `digest` + `contentLength` (não verificadas por texto)\n",
+        "Todas as capturas sem texto são mantidas. Estas contagens são apenas um "
+        "limite superior do que um critério fraco deduziria e **nunca são somadas "
+        "à Camada 1**.\n",
+        "| Tipo de grupo (dentro do artigo) | Grupos | Candidatas |",
+        "| --- | ---: | ---: |",
+        f"| Só capturas sem texto (n−1 por grupo) | {pure_groups} | {pure_candidates} |",
+        f"| Misto (mesmo `digest`/`contentLength` de uma captura com texto) | "
+        f"{mixed_groups} | {mixed_candidates} |",
+        "",
+        "## Distribuição de similaridades (pares consecutivos com texto)\n",
+    ]
+
+    similarities = [p.similarity for p in pairs]
+    if similarities:
+        stats = describe(similarities)
+        lines += [
+            "| n | mín. | p10 | mediana | p90 | máx. |",
+            "| ---: | ---: | ---: | ---: | ---: | ---: |",
+            f"| {stats['n']} | {_num(stats['min'])} | {_num(stats['p10'])} | "
+            f"{_num(stats['mediana'])} | {_num(stats['p90'])} | {_num(stats['max'])} |",
+            "",
+            "| Faixa | Pares |",
+            "| --- | ---: |",
+        ]
+        bins: dict[float, int] = defaultdict(int)
+        for value in similarities:
+            bins[_subbin_of(value)] += 1
+        for key in sorted(bins):
+            label = "= 1,000" if key == 1.0 else (
+                f"[{_num(key)}; {_num(key + SAMPLE_SUBBIN_WIDTH)})"
+            )
+            lines.append(f"| {label} | {bins[key]} |")
+        lines.append("")
+
+    lines += [
+        "## Sensibilidade ao limiar (Camada 1)\n",
+        "Redundantes = capturas com similaridade ≥ limiar face ao termo de "
+        "comparação; versões = capturas da Camada 1 que ficam como "
+        "representantes (versões textuais distintas). \"Último rep.\" é a "
+        "estratégia do desenho; \"consecutiva\" é a análise de sensibilidade. "
+        "Divergências = capturas com classificação ou representante diferente "
+        "entre as duas.\n",
+        "| Limiar | Redundantes (último rep.) | Redundantes (consecutiva) | "
+        "Versões (último rep.) | Versões (consecutiva) | Divergências | "
+        "Artigos com redundantes (último rep.) |",
+        "| ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for s in sensitivity:
+        lines.append(
+            f"| {_num(s.threshold)} | {s.redundant_last_rep} | {s.redundant_consecutive} | "
+            f"{s.versions_last_rep} | {s.versions_consecutive} | {s.disagreements} | "
+            f"{s.articles_with_redundant} |"
+        )
+
+    band_counts = defaultdict(int)
+    for band, _pair in sample:
+        band_counts[band] += 1
+    lines += [
+        "",
+        "## Amostra para rotulagem manual\n",
+        "`output/corpus_redundancy_label_sample.csv`: pares consecutivos com texto, "
+        f"até {SAMPLE_PER_BAND} por faixa (semente {SAMPLE_SEED}), repartidos em "
+        "rotação pelas sub-faixas de 0,05 (1,0 exato numa sub-faixa própria). As "
+        "faixas servem só para espalhar a amostra; não são limiares propostos. "
+        "Colunas `rotulo_manual` (\"mesma versão\" / \"texto alterado\") e `notas` "
+        "por preencher.\n",
+        "| Faixa | Intervalo | Pares na amostra | Pares disponíveis |",
+        "| --- | --- | ---: | ---: |",
+    ]
+    for band, low, high in SAMPLE_BANDS:
+        available = sum(_band_of(v) == band for v in similarities)
+        interval = f"[{_num(low)}; {_num(high)}]" if high == 1.0 else f"[{_num(low)}; {_num(high)})"
+        lines.append(f"| {band} | {interval} | {band_counts[band]} | {available} |")
+
+    lines.append(
+        "\nEstes valores são o resultado real desta execução, não uma estimativa."
+    )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def run(
+    project_root: Path | None = None, threshold: float | None = None
+) -> tuple[list[dict[str, str]], list[SensitivityRow], list[tuple[str, Pair]]]:
+    root = project_root or Path(__file__).resolve().parents[2]
+    output = root / "output"
+    corpus = load_corpus(output / "corpus_articles.ttl", root)
+
+    rows = [row for captures in corpus.values() for row in annotate_article(captures, threshold)]
+    layer1_words = {
+        article: [word_set(c.text or "") for c in captures if c.in_layer1]
+        for article, captures in corpus.items()
+    }
+    sensitivity = sensitivity_table(layer1_words)
+    pairs = consecutive_pairs(corpus)
+    sample = label_sample(pairs)
+
+    write_redundancy_csv(rows, output / "corpus_redundancy.csv")
+    write_sample_csv(sample, output / "corpus_redundancy_label_sample.csv")
+    write_summary_markdown(
+        corpus, rows, pairs, sensitivity, sample, threshold,
+        output / "corpus_redundancy_summary.md",
+    )
+    return rows, sensitivity, sample
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="python -m semantic_harvester.corpus_redundancy",
+        description=__doc__.splitlines()[0],
+    )
+    parser.add_argument(
+        "--limiar",
+        type=float,
+        default=None,
+        help="limiar de Jaccard para a Camada 1; omitido enquanto não houver "
+        "calibração por rotulagem manual (Camada 1 fica pendente_limiar)",
+    )
+    args = parser.parse_args(argv)
+    if args.limiar is not None and not 0.0 <= args.limiar <= 1.0:
+        parser.error("--limiar tem de estar entre 0 e 1")
+
+    rows, sensitivity, sample = run(threshold=args.limiar)
+    print(f"Capturas anotadas: {len(rows)}")
+    print(f"Pares na amostra de rotulagem: {len(sample)}")
+    print(
+        "Saídas: output/corpus_redundancy.csv, output/corpus_redundancy_summary.md, "
+        "output/corpus_redundancy_label_sample.csv"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

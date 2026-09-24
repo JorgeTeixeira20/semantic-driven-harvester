@@ -315,3 +315,20 @@ Turtle relido) e **só substitui** `output/corpus_articles.ttl`,
 `output/corpus_rdf_report.csv`, `output/corpus_rdf_summary.md` e
 `data/processed/corpus_articles_triples.nt` se todas passarem (cópia prévia do
 `.nt` em `data/processed/corpus_articles_triples.nt.pre-rebuild`).
+
+## Caminho D — anotação de redundância entre capturas
+
+Sem rede e sem alterar o grafo nem o raw: lê `output/corpus_articles.ttl` e os
+textos referenciados em `data/raw/texts/`.
+
+```bash
+python -m semantic_harvester.corpus_redundancy               # limiar pendente de calibração
+python -m semantic_harvester.corpus_redundancy --limiar 0.9  # só depois da rotulagem manual
+```
+
+Escreve `output/corpus_redundancy.csv` (uma linha por captura: camada,
+representante, similaridade, rótulo), `output/corpus_redundancy_summary.md`
+(contagens por camada, distribuição e tabela de sensibilidade ao limiar) e
+`output/corpus_redundancy_label_sample.csv` (amostra de pares para rotulagem
+manual). Sem `--limiar`, a Camada 1 fica `pendente_limiar`. Desenho e decisões
+em `docs/experiments.md`.

@@ -40,6 +40,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   retidos, reconstruindo capturas do raw já preservado pela Fase 2 (sem
   repetir pedidos de `version_history`) e descarregando/reutilizando só os
   textos extraídos.
+- `corpus_redundancy.py`: Caminho D — anotação (não destrutiva) de redundância
+  entre capturas do mesmo artigo por similaridade textual; lê o Turtle do
+  corpus e a cache de textos, sem rede; o limiar depende de rotulagem manual.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -80,6 +83,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_text_retry` | Rede (até 324 capturas, várias tentativas cada); resumível por captura; grava textos em `data/raw/texts/` e `output/corpus_text_retry_report.csv`. |
 | `python -m semantic_harvester.corpus_rdf --rebuild-offline [--check-only]` | Sem rede; reconstrói o grafo dos artigos retidos a partir do raw e da cache de textos, verifica e só então substitui os outputs. |
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
+| `python -m semantic_harvester.corpus_redundancy [--limiar X]` | Sem rede; lê `output/corpus_articles.ttl` e `data/raw/texts/`; grava `output/corpus_redundancy*`; não altera grafo nem raw. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.
