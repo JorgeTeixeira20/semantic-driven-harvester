@@ -48,4 +48,7 @@ output/*
 !output/corpus_text_retry_candidates.csv
 !output/corpus_text_retry_report.csv
 !output/corpus_text_retry_summary.md
+!output/corpus_redundancy.csv
+!output/corpus_redundancy_summary.md
+!output/corpus_redundancy_label_sample.csv
 data/processed/corpus_articles_triples.nt.pre-rebuild

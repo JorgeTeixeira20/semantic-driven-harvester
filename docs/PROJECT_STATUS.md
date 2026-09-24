@@ -1,8 +1,9 @@
 # Estado do projeto
 
-Atualizado em **2026-09-16**, a partir do código, testes, documentação e histórico
-até `a3208f4`. Este documento é um retrato datado, não substitui a inspeção do
-checkout atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
+Atualizado em **2026-09-24** (Caminho D), a partir do código, testes,
+documentação e histórico; a última revisão integral foi até `a3208f4`.
+Este documento é um retrato datado, não substitui a inspeção do checkout
+atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
 [README.md](../README.md).
 
 ## Objetivo e âmbito implementado
@@ -39,7 +40,9 @@ O pacote [src/semantic_harvester/](../src/semantic_harvester/) contém:
 O fluxo é API → raw local → manifesto/metadados → Turtle. A
 [ontologia](../ontology/semantic_harvester.ttl) define as classes e propriedades;
 `Artigo → RecursoWeb → CapturaArquivada → TextoExtraido` resume as relações principais.
-Não estão implementados NER, deduplicação semântica/local, base de dados,
+A redução de redundância entre capturas (Caminho D) está implementada como
+anotação por similaridade textual em `corpus_redundancy.py`, com limiar ainda
+por calibrar. Não estão implementados NER, deduplicação semântica, base de dados,
 frontend ou LLMs. Há parâmetros de deduplicação enviados à API; isso não é uma
 implementação local de deduplicação. `EntidadeMencionada` e `Tema` existem no
 vocabulário, mas não há pipeline de extração/enriquecimento correspondente.
@@ -131,7 +134,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 68 testes em cinco módulos de `tests/`.
+pacote conforme o README. Existem 87 testes em seis módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -142,11 +145,15 @@ o mapeamento RDF do corpus (`test_corpus_rdf.py`: reconstrução do raw,
 normalização de `originalURL`, fusão de artigos, retoma sem repetir pedidos e
 reconstrução offline com verificações) e a
 retentativa de textos (`test_corpus_text_retry.py`: tentativas com espera crescente,
-404 não retentado, retoma por captura).
+404 não retentado, retoma por captura) e a anotação de redundância do Caminho D
+(`test_corpus_redundancy.py`: normalização, estratégias último representante e
+consecutiva incluindo a cadeia A≈B, B≈C, A≉C, camadas, grupos de `digest`
+anotados sem remoção, amostra de rotulagem e execução não destrutiva).
 
-Última validação em **2026-09-20**, com o Python 3.13.1 do ambiente virtual:
-`.venv/Scripts/python.exe -m unittest discover -s tests -v` — **68 testes,
-todos passaram (`OK`)**, sem chamadas à API real.
+Última validação em **2026-09-24**, com o Python 3.12.4 do ambiente virtual (macOS):
+`.venv/bin/python -m unittest discover -s tests` — **87 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
+3.13.1 no Windows, 68 testes OK.)
 
 [tests/support.py](../tests/support.py) fornece respostas simuladas, temporários
 e bloqueio de rede. As [fixtures](../tests/fixtures/README.md) são sintéticas.
@@ -294,8 +301,7 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    `texts_reused` do relatório perdem a divisão histórica (todos "reutilizados").
    Detalhe em `experiments.md`.
 
-   O Caminho D não foi iniciado (proposta de desenho em `experiments.md`,
-   com os números atualizados para os 789 textos).
+   O Caminho D foi implementado e executado em 2026-09-24 (passo 3 abaixo).
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com
@@ -303,6 +309,24 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    que o precedente conhecido. Deteção de equivalência semântica mais
    sofisticada (ex.: embeddings) fica como trabalho futuro, condicional a
    tempo disponível.
+
+   **Implementado e executado em 2026-09-24, limiar pendente.**
+   `src/semantic_harvester/corpus_redundancy.py` aplica o desenho de
+   `experiments.md` sem alterar o grafo nem o raw (checksums iguais antes e
+   depois): Camada 1 (texto e `statusCode` 200) compara cada captura com o
+   último representante retido, com a variante consecutiva como
+   sensibilidade; Camada 2 mantém todas as capturas sem texto e só anota
+   grupos `digest`+`contentLength`; Jaccard de palavras sobre texto
+   normalizado, com chrome. Resultado real: **789 capturas na Camada 1, 150 na
+   Camada 2, 2 não avaliáveis**; 664 pares consecutivos (mediana 0,655); na
+   tabela de sensibilidade, 64 redundantes a 1,00, 81 a 0,90, 124 a 0,80 e
+   210 a 0,70 (estratégia principal, em 789); Camada 2 com 9 grupos/14
+   candidatas não verificadas e 0 grupos mistos. **O limiar não foi fixado:
+   fica pendente da rotulagem manual, pelos autores, dos 60 pares de
+   `output/corpus_redundancy_label_sample.csv`**; só depois se corre
+   `--limiar X` e se reporta o número de versões textuais distintas. Não
+   implementado nesta iteração: a remoção do chrome (variante b do desenho) e
+   a representação em RDF. Detalhe em `experiments.md`.
 4. **B** — povoamento de `EntidadeMencionada`/`Tema` (definidos na ontologia
    desde o início, nunca usados em código). **Decisão de âmbito:** caracterização
    descritiva/quantitativa (contagens, frequências), não uma avaliação formal

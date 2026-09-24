@@ -1327,10 +1327,15 @@ Concluídos: descoberta (Fase 1), profundidade temporal (Fase 2),
 classificação Artigo/redirecionamento (passo 6) e mapeamento RDF. O Caminho D
 (redução de redundância) não foi iniciado.
 
-## Caminho D — redução de redundância entre capturas (proposta, por validar)
+## Caminho D — redução de redundância entre capturas (implementado; limiar pendente de rotulagem manual)
 
-**Estado: proposta para validação do autor e do Jorge. Nada foi
-implementado e não foram feitos pedidos à API.** As estatísticas abaixo foram
+**Estado em 2026-09-24: desenho validado pelo autor e implementado em
+`src/semantic_harvester/corpus_redundancy.py`; executado sobre o corpus real
+(ver "Implementação e resultado da execução" no fim desta secção). O limiar
+da Camada 1 continua por fixar, pendente de rotulagem manual.** O texto abaixo
+até "Atualização com os textos finais" é a proposta tal como foi escrita,
+mantida como registo; na altura: *nada foi implementado e não foram feitos
+pedidos à API.* As estatísticas abaixo foram
 calculadas sobre dados já recolhidos (`output/corpus_articles.ttl`, raw de
 `version_history`, textos em `data/raw/texts/`) com scripts ad hoc não
 versionados; são exploratórias, não uma calibração.
@@ -1578,6 +1583,117 @@ Consequências para a proposta:
 - A "questão prévia" (retentar as 324 capturas) está resolvida: ver "Resultados
   da retentativa e reconstrução do grafo". As 35 capturas com `statusCode` ≠
   200 continuam todas sem texto e ficam na Camada 2.
+
+### Implementação e resultado da execução (2026-09-24)
+
+**Decidido (pedido do autor, 2026-09-24):** as decisões 1–4 acima foram aceites tal
+como propostas — camadas 1 e 2, anotação em CSV nesta iteração (ontologia
+inalterada), comparação com o último representante com a consecutiva como
+sensibilidade, limiar calibrado por rotulagem manual e não por decreto.
+
+**Implementação** (`corpus_redundancy.py`; comando no README). Não faz
+pedidos à API, não altera o grafo nem o raw: lê `output/corpus_articles.ttl`
+e os textos referenciados por `sdh:filePath`.
+
+- Camada 1: capturas com texto **e** `statusCode` 200. Por artigo, em ordem
+  de `tstamp`, cada uma é comparada com o último representante retido;
+  redundante se Jaccard ≥ limiar, senão passa a representante. A variante
+  "só com a consecutiva" é calculada em paralelo (sensibilidade).
+- Similaridade: Jaccard de conjuntos de palavras `\w+` do texto normalizado
+  (Unicode NFC, minúsculas, espaços colapsados), texto completo com chrome.
+  Esta tokenização foi escolhida por continuidade: reproduz exatamente a
+  medição exploratória da "Atualização com os textos finais" (a separação por
+  espaços dava valores ligeiramente diferentes, p. ex. mínimo 0,391 em vez de
+  0,434).
+- Camada 2: todas as capturas sem texto (ou com `statusCode` ≠ 200) mantidas.
+  Grupos com `digest` **e** `contentLength` iguais no artigo são anotados
+  (`grupo_digest`): num grupo só sem texto, a primeira fica
+  `mantida_sem_texto` e as restantes `candidata_digest_nao_verificada`; num
+  grupo misto, as sem texto ficam `candidata_digest_nao_verificada_grupo_misto`.
+  Nunca somadas à Camada 1.
+- Artigos sem nenhum texto: camada `nao_avaliavel`, todas mantidas.
+- **Sem limiar fixado**, as capturas da Camada 1 que dependem dele ficam
+  `pendente_limiar` no CSV (a primeira com texto de cada artigo é
+  representante para qualquer limiar); `--limiar X` preenche
+  `representante`/`similaridade`/`rotulo` depois da calibração. A coluna
+  `sim_consecutiva` não depende do limiar e está preenchida.
+- Não implementado nesta iteração: a variante (b) de remoção do chrome
+  (ponto 3 do desenho). Só existe a variante (a), sem remoção; a decisão de
+  a acrescentar fica associada à calibração.
+- Amostra para rotulagem (`output/corpus_redundancy_label_sample.csv`): pares
+  **consecutivos** com texto (não dependem do limiar), 20 por faixa — baixa
+  [0; 0,70), média [0,70; 0,90), alta [0,90; 1] — semente 0, repartidos em
+  rotação por sub-faixas de 0,05 com o 1,0 exato numa sub-faixa própria, para
+  a faixa alta não ficar só com pares idênticos. As faixas servem para espalhar
+  a amostra, não são limiares propostos. Para cada par: palavras só em A/só em
+  B (até 25, por ordem de aparecimento) e colunas `rotulo_manual`/`notas`
+  vazias.
+- Testes: 19 unitários em `tests/test_corpus_redundancy.py` com fixtures
+  sintéticas (idênticos, quase idênticos, diferentes; cadeia A≈B, B≈C, A≉C
+  nas duas estratégias; artigo com 1 captura; artigo sem texto; captura sem
+  texto entre duas com texto; grupo de `digest` igual sem texto anotado e não
+  removido; grupo misto; `statusCode` ≠ 200 com texto; execução completa
+  sobre um Turtle sintético sem alterar os ficheiros de entrada).
+
+**Resultado real da execução** (2026-09-24, sem limiar;
+`output/corpus_redundancy_summary.md`, `output/corpus_redundancy.csv`). Os
+checksums SHA-256 de `output/corpus_articles.ttl` e de todos os ficheiros de
+`data/raw/texts/` foram iguais antes e depois.
+
+| Camada | Capturas |
+| --- | ---: |
+| 1 — com texto e `statusCode` 200 | 789 |
+| 2 — sem texto, em artigos com algum texto | 150 |
+| Não avaliáveis (2 artigos sem nenhum texto) | 2 |
+| Total | 941 |
+
+As 35 capturas com `statusCode` ≠ 200 não têm texto e estão todas fora da
+Camada 1. Estrutura: 84 artigos comparáveis (2+ textos), 41 com exatamente 1
+texto, 2 sem texto; 31 artigos têm uma só captura.
+
+Distribuição dos 664 pares consecutivos com texto: mín. 0,434, p10 0,561,
+mediana 0,655, p90 0,995, máx. 1,000 (igual à exploração). Histograma por
+faixas de 0,05 no resumo; destaque: 5 pares em [0,90; 0,95), 12 em
+[0,95; 1,0) e 64 iguais a 1,0, contra 7 em [0,85; 0,90) e 41 em [0,80; 0,85).
+
+Sensibilidade (redundantes na Camada 1, de 789):
+
+| Limiar | Último representante | Consecutiva | Divergências | Artigos com redundantes |
+| ---: | ---: | ---: | ---: | ---: |
+| 0,50 | 624 | 648 | 108 | 84 |
+| 0,60 | 518 | 540 | 72 | 72 |
+| 0,70 | 210 | 212 | 5 | 57 |
+| 0,80 | 124 | 129 | 34 | 34 |
+| 0,85 | 88 | 88 | 0 | 22 |
+| 0,90 | 81 | 81 | 0 | 15 |
+| 0,95 | 75 | 76 | 3 | 12 |
+| 0,99 | 70 | 70 | 0 | 12 |
+| 1,00 | 64 | 64 | 0 | 12 |
+
+(Divergências = capturas com classificação ou representante diferente entre
+as duas estratégias; a coluna "Artigos" refere-se à estratégia principal.)
+Leitura descritiva, não uma escolha de limiar: entre 0,85 e 1,00 as duas
+estratégias quase coincidem (0–3 divergências) e o número de redundantes varia
+pouco (88 → 64); abaixo de 0,80 a contagem sobe depressa e entra na zona onde
+está a maioria dos pares consecutivos (mediana 0,655), que a exploração
+atribui em parte à variação do chrome. A fusão por cadeia que a estratégia
+principal evita só aparece com peso abaixo de 0,85.
+
+Camada 2 (anotação, não redução): **9 grupos só sem texto, 14 candidatas;
+0 grupos mistos.** Diferença face à exploração (só por `digest`: 3 grupos/23
+capturas sem texto e 9 grupos mistos/9 capturas, que este código reproduz
+quando se ignora o `contentLength`): exigir `contentLength` igual divide os
+grupos sem texto e elimina todos os mistos — nos 9 casos, a captura sem texto
+tem um `contentLength` diferente de todas as capturas com texto com o mesmo
+`digest`. É mais um indício de que `digest` igual não implica resposta
+idêntica neste corpus.
+
+**Pendente:** o limiar da Camada 1 **não foi fixado** e fica pendente da
+rotulagem manual da amostra de 60 pares (20 por faixa) pelos autores. Só
+depois se corre `--limiar X` e se reportam versões textuais distintas por
+artigo como resultado de D; até lá, os números acima são uma tabela de
+sensibilidade, não o resultado da redução. Representação em RDF continua
+fora desta iteração (decisão 2).
 
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 

@@ -445,7 +445,7 @@ def describe(values: list[float]) -> dict[str, float]:
 def write_redundancy_csv(rows: list[dict[str, str]], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(CSV_FIELDS))
+        writer = csv.DictWriter(handle, fieldnames=list(CSV_FIELDS), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -457,7 +457,7 @@ def write_sample_csv(sample: list[tuple[str, Pair]], path: Path) -> None:
         "rotulo_manual", "notas",
     )
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(fields))
+        writer = csv.DictWriter(handle, fieldnames=list(fields), lineterminator="\n")
         writer.writeheader()
         for number, (band, pair) in enumerate(sample, start=1):
             writer.writerow({
