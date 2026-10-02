@@ -43,6 +43,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
 - `corpus_redundancy.py`: Caminho D — anotação (não destrutiva) de redundância
   entre capturas do mesmo artigo por similaridade textual; lê o Turtle do
   corpus e a cache de textos, sem rede; o limiar depende de rotulagem manual.
+- `corpus_chrome.py`: variante (b) do Caminho D — remoção do chrome por
+  n-gramas frequentes entre artigos distintos e avaliação contra os 60 pares
+  rotulados; sem rede, não altera grafo, raw nem as saídas da variante (a).
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -84,6 +87,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_rdf --rebuild-offline [--check-only]` | Sem rede; reconstrói o grafo dos artigos retidos a partir do raw e da cache de textos, verifica e só então substitui os outputs. |
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
 | `python -m semantic_harvester.corpus_redundancy [--limiar X]` | Sem rede; lê `output/corpus_articles.ttl` e `data/raw/texts/`; grava `output/corpus_redundancy*`; não altera grafo nem raw. |
+| `python -m semantic_harvester.corpus_chrome --so-distribuicao \| --fracao F [--n 5]` | Sem rede; lê o Turtle, `data/raw/texts/` e a amostra rotulada; grava `output/corpus_chrome_*`. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.

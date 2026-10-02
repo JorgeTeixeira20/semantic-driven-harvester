@@ -332,3 +332,16 @@ representante, similaridade, rótulo), `output/corpus_redundancy_summary.md`
 `output/corpus_redundancy_label_sample.csv` (amostra de pares para rotulagem
 manual). Sem `--limiar`, a Camada 1 fica `pendente_limiar`. Desenho e decisões
 em `docs/experiments.md`.
+
+### Variante (b): remoção do chrome
+
+```bash
+python -m semantic_harvester.corpus_chrome --so-distribuicao      # só a distribuição dos n-gramas
+python -m semantic_harvester.corpus_chrome --fracao F [--n 5]     # avaliação com a fração escolhida
+```
+
+Sem rede e sem alterar grafo, raw ou saídas da variante (a). Considera chrome
+os n-gramas de palavras presentes numa fração alta dos artigos distintos, retira
+as palavras que eles cobrem e recalcula a Jaccard na Camada 1 e nos 60 pares
+rotulados. Escreve `output/corpus_chrome_summary.md` e
+`output/corpus_chrome_label_eval.csv`.
