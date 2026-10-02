@@ -3,7 +3,6 @@ from __future__ import annotations
 import csv
 import json
 import unittest
-from urllib.parse import parse_qs, urlsplit
 
 from semantic_harvester.corpus_entities import load_vocabulary
 from semantic_harvester.wikidata_vocabulary import (
@@ -58,6 +57,8 @@ class CollectAndBuildTests(unittest.TestCase):
                 stint("P4", "2016", None, label="Bruno Fernandes"),
             ],
             "Q2": [
+                stint("P8", "2016", None, label="Luís Miguel Afonso Fernandes"),
+                stint("P8", "2016", None, label="Pizzi", lang="en"),
                 stint("P5", "2015", "2017", label="Bruno Fernandes"),
                 stint("P6", "2017", "2018", label="Rafa", alt="Rafa Silva"),
                 stint("P7", "2017", "2018", label="Rafa Silva"),
@@ -66,7 +67,7 @@ class CollectAndBuildTests(unittest.TestCase):
 
     def test_only_overlapping_stints_with_dates(self) -> None:
         players = collect_players(self.bindings)
-        self.assertEqual(set(players), {"P1", "P4", "P5", "P6", "P7"})
+        self.assertEqual(set(players), {"P1", "P4", "P5", "P6", "P7", "P8"})
         self.assertEqual(players["P1"].clubs, {"Q1"})
 
     def test_vocabulary_rules(self) -> None:
@@ -84,6 +85,8 @@ class CollectAndBuildTests(unittest.TestCase):
         self.assertEqual(rows["Rafa"]["variantes"], "")
         self.assertEqual(stats["variantes_partilhadas_descartadas"], 1)
         self.assertEqual(stats["rotulos_uma_palavra"], 1)
+        # Rótulo noutra língua conta sempre, mesmo com uma só palavra.
+        self.assertEqual(rows["Luís Miguel Afonso Fernandes"]["variantes"], "Pizzi")
         self.assertNotIn("Veterano Antigo", rows)
         self.assertNotIn("Sem Datas", rows)
 

@@ -2052,8 +2052,10 @@ público da Wikidata, um pedido de cada vez, respostas guardadas em bruto em
    (`p:P54`) por um desses clubes cujas datas se sobrepõem ao intervalo
    (início ≤ 2020 e fim ≥ 2015 ou sem fim). Passagens sem nenhuma data ficam
    de fora: não se pode confirmar o período.
-3. Uma linha por rótulo (pt, ou en se faltar); variantes = outros rótulos e
-   nomes alternativos pt/en com 2 ou mais palavras (os de uma palavra, como
+3. Uma linha por rótulo (pt, ou en se faltar); variantes = o rótulo na outra
+   língua (sempre, mesmo de uma palavra: é o nome principal do item, por
+   exemplo "Pizzi" em en para "Luís Miguel Afonso Fernandes" em pt) e nomes
+   alternativos pt/en com 2 ou mais palavras (os de uma palavra, como
    "Ronaldo", são ambíguos e ficam de fora); homónimos (mesmo rótulo em vários
    jogadores) fundidos numa linha com todos os identificadores; variantes
    partilhadas por mais de uma linha descartadas.

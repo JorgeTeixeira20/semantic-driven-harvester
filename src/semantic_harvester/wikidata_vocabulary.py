@@ -16,9 +16,10 @@ Passos (pedidos ao endpoint SPARQL público da Wikidata, um de cada vez):
 
 As respostas são guardadas byte a byte em `data/raw/wikidata/` antes de serem
 interpretadas. O vocabulário (`data/processed/caminho_b_vocabulario_wikidata.csv`)
-tem uma linha por rótulo: rótulo pt (ou en), variantes = outros rótulos e
-nomes alternativos com 2 ou mais palavras (os de uma só palavra, como
-"Ronaldo", ficam de fora por ambiguidade). Homónimos (o mesmo rótulo em vários
+tem uma linha por rótulo: rótulo pt (ou en), variantes = o rótulo noutra
+língua (sempre, mesmo de uma palavra: é o nome principal do item, por exemplo
+"Pizzi") e nomes alternativos com 2 ou mais palavras (os de uma só palavra,
+como "Ronaldo", ficam de fora por ambiguidade). Homónimos (o mesmo rótulo em vários
 jogadores) são fundidos numa linha com todos os identificadores, porque a
 correspondência por string não os distingue; variantes partilhadas por mais
 de uma linha são descartadas.
@@ -177,8 +178,12 @@ def build_vocabulary(
         row = rows.setdefault(key, {"rotulo": label, "qids": set(), "clubs": set(), "variants": set()})
         row["qids"].add(player.qid)
         row["clubs"] |= {club_names.get(c, c) for c in player.clubs}
-        others = set(player.labels.values()) | player.alt_labels
-        for name in others:
+        # Rótulos noutra língua contam sempre (são o nome principal do item, por
+        # exemplo "Pizzi" em en); nomes alternativos só com 2 ou mais palavras.
+        for name in player.labels.values():
+            if name.casefold() != key:
+                row["variants"].add(name)
+        for name in player.alt_labels - set(player.labels.values()):
             if name.casefold() == key:
                 continue
             if len(name.split()) < 2:
