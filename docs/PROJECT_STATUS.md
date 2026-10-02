@@ -134,7 +134,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 87 testes em seis módulos de `tests/`.
+pacote conforme o README. Existem 106 testes em sete módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -148,10 +148,13 @@ retentativa de textos (`test_corpus_text_retry.py`: tentativas com espera cresce
 404 não retentado, retoma por captura) e a anotação de redundância do Caminho D
 (`test_corpus_redundancy.py`: normalização, estratégias último representante e
 consecutiva incluindo a cadeia A≈B, B≈C, A≉C, camadas, grupos de `digest`
-anotados sem remoção, amostra de rotulagem e execução não destrutiva).
+anotados sem remoção, amostra de rotulagem e execução não destrutiva) e a
+remoção do chrome (`test_corpus_chrome.py`: n-gramas partilhados por muitos
+artigos removidos, específicos de um artigo intactos, contagem por artigo,
+separação dos rótulos e execução não destrutiva).
 
-Última validação em **2026-09-24**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **87 testes, todos
+Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
+`.venv/bin/python -m unittest discover -s tests` — **106 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -326,12 +329,18 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    "mesma versão" e 2 "texto alterado" (0,434 e 0,780). Os rótulos não se
    separam por similaridade: há "mesma versão" desde 0,438, e um limiar ≥ 0,80
    (o mínimo que não funde os 2 "texto alterado") deixa de reconhecer 28 dos
-   58 pares iguais; a causa é o chrome no texto completo. **O limiar continua
-   por fixar**; a evidência pesa a favor de reconsiderar antes a remoção do
-   chrome (variante b do desenho), decisão dos autores. Só depois se corre
-   `--limiar X` e se reporta o número de versões textuais distintas. Não
-   implementado nesta iteração: a remoção do chrome (variante b do desenho) e
-   a representação em RDF. Detalhe em `experiments.md`.
+   58 pares iguais; a causa é o chrome no texto completo. **Variante (b),
+   remoção do chrome, implementada e avaliada em 2026-10-02**
+   (`corpus_chrome.py`): n-gramas presentes em ≥ 10% dos artigos distintos
+   (fração escolhida pela distribuição, antes dos rótulos) são retirados. Não
+   separa os rótulos e piora a sobreposição (37 dos 58 pares iguais abaixo de
+   0,80; 34 pares ambíguos entre 0,240 e 0,713), com o mesmo resultado em todas
+   as frações (0,02–0,50) e n (3, 5, 8) testados: o que distingue capturas do
+   mesmo artigo é chrome rotativo (manchetes do dia), raro entre artigos. A
+   amostra rotulada cobre só 34 artigos (um vídeo com 11 dos 60 pares), o que
+   limita a generalização. **O limiar continua por fixar**; os próximos passos
+   são decisão dos autores. Por implementar: a representação em RDF. Detalhe
+   em `experiments.md`.
 4. **B** — povoamento de `EntidadeMencionada`/`Tema` (definidos na ontologia
    desde o início, nunca usados em código). **Decisão de âmbito:** caracterização
    descritiva/quantitativa (contagens, frequências), não uma avaliação formal

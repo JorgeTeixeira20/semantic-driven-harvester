@@ -1327,13 +1327,15 @@ Concluídos: descoberta (Fase 1), profundidade temporal (Fase 2),
 classificação Artigo/redirecionamento (passo 6) e mapeamento RDF. O Caminho D
 (redução de redundância) não foi iniciado.
 
-## Caminho D — redução de redundância entre capturas (implementado; amostra rotulada; limiar por decidir)
+## Caminho D — redução de redundância entre capturas (implementado; amostra rotulada; variante b testada; limiar por decidir)
 
 **Estado em 2026-09-24: desenho validado pelo autor e implementado em
 `src/semantic_harvester/corpus_redundancy.py`; executado sobre o corpus real
 (ver "Implementação e resultado da execução" no fim desta secção). Amostra de
 60 pares rotulada manualmente pelo autor em 2026-10-02 ("Rotulagem manual da
-amostra"); o limiar da Camada 1 continua por fixar.** O texto abaixo
+amostra"); variante (b), remoção do chrome, implementada e avaliada contra esses
+rótulos no mesmo dia, sem separação ("Variante (b): remoção do chrome"); o
+limiar da Camada 1 continua por fixar.** O texto abaixo
 até "Atualização com os textos finais" é a proposta tal como foi escrita,
 mantida como registo; na altura: *nada foi implementado e não foram feitos
 pedidos à API.* As estatísticas abaixo foram
@@ -1777,9 +1779,119 @@ cabe aos autores e não foi tomada aqui.
   consecutivos concentram-se em artigos capturados com muita frequência, o que
   limita o que estes 60 rótulos dizem sobre o corpus.
 
-**Pendente:** fixar o limiar (ou decidir antes a remoção do chrome e repetir
-a distribuição e, se necessário, a rotulagem) e só depois correr
-`--limiar X` e reportar as versões textuais distintas por artigo.
+**Pendente (em 2026-10-02, antes da subsecção seguinte):** fixar o limiar (ou
+decidir antes a remoção do chrome e repetir a distribuição e, se necessário, a
+rotulagem) e só depois correr `--limiar X` e reportar as versões textuais
+distintas por artigo.
+
+### Variante (b): remoção do chrome (2026-10-02)
+
+**Implementação** (`src/semantic_harvester/corpus_chrome.py`; comando no
+README). Ponto 3(b) do desenho, sem marcadores manuais: um n-grama de palavras
+(texto normalizado como na variante a) é **chrome** se aparecer numa fração ≥ `f`
+dos **artigos distintos** com texto e em pelo menos 2 artigos. A frequência é
+contada por artigo, não por captura, para que um artigo muito capturado não
+faça o seu próprio conteúdo passar por chrome (leitura literal de "capturas de
+artigos diferentes"). As palavras cobertas por algum n-grama de chrome são
+retiradas e a medida é a mesma (Jaccard de conjuntos de palavras) sobre o que
+sobra. n = 5 por omissão (trigramas arriscam apanhar expressões comuns do
+próprio texto jornalístico; 8-gramas deixam escapar manchetes curtas), com
+n = 3 e n = 8 como sensibilidade. Não altera o grafo, o raw nem as saídas da
+variante (a) (checksums de `output/corpus_articles.ttl`, `data/raw/texts/` e
+`output/corpus_redundancy*` iguais antes e depois). 19 testes unitários com
+fixtures sintéticas (`tests/test_corpus_chrome.py`).
+
+**Escolha da fração, só pela distribuição e antes de olhar para os rótulos.**
+Primeiro correu-se `--so-distribuicao` (`output/corpus_chrome_summary.md`):
+789 capturas da Camada 1 de 125 artigos, 223 142 5-gramas distintos, dos quais
+166 085 aparecem em 1 artigo e 40 272 em 2. A curva das palavras removidas tem
+um patamar entre ≥ 13 e ≥ 38 artigos (frações 0,10–0,30: 43,2% → 39,2% das
+palavras), sobe depressa abaixo dele (46,0% a ≥ 8 artigos, 54,0% a ≥ 4,
+58,0% a ≥ 3) e cai a pique acima (29,9% a 0,40, 15,5% a 0,50, 3,8% a 0,75).
+Fixou-se **f = 0,10 (≥ 13 artigos)**, o limite inferior do patamar: remove o
+máximo de chrome persistente sem entrar na zona de baixa frequência, onde
+manchetes rotativas e conteúdo partilhado por poucos artigos se misturam.
+Resultado: 1 714 5-gramas de chrome; nenhuma captura fica vazia.
+
+**Resultado real na Camada 1 (texto sem chrome).** Pares consecutivos (664):
+mín. 0,225, p10 0,340, mediana 0,457, p90 0,995, máx. 1,000 (com chrome:
+0,434 / 0,561 / 0,655 / 0,995 / 1,000). Redundantes pela estratégia principal:
+253 a 0,50, 142 a 0,60, 99 a 0,70, 82 a 0,80, 78 a 0,85, 75 a 0,90, 73 a 0,95,
+70 a 0,99, 66 a 1,00 (tabela completa no resumo).
+
+**Teste contra os 60 rótulos manuais (o teste que interessa), texto sem
+chrome, n = 5, f = 0,10** (`output/corpus_chrome_label_eval.csv`):
+
+| Limiar | "mesma versão" abaixo do limiar (de 58) | "texto alterado" acima do limiar (de 2) |
+| ---: | ---: | ---: |
+| 0,50 | 18 | 1 |
+| 0,60 | 27 | 1 |
+| 0,70 | 33 | 1 |
+| 0,80 | 37 | 0 |
+| 0,85 | 40 | 0 |
+| 0,90 | 43 | 0 |
+| 0,95 | 46 | 0 |
+| 0,99 | 48 | 0 |
+| 1,00 | 50 | 0 |
+
+**Os rótulos continuam sem se separar, e a sobreposição aumentou** face ao
+texto com chrome (tabela da subsecção anterior: 28 erros a 0,80, agora 37).
+Mínimo "mesma versão" 0,240; máximo "texto alterado" 0,713. O par 1 (texto
+alterado) desce de 0,434 para 0,228 e fica abaixo de todos os "mesma versão";
+o par 29 (texto alterado) desce de 0,780 para 0,713. **34 pares continuam
+ambíguos**: o par 29 e os 33 pares "mesma versão" com similaridade ≤ 0,713 —
+pares 2 (0,240), 9, 6, 3, 4, 5, 15, 7, 10, 16, 8, 17, 11, 13, 14, 12, 18, 20,
+28, 30, 24, 23, 19, 25, 22, 21, 26, 27, 32, 33, 31, 36 e 40 (0,689), por ordem
+crescente de similaridade (valores por par no CSV). Não se propõe limiar: com
+esta medida nenhum valor separa os rótulos.
+
+Sensibilidade (calculada depois de fixada a fração, só para verificar que a
+conclusão não depende dela; mesma função `evaluate()`):
+
+| n / fração | mín. "mesma versão" | máx. "texto alterado" | pares ambíguos | erros a 0,80 (mesma abaixo / alterado acima) |
+| --- | ---: | ---: | ---: | ---: |
+| 5 / 0,02 | 0,225 | 0,707 | 31 | 34 / 0 |
+| 5 / 0,05 | 0,245 | 0,709 | 35 | 37 / 0 |
+| 5 / 0,10 | 0,240 | 0,713 | 34 | 37 / 0 |
+| 5 / 0,20 | 0,241 | 0,726 | 34 | 37 / 0 |
+| 5 / 0,30 | 0,240 | 0,737 | 34 | 37 / 0 |
+| 5 / 0,50 | 0,331 | 0,772 | 33 | 32 / 0 |
+| 3 / 0,10 | 0,238 | 0,708 | — | — |
+| 8 / 0,10 | 0,239 | 0,714 | — | — |
+
+Nenhuma combinação testada separa os rótulos.
+
+**Porquê (diagnóstico observado).** A remoção apanha o chrome persistente
+(menus, rodapés, blocos fixos de cada época do layout), mas o que difere entre
+duas capturas do mesmo artigo é sobretudo o chrome **rotativo**: manchetes do
+dia, colunistas, números da tabela de clubes. No par 2, quase todos os 5-gramas
+não removidos que contêm palavras exclusivas de A aparecem em 2–4 artigos do
+corpus (340 em 2, 107 em 4): as manchetes de um dia só surgem nos poucos
+artigos capturados nesse dia, e com 125 artigos espalhados por 2017–2019 a
+frequência entre artigos não as distingue do conteúdo próprio. Ao retirar a
+parte estável e comum, a interseção encolhe e as diferenças rotativas ficam,
+pelo que a Jaccard dos pares "mesma versão" desce. A variante (b), tal como
+desenhada, **não resolve** o problema identificado na rotulagem.
+
+**Limitações deste teste.**
+
+- A amostra rotulada **não é representativa de artigos**: 60 pares de só 34
+  artigos distintos; um vídeo (Abel Xavier, Hora Record) contribui sozinho com
+  11 pares e outros 5 artigos com 3 pares cada. Os pares consecutivos
+  concentram-se em artigos capturados com muita frequência. A conclusão
+  "nenhum limiar separa" é robusta dentro da amostra (vale para todas as
+  frações e n testados), mas a amostra limita o quanto se generaliza ao corpus.
+- Só há 2 pares "texto alterado"; os limites do lado "alterado" assentam em
+  dois casos.
+- A frequência por artigo depende do tamanho e da dispersão temporal do corpus;
+  num corpus com muitos artigos capturados nos mesmos dias, o chrome rotativo
+  poderia ganhar frequência suficiente para ser apanhado. Não foi testado.
+
+**Estado do limiar depois disto:** continua **por fixar**. Nem a variante (a)
+nem a (b) separam os 60 rótulos com Jaccard de palavras; escolher um limiar
+agora seria forçado. As opções seguintes (frequência do chrome por proximidade
+temporal das capturas, isolamento do corpo do artigo, ou outra medida) são
+decisões dos autores e não foram tomadas aqui.
 
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 
