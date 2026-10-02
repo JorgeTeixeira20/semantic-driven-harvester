@@ -47,7 +47,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   n-gramas frequentes entre artigos distintos e avaliação contra os 60 pares
   rotulados; sem rede, não altera grafo, raw nem as saídas da variante (a).
 - `corpus_entities.py`: Caminho B — temas pelo `originalURL` e entidades por
-  vocabulário fechado no texto sem chrome; sem rede; proposta por validar.
+  vocabulário fechado no texto sem chrome; sem rede.
+- `wikidata_vocabulary.py`: vocabulário de jogadores do Caminho B a partir da
+  Wikidata (rede: endpoint SPARQL); raw em `data/raw/wikidata/`.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -90,7 +92,8 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
 | `python -m semantic_harvester.corpus_redundancy [--limiar X]` | Sem rede; lê `output/corpus_articles.ttl` e `data/raw/texts/`; grava `output/corpus_redundancy*`; não altera grafo nem raw. |
 | `python -m semantic_harvester.corpus_chrome --so-distribuicao \| --fracao F [--n 5]` | Sem rede; lê o Turtle, `data/raw/texts/` e a amostra rotulada; grava `output/corpus_chrome_*`. |
-| `python -m semantic_harvester.corpus_entities --vocabulario CSV` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`. Não executar antes de decidida a fonte do vocabulário. |
+| `python -m semantic_harvester.corpus_entities --vocabulario CSV` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`. |
+| `python -m semantic_harvester.wikidata_vocabulary` | Rede (28 pedidos SPARQL à Wikidata); grava raw em `data/raw/wikidata/` e `data/processed/caminho_b_vocabulario_wikidata.csv`. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.

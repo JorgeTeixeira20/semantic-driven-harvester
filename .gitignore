@@ -56,6 +56,8 @@ output/*
 !output/corpus_chrome_summary.md
 !output/corpus_chrome_label_eval.csv
 !output/corpus_redundancy_versions.csv
+!output/corpus_entities.csv
+!output/corpus_entities_summary.md
 data/processed/corpus_articles_triples.nt.pre-rebuild
 
 # Metadados do Finder (macOS)

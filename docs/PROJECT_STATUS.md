@@ -135,7 +135,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 136 testes em oito módulos de `tests/`.
+pacote conforme o README. Existem 141 testes em nove módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -155,10 +155,12 @@ artigos removidos, específicos de um artigo intactos, contagem por artigo,
 separação dos rótulos e execução não destrutiva) e os temas/entidades do Caminho B
 (`test_corpus_entities.py`: normalização sem acentos, limites de palavra,
 variantes, chrome do menu removido, persistência entre capturas, temas a
-partir de URLs).
+partir de URLs) e o vocabulário da Wikidata (`test_wikidata_vocabulary.py`:
+sobreposição de datas, regras de variantes e homónimos, respostas guardadas
+em bruto, com sessão simulada).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **136 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **141 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -382,8 +384,19 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    entre capturas (os menus citam os três grandes em todas as páginas).
    Recomendação: temas pelo URL e entidades por lista fechada de fonte
    independente; os 13 termos da Fase 1 só como controlo, por serem
-   circulares. **Por decidir pelo autor: a fonte da lista de atletas/clubes.**
-   Só depois se corre sobre os 789 textos.
+   circulares. **Fonte decidida pelo autor: Wikidata** (plantéis da
+   Primeira Liga 2015–16 a 2019–20; `wikidata_vocabulary.py`): 1 094
+   futebolistas, 1 091 rótulos em
+   `data/processed/caminho_b_vocabulario_wikidata.csv`. **Primeira execução
+   real em 2026-10-02:** temas pelo URL em todos os 127 artigos (clube-secção
+   em 50, modalidade em 71); jogadores no texto em 93 artigos pela regra de
+   persistência (291 pares artigo–jogador, 119 jogadores distintos) e em 118
+   pela regra fraca (1 424 pares). Ressalvas: 163 dos 291 pares vêm de artigos
+   com uma só captura (sem proteção de persistência); 62 de rótulos de uma
+   palavra; a remoção do chrome quase não afeta os jogadores (estão nas
+   manchetes rotativas, não nos menus); cobertura limitada pela Wikidata.
+   Contagens de correspondências, sem avaliação de precisão (decisão de
+   âmbito). Por fazer: representação em RDF (`temTema`/`mencionaEntidade`).
 5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
    **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
    construída cedo (não deixada para o fim) para reduzir o risco de ficar sem

@@ -1961,10 +1961,12 @@ artigos (um vídeo com 11 pares, mais 5 artigos com 3 pares cada) e em apenas
 similaridade semântica (embeddings) ou outra abordagem que isole o conteúdo do
 artigo. Ver `PROJECT_STATUS.md` para as condições.
 
-## Caminho B — povoamento de `Tema` e `EntidadeMencionada` (proposta, por validar)
+## Caminho B — povoamento de `Tema` e `EntidadeMencionada` (fonte decidida; primeira execução real)
 
 **Estado (2026-10-02): fonte do vocabulário decidida pelo autor (Wikidata,
-ver abaixo); scripts implementados e testados com fixtures sintéticas.** Os
+ver abaixo); scripts implementados e testados; vocabulário construído e
+primeira execução real sobre o corpus feita ("Resultado real", no fim desta
+secção).** O texto até "Limitações" é a proposta tal como foi escrita. Os
 únicos números do corpus abaixo vêm da estrutura dos `originalURL` dos 127
 artigos (metadados já versionados em `output/corpus_classification.csv`), não
 de qualquer análise dos textos.
@@ -2122,6 +2124,76 @@ esse nome).
   positivos vindos do chrome; e o texto Premium sem corpo só dá título/lead.
 - Representação em RDF (`mencionaEntidade`/`temTema`, IDs das instâncias)
   fica para uma iteração seguinte, como no Caminho D.
+
+### Resultado real (2026-10-02)
+
+**Vocabulário** (`wikidata_vocabulary`, 28 pedidos à Wikidata: 5 épocas + 23
+clubes; respostas em bruto em `data/raw/wikidata/`, fora do Git): só 2016–17,
+2017–18 e 2019–20 têm participantes (18 clubes cada, 23 distintos). **1 094
+futebolistas** com passagem datada sobreposta a 2015–2020 → **1 091
+rótulos** em `data/processed/caminho_b_vocabulario_wikidata.csv`; 3 rótulos
+com homónimos (por exemplo "Bruno Fernandes", vários jogadores fundidos numa
+linha), 54 rótulos de uma só palavra, 85 nomes alternativos de uma palavra
+descartados, 8 variantes partilhadas descartadas.
+
+Na primeira construção, a regra das 2 palavras descartava também o rótulo
+noutra língua: o "Pizzi" (rótulo en) perdia-se para o rótulo pt "Luís Miguel
+Afonso Fernandes". Corrigido antes da versão usada (o rótulo noutra língua
+conta sempre; a regra das 2 palavras fica só para nomes alternativos).
+Lacunas de cobertura verificadas nas respostas em bruto: alcunhas que só
+existem como nome alternativo de uma palavra ("Rafa", "Charles") não entram;
+há jogadores sem passagem datada nos clubes certos (por exemplo "Xadas", só
+com uma passagem sem datas) ou não ligados a estes clubes ("Zungu", "Ferro").
+
+**Execução** (`corpus_entities --vocabulario
+data/processed/caminho_b_vocabulario_wikidata.csv`, texto sem o chrome
+persistente, f = 0,10; `output/corpus_entities.csv`,
+`output/corpus_entities_summary.md`). Sem rede; checksums do grafo, dos
+textos, do vocabulário e das saídas do Caminho D iguais antes e depois.
+
+*Temas (URL), 127 artigos:* secção em 127 (14 valores); modalidade em 71
+(futebol 59; atletismo, ciclismo, judo e motores 2 cada; outras 1); competição
+em 62 (liga-nos 52; europeu 4; 2.ª liga 2; outras 1); clube-secção em 50
+(sporting 17, benfica 16, fc-porto 5, v--guimaraes 3, boavista, moreirense e
+sp--braga 2 cada, aves, maritimo e portimonense 1).
+
+*Entidades (jogadores no texto), 125 artigos com texto:*
+
+| Medida | Regra fraca (≥ 1 captura) | Regra de persistência (todas as capturas) |
+| --- | ---: | ---: |
+| Pares artigo–jogador | 1 424 | 291 |
+| Artigos com pelo menos um jogador | 118 | 93 |
+| Jogadores distintos | 228 | 119 |
+
+Mais frequentes pela persistência (nº de artigos): João Félix 16, Jonas 16,
+Bruno Fernandes 15, Luisão 11, Bas Dost 11, Bernardo Silva 9, Pepe 7, Pizzi
+(rótulo "Luís Miguel Afonso Fernandes") 7, Renato Sanches 6. 65 dos 119
+jogadores aparecem num só artigo.
+
+**O que os números mostram sobre a deteção.**
+
+- A remoção do chrome persistente quase não muda os jogadores (291 pares pela
+  persistência sem remoção do chrome: 298). Os jogadores não estão nos menus
+  persistentes, estão nas manchetes rotativas; o filtro que pesa é a
+  **persistência entre capturas** (1 424 → 291). A remoção continua necessária
+  para os clubes, que estão nos menus, mas os clubes entram aqui como Tema
+  pelo URL.
+- **163 dos 291 pares** vêm dos 41 artigos com uma só captura com texto, onde a
+  persistência não filtra nada: aí as manchetes do dia contam como menções.
+  Só 128 pares (56 artigos) passaram por um teste de persistência real.
+- 62 dos 291 pares vêm de rótulos de uma só palavra (Jonas 16, Luisão 11,
+  Pepe 7, Moreira 5, …), com maior risco de homonímia ("Moreira" é também um
+  apelido comum).
+- Circularidade residual: João Félix e Bruno Fernandes estavam entre os
+  termos de pesquisa da Fase 1 e somam 31 dos 291 pares (os outros três atletas
+  da Fase 1 não estão no vocabulário: não são jogadores destes plantéis).
+
+**Limitações** (além das da proposta): não há avaliação de precisão (decisão
+de âmbito), por isso estes números são contagens de correspondências, não de
+menções verificadas; o vocabulário depende da completude da Wikidata (épocas
+sem participantes, passagens sem datas, alcunhas); os 41 artigos de uma
+captura não têm proteção contra manchetes. Representação em RDF continua por
+fazer.
 
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 

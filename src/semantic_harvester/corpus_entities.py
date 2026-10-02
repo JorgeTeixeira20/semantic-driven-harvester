@@ -101,16 +101,18 @@ def count_mentions(segments: list[list[str]], terms: list[Term]) -> Counter[str]
     junta as palavras que estavam de um lado e do outro.
     """
 
-    counts: Counter[str] = Counter()
+    # Índice pela primeira palavra: cada texto é percorrido uma só vez.
+    index: dict[str, list[tuple[tuple[str, ...], str]]] = defaultdict(list)
     for term in terms:
-        for segment in segments:
-            for variant in term.variants:
-                size = len(variant)
-                counts[term.rotulo] += sum(
-                    1 for i in range(len(segment) - size + 1)
-                    if tuple(segment[i:i + size]) == variant
-                )
-    return +counts
+        for variant in term.variants:
+            index[variant[0]].append((variant, term.rotulo))
+    counts: Counter[str] = Counter()
+    for segment in segments:
+        for i, word in enumerate(segment):
+            for variant, label in index.get(word, ()):
+                if tuple(segment[i:i + len(variant)]) == variant:
+                    counts[label] += 1
+    return counts
 
 
 def text_segments(
@@ -247,7 +249,7 @@ def write_summary(
     weak_counts = Counter(r["rotulo"] for r in entities)
     strong_counts = Counter(r["rotulo"] for r in strong)
     chrome_text = (
-        f"sem o chrome persistente (5-gramas em ≥ {chrome_fraction:g} dos artigos)"
+        f"sem o chrome persistente (5-gramas em ≥ {chrome_fraction:.2f} dos artigos)".replace(".", ",", 1)
         if chrome_fraction is not None else "completo, **sem** remoção do chrome"
     )
     lines = [
@@ -274,6 +276,10 @@ def write_summary(
         f"capturas com texto): {len({r['artigo'] for r in strong})}",
         f"- Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): "
         f"{len({r['artigo'] for r in entities})}",
+        f"- Pares artigo–entidade: {len(entities)} pela regra fraca, {len(strong)} pela "
+        f"regra de persistência; destes, {sum(r['uma_so_captura'] == 'True' for r in strong)} "
+        "são de artigos com uma só captura com texto, onde a persistência não "
+        "filtra nada.",
         "",
         "| Entidade | Artigos (persistência) | Artigos (≥ 1 captura) |",
         "| --- | ---: | ---: |",

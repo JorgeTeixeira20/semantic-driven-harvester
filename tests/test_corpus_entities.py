@@ -211,6 +211,8 @@ class RunOnSyntheticCorpusTests(OfflineTestCase):
             self.assertEqual(len(list(csv.DictReader(h))), len(rows))
         summary = (self.root / "output" / "corpus_entities_summary.md").read_text("utf-8")
         self.assertIn("| Telma Monteiro | 1 | 1 |", summary)
+        self.assertIn("1 pela regra de persistência; destes, 0 são de artigos com uma só", summary)
+        self.assertIn("≥ 0,50 dos artigos", summary)
 
     def test_without_chrome_removal_menu_club_is_found_everywhere(self) -> None:
         vocab = self._write()
