@@ -20,6 +20,8 @@ data/raw/api_diagnostics_site_volume/*
 !data/raw/api_diagnostics_site_volume/.gitkeep
 data/raw/corpus_queries/*
 !data/raw/corpus_queries/.gitkeep
+data/raw/wikidata/*
+!data/raw/wikidata/.gitkeep
 data/processed/corpus_articles_triples.nt
 output/*
 !output/.gitkeep

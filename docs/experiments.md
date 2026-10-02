@@ -1963,8 +1963,8 @@ artigo. Ver `PROJECT_STATUS.md` para as condições.
 
 ## Caminho B — povoamento de `Tema` e `EntidadeMencionada` (proposta, por validar)
 
-**Estado (2026-10-02): proposta para validação do autor; script implementado e
-testado só com fixtures sintéticas, não executado sobre os textos reais.** Os
+**Estado (2026-10-02): fonte do vocabulário decidida pelo autor (Wikidata,
+ver abaixo); scripts implementados e testados com fixtures sintéticas.** Os
 únicos números do corpus abaixo vêm da estrutura dos `originalURL` dos 127
 artigos (metadados já versionados em `output/corpus_classification.csv`), não
 de qualquer análise dos textos.
@@ -2032,6 +2032,39 @@ que o artigo é, segundo o próprio jornal); Entidades por lista fechada de
 fonte independente dos termos de pesquisa; os 13 termos da Fase 1, se forem
 usados, reportados à parte e nunca somados. **Decisão pedida ao autor:** a
 fonte da lista de atletas/clubes para as Entidades.
+
+### Decisão do autor sobre a fonte (2026-10-02) e construção do vocabulário
+
+**Decidido:** opção (b) com a lista de entidades a partir da **Wikidata** —
+jogadores dos plantéis dos clubes da Primeira Liga (Liga NOS) nas épocas
+2015–16 a 2019–20. Na prática, o vocabulário fechado de entidades é só de
+**jogadores**; os clubes entram como Tema pelo URL.
+
+Construção (`src/semantic_harvester/wikidata_vocabulary.py`, endpoint SPARQL
+público da Wikidata, um pedido de cada vez, respostas guardadas em bruto em
+`data/raw/wikidata/`, vocabulário em
+`data/processed/caminho_b_vocabulario_wikidata.csv`):
+
+1. Clubes = participantes (`wdt:P1923`) dos itens de época 2015–16 a 2019–20,
+   uma consulta por época (com `VALUES`, o endpoint devolveu clubes de todas
+   as épocas existentes, observado na exploração).
+2. Jogadores = futebolistas (`wdt:P106 wd:Q937857`) com uma passagem
+   (`p:P54`) por um desses clubes cujas datas se sobrepõem ao intervalo
+   (início ≤ 2020 e fim ≥ 2015 ou sem fim). Passagens sem nenhuma data ficam
+   de fora: não se pode confirmar o período.
+3. Uma linha por rótulo (pt, ou en se faltar); variantes = outros rótulos e
+   nomes alternativos pt/en com 2 ou mais palavras (os de uma palavra, como
+   "Ronaldo", são ambíguos e ficam de fora); homónimos (mesmo rótulo em vários
+   jogadores) fundidos numa linha com todos os identificadores; variantes
+   partilhadas por mais de uma linha descartadas.
+
+Observado na exploração (consultas de leitura, antes do script), a confirmar
+na execução: só 3 das 5 épocas (2016–17, 2017–18, 2019–20) têm participantes
+na Wikidata, 18 clubes cada, 23 clubes distintos; clubes que só jogaram em
+2015–16 ou 2018–19 (por exemplo, Académica e União da Madeira) ficam de fora.
+Na mesma exploração, homónimos e rótulos que não são o nome usado na
+imprensa já apareceram (vários "Bruno Fernandes"; "Pizzi" sem rótulo pt com
+esse nome).
 
 ### Estratégia de deteção (sem NER)
 
