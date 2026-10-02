@@ -1327,15 +1327,16 @@ Concluídos: descoberta (Fase 1), profundidade temporal (Fase 2),
 classificação Artigo/redirecionamento (passo 6) e mapeamento RDF. O Caminho D
 (redução de redundância) não foi iniciado.
 
-## Caminho D — redução de redundância entre capturas (implementado; amostra rotulada; variante b testada; limiar por decidir)
+## Caminho D — redução de redundância entre capturas (concluído: variante a, limiar 0,80)
 
 **Estado em 2026-09-24: desenho validado pelo autor e implementado em
 `src/semantic_harvester/corpus_redundancy.py`; executado sobre o corpus real
 (ver "Implementação e resultado da execução" no fim desta secção). Amostra de
 60 pares rotulada manualmente pelo autor em 2026-10-02 ("Rotulagem manual da
 amostra"); variante (b), remoção do chrome, implementada e avaliada contra esses
-rótulos no mesmo dia, sem separação ("Variante (b): remoção do chrome"); o
-limiar da Camada 1 continua por fixar.** O texto abaixo
+rótulos no mesmo dia, sem separação ("Variante (b): remoção do chrome").
+Caminho D fechado em 2026-10-02 com a variante (a) e limiar 0,80, por decisão
+dos autores ("Fecho do Caminho D").** O texto abaixo
 até "Atualização com os textos finais" é a proposta tal como foi escrita,
 mantida como registo; na altura: *nada foi implementado e não foram feitos
 pedidos à API.* As estatísticas abaixo foram
@@ -1887,11 +1888,78 @@ desenhada, **não resolve** o problema identificado na rotulagem.
   num corpus com muitos artigos capturados nos mesmos dias, o chrome rotativo
   poderia ganhar frequência suficiente para ser apanhado. Não foi testado.
 
-**Estado do limiar depois disto:** continua **por fixar**. Nem a variante (a)
+**Estado do limiar depois disto (2026-10-02, antes do fecho):** continua **por fixar**. Nem a variante (a)
 nem a (b) separam os 60 rótulos com Jaccard de palavras; escolher um limiar
 agora seria forçado. As opções seguintes (frequência do chrome por proximidade
 temporal das capturas, isolamento do corpo do artigo, ou outra medida) são
 decisões dos autores e não foram tomadas aqui.
+
+### Fecho do Caminho D: variante (a) com limiar 0,80 (2026-10-02)
+
+**Decisão (dos autores):** fechar o Caminho D com a **variante (a)** (texto
+completo, com chrome) e **limiar 0,80**. A variante (b) fica documentada como
+testada e **não adotada**: não separou os rótulos e piorou a sobreposição
+(subsecção anterior).
+
+**Critério de escolha do limiar.** É uma escolha **pragmática, não uma
+calibração limpa**: nem a variante (a) nem a (b) separam os 60 rótulos
+manuais com nenhum limiar, em nenhuma das configurações de Jaccard de palavras
+testadas (texto completo; texto sem chrome com frações 0,02–0,50 e n = 3, 5, 8).
+Entre os limiares da grelha, 0,80 é o menor que não classifica como igual
+nenhum dos pares rotulados "texto alterado". Contra os rótulos, com a
+variante (a):
+
+- **0 de 2** "texto alterado" ficam com similaridade ≥ 0,80. O erro grave
+  (fundir numa só versão textos realmente alterados) é evitado na amostra.
+- **28 de 58** "mesma versão" ficam abaixo de 0,80 e são marcados como
+  versões distintas. É um **erro conservador**, aceite porque o Caminho D é só
+  uma anotação não destrutiva: não apaga capturas do grafo nem do raw, só
+  aumenta o número de "versões distintas".
+
+**Execução real** (`python -m semantic_harvester.corpus_redundancy --limiar
+0.80`; `output/corpus_redundancy.csv`, sem `pendente_limiar`;
+`output/corpus_redundancy_summary.md`; novo
+`output/corpus_redundancy_versions.csv` com as versões por artigo). Os
+checksums do grafo, dos textos, da amostra rotulada e das saídas da variante
+(b) ficaram iguais. Antes de correr, corrigiu-se um defeito: `run()`
+reescrevia sempre a amostra de rotulagem e teria apagado os rótulos manuais;
+agora uma amostra rotulada nunca é reescrita (coberto por teste).
+
+| Camada / rótulo | Capturas |
+| --- | ---: |
+| Camada 1 — representante (versão textual distinta) | 665 |
+| Camada 1 — redundante | 124 |
+| Camada 2 — mantida sem texto | 136 |
+| Camada 2 — candidata por `digest` (não verificada) | 14 |
+| Não avaliáveis | 2 |
+| Total | 941 |
+
+**Versões textuais distintas:** 665 em 789 capturas da Camada 1 de 125
+artigos (2 artigos sem texto não avaliáveis). Por artigo: 55 com 1 versão, 21
+com 2, 28 com 3–5, 7 com 6–10, 14 com ≥ 11. Dos 84 artigos com 2 ou mais
+capturas com texto, 14 ficam com uma única versão.
+
+**Limitação conhecida, visível no resultado.** O erro conservador concentra-se
+nos artigos muito capturados, onde o chrome muda de captura para captura:
+
+| Capturas da Camada 1 por artigo | Artigos | Capturas | Versões distintas | Artigos com todas as capturas como versões |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 41 | 41 | 41 (100%) | 41 |
+| 2–5 | 56 | 165 | 140 (84,8%) | 34 |
+| 6–20 | 17 | 159 | 115 (72,3%) | 8 |
+| ≥ 21 | 11 | 424 | 369 (87,0%) | 8 |
+
+Por exemplo, o vídeo `…/zungu-aproveitou-distracao-da-defesa-do-benfica-para-marcar.html`
+fica com 71 versões em 71 capturas, embora os seus 3 pares na amostra tenham
+sido rotulados "mesma versão" com o corpo idêntico. As 665 "versões
+distintas" são por isso um **limite superior** das versões textuais reais, não
+uma contagem exata. A validação assenta numa amostra de 60 pares de só 34
+artigos (um vídeo com 11 pares, mais 5 artigos com 3 pares cada) e em apenas
+2 pares "texto alterado"; não é representativa do corpus.
+
+**Trabalho futuro (decisão em aberto, não tomada):** avaliar uma medida de
+similaridade semântica (embeddings) ou outra abordagem que isole o conteúdo do
+artigo. Ver `PROJECT_STATUS.md` para as condições.
 
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 

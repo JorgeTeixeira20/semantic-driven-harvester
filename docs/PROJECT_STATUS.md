@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-10-02** (Caminho D), a partir do código, testes,
+Atualizado em **2026-10-02** (fecho do Caminho D), a partir do código, testes,
 documentação e histórico; a última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
@@ -134,7 +134,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 106 testes em sete módulos de `tests/`.
+pacote conforme o README. Existem 113 testes em sete módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -154,7 +154,7 @@ artigos removidos, específicos de um artigo intactos, contagem por artigo,
 separação dos rótulos e execução não destrutiva).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **106 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **113 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -304,7 +304,7 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    `texts_reused` do relatório perdem a divisão histórica (todos "reutilizados").
    Detalhe em `experiments.md`.
 
-   O Caminho D foi implementado e executado em 2026-09-24 (passo 3 abaixo).
+   O Caminho D foi concluído em 2026-10-02 (passo 3 abaixo).
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com
@@ -313,7 +313,30 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    sofisticada (ex.: embeddings) fica como trabalho futuro, condicional a
    tempo disponível.
 
-   **Implementado e executado em 2026-09-24, limiar pendente.**
+   **Concluído em 2026-10-02: variante (a) (texto completo, com chrome) com
+   limiar 0,80**, decisão dos autores. `output/corpus_redundancy.csv` final
+   (sem `pendente_limiar`): das 789 capturas da Camada 1 de 125 artigos, **665
+   versões textuais distintas** e 124 redundantes; Camada 2 com 150 capturas
+   (14 candidatas por `digest`, não verificadas) e 2 não avaliáveis; versões
+   por artigo em `output/corpus_redundancy_versions.csv`. **Escolha
+   pragmática, não calibração limpa:** nem a variante (a) nem a (b) separam os
+   60 rótulos manuais com nenhum limiar de Jaccard de palavras testado. A
+   0,80, nenhum dos 2 "texto alterado" fica classificado como igual (erro grave
+   evitado na amostra), mas 28 dos 58 "mesma versão" ficam como versões
+   distintas (erro conservador, aceite porque D é anotação não destrutiva).
+   Esse erro concentra-se nos artigos muito capturados (por exemplo, um vídeo
+   com 71 versões em 71 capturas), pelo que 665 é um limite superior. A
+   variante (b) (remoção do chrome) fica testada e não adotada. Amostra de
+   validação limitada: 34 artigos, um vídeo com 11 dos 60 pares, 2 pares
+   "texto alterado".
+
+   **Decisão em aberto (não tomada):** avaliar um modelo de similaridade
+   semântica (embeddings) é trabalho futuro, condicional a (a) sobrar tempo
+   depois do Caminho B e do protótipo de navegação e (b) confirmação do
+   orientador de que o resultado atual não chega — ainda por validar em
+   reunião.
+
+   **Histórico (2026-09-24 a 2026-10-02, antes do fecho).**
    `src/semantic_harvester/corpus_redundancy.py` aplica o desenho de
    `experiments.md` sem alterar o grafo nem o raw (checksums iguais antes e
    depois): Camada 1 (texto e `statusCode` 200) compara cada captura com o
@@ -338,9 +361,8 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    as frações (0,02–0,50) e n (3, 5, 8) testados: o que distingue capturas do
    mesmo artigo é chrome rotativo (manchetes do dia), raro entre artigos. A
    amostra rotulada cobre só 34 artigos (um vídeo com 11 dos 60 pares), o que
-   limita a generalização. **O limiar continua por fixar**; os próximos passos
-   são decisão dos autores. Por implementar: a representação em RDF. Detalhe
-   em `experiments.md`.
+   limita a generalização. Por implementar: a representação em RDF da
+   anotação. Detalhe em `experiments.md`.
 4. **B** — povoamento de `EntidadeMencionada`/`Tema` (definidos na ontologia
    desde o início, nunca usados em código). **Decisão de âmbito:** caracterização
    descritiva/quantitativa (contagens, frequências), não uma avaliação formal

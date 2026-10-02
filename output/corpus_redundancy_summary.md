@@ -2,7 +2,15 @@
 
 Execução real, sem pedidos à API, sobre `output/corpus_articles.ttl` e os textos em `data/raw/texts/`. Nada foi removido do grafo nem do raw: o resultado é uma anotação por captura em `output/corpus_redundancy.csv`. Similaridade: Jaccard de conjuntos de palavras (`\w+`) do texto normalizado (NFC, minúsculas, espaços), sem remover o chrome do site.
 
-**Limiar: não fixado, pendente de rotulagem manual.** As capturas da Camada 1 que dependem do limiar estão marcadas `pendente_limiar` no CSV; a tabela de sensibilidade abaixo mostra o efeito de cada limiar candidato. Depois da rotulagem, `--limiar X` preenche o CSV.
+**Limiar aplicado no CSV: 0,800.**
+
+## Limiar e validação contra a amostra rotulada
+
+Contra os 60 pares rotulados manualmente em `output/corpus_redundancy_label_sample.csv`, com este limiar:
+
+- "texto alterado" com similaridade ≥ limiar (seriam tratados como a mesma versão — erro grave): **0 de 2**.
+- "mesma versão" com similaridade < limiar (ficam como versões distintas — erro conservador): **28 de 58**. A anotação é não destrutiva: este erro não apaga nada, só aumenta o número de "versões distintas".
+- Limiares da grelha que separam os rótulos sem erros: **nenhum**. O limiar é uma escolha pragmática dos autores, não uma calibração limpa; critério e limitações em `docs/experiments.md`.
 
 ## Estrutura do corpus
 
@@ -73,9 +81,23 @@ Redundantes = capturas com similaridade ≥ limiar face ao termo de comparação
 | 0,990 | 70 | 70 | 719 | 719 | 0 | 12 |
 | 1,000 | 64 | 64 | 725 | 725 | 0 | 12 |
 
+## Versões textuais distintas por artigo (Camada 1)
+
+- Artigos com texto: 125; capturas da Camada 1: 789; versões textuais distintas: **665**; capturas redundantes: 124.
+- Detalhe por artigo em `output/corpus_redundancy_versions.csv`.
+
+| Versões distintas | Artigos |
+| --- | ---: |
+| 1 | 55 |
+| 2 | 21 |
+| 3–5 | 28 |
+| 6–10 | 7 |
+| ≥ 11 | 14 |
+| Artigos sem texto (não avaliáveis) | 2 |
+
 ## Amostra para rotulagem manual
 
-`output/corpus_redundancy_label_sample.csv`: pares consecutivos com texto, até 20 por faixa (semente 0), repartidos em rotação pelas sub-faixas de 0,05 (1,0 exato numa sub-faixa própria). As faixas servem só para espalhar a amostra; não são limiares propostos. Colunas `rotulo_manual` ("mesma versão" / "texto alterado") e `notas` por preencher.
+`output/corpus_redundancy_label_sample.csv`: pares consecutivos com texto, até 20 por faixa (semente 0), repartidos em rotação pelas sub-faixas de 0,05 (1,0 exato numa sub-faixa própria). As faixas servem só para espalhar a amostra; não são limiares propostos. Já rotulada manualmente (colunas `rotulo_manual` e `notas`); não é reescrita por novas execuções.
 
 | Faixa | Intervalo | Pares na amostra | Pares disponíveis |
 | --- | --- | ---: | ---: |
