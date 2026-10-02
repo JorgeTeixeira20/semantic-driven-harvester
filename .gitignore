@@ -52,3 +52,6 @@ output/*
 !output/corpus_redundancy_summary.md
 !output/corpus_redundancy_label_sample.csv
 data/processed/corpus_articles_triples.nt.pre-rebuild
+
+# Metadados do Finder (macOS)
+.DS_Store
