@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-09-24** (Caminho D), a partir do código, testes,
+Atualizado em **2026-10-02** (Caminho D), a partir do código, testes,
 documentação e histórico; a última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
@@ -321,9 +321,14 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    Camada 2, 2 não avaliáveis**; 664 pares consecutivos (mediana 0,655); na
    tabela de sensibilidade, 64 redundantes a 1,00, 81 a 0,90, 124 a 0,80 e
    210 a 0,70 (estratégia principal, em 789); Camada 2 com 9 grupos/14
-   candidatas não verificadas e 0 grupos mistos. **O limiar não foi fixado:
-   fica pendente da rotulagem manual, pelos autores, dos 60 pares de
-   `output/corpus_redundancy_label_sample.csv`**; só depois se corre
+   candidatas não verificadas e 0 grupos mistos. **Rotulagem manual feita em
+   2026-10-02** (60 pares de `output/corpus_redundancy_label_sample.csv`): 58
+   "mesma versão" e 2 "texto alterado" (0,434 e 0,780). Os rótulos não se
+   separam por similaridade: há "mesma versão" desde 0,438, e um limiar ≥ 0,80
+   (o mínimo que não funde os 2 "texto alterado") deixa de reconhecer 28 dos
+   58 pares iguais; a causa é o chrome no texto completo. **O limiar continua
+   por fixar**; a evidência pesa a favor de reconsiderar antes a remoção do
+   chrome (variante b do desenho), decisão dos autores. Só depois se corre
    `--limiar X` e se reporta o número de versões textuais distintas. Não
    implementado nesta iteração: a remoção do chrome (variante b do desenho) e
    a representação em RDF. Detalhe em `experiments.md`.

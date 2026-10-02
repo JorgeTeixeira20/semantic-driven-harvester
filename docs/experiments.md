@@ -1327,12 +1327,13 @@ Concluídos: descoberta (Fase 1), profundidade temporal (Fase 2),
 classificação Artigo/redirecionamento (passo 6) e mapeamento RDF. O Caminho D
 (redução de redundância) não foi iniciado.
 
-## Caminho D — redução de redundância entre capturas (implementado; limiar pendente de rotulagem manual)
+## Caminho D — redução de redundância entre capturas (implementado; amostra rotulada; limiar por decidir)
 
 **Estado em 2026-09-24: desenho validado pelo autor e implementado em
 `src/semantic_harvester/corpus_redundancy.py`; executado sobre o corpus real
-(ver "Implementação e resultado da execução" no fim desta secção). O limiar
-da Camada 1 continua por fixar, pendente de rotulagem manual.** O texto abaixo
+(ver "Implementação e resultado da execução" no fim desta secção). Amostra de
+60 pares rotulada manualmente pelo autor em 2026-10-02 ("Rotulagem manual da
+amostra"); o limiar da Camada 1 continua por fixar.** O texto abaixo
 até "Atualização com os textos finais" é a proposta tal como foi escrita,
 mantida como registo; na altura: *nada foi implementado e não foram feitos
 pedidos à API.* As estatísticas abaixo foram
@@ -1688,12 +1689,97 @@ tem um `contentLength` diferente de todas as capturas com texto com o mesmo
 `digest`. É mais um indício de que `digest` igual não implica resposta
 idêntica neste corpus.
 
-**Pendente:** o limiar da Camada 1 **não foi fixado** e fica pendente da
+**Pendente (em 2026-09-24; a rotulagem foi feita depois, ver a subsecção
+seguinte):** o limiar da Camada 1 **não foi fixado** e fica pendente da
 rotulagem manual da amostra de 60 pares (20 por faixa) pelos autores. Só
 depois se corre `--limiar X` e se reportam versões textuais distintas por
 artigo como resultado de D; até lá, os números acima são uma tabela de
 sensibilidade, não o resultado da redução. Representação em RDF continua
 fora desta iteração (decisão 2).
+
+### Rotulagem manual da amostra (2026-10-02)
+
+**Método.** O autor rotulou os 60 pares de
+`output/corpus_redundancy_label_sample.csv` um a um ("mesma versão" / "texto
+alterado", colunas `rotulo_manual` e `notas`, versionadas no commit
+`e9de48c`). Para cada par foram mostradas a similaridade e as palavras só em
+A / só em B e, a pedido ou como apoio, o texto completo ou o corpo do artigo
+isolado de A e B com as diferenças palavra a palavra. Essa extração do corpo
+foi feita com um script ad hoc não versionado (heurística por título e
+marcadores de fim como "Mais notícias", "O Record recomenda para si", "Mais
+Fotos"), verificada à mão nos primeiros pares; serviu só de apoio à leitura,
+a decisão foi sempre do autor. Critério seguido, coerente com as Limitações
+acima: "mesma versão" quando o conteúdo do artigo no texto extraído é o mesmo,
+mesmo que o chrome mude.
+
+**Resultado.**
+
+| Faixa | mesma versão | texto alterado |
+| --- | ---: | ---: |
+| baixa [0; 0,70) | 19 | 1 |
+| média [0,70; 0,90) | 19 | 1 |
+| alta [0,90; 1] | 20 | 0 |
+| Total | 58 | 2 |
+
+Os dois "texto alterado": par 1 (0,434), em que a captura posterior não
+contém o artigo, só menus e manchetes; par 29 (0,780), página de jogo em
+direto (`…/fc-porto-chelsea-final-da-uefa-youth-league-em-direto`) capturada
+ao intervalo e depois do fim, com título, abertura e relato reescritos. Nos
+58 "mesma versão", o corpo do artigo era idêntico (ou só diferia num contador
+de visualizações, num marcador "PUB" ou na posição das etiquetas "Temas") e as
+diferenças estavam no chrome: data do dia, menus, colunistas, manchetes e
+blocos "Mais notícias"/"Mais Fotos"/"Mais Hora Record". 7 dos 60 pares eram
+textos iguais byte a byte (todos com similaridade 1,0).
+
+**Consequência para o limiar (descritiva; o limiar não foi fixado).** Contra
+estes rótulos, com a medida atual (texto completo com chrome):
+
+| Limiar | "mesma versão" abaixo do limiar (de 58) | "texto alterado" acima do limiar (de 2) |
+| ---: | ---: | ---: |
+| 0,50 | 5 | 1 |
+| 0,60 | 13 | 1 |
+| 0,70 | 19 | 1 |
+| 0,80 | 28 | 0 |
+| 0,85 | 33 | 0 |
+| 0,90 | 38 | 0 |
+| 0,95 | 43 | 0 |
+| 0,99 | 48 | 0 |
+| 1,00 | 51 | 0 |
+
+Os rótulos **não se separam por similaridade**: há "mesma versão" desde 0,438
+(par 2), praticamente ao nível do "texto alterado" mais baixo (0,434), e o
+"texto alterado" do par 29 (0,780) fica acima de 19 pares "mesma versão".
+Nenhum limiar acerta nos 60: os que evitam fundir os 2 "texto alterado"
+(≥ 0,80) deixam de reconhecer pelo menos 28 dos 58 pares "mesma versão". A
+causa observada é a que a exploração antecipava: a similaridade sobre o texto
+completo é dominada pelo chrome, que varia de captura para captura mesmo
+quando o artigo não muda. Isto é evidência a favor de reconsiderar a variante
+(b) do ponto 3 do desenho (remover o chrome) antes de fixar o limiar; a decisão
+cabe aos autores e não foi tomada aqui.
+
+**Observações registadas nas notas** (não quantificadas no corpus inteiro):
+
+- 7 pares de artigos **Premium** (3 artigos distintos) sem corpo: as capturas
+  só têm título, subtítulo/primeiro parágrafo e o aviso de acesso pago; foram
+  rotulados "mesma versão" pelo conteúdo visível, mas o corpo nunca pode ser
+  comparado.
+- 2 pares da página `https://www.record.pt/jogos-em-direto/live/78799`, que
+  no texto extraído é só título e menu: não é um artigo. É um caso concreto da
+  limitação já registada da classificação (páginas `/jogos-em-direto/` não
+  cobertas pela regra).
+- 3 pares cujo conteúdo não é de futebol/desporto, segundo o autor (Record
+  Auto, running/equipamento, Record Gaming); um quarto é de ciclismo.
+- 1 par (31, fotogaleria) em que o autor indicou que a foto muda; o texto
+  extraído não inclui imagens e é idêntico, por isso foi rotulado "mesma
+  versão" com essa nota.
+- A amostra cobre só 34 artigos distintos: um vídeo (Abel Xavier, Hora Record)
+  aparece em 11 dos 60 pares, e outros 5 artigos em 3 pares cada. Os pares
+  consecutivos concentram-se em artigos capturados com muita frequência, o que
+  limita o que estes 60 rótulos dizem sobre o corpus.
+
+**Pendente:** fixar o limiar (ou decidir antes a remoção do chrome e repetir
+a distribuição e, se necessário, a rotulagem) e só depois correr
+`--limiar X` e reportar as versões textuais distintas por artigo.
 
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 
