@@ -40,9 +40,10 @@ O pacote [src/semantic_harvester/](../src/semantic_harvester/) contém:
 O fluxo é API → raw local → manifesto/metadados → Turtle. A
 [ontologia](../ontology/semantic_harvester.ttl) define as classes e propriedades;
 `Artigo → RecursoWeb → CapturaArquivada → TextoExtraido` resume as relações principais.
-A redução de redundância entre capturas (Caminho D) está implementada como
-anotação por similaridade textual em `corpus_redundancy.py`, com limiar ainda
-por calibrar. Não estão implementados NER, deduplicação semântica, base de dados,
+A redução de redundância entre capturas (Caminho D) está concluída como
+anotação por similaridade textual em `corpus_redundancy.py`, com limiar 0,80
+(escolha pragmática; ver "Trabalho em aberto"). Não estão implementados NER,
+deduplicação semântica, base de dados,
 frontend ou LLMs. Há parâmetros de deduplicação enviados à API; isso não é uma
 implementação local de deduplicação. `EntidadeMencionada` e `Tema` existem no
 vocabulário, mas não há pipeline de extração/enriquecimento correspondente.
@@ -134,7 +135,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 113 testes em sete módulos de `tests/`.
+pacote conforme o README. Existem 136 testes em oito módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -151,10 +152,13 @@ consecutiva incluindo a cadeia A≈B, B≈C, A≉C, camadas, grupos de `digest`
 anotados sem remoção, amostra de rotulagem e execução não destrutiva) e a
 remoção do chrome (`test_corpus_chrome.py`: n-gramas partilhados por muitos
 artigos removidos, específicos de um artigo intactos, contagem por artigo,
-separação dos rótulos e execução não destrutiva).
+separação dos rótulos e execução não destrutiva) e os temas/entidades do Caminho B
+(`test_corpus_entities.py`: normalização sem acentos, limites de palavra,
+variantes, chrome do menu removido, persistência entre capturas, temas a
+partir de URLs).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **113 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **136 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -368,6 +372,18 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    descritiva/quantitativa (contagens, frequências), não uma avaliação formal
    de precisão do reconhecimento; a considerar um vocabulário fechado
    (clubes/competições/jogadores) em vez de um NER genérico em português.
+
+   **Proposta escrita e script testado em 2026-10-02, não executado sobre o
+   corpus** (secção "Caminho B" em `experiments.md`;
+   `src/semantic_harvester/corpus_entities.py`). Tema = classificação
+   editorial a partir do `originalURL` (secção, modalidade, competição,
+   clube-secção); EntidadeMencionada = nome de um vocabulário fechado que ocorre
+   no texto, procurado sem o chrome persistente e com regra de persistência
+   entre capturas (os menus citam os três grandes em todas as páginas).
+   Recomendação: temas pelo URL e entidades por lista fechada de fonte
+   independente; os 13 termos da Fase 1 só como controlo, por serem
+   circulares. **Por decidir pelo autor: a fonte da lista de atletas/clubes.**
+   Só depois se corre sobre os 789 textos.
 5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
    **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
    construída cedo (não deixada para o fim) para reduzir o risco de ficar sem

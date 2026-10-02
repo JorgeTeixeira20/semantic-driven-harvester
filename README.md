@@ -345,3 +345,17 @@ os n-gramas de palavras presentes numa fração alta dos artigos distintos, reti
 as palavras que eles cobrem e recalcula a Jaccard na Camada 1 e nos 60 pares
 rotulados. Escreve `output/corpus_chrome_summary.md` e
 `output/corpus_chrome_label_eval.csv`.
+
+## Caminho B — temas e entidades mencionadas (proposta por validar)
+
+```bash
+python -m semantic_harvester.corpus_entities --vocabulario CAMINHO.csv [--fracao-chrome 0.10 | --sem-remocao-chrome]
+```
+
+Sem rede e sem alterar grafo nem raw. Temas a partir do `originalURL`
+(secção, modalidade, competição, clube) e entidades por correspondência exata
+de um vocabulário fechado (CSV `tipo,categoria,rotulo,variantes`) no texto sem o
+chrome persistente, com regra de persistência entre capturas. Escreve
+`output/corpus_entities.csv` e `output/corpus_entities_summary.md`. Ainda não
+executado sobre o corpus real: a fonte do vocabulário está por decidir
+(`docs/experiments.md`).

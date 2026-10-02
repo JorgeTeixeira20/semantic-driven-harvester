@@ -1961,6 +1961,133 @@ artigos (um vídeo com 11 pares, mais 5 artigos com 3 pares cada) e em apenas
 similaridade semântica (embeddings) ou outra abordagem que isole o conteúdo do
 artigo. Ver `PROJECT_STATUS.md` para as condições.
 
+## Caminho B — povoamento de `Tema` e `EntidadeMencionada` (proposta, por validar)
+
+**Estado (2026-10-02): proposta para validação do autor; script implementado e
+testado só com fixtures sintéticas, não executado sobre os textos reais.** Os
+únicos números do corpus abaixo vêm da estrutura dos `originalURL` dos 127
+artigos (metadados já versionados em `output/corpus_classification.csv`), não
+de qualquer análise dos textos.
+
+### Decisões já tomadas (PROJECT_STATUS.md)
+
+Vocabulário fechado (clubes/competições/jogadores) em vez de NER genérico;
+caracterização descritiva/quantitativa (contagens, frequências), não avaliação
+formal de precisão. Esta proposta não reabre essas decisões; decide a fonte do
+vocabulário, a fronteira Tema/Entidade e a forma de detetar.
+
+### O que a ontologia fixa
+
+`sdh:temTema` (Artigo → Tema) e `sdh:mencionaEntidade` (Artigo →
+EntidadeMencionada) têm ambas **domínio `Artigo`**: a anotação é por artigo,
+não por captura nem por texto extraído. As classes só têm `rdfs:label`, sem
+definição; a distinção abaixo apoia-se nos nomes das propriedades.
+
+### Distinção Tema vs. EntidadeMencionada (proposta)
+
+- **Tema** = classificação **editorial** do artigo: aquilo de que o artigo
+  trata, tal como o próprio Record o arquiva — modalidade, competição e
+  clube-secção. "Tem tema" não exige que a palavra apareça no texto.
+- **EntidadeMencionada** = nome próprio que **ocorre no texto** do artigo
+  ("menciona"): atletas e clubes (e, se o vocabulário os incluir, outras
+  pessoas/organizações).
+- Consequência: o mesmo clube pode ser as duas coisas (o artigo está na secção
+  do Sporting → Tema "Sporting"; o texto cita o Benfica → Entidade "Benfica").
+  A modalidade é sempre Tema; um atleta é sempre Entidade.
+
+### Fonte do vocabulário fechado — opções
+
+**(a) Reutilizar os 13 termos da Fase 1** (4 modalidades, Benfica/Sporting/
+Porto/SC Braga, 5 atletas; "Facetas e termos").
+
+- Prós: já existe, é pequeno, decidido pelos autores.
+- Contras: **circular** — o corpus foi recolhido pesquisando estes termos, logo
+  "encontrá-los" é em grande parte garantido e não diz nada de independente;
+  ignora todos os outros clubes/atletas do corpus; "Porto" sozinho é ambíguo
+  (cidade). Serve, no máximo, como **controlo** (taxa com que os termos de
+  pesquisa reaparecem no texto), nunca como resultado de B.
+
+**(b) Temas a partir do `originalURL` + vocabulário fechado só para entidades
+no texto.** O caminho do URL já traz a classificação editorial sem NER:
+`futebol/futebol-nacional/liga-nos/<clube>/detalhe/...`,
+`modalidades/<modalidade>/...`, `internacional/competicoes-de-selecoes/<competição>/...`.
+
+- Prós: independente dos termos de pesquisa e do texto (não é afetado pelo
+  chrome); determinístico; regras estruturais por posição no caminho, não uma
+  lista de nomes.
+- Contras: cobertura parcial. Nos 127 artigos: 50 têm o clube no caminho
+  (`liga-nos/<clube>`, 10 clubes distintos), mas 20 estão em `multimedia/…`
+  (vídeos/fotogalerias, sem clube nem modalidade no URL) e vários em
+  `internacional/…`, `opiniao/…`, `fora-de-campo` etc. só dão a secção. Os
+  slugs são ortográficos (`sp--braga`, `v--guimaraes`) e precisam de um rótulo
+  legível — mapeamento de apresentação, não de deteção.
+- A parte "entidades no texto" continua a exigir uma lista fechada de atletas
+  (e clubes), cuja **fonte independente** tem de ser escolhida: por exemplo,
+  plantéis dos clubes da Liga NOS 2015–2020 numa base pública como a Wikidata
+  (reprodutível, mas implica uma recolha nova fora do Arquivo.pt), ou uma
+  lista curada pelos autores com critério explícito.
+
+**Recomendação: (b), com (a) só como controlo separado.** Temas pelo URL (o
+que o artigo é, segundo o próprio jornal); Entidades por lista fechada de
+fonte independente dos termos de pesquisa; os 13 termos da Fase 1, se forem
+usados, reportados à parte e nunca somados. **Decisão pedida ao autor:** a
+fonte da lista de atletas/clubes para as Entidades.
+
+### Estratégia de deteção (sem NER)
+
+1. Normalização para comparar: Unicode NFC → minúsculas (`casefold`) →
+   remoção de acentos (NFKD sem marcas combinantes) → palavras `\w+`.
+2. Correspondência **exata de sequências de palavras** (limites de palavra
+   garantidos pela tokenização): "Bruno Fernandes" só conta se as duas
+   palavras aparecerem seguidas; cada entrada do vocabulário pode ter
+   variantes ("FC Porto", "F.C. Porto"). Sem correspondência parcial nem
+   aproximada; termos ambíguos ("Porto") só entram em variantes desambiguadas.
+3. **Chrome.** No texto completo, os menus de todas as páginas contêm
+   "Benfica", "Sporting", "FC Porto" e as manchetes rotativas citam
+   jogadores: a correspondência direta encontraria os três clubes em quase
+   todos os artigos. Propõe-se, por omissão:
+   - procurar no texto **sem o chrome persistente**, reutilizando a remoção do
+     Caminho D, variante (b) (5-gramas em ≥ 10% dos artigos). No D essa
+     variante não foi adotada porque não removia o chrome **rotativo**; aqui o
+     objetivo é outro — retirar os menus, que são persistentes — e é para isso
+     que ela funciona. Não reabre a decisão do D;
+   - contra o chrome rotativo, **persistência entre capturas**: uma entidade
+     conta para o artigo se aparecer em todas as suas capturas com texto (o
+     corpo do artigo repete-se, as manchetes do dia não). O CSV guarda
+     "capturas com menção / capturas com texto", para se poder reportar
+     também a regra fraca (≥ 1 captura) como sensibilidade. Artigos com uma
+     só captura não têm esta proteção e são assinalados.
+4. Temas pelo URL: regras posicionais sobre o caminho (modalidade =
+   `futebol` ou o segmento a seguir a `modalidades/`; competição = o segmento
+   a seguir a `futebol-nacional/` ou a `competicoes-de-*/`; clube = o segmento
+   a seguir à competição nacional; `secao` = primeiro segmento). Ignoram
+   marcadores técnicos (`detalhe`, `amp`/`AMP`).
+
+### Saídas e testes previstos
+
+- `output/corpus_entities.csv`: uma linha por (artigo, tipo, categoria,
+  rótulo), com origem (`url`/`texto`), capturas com menção, capturas com
+  texto, nº de ocorrências e se cumpre a regra de persistência.
+- `output/corpus_entities_summary.md`: frequências por tema e por entidade
+  (nº de artigos), artigos sem tema/sem entidade, artigos de uma só captura,
+  e a comparação regra forte vs. fraca.
+- Testes com fixtures sintéticas: normalização (acentos/maiúsculas), limite
+  de palavra ("Portimonense" não conta como "Porto"), sequência multi-palavra,
+  variantes, entidade só no menu removida pelo chrome, entidade só numa
+  manchete de uma captura falha a persistência, temas a partir de URLs de
+  cada forma, artigo sem texto, saídas não destrutivas.
+
+### Limitações
+
+- Correspondência de strings sem NER: falha alcunhas e formas não previstas
+  ("CR7"), e não resolve homónimos.
+- O corpus vem de pesquisas por 13 termos: as frequências caracterizam esta
+  amostra, não o Record.
+- A remoção do chrome e a persistência reduzem, mas não eliminam, falsos
+  positivos vindos do chrome; e o texto Premium sem corpo só dá título/lead.
+- Representação em RDF (`mencionaEntidade`/`temTema`, IDs das instâncias)
+  fica para uma iteração seguinte, como no Caminho D.
+
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 
 **Estado em 2026-09-20: script escrito e testado em 2026-09-19 e executado pelo

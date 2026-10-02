@@ -76,16 +76,25 @@ def chrome_ngrams(
     return {gram for gram, count in frequency.items() if count >= minimum}
 
 
-def strip_chrome(
+def chrome_coverage(
     words: list[str], chrome: set[tuple[str, ...]], n: int
-) -> list[str]:
-    """Remove as palavras cobertas por pelo menos um n-grama de chrome."""
+) -> list[bool]:
+    """Para cada palavra, se está coberta por pelo menos um n-grama de chrome."""
 
     covered = [False] * len(words)
     for i in range(len(words) - n + 1):
         if tuple(words[i:i + n]) in chrome:
             for j in range(i, i + n):
                 covered[j] = True
+    return covered
+
+
+def strip_chrome(
+    words: list[str], chrome: set[tuple[str, ...]], n: int
+) -> list[str]:
+    """Remove as palavras cobertas por pelo menos um n-grama de chrome."""
+
+    covered = chrome_coverage(words, chrome, n)
     return [word for word, hit in zip(words, covered) if not hit]
 
 
