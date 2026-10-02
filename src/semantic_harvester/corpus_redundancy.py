@@ -476,6 +476,80 @@ def write_sample_csv(sample: list[tuple[str, Pair]], path: Path) -> None:
             })
 
 
+LABEL_SAME = "mesma versão"
+LABEL_CHANGED = "texto alterado"
+
+
+def read_labelled_sample(path: Path) -> list[dict[str, str]] | None:
+    """Devolve as linhas da amostra se já tiver rótulos manuais; senão `None`."""
+
+    if not path.is_file():
+        return None
+    with path.open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    return rows if any(row.get("rotulo_manual") for row in rows) else None
+
+
+@dataclass(frozen=True)
+class LabelValidation:
+    same_total: int
+    changed_total: int
+    same_below: int
+    changed_above: int
+    separating_thresholds: list[float]
+
+
+def validate_against_labels(
+    labels: list[dict[str, str]],
+    threshold: float,
+    grid: tuple[float, ...] = SENSITIVITY_THRESHOLDS,
+) -> LabelValidation:
+    """Erros do limiar contra os rótulos: iguais abaixo e alterados acima."""
+
+    same = [float(r["similaridade"]) for r in labels if r["rotulo_manual"] == LABEL_SAME]
+    changed = [float(r["similaridade"]) for r in labels if r["rotulo_manual"] == LABEL_CHANGED]
+
+    def errors(t: float) -> tuple[int, int]:
+        return sum(s < t for s in same), sum(s >= t for s in changed)
+
+    below, above = errors(threshold)
+    separating = [t for t in grid if errors(t) == (0, 0)]
+    return LabelValidation(len(same), len(changed), below, above, separating)
+
+
+def versions_per_article(
+    corpus: dict[str, list[Capture]], rows: list[dict[str, str]]
+) -> list[dict[str, str]]:
+    """Por artigo: capturas, capturas da Camada 1 e versões textuais distintas."""
+
+    versions: dict[str, int] = defaultdict(int)
+    layer1: dict[str, int] = defaultdict(int)
+    for row in rows:
+        if row["camada"] == LAYER_TEXT:
+            layer1[row["artigo"]] += 1
+            versions[row["artigo"]] += row["rotulo"] == LABEL_REPRESENTATIVE
+    return [
+        {
+            "artigo": article,
+            "capturas": str(len(captures)),
+            "capturas_camada1": str(layer1[article]),
+            "versoes_distintas": str(versions[article]),
+        }
+        for article, captures in corpus.items()
+    ]
+
+
+def write_versions_csv(rows: list[dict[str, str]], path: Path) -> None:
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=["artigo", "capturas", "capturas_camada1", "versoes_distintas"],
+            lineterminator="\n",
+        )
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def _num(value: float) -> str:
     return f"{value:.3f}".replace(".", ",")
 
@@ -488,6 +562,8 @@ def write_summary_markdown(
     sample: list[tuple[str, Pair]],
     threshold: float | None,
     path: Path,
+    labels: list[dict[str, str]] | None = None,
+    versions: list[dict[str, str]] | None = None,
 ) -> None:
     captures = [c for cs in corpus.values() for c in cs]
     layer1 = [r for r in rows if r["camada"] == LAYER_TEXT]
@@ -530,6 +606,27 @@ def write_summary_markdown(
         )
     else:
         lines.append(f"**Limiar aplicado no CSV: {_num(threshold)}.**\n")
+        if labels:
+            check = validate_against_labels(labels, threshold)
+            lines += [
+                "## Limiar e validação contra a amostra rotulada\n",
+                f"Contra os {check.same_total + check.changed_total} pares rotulados "
+                "manualmente em `output/corpus_redundancy_label_sample.csv`, com este "
+                "limiar:\n",
+                f"- \"texto alterado\" com similaridade ≥ limiar (seriam tratados como a "
+                f"mesma versão — erro grave): **{check.changed_above} de "
+                f"{check.changed_total}**.",
+                f"- \"mesma versão\" com similaridade < limiar (ficam como versões "
+                f"distintas — erro conservador): **{check.same_below} de "
+                f"{check.same_total}**. A anotação é não destrutiva: este erro não "
+                "apaga nada, só aumenta o número de \"versões distintas\".",
+                "- Limiares da grelha que separam os rótulos sem erros: "
+                + (", ".join(_num(t) for t in check.separating_thresholds)
+                   if check.separating_thresholds else "**nenhum**")
+                + ". O limiar é uma escolha pragmática dos autores, não uma "
+                "calibração limpa; critério e limitações em `docs/experiments.md`.",
+                "",
+            ]
 
     lines += [
         "## Estrutura do corpus\n",
@@ -607,6 +704,30 @@ def write_summary_markdown(
             f"{s.articles_with_redundant} |"
         )
 
+    if versions is not None:
+        evaluable = [v for v in versions if int(v["capturas_camada1"]) > 0]
+        total_versions = sum(int(v["versoes_distintas"]) for v in evaluable)
+        total_layer1 = sum(int(v["capturas_camada1"]) for v in evaluable)
+        buckets = ((1, 1), (2, 2), (3, 5), (6, 10), (11, 10**9))
+        lines += [
+            "",
+            "## Versões textuais distintas por artigo (Camada 1)\n",
+            f"- Artigos com texto: {len(evaluable)}; capturas da Camada 1: "
+            f"{total_layer1}; versões textuais distintas: **{total_versions}**; "
+            f"capturas redundantes: {total_layer1 - total_versions}.",
+            "- Detalhe por artigo em `output/corpus_redundancy_versions.csv`.",
+            "",
+            "| Versões distintas | Artigos |",
+            "| --- | ---: |",
+        ]
+        for low, high in buckets:
+            count = sum(low <= int(v["versoes_distintas"]) <= high for v in evaluable)
+            label = str(low) if low == high else (f"{low}–{high}" if high < 10**9 else f"≥ {low}")
+            lines.append(f"| {label} | {count} |")
+        lines.append(
+            f"| Artigos sem texto (não avaliáveis) | {len(versions) - len(evaluable)} |"
+        )
+
     band_counts = defaultdict(int)
     for band, _pair in sample:
         band_counts[band] += 1
@@ -617,8 +738,10 @@ def write_summary_markdown(
         f"até {SAMPLE_PER_BAND} por faixa (semente {SAMPLE_SEED}), repartidos em "
         "rotação pelas sub-faixas de 0,05 (1,0 exato numa sub-faixa própria). As "
         "faixas servem só para espalhar a amostra; não são limiares propostos. "
-        "Colunas `rotulo_manual` (\"mesma versão\" / \"texto alterado\") e `notas` "
-        "por preencher.\n",
+        + ("Já rotulada manualmente (colunas `rotulo_manual` e `notas`); não é "
+           "reescrita por novas execuções.\n" if labels else
+           "Colunas `rotulo_manual` (\"mesma versão\" / \"texto alterado\") e "
+           "`notas` por preencher.\n"),
         "| Faixa | Intervalo | Pares na amostra | Pares disponíveis |",
         "| --- | --- | ---: | ---: |",
     ]
@@ -649,11 +772,19 @@ def run(
     pairs = consecutive_pairs(corpus)
     sample = label_sample(pairs)
 
+    sample_path = output / "corpus_redundancy_label_sample.csv"
+    # Uma amostra já rotulada à mão nunca é reescrita (os rótulos perder-se-iam).
+    labels = read_labelled_sample(sample_path)
+    versions = versions_per_article(corpus, rows) if threshold is not None else None
+
     write_redundancy_csv(rows, output / "corpus_redundancy.csv")
-    write_sample_csv(sample, output / "corpus_redundancy_label_sample.csv")
+    if labels is None:
+        write_sample_csv(sample, sample_path)
+    if versions is not None:
+        write_versions_csv(versions, output / "corpus_redundancy_versions.csv")
     write_summary_markdown(
         corpus, rows, pairs, sensitivity, sample, threshold,
-        output / "corpus_redundancy_summary.md",
+        output / "corpus_redundancy_summary.md", labels, versions,
     )
     return rows, sensitivity, sample
 

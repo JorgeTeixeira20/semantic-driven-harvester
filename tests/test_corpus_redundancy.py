@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import contextlib
 import csv
+import io
 import unittest
 from pathlib import Path
 
@@ -11,7 +13,8 @@ from semantic_harvester.corpus_redundancy import (
     LABEL_PENDING, LABEL_REDUNDANT, LABEL_REPRESENTATIVE, LAYER_NO_TEXT,
     LAYER_NOT_EVALUABLE, LAYER_TEXT, Capture, Pair, annotate_article,
     assign_consecutive, assign_last_representative, jaccard, label_sample,
-    load_corpus, normalize_text, run, sensitivity_table, word_set,
+    load_corpus, main, normalize_text, run, sensitivity_table,
+    validate_against_labels, versions_per_article, word_set,
 )
 from semantic_harvester.rdf_mapper import (
     SDH, capture_uri, extracted_text_uri, resource_uri,
@@ -261,6 +264,90 @@ class RunOnSyntheticCorpusTests(OfflineTestCase):
         self.assertTrue((self.root / "output" / "corpus_redundancy_label_sample.csv").is_file())
         self.assertTrue(ttl.is_file())
         self.assertEqual(sensitivity[-1].redundant_last_rep, 1)
+
+    def _write_labelled_sample(self, label_b: str = "texto alterado") -> Path:
+        path = self.root / "output" / "corpus_redundancy_label_sample.csv"
+        path.write_text(
+            "par_id,faixa,artigo,tstamp_a,tstamp_b,similaridade,n_palavras_so_a,"
+            "n_palavras_so_b,palavras_so_a,palavras_so_b,rotulo_manual,notas\n"
+            f"1,alta,{ARTICLE},20200101000000,20200103000000,1.000000,0,0,,,mesma versão,nota\n"
+            f"2,baixa,{ARTICLE},20200101000000,20200103000000,0.400000,0,0,,,mesma versão,\n"
+            f"3,media,{ARTICLE},20200101000000,20200103000000,0.700000,0,0,,,{label_b},\n",
+            encoding="utf-8",
+        )
+        return path
+
+    def test_run_with_threshold_fills_layer1_and_writes_versions(self) -> None:
+        self._write_corpus()
+        rows, _, _ = run(self.root, threshold=0.8)
+
+        self.assertNotIn(LABEL_PENDING, {r["rotulo"] for r in rows})
+        layer1 = [r for r in rows if r["camada"] == LAYER_TEXT]
+        self.assertEqual([r["rotulo"] for r in layer1], [LABEL_REPRESENTATIVE, LABEL_REDUNDANT])
+        self.assertEqual({r["limiar"] for r in rows}, {"0.8"})
+        with (self.root / "output" / "corpus_redundancy_versions.csv").open(encoding="utf-8") as h:
+            versions = {r["artigo"]: r for r in csv.DictReader(h)}
+        self.assertEqual(versions[ARTICLE]["versoes_distintas"], "1")
+        self.assertEqual(versions[ARTICLE]["capturas_camada1"], "2")
+        self.assertEqual(versions[ARTICLE + "-sem-texto"]["versoes_distintas"], "0")
+        summary = (self.root / "output" / "corpus_redundancy_summary.md").read_text("utf-8")
+        self.assertIn("Limiar aplicado no CSV: 0,800", summary)
+        self.assertIn("versões textuais distintas: **1**", summary)
+
+    def test_labelled_sample_is_never_overwritten(self) -> None:
+        self._write_corpus()
+        path = self._write_labelled_sample()
+        content = path.read_bytes()
+
+        run(self.root, threshold=None)
+        run(self.root, threshold=0.8)
+
+        self.assertEqual(path.read_bytes(), content)
+        summary = (self.root / "output" / "corpus_redundancy_summary.md").read_text("utf-8")
+        self.assertIn("Já rotulada manualmente", summary)
+
+    def test_summary_validates_threshold_against_labels(self) -> None:
+        self._write_corpus()
+        self._write_labelled_sample()
+        run(self.root, threshold=0.8)
+        summary = (self.root / "output" / "corpus_redundancy_summary.md").read_text("utf-8")
+        self.assertIn("erro grave): **0 de 1**", summary)
+        self.assertIn("erro conservador): **1 de 2**", summary)
+        self.assertIn("separam os rótulos sem erros: **nenhum**", summary)
+
+    def test_unlabelled_sample_is_written(self) -> None:
+        self._write_corpus()
+        run(self.root, threshold=None)
+        path = self.root / "output" / "corpus_redundancy_label_sample.csv"
+        with path.open(encoding="utf-8") as h:
+            self.assertTrue(all(r["rotulo_manual"] == "" for r in csv.DictReader(h)))
+
+
+class ValidationTests(unittest.TestCase):
+    def test_errors_and_separating_thresholds(self) -> None:
+        labels = [
+            {"rotulo_manual": "mesma versão", "similaridade": "0.95"},
+            {"rotulo_manual": "mesma versão", "similaridade": "0.75"},
+            {"rotulo_manual": "texto alterado", "similaridade": "0.60"},
+        ]
+        check = validate_against_labels(labels, 0.8, grid=(0.5, 0.7, 0.8))
+        self.assertEqual((check.same_below, check.changed_above), (1, 0))
+        self.assertEqual((check.same_total, check.changed_total), (2, 1))
+        self.assertEqual(check.separating_thresholds, [0.7])
+
+    def test_versions_per_article_counts_representatives(self) -> None:
+        captures = [capture("1", words(0, 100)), capture("2", words(0, 100)),
+                    capture("3", words(200, 300)), capture("4", None)]
+        rows = annotate_article(captures, threshold=0.8)
+        (result,) = versions_per_article({ARTICLE: captures}, rows)
+        self.assertEqual(result, {"artigo": ARTICLE, "capturas": "4",
+                                  "capturas_camada1": "3", "versoes_distintas": "2"})
+
+
+class MainTests(unittest.TestCase):
+    def test_rejects_threshold_outside_unit_interval(self) -> None:
+        with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
+            main(["--limiar", "1.5"])
 
 
 if __name__ == "__main__":
