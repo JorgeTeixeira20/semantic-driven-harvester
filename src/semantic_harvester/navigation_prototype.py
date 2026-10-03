@@ -34,7 +34,8 @@ h1 { font-size: 1.5rem; } h2 { font-size: 1.2rem; margin-top: 2rem; }
 table { border-collapse: collapse; width: 100%; font-size: .9rem; }
 th, td { border-bottom: 1px solid #d0d7de; padding: .35rem .5rem; text-align: left;
          vertical-align: top; }
-th { background: #f6f8fa; } td.n { text-align: right; font-variant-numeric: tabular-nums; }
+th { background: #f6f8fa; }
+th.n, td.n { text-align: center; font-variant-numeric: tabular-nums; }
 p.meta, footer { color: #59636e; font-size: .85rem; }
 code { font-size: .85rem; }
 """
@@ -89,7 +90,10 @@ def link(href: str, text: Any) -> str:
 
 
 def table(headers: list[str], rows: list[list[str]], numeric: set[int] = frozenset()) -> str:
-    head = "".join(f"<th>{html.escape(h)}</th>" for h in headers)
+    head = "".join(
+        f'<th class="n">{html.escape(h)}</th>' if i in numeric else f"<th>{html.escape(h)}</th>"
+        for i, h in enumerate(headers)
+    )
     body = "".join(
         "<tr>" + "".join(
             f'<td class="n">{cell}</td>' if i in numeric else f"<td>{cell}</td>"
