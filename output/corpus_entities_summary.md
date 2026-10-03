@@ -60,6 +60,16 @@ Sem pedidos à API; não altera o grafo nem o raw. Anotação por artigo. Vocabu
 - Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): 118
 - Pares artigo–entidade: 1424 pela regra fraca, 291 pela regra de persistência; destes, 163 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
 
+### Coerência de clube (sinal, não filtro)
+
+Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coincide com o tema `clube` do URL do artigo; `nao` se não coincide (possível falso positivo, por exemplo uma manchete do chrome); `sem_tema` se o URL não tem clube. Nenhuma menção é removida.
+
+| clube_coerente | Pares (regra fraca) | Pares (persistência) |
+| --- | ---: | ---: |
+| sim | 189 | 82 |
+| nao | 333 | 41 |
+| sem_tema | 902 | 168 |
+
 | Entidade | Artigos (persistência) | Artigos (≥ 1 captura) |
 | --- | ---: | ---: |
 | Jonas | 16 | 41 |

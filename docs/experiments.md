@@ -2195,6 +2195,81 @@ sem participantes, passagens sem datas, alcunhas); os 41 artigos de uma
 captura não têm proteção contra manchetes. Representação em RDF continua por
 fazer.
 
+### Contaminação por chrome: diagnóstico e sinal `clube_coerente` (2026-10-03)
+
+**Dois casos reportados pelo autor, investigados no texto real.**
+
+1. `…/running---equipamento/amp/divulgadas-primeiras-imagens-dos-novos-nike-pegasus-36-turbo-e-zoom-fly-3`
+   (hash `334c91e33971c03a`, 4 capturas com texto; artigo sobre sapatilhas):
+   "Jonas", "Bernardo Silva" e "Wilson Eduardo" vêm do bloco **"Últimas
+   Notícias"** da página AMP — em `20190322194121`: "19:33 Vídeos O momento
+   em que Jonas se emocionou e agradeceu ao Benfica", "19:30 Internacional
+   Wilson Eduardo apontou o golo da vitória de Angola sobre o Botsuana"; em
+   `20190321194332`: "Zinchenko elogia Bernardo Silva…". Nenhum aparece em
+   todas as capturas: contam só pela regra fraca, não pela persistência.
+2. `…/liga-nos/detalhe/a-cronica-do-boavista-moreirense-1-0-um-tiro-certeiro-e-xeque-mate.html`
+   (hash `99f811299bc25610`): é o artigo **Premium sem corpo** já visto no
+   Caminho D, com **28 capturas** (novembro–dezembro de 2017). O texto é quase
+   todo chrome e cada captura traz as manchetes do seu dia: 49 jogadores pela
+   regra fraca. As menções vêm dos blocos de manchetes — "Últimas Notícias /
+   Mais Recentes / Mais Vistas / Mais Comentadas" ("04h20 Benfica Luisão faz o
+   pleno…"), "Mais notícias", e a lista de manchetes logo a seguir ao menu
+   ("Bas Dost coloca Sporting provisoriamente na liderança", "Dez momentos dos
+   10 anos de Rui Patrício na Europa", "Foi desta forma que Jonas chegou ao
+   golo 100…"). Pela persistência fica só **Carraça** (28/28, citado no
+   subtítulo "golo de Carraça", menção legítima); **Luisão** fica de fora por
+   pouco (23/28), porque esteve em manchete durante semanas.
+
+**Causa real:** não é um índice alfabético nem um índice de jogadores; são
+**manchetes rotativas do chrome** (blocos de últimas notícias, mais lidas,
+"Mais notícias", "Notícias MAIS" e a faixa de manchetes sob o menu). Não são
+persistentes ao longo do corpus, por isso a remoção por n-gramas frequentes
+não as apanha (já observado no Caminho D).
+
+**Mais duas falhas verificadas ao inspecionar pares que passam a persistência
+mas não coincidem com o clube do artigo:**
+
+- **Capturas próximas no tempo partilham manchetes**: no artigo do Yuta
+  Koike (Portimonense, 5 capturas no mesmo dia), "Jonas" vem de "Notícias MAIS
+  … 05h21 - Benfica Jonas confiante na renovação"; no do Charles (Marítimo, 7
+  capturas), "Alan Ruiz" vem de "'Tareias' de Jesus não fazem mossa em Alan
+  Ruiz". A regra de persistência só protege quando as capturas estão
+  espaçadas.
+- **Rótulo de uma palavra dentro de outro nome**: no mesmo artigo do Charles,
+  "Moreira" corresponde a "André Moreira" (outro jogador).
+
+**Sinal `clube_coerente`** (`corpus_entities`, coluna nova nas linhas de
+entidade; tabela explícita slug do URL → clube em
+`data/processed/caminho_b_clubes_url.csv`, 10 clubes com identificador
+Wikidata, porque a comparação por palavras é ambígua — "sporting" ocorre em
+três clubes, "v--guimaraes" não partilha palavras com "Vitória Sport Clube"):
+`sim` se um clube do jogador no vocabulário coincide com o tema `clube` do
+URL, `nao` se não coincide, `sem_tema` se o URL não tem clube. **Não remove
+nem corrige nenhuma menção.** Resultado real (resto do CSV igual à execução
+anterior; checksums das entradas iguais):
+
+| clube_coerente | Pares (regra fraca) | Pares (persistência) | — artigos com 2+ capturas | — artigos com 1 captura |
+| --- | ---: | ---: | ---: | ---: |
+| sim | 189 | 82 | 46 | 36 |
+| nao | 333 | 41 | 22 | 19 |
+| sem_tema | 902 | 168 | 60 | 108 |
+| Total | 1 424 | 291 | 128 | 163 |
+
+Leitura: só 50 dos 127 artigos têm clube no URL, por isso a maioria dos pares
+fica `sem_tema` — incluindo **os dois casos acima**, que o sinal não pode
+assinalar. Onde há comparação, a regra fraca dá mais `nao` do que `sim`
+(333 vs. 189) e a persistência inverte a proporção (41 vs. 82), coerente com a
+persistência filtrar manchetes. `nao` é um indício, não uma prova: um jogador
+pode ser legitimamente mencionado num artigo de outro clube (transferências,
+adversários, antigos jogadores), e `sim` também não prova uma menção no corpo
+(o clube pode vir de uma manchete sobre o mesmo clube).
+
+**Limitações acrescentadas ao Caminho B:** as manchetes rotativas do chrome
+são a principal fonte de falsos positivos; a persistência atenua-as só com
+capturas espaçadas no tempo e não atua nos 41 artigos de uma captura; o sinal
+de clube cobre apenas os 50 artigos com clube no URL e não distingue
+menções legítimas a outros clubes.
+
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 
 **Estado em 2026-09-20: script escrito e testado em 2026-09-19 e executado pelo

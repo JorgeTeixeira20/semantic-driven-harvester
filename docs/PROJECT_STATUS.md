@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-10-02** (fecho do Caminho D), a partir do código, testes,
+Atualizado em **2026-10-03** (Caminho B), a partir do código, testes,
 documentação e histórico; a última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
@@ -135,7 +135,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 141 testes em nove módulos de `tests/`.
+pacote conforme o README. Existem 150 testes em nove módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -160,7 +160,7 @@ sobreposição de datas, regras de variantes e homónimos, respostas guardadas
 em bruto, com sessão simulada).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **141 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **150 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -396,7 +396,17 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    palavra; a remoção do chrome quase não afeta os jogadores (estão nas
    manchetes rotativas, não nos menus); cobertura limitada pela Wikidata.
    Contagens de correspondências, sem avaliação de precisão (decisão de
-   âmbito). Por fazer: representação em RDF (`temTema`/`mencionaEntidade`).
+   âmbito). **Contaminação por chrome investigada em 2026-10-03:** os falsos
+   positivos vêm de manchetes rotativas (blocos "Últimas Notícias", "Mais
+   notícias", "Notícias MAIS", faixa sob o menu), confirmado em dois casos
+   reais (artigo Nike AMP; crónica Premium Boavista-Moreirense com 49 jogadores
+   pela regra fraca e só 1, legítimo, pela persistência); a persistência falha
+   com capturas próximas no tempo. **Sinal `clube_coerente`** (só sinal, nada
+   removido; tabela slug → clube em `data/processed/caminho_b_clubes_url.csv`):
+   pela regra fraca 189 `sim`, 333 `nao`, 902 `sem_tema`; pela persistência 82
+   `sim`, 41 `nao`, 168 `sem_tema`. Só 50 artigos têm clube no URL, por isso os
+   dois casos investigados ficam `sem_tema`. Por fazer: representação em RDF
+   (`temTema`/`mencionaEntidade`).
 5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
    **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
    construída cedo (não deixada para o fim) para reduzir o risco de ficar sem
