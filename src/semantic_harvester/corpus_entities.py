@@ -18,8 +18,13 @@ nem o raw. A anotação é por **artigo** (domínio de `sdh:temTema` e
   as capturas com texto) e a regra fraca (≥ 1 captura).
 
 O vocabulário tem as colunas `tipo` (`entidade`), `categoria` (ex.: `atleta`,
-`clube`), `rotulo` (forma canónica) e `variantes` (formas alternativas
-separadas por `|`; o rótulo conta sempre como variante).
+`clube`), `rotulo` (forma canónica), `variantes` (formas alternativas
+separadas por `|`; o rótulo conta sempre como variante) e, opcionalmente,
+`clubes` (clubes do jogador, separados por `|`).
+
+Coluna `clube_coerente` (sinal, não filtro): compara os clubes do jogador com
+o tema `clube` do URL do artigo, através da tabela explícita slug → clube
+(`--clubes-url`): `sim`, `nao` ou `sem_tema` (URL sem clube).
 """
 
 from __future__ import annotations
@@ -46,7 +51,12 @@ TECHNICAL_SEGMENTS = {"detalhe", "amp"}
 CSV_FIELDS = (
     "artigo", "tipo", "categoria", "rotulo", "origem", "capturas_com_mencao",
     "capturas_com_texto", "ocorrencias", "persistente", "uma_so_captura",
+    "clube_coerente",
 )
+COHERENT_YES = "sim"
+COHERENT_NO = "nao"
+COHERENT_NO_THEME = "sem_tema"
+DEFAULT_CLUB_MAP = Path("data") / "processed" / "caminho_b_clubes_url.csv"
 
 _WORD_RE = re.compile(r"\w+")
 
@@ -72,6 +82,7 @@ class Term:
     categoria: str
     rotulo: str
     variants: tuple[tuple[str, ...], ...]
+    clubs: frozenset[str] = frozenset()
 
 
 def load_vocabulary(path: Path) -> list[Term]:
@@ -90,8 +101,33 @@ def load_vocabulary(path: Path) -> list[Term]:
             folded = tuple(match_tokens(form))
             if folded and folded not in variants:
                 variants.append(folded)
-        terms.append(Term(row["tipo"], row["categoria"], row["rotulo"], tuple(variants)))
+        clubs = frozenset(c for c in (row.get("clubes") or "").split("|") if c)
+        terms.append(Term(row["tipo"], row["categoria"], row["rotulo"], tuple(variants), clubs))
     return terms
+
+
+def load_club_map(path: Path) -> dict[str, str]:
+    """Slug de clube no `originalURL` → nome do clube usado no vocabulário."""
+
+    with path.open(encoding="utf-8", newline="") as handle:
+        return {row["slug"]: row["clube"] for row in csv.DictReader(handle)}
+
+
+def club_coherence(
+    term: Term, article_club_slugs: list[str], club_map: dict[str, str]
+) -> str:
+    """Sinal transparente: o clube do jogador coincide com o tema `clube` do artigo?
+
+    Não remove nem corrige nada; só compara.
+    """
+
+    if not article_club_slugs:
+        return COHERENT_NO_THEME
+    missing = [slug for slug in article_club_slugs if slug not in club_map]
+    if missing:
+        raise ValueError(f"Clube do URL sem correspondência na tabela: {missing}")
+    article_clubs = {club_map[slug] for slug in article_club_slugs}
+    return COHERENT_YES if term.clubs & article_clubs else COHERENT_NO
 
 
 def count_mentions(segments: list[list[str]], terms: list[Term]) -> Counter[str]:
@@ -169,15 +205,18 @@ def analyse_article(
     terms: list[Term],
     chrome: set[tuple[str, ...]] | None,
     n: int = DEFAULT_N,
+    club_map: dict[str, str] | None = None,
 ) -> list[dict[str, str]]:
+    themes = themes_from_url(article)
+    club_slugs = [value for categoria, value in themes if categoria == "clube"]
     rows = [
         {
             "artigo": article, "tipo": "tema", "categoria": categoria,
             "rotulo": valor, "origem": ORIGIN_URL, "capturas_com_mencao": "",
             "capturas_com_texto": "", "ocorrencias": "", "persistente": "",
-            "uma_so_captura": "",
+            "uma_so_captura": "", "clube_coerente": "",
         }
-        for categoria, valor in themes_from_url(article)
+        for categoria, valor in themes
     ]
 
     texts = [c.text or "" for c in captures if c.in_layer1]
@@ -195,6 +234,9 @@ def analyse_article(
             "ocorrencias": str(sum(counts[label] for counts in per_capture)),
             "persistente": str(with_mention == len(texts)),
             "uma_so_captura": str(len(texts) == 1),
+            "clube_coerente": (
+                club_coherence(term, club_slugs, club_map) if club_map is not None else ""
+            ),
         })
     return rows
 
@@ -222,6 +264,27 @@ def _frequency_table(counter: Counter, header: str) -> list[str]:
     lines = [f"| {header} | Artigos |", "| --- | ---: |"]
     lines += [f"| {key} | {count} |" for key, count in sorted(counter.items(), key=lambda kv: (-kv[1], kv[0]))]
     return lines
+
+
+def coherence_lines(
+    entities: list[dict[str, str]], strong: list[dict[str, str]]
+) -> list[str]:
+    if not any(r["clube_coerente"] for r in entities):
+        return []
+    values = (COHERENT_YES, COHERENT_NO, COHERENT_NO_THEME)
+    weak_counts = Counter(r["clube_coerente"] for r in entities)
+    strong_counts = Counter(r["clube_coerente"] for r in strong)
+    return [
+        "### Coerência de clube (sinal, não filtro)\n",
+        "Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário "
+        "coincide com o tema `clube` do URL do artigo; `nao` se não coincide "
+        "(possível falso positivo, por exemplo uma manchete do chrome); `sem_tema` "
+        "se o URL não tem clube. Nenhuma menção é removida.\n",
+        "| clube_coerente | Pares (regra fraca) | Pares (persistência) |",
+        "| --- | ---: | ---: |",
+        *(f"| {v} | {weak_counts[v]} | {strong_counts[v]} |" for v in values),
+        "",
+    ]
 
 
 def write_summary(
@@ -281,6 +344,7 @@ def write_summary(
         "são de artigos com uma só captura com texto, onde a persistência não "
         "filtra nada.",
         "",
+        *coherence_lines(entities, strong),
         "| Entidade | Artigos (persistência) | Artigos (≥ 1 captura) |",
         "| --- | ---: | ---: |",
         *(f"| {label} | {strong_counts[label]} | {count} |"
@@ -296,6 +360,7 @@ def run(
     project_root: Path | None = None,
     vocabulary_path: Path | None = None,
     chrome_fraction: float | None = DEFAULT_CHROME_FRACTION,
+    club_map_path: Path | None = None,
 ) -> list[dict[str, str]]:
     root = project_root or Path(__file__).resolve().parents[2]
     if vocabulary_path is None:
@@ -304,10 +369,11 @@ def run(
     corpus = load_corpus(output / "corpus_articles.ttl", root)
     terms = load_vocabulary(vocabulary_path)
     chrome = build_chrome(corpus, chrome_fraction)
+    club_map = load_club_map(club_map_path) if club_map_path is not None else None
 
     rows = [
         row for article, captures in corpus.items()
-        for row in analyse_article(article, captures, terms, chrome)
+        for row in analyse_article(article, captures, terms, chrome, club_map=club_map)
     ]
     write_csv(rows, output / "corpus_entities.csv")
     write_summary(corpus, rows, vocabulary_path, chrome_fraction,
@@ -326,12 +392,16 @@ def main(argv: list[str] | None = None) -> int:
                         help="fração de artigos para um 5-grama ser chrome (por omissão 0,10)")
     parser.add_argument("--sem-remocao-chrome", action="store_true",
                         help="procura no texto completo, sem remover o chrome")
+    parser.add_argument("--clubes-url", type=Path, default=DEFAULT_CLUB_MAP,
+                        help="tabela slug do URL → clube do vocabulário, para a coluna "
+                        "clube_coerente (por omissão data/processed/caminho_b_clubes_url.csv)")
     args = parser.parse_args(argv)
     fraction = None if args.sem_remocao_chrome else args.fracao_chrome
     if fraction is not None and not 0.0 < fraction <= 1.0:
         parser.error("--fracao-chrome tem de estar em ]0, 1]")
 
-    rows = run(vocabulary_path=args.vocabulario, chrome_fraction=fraction)
+    rows = run(vocabulary_path=args.vocabulario, chrome_fraction=fraction,
+               club_map_path=args.clubes_url)
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")
     print("Saídas: output/corpus_entities.csv, output/corpus_entities_summary.md")
     return 0

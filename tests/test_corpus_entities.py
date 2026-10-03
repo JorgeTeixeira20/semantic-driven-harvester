@@ -8,8 +8,8 @@ from rdflib import RDF, XSD, Graph, Literal
 
 from semantic_harvester.corpus_chrome import ngrams, tokens
 from semantic_harvester.corpus_entities import (
-    Term, analyse_article, count_mentions, fold, load_vocabulary, match_tokens,
-    run, text_segments, themes_from_url,
+    Term, analyse_article, club_coherence, count_mentions, fold, load_vocabulary,
+    match_tokens, run, text_segments, themes_from_url,
 )
 from semantic_harvester.corpus_redundancy import Capture
 from semantic_harvester.rdf_mapper import (
@@ -21,9 +21,14 @@ MENU = "Menu Record Benfica Sporting FC Porto Modalidades Opinião Vídeos"
 ARTICLE = "https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/exemplo.html"
 
 
-def term(rotulo: str, *variants: str, categoria: str = "atleta") -> Term:
+def term(rotulo: str, *variants: str, categoria: str = "atleta",
+         clubs: tuple[str, ...] = ()) -> Term:
     forms = [rotulo, *variants]
-    return Term("entidade", categoria, rotulo, tuple(tuple(match_tokens(f)) for f in forms))
+    return Term("entidade", categoria, rotulo, tuple(tuple(match_tokens(f)) for f in forms),
+                frozenset(clubs))
+
+
+CLUB_MAP = {"sporting": "Sporting Clube de Portugal", "benfica": "Sport Lisboa e Benfica"}
 
 
 def capture(tstamp: str, text: str | None, status: int = 200) -> Capture:
@@ -148,6 +153,48 @@ class AnalyseArticleTests(unittest.TestCase):
         self.assertEqual(rows[0]["uma_so_captura"], "True")
 
 
+class ClubCoherenceTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.sporting_player = term("Bas Dost", clubs=("Sporting Clube de Portugal",))
+        self.benfica_player = term("Jonas", clubs=("Sport Lisboa e Benfica",))
+        self.two_clubs = term("Gelson", clubs=("Sporting Clube de Portugal", "Outro Clube"))
+
+    def test_same_club_is_sim(self) -> None:
+        self.assertEqual(club_coherence(self.sporting_player, ["sporting"], CLUB_MAP), "sim")
+        self.assertEqual(club_coherence(self.two_clubs, ["sporting"], CLUB_MAP), "sim")
+
+    def test_different_club_is_nao(self) -> None:
+        self.assertEqual(club_coherence(self.benfica_player, ["sporting"], CLUB_MAP), "nao")
+
+    def test_article_without_club_theme_is_sem_tema(self) -> None:
+        self.assertEqual(club_coherence(self.benfica_player, [], CLUB_MAP), "sem_tema")
+
+    def test_unmapped_slug_fails_loudly(self) -> None:
+        with self.assertRaises(ValueError):
+            club_coherence(self.benfica_player, ["clube-desconhecido"], CLUB_MAP)
+
+    def test_analyse_article_fills_column_without_removing_mentions(self) -> None:
+        captures = [capture("1", "Bas Dost marcou. Manchete: Jonas no Benfica")]
+        rows = {r["rotulo"]: r for r in analyse_article(
+            ARTICLE, captures, [self.sporting_player, self.benfica_player], None,
+            club_map=CLUB_MAP) if r["origem"] == "texto"}
+        self.assertEqual(rows["Bas Dost"]["clube_coerente"], "sim")
+        self.assertEqual(rows["Jonas"]["clube_coerente"], "nao")
+
+    def test_url_without_club_gives_sem_tema(self) -> None:
+        url = "https://www.record.pt/futebol/futebol-nacional/liga-nos/detalhe/cronica.html"
+        rows = [r for r in analyse_article(url, [capture("1", "Jonas marcou")],
+                                           [self.benfica_player], None, club_map=CLUB_MAP)
+                if r["origem"] == "texto"]
+        self.assertEqual(rows[0]["clube_coerente"], "sem_tema")
+
+    def test_without_club_map_column_is_empty(self) -> None:
+        rows = [r for r in analyse_article(ARTICLE, [capture("1", "Jonas")],
+                                           [self.benfica_player], None)
+                if r["origem"] == "texto"]
+        self.assertEqual(rows[0]["clube_coerente"], "")
+
+
 class VocabularyTests(OfflineTestCase):
     def test_load_vocabulary_with_variants(self) -> None:
         path = self.root / "vocab.csv"
@@ -155,6 +202,13 @@ class VocabularyTests(OfflineTestCase):
                         "entidade,atleta,Cristiano Ronaldo,CR7|Ronaldo\n", encoding="utf-8")
         (t,) = load_vocabulary(path)
         self.assertEqual(t.variants, (("cristiano", "ronaldo"), ("cr7",), ("ronaldo",)))
+
+    def test_load_vocabulary_reads_clubs(self) -> None:
+        path = self.root / "vocab.csv"
+        path.write_text("tipo,categoria,rotulo,variantes,clubes\n"
+                        "entidade,jogador,Jonas,,Sport Lisboa e Benfica|Valencia\n", encoding="utf-8")
+        (t,) = load_vocabulary(path)
+        self.assertEqual(t.clubs, frozenset({"Sport Lisboa e Benfica", "Valencia"}))
 
     def test_themes_are_not_accepted_in_vocabulary(self) -> None:
         path = self.root / "vocab.csv"
@@ -213,6 +267,21 @@ class RunOnSyntheticCorpusTests(OfflineTestCase):
         self.assertIn("| Telma Monteiro | 1 | 1 |", summary)
         self.assertIn("1 pela regra de persistência; destes, 0 são de artigos com uma só", summary)
         self.assertIn("≥ 0,50 dos artigos", summary)
+
+    def test_run_with_club_map_reports_coherence(self) -> None:
+        vocab = self._write()
+        vocab.write_text("tipo,categoria,rotulo,variantes,clubes\n"
+                         "entidade,atleta,Telma Monteiro,,Sporting Clube de Portugal\n",
+                         encoding="utf-8")
+        club_map = self.root / "clubes.csv"
+        club_map.write_text("slug,wikidata,clube\nsporting,Q75729,Sporting Clube de Portugal\n",
+                            encoding="utf-8")
+        rows = run(self.root, vocab, chrome_fraction=0.5, club_map_path=club_map)
+        (row,) = [r for r in rows if r["origem"] == "texto"]
+        self.assertEqual(row["clube_coerente"], "sim")
+        summary = (self.root / "output" / "corpus_entities_summary.md").read_text("utf-8")
+        self.assertIn("| sim | 1 | 1 |", summary)
+        self.assertIn("| nao | 0 | 0 |", summary)
 
     def test_without_chrome_removal_menu_club_is_found_everywhere(self) -> None:
         vocab = self._write()
