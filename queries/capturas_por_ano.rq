@@ -1,0 +1,15 @@
+# Agregada/temporal: capturas, textos disponíveis e artigos distintos por ano
+# de captura.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+
+SELECT ?ano (COUNT(DISTINCT ?captura) AS ?capturas)
+       (COUNT(DISTINCT ?texto) AS ?textos)
+       (COUNT(DISTINCT ?recurso) AS ?artigos)
+WHERE {
+  ?recurso sdh:temCaptura ?captura .
+  ?captura sdh:capturedAt ?data .
+  BIND(YEAR(?data) AS ?ano)
+  OPTIONAL { ?captura sdh:temTextoExtraido ?texto }
+}
+GROUP BY ?ano
+ORDER BY ?ano

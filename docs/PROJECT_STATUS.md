@@ -369,7 +369,8 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    amostra rotulada cobre só 34 artigos (um vídeo com 11 dos 60 pares), o que
    limita a generalização. Por implementar: a representação em RDF da
    anotação. Detalhe em `experiments.md`.
-4. **B** — povoamento de `EntidadeMencionada`/`Tema` (definidos na ontologia
+4. **B** — **O Caminho B foi concluído em 2026-10-03.** Povoamento de
+   `EntidadeMencionada`/`Tema` (definidos na ontologia
    desde o início, nunca usados em código). **Decisão de âmbito:** caracterização
    descritiva/quantitativa (contagens, frequências), não uma avaliação formal
    de precisão do reconhecimento; a considerar um vocabulário fechado

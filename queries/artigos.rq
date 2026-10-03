@@ -1,0 +1,20 @@
+# (i) Estrutural: cada artigo com o seu RecursoWeb, nº de capturas, nº de
+# textos disponíveis e primeira/última captura.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?artigo ?titulo ?recurso ?url
+       (COUNT(DISTINCT ?captura) AS ?capturas)
+       (COUNT(DISTINCT ?texto) AS ?textos)
+       (MIN(?data) AS ?primeira) (MAX(?data) AS ?ultima)
+WHERE {
+  ?artigo a sdh:Artigo ;
+          rdfs:label ?titulo ;
+          sdh:temRecursoWeb ?recurso .
+  ?recurso sdh:originalURL ?url ;
+           sdh:temCaptura ?captura .
+  ?captura sdh:capturedAt ?data .
+  OPTIONAL { ?captura sdh:temTextoExtraido ?texto }
+}
+GROUP BY ?artigo ?titulo ?recurso ?url
+ORDER BY ?titulo

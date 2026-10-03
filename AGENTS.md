@@ -50,6 +50,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   vocabulário fechado no texto sem chrome; sem rede.
 - `wikidata_vocabulary.py`: vocabulário de jogadores do Caminho B a partir da
   Wikidata (rede: endpoint SPARQL); raw em `data/raw/wikidata/`.
+- `navigation_prototype.py`: protótipo de navegação — corre `queries/*.rq`
+  (SPARQL, `rdflib`) sobre o Turtle do corpus e gera HTML estático em
+  `output/prototipo/`; sem rede nem servidor.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -94,6 +97,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_chrome --so-distribuicao \| --fracao F [--n 5]` | Sem rede; lê o Turtle, `data/raw/texts/` e a amostra rotulada; grava `output/corpus_chrome_*`. |
 | `python -m semantic_harvester.corpus_entities --vocabulario CSV` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`. |
 | `python -m semantic_harvester.wikidata_vocabulary` | Rede (28 pedidos SPARQL à Wikidata); grava raw em `data/raw/wikidata/` e `data/processed/caminho_b_vocabulario_wikidata.csv`. |
+| `python -m semantic_harvester.navigation_prototype` | Sem rede; lê `output/corpus_articles.ttl` e `queries/`; regenera `output/prototipo/`. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.

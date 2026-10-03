@@ -367,3 +367,15 @@ python -m semantic_harvester.wikidata_vocabulary
 ```
 
 Escreve `data/processed/caminho_b_vocabulario_wikidata.csv`.
+
+## Protótipo de navegação
+
+```bash
+python -m semantic_harvester.navigation_prototype
+```
+
+Sem rede e sem servidor: corre as queries SPARQL de `queries/*.rq` com `rdflib`
+sobre `output/corpus_articles.ttl` e gera páginas HTML estáticas em
+`output/prototipo/` (abrir `output/prototipo/index.html` no browser): agregados
+por ano e por `statusCode`, artigos mais capturados, lista de artigos e o
+histórico cronológico de capturas de cada artigo, com ligação ao Arquivo.pt.

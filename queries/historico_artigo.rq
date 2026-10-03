@@ -1,0 +1,17 @@
+# (ii) Temporal: histórico completo de capturas de um artigo, por ordem
+# cronológica. ?artigo é ligado na execução (initBindings).
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+
+SELECT ?tstamp ?data ?status ?digest ?tamanho ?arquivo ?ficheiro
+WHERE {
+  ?artigo sdh:temRecursoWeb ?recurso .
+  ?recurso sdh:temCaptura ?captura .
+  ?captura sdh:tstamp ?tstamp .
+  OPTIONAL { ?captura sdh:capturedAt ?data }
+  OPTIONAL { ?captura sdh:statusCode ?status }
+  OPTIONAL { ?captura sdh:digest ?digest }
+  OPTIONAL { ?captura sdh:contentLength ?tamanho }
+  OPTIONAL { ?captura sdh:archiveURL ?arquivo }
+  OPTIONAL { ?captura sdh:temTextoExtraido ?texto . ?texto sdh:filePath ?ficheiro }
+}
+ORDER BY ?tstamp

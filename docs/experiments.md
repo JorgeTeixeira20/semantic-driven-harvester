@@ -2270,6 +2270,52 @@ capturas espaçadas no tempo e não atua nos 41 artigos de uma captura; o sinal
 de clube cobre apenas os 50 artigos com clube no URL e não distingue
 menções legítimas a outros clubes.
 
+## Protótipo de navegação (proposta, 2026-10-03)
+
+**Âmbito já decidido (PROJECT_STATUS.md):** versão mínima baseada em SPARQL
+sobre o grafo existente; interface mais interativa só se sobrar tempo. Por
+decisão dos autores, ruído, homonímia e chrome (Caminhos D e B) não voltam a
+ser refinados nesta fase.
+
+**Dados.** Só `output/corpus_articles.ttl` (Caminho A: `Jornal`, `Artigo`,
+`RecursoWeb`, `CapturaArquivada`, `TextoExtraido`). As saídas de D
+(redundância) e B (temas/entidades) existem só em CSV, sem RDF — já registado
+como "por fazer" nos dois Caminhos; integrá-las no grafo e no protótipo fica
+como trabalho seguinte.
+
+**Tecnologia: (b) página HTML estática gerada, sobre (a) queries + script.**
+Ambas usam só `rdflib` (SPARQL em memória sobre o Turtle; nenhuma dependência
+nova). As queries ficam em ficheiros `.rq` versionados em `queries/`, legíveis
+e reutilizáveis noutra ferramenta SPARQL. O script corre-as e gera
+`output/prototipo/`: um `index.html` com as tabelas agregadas e a lista de
+artigos, e uma página por artigo com o histórico de capturas, ligadas entre si
+e às capturas no Arquivo.pt (`archiveURL`). Escolhe-se (b) porque o esforço
+extra sobre (a) é pequeno (só gerar HTML a partir de resultados que (a) já
+teria) e o resultado é navegável e apresentável sem servidor: abre-se o
+`index.html` no browser. HTML autocontido (sem CSS/JS externos), valores
+escapados.
+
+**Queries (5), cobrindo estrutura, tempo e agregação:**
+
+1. `artigos.rq` (estrutural): cada artigo com título, `RecursoWeb`/
+   `originalURL`, nº de capturas, nº de textos disponíveis, primeira e última
+   captura.
+2. `historico_artigo.rq` (temporal): histórico completo de um artigo
+   (`?artigo` ligado na execução), por ordem cronológica: data, `tstamp`,
+   `statusCode`, `digest`, `contentLength`, `archiveURL`, texto disponível.
+3. `mais_capturados.rq` (agregada): os 10 artigos com mais capturas e o
+   intervalo temporal que cobrem.
+4. `capturas_por_ano.rq` (agregada/temporal): capturas e textos disponíveis
+   por ano de captura.
+5. `textos_por_status.rq` (agregada): capturas com e sem texto por
+   `statusCode`.
+
+**Testes:** só onde a lógica pode falhar — contagens das queries agregadas
+sobre um grafo pequeno (o risco real é a contagem errada com `OPTIONAL` +
+`COUNT`), a ordem e o filtro por artigo do histórico, e a geração (todas as
+ligações entre páginas apontam para ficheiros gerados; títulos com `<`/`&`
+escapados). A formatação das tabelas não tem teste dedicado.
+
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 
 **Estado em 2026-09-20: script escrito e testado em 2026-09-19 e executado pelo

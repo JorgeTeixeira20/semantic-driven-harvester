@@ -1,0 +1,12 @@
+# Agregada: capturas com e sem texto disponível por statusCode.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+
+SELECT ?status (COUNT(DISTINCT ?captura) AS ?capturas)
+       (COUNT(DISTINCT ?texto) AS ?com_texto)
+WHERE {
+  ?captura a sdh:CapturaArquivada .
+  OPTIONAL { ?captura sdh:statusCode ?status }
+  OPTIONAL { ?captura sdh:temTextoExtraido ?texto }
+}
+GROUP BY ?status
+ORDER BY ?status

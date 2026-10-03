@@ -1,0 +1,14 @@
+# (iii) Agregada: os 10 artigos com mais capturas e o intervalo que cobrem.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?artigo ?titulo (COUNT(DISTINCT ?captura) AS ?capturas)
+       (MIN(?data) AS ?primeira) (MAX(?data) AS ?ultima)
+WHERE {
+  ?artigo a sdh:Artigo ; rdfs:label ?titulo ; sdh:temRecursoWeb ?recurso .
+  ?recurso sdh:temCaptura ?captura .
+  ?captura sdh:capturedAt ?data .
+}
+GROUP BY ?artigo ?titulo
+ORDER BY DESC(?capturas) ?titulo
+LIMIT 10
