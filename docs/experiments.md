@@ -2360,8 +2360,17 @@ VMAEIADT… · 23319 · texto sim · Arquivo.pt`, `2017-05-31 01:00 ·
 20170531010057 · 200 · SQQKVPJJ… · 23284 · sim`, … — uma linha por captura,
 com ligação à captura no Arquivo.pt.
 
-**Limitações:** HTML estático (sem pesquisa nem filtros; cada nova pergunta
-exige uma nova query `.rq` e regenerar); só o grafo do Caminho A — redundância
+**Pesquisa e filtro (acrescentados a pedido do autor, 2026-10-03):** a lista
+"Todos os artigos" tem uma caixa de pesquisa (título e URL, sem distinguir
+maiúsculas nem acentos, várias palavras combinadas), um filtro por secção do
+site (primeiro segmento do URL, com contagens: futebol 59, internacional 22,
+multimedia 20, modalidades 12, …) e um contador "N de 127 artigos". JavaScript
+embutido na página, sem bibliotecas externas nem servidor; a lógica foi
+verificada com Node sobre as linhas reais (por exemplo "zivkovic" → 7
+artigos), não num browser automatizado.
+
+**Limitações:** HTML estático (a pesquisa só filtra a lista de artigos; cada
+nova pergunta ao grafo exige uma nova query `.rq` e regenerar); só o grafo do Caminho A — redundância
 (D) e temas/entidades (B) continuam fora até terem representação RDF; as
 ligações para o Arquivo.pt dependem da disponibilidade do serviço; os textos
 extraídos não são mostrados (estão fora do Git).

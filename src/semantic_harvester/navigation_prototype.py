@@ -18,9 +18,12 @@ from __future__ import annotations
 import argparse
 import html
 import shutil
+from collections import Counter
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from rdflib import Graph, URIRef
 
@@ -38,6 +41,36 @@ th { background: #f6f8fa; }
 th.n, td.n { text-align: center; font-variant-numeric: tabular-nums; }
 p.meta, footer { color: #59636e; font-size: .85rem; }
 code { font-size: .85rem; }
+.filtros { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: .5rem 0 1rem; }
+.filtros input { flex: 1 1 20rem; padding: .4rem .6rem; font-size: .95rem;
+                 border: 1px solid #d0d7de; border-radius: 6px; }
+.filtros select { padding: .4rem; font-size: .95rem; border: 1px solid #d0d7de; border-radius: 6px; }
+"""
+
+# Filtro do lado do cliente: só a lista de artigos; sem bibliotecas externas.
+FILTER_SCRIPT = """
+(function () {
+  const fold = s => s.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();
+  const input = document.getElementById('pesquisa');
+  const select = document.getElementById('secao');
+  const rows = Array.from(document.querySelectorAll('#artigos tbody tr'));
+  const count = document.getElementById('contagem');
+  function apply() {
+    const terms = fold(input.value).split(/\\s+/).filter(Boolean);
+    const section = select.value;
+    let shown = 0;
+    for (const row of rows) {
+      const ok = (!section || row.dataset.secao === section) &&
+                 terms.every(t => row.dataset.texto.includes(t));
+      row.hidden = !ok;
+      if (ok) shown++;
+    }
+    count.textContent = shown + ' de ' + rows.length + ' artigos';
+  }
+  input.addEventListener('input', apply);
+  select.addEventListener('change', apply);
+  apply();
+})();
 """
 
 
@@ -89,29 +122,50 @@ def link(href: str, text: Any) -> str:
     return f'<a href="{html.escape(href, quote=True)}">{esc(text)}</a>'
 
 
-def table(headers: list[str], rows: list[list[str]], numeric: set[int] = frozenset()) -> str:
+def table(
+    headers: list[str], rows: list[list[str]], numeric: set[int] = frozenset(),
+    table_id: str = "", row_attrs: list[str] | None = None,
+) -> str:
     head = "".join(
         f'<th class="n">{html.escape(h)}</th>' if i in numeric else f"<th>{html.escape(h)}</th>"
         for i, h in enumerate(headers)
     )
+    attrs = row_attrs or [""] * len(rows)
     body = "".join(
-        "<tr>" + "".join(
+        f"<tr{attr}>" + "".join(
             f'<td class="n">{cell}</td>' if i in numeric else f"<td>{cell}</td>"
             for i, cell in enumerate(row)
         ) + "</tr>"
-        for row in rows
+        for row, attr in zip(rows, attrs)
     )
-    return f"<table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>"
+    ident = f' id="{table_id}"' if table_id else ""
+    return f"<table{ident}><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>"
 
 
-def page(title: str, body: str) -> str:
+def section_of(url: str) -> str:
+    """Primeiro segmento do caminho do URL (secção do site)."""
+
+    parts = [p for p in urlsplit(url).path.split("/") if p]
+    return parts[0].lower() if parts else ""
+
+
+def search_text(*values: Any) -> str:
+    """Texto sem acentos e em minúsculas, para o filtro do lado do cliente."""
+
+    text = " ".join(fmt(v) for v in values).casefold()
+    return "".join(c for c in unicodedata.normalize("NFD", text) if not unicodedata.combining(c))
+
+
+def page(title: str, body: str, script: str = "") -> str:
     return (
         "<!doctype html>\n<html lang=\"pt\"><head><meta charset=\"utf-8\">"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
         f"<title>{html.escape(title)}</title><style>{STYLE}</style></head><body>"
         f"{body}<footer><p>Gerado por <code>semantic_harvester.navigation_prototype</code> "
         f"a partir de <code>output/corpus_articles.ttl</code> com as queries de "
-        f"<code>queries/</code>.</p></footer></body></html>\n"
+        f"<code>queries/</code>.</p></footer>"
+        + (f"<script>{script}</script>" if script else "")
+        + "</body></html>\n"
     )
 
 
@@ -139,13 +193,22 @@ def index_page(
                 esc(r["capturas"]), esc(r["primeira"]), esc(r["ultima"])] for r in top],
               numeric={1}),
         "<h2>Todos os artigos</h2>",
+        '<div class="filtros"><input id="pesquisa" type="search" '
+        'placeholder="Pesquisar no título ou no URL…" aria-label="Pesquisar artigos">'
+        '<select id="secao" aria-label="Filtrar por secção"><option value="">Todas as secções</option>'
+        + "".join(f'<option value="{esc(sec)}">{esc(sec)} ({n})</option>'
+                  for sec, n in sorted(Counter(section_of(r["url"]) for r in articles).items()))
+        + '</select><span id="contagem" class="meta"></span></div>',
         table(["Artigo", "URL original (RecursoWeb)", "Capturas", "Com texto", "Primeira", "Última"],
               [[link(f"{ARTICLES_DIR}/{article_id(r['artigo'])}.html", r["titulo"]),
                 link(r["url"], r["url"]), esc(r["capturas"]), esc(r["textos"]),
                 esc(r["primeira"]), esc(r["ultima"])] for r in articles],
-              numeric={2, 3}),
+              numeric={2, 3}, table_id="artigos",
+              row_attrs=[f' data-secao="{esc(section_of(r["url"]))}"'
+                         f' data-texto="{html.escape(search_text(r["titulo"], r["url"]), quote=True)}"'
+                         for r in articles]),
     ]
-    return page("Protótipo de navegação", "".join(body))
+    return page("Protótipo de navegação", "".join(body), FILTER_SCRIPT)
 
 
 def article_page(article: dict, history: list[dict]) -> str:

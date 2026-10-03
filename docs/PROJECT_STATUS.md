@@ -424,8 +424,10 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    texto por `statusCode`. Sem servidor nem dependências novas. Resultado real:
    127 páginas de artigo, 941 linhas de histórico, totais iguais aos do
    Caminho A; tornou visível que as capturas vão de 2017 a 2023 (nenhuma de
-   2015–2016) e que as 24 de 2020–2023 não têm texto. Fora desta versão: dados
-   de D e B (sem RDF ainda) e interatividade (pesquisa/filtros).
+   2015–2016) e que as 24 de 2020–2023 não têm texto. A lista de artigos tem
+   pesquisa por título/URL e filtro por secção (JavaScript embutido, sem
+   dependências). Fora desta versão: dados de D e B (sem RDF ainda) e
+   consultas novas sem regenerar.
 
 **Trabalho relacionado consultado:** *Major Minors* (Martins & Costa, Prémio
 Arquivo.pt 2021, também referido no RPD) deduplica apenas por título exato
