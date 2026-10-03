@@ -1,17 +1,110 @@
 <!doctype html>
-<html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Yusupha com pouca margem</title><style>
-body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 72rem;
-       padding: 0 1rem; color: #1f2328; background: #fff; }
-h1 { font-size: 1.5rem; } h2 { font-size: 1.2rem; margin-top: 2rem; }
-table { border-collapse: collapse; width: 100%; font-size: .9rem; }
-th, td { border-bottom: 1px solid #d0d7de; padding: .35rem .5rem; text-align: left;
-         vertical-align: top; }
-th { background: #f6f8fa; }
+<html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark"><title>Yusupha com pouca margem</title><style>
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --text: #0f172a; --muted: #64748b;
+  --border: #e2e8f0; --row-hover: #f8fafc; --accent: #4f46e5; --accent-soft: #eef2ff;
+  --ok: #047857; --ok-bg: #d1fae5; --warn: #b45309; --warn-bg: #fef3c7;
+  --bad: #b91c1c; --bad-bg: #fee2e2; --bar: #c7d2fe; --bar-strong: #6366f1;
+  --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 4px 16px rgba(15, 23, 42, .06);
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1020; --surface: #121a2e; --text: #e2e8f0; --muted: #94a3b8;
+    --border: #23304d; --row-hover: #18223a; --accent: #a5b4fc; --accent-soft: #1e2546;
+    --ok: #6ee7b7; --ok-bg: #0f3b2e; --warn: #fcd34d; --warn-bg: #3b2f10;
+    --bad: #fca5a5; --bad-bg: #3f1a1a; --bar: #2e3a6b; --bar-strong: #818cf8;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px rgba(0, 0, 0, .25);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; overflow-x: hidden; background: var(--bg); color: var(--text); line-height: 1.5;
+       font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+             "Helvetica Neue", Arial, sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+              font-size: .8rem; }
+.wrap { max-width: 76rem; margin: 0 auto; padding: 0 1.25rem; }
+header.hero { background: linear-gradient(135deg, #312e81 0%, #4f46e5 55%, #7c3aed 100%);
+              color: #fff; padding: 2.5rem 0 4.5rem; }
+header.hero .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .72rem;
+                       opacity: .8; margin: 0 0 .6rem; }
+header.hero h1 { font-size: clamp(1.5rem, 3vw, 2.2rem); line-height: 1.2; margin: 0 0 .6rem;
+                 letter-spacing: -.02em; font-weight: 700; }
+header.hero p { margin: 0; max-width: 46rem; opacity: .9; }
+header.hero a { color: #fff; opacity: .85; }
+.crumb { font-size: .85rem; margin: 0 0 1rem; }
+main { margin-top: -3rem; padding-bottom: 3rem; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(9.5rem, 100%), 1fr));
+         gap: 1rem; margin-bottom: 1.5rem; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+        box-shadow: var(--shadow); padding: 1rem 1.2rem; }
+.stat .label { color: var(--muted); font-size: .78rem; text-transform: uppercase;
+               letter-spacing: .06em; }
+.stat .value { font-size: 1.7rem; font-weight: 700; letter-spacing: -.02em; margin-top: .15rem;
+               font-variant-numeric: tabular-nums; }
+.stat .value.small { font-size: 1.1rem; }
+.stat .hint { color: var(--muted); font-size: .8rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
+          gap: 1.5rem; }
+.grid-2 { margin-bottom: 1.5rem; } .grid-2 > .card { margin-bottom: 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+        box-shadow: var(--shadow); padding: 1.25rem 1.25rem .75rem; margin-bottom: 1.5rem;
+        min-width: 0; }
+.card h2 { font-size: 1.05rem; margin: 0 0 .25rem; letter-spacing: -.01em; }
+.card .sub { color: var(--muted); font-size: .85rem; margin: 0 0 .9rem; }
+.table-wrap { overflow: auto; margin: 0 -1.25rem; }
+.table-wrap.tall { max-height: 70vh; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .88rem; }
+th, td { padding: .6rem .9rem; text-align: left; vertical-align: middle;
+         border-bottom: 1px solid var(--border); }
+th:first-child, td:first-child { padding-left: 1.25rem; }
+th:last-child, td:last-child { padding-right: 1.25rem; }
+thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); color: var(--muted);
+           font-weight: 600; font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; }
+tbody tr { transition: background-color .12s ease; }
+tbody tr:hover { background: var(--row-hover); }
+tbody tr:last-child td { border-bottom: 0; }
 th.n, td.n { text-align: center; font-variant-numeric: tabular-nums; }
-p.meta, footer { color: #59636e; font-size: .85rem; }
-code { font-size: .85rem; }
-.filtros { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: .5rem 0 1rem; }
-.filtros input { flex: 1 1 20rem; padding: .4rem .6rem; font-size: .95rem;
-                 border: 1px solid #d0d7de; border-radius: 6px; }
-.filtros select { padding: .4rem; font-size: .95rem; border: 1px solid #d0d7de; border-radius: 6px; }
-</style></head><body><p><a href="../index.html">← todos os artigos</a></p><h1>Yusupha com pouca margem</h1><p class="meta">URL original: <a href="https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html</a><br>14 capturas, 13 com texto; de 2018-03-29 09:09 a 2018-04-21 10:52.</p><h2>Histórico de capturas (ordem cronológica)</h2><table><thead><tr><th>Data</th><th>tstamp</th><th>statusCode</th><th>digest</th><th class="n">Tamanho</th><th>Texto</th><th>Captura</th></tr></thead><tbody><tr><td>2018-03-29 09:09</td><td>20180329090955</td><td>200</td><td><code>CRG2XBGBXFX5UFIOZMXULYQXVT2ND225</code></td><td class="n">12183</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180329090955/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-03-30 07:59</td><td>20180330075931</td><td>200</td><td><code>QU4HLEWWBVHQ7EHWM5U5HYCETGCXPWLU</code></td><td class="n">12306</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180330075931/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-01 10:16</td><td>20180401101656</td><td>200</td><td><code>S4LBGT2QKTXNKFWR5BCUQK5ZFOHBCIQU</code></td><td class="n">12134</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180401101656/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-03 09:24</td><td>20180403092439</td><td>200</td><td><code>AXLU6DBMABGXW5XAHSRJMQ67ITNWPDJC</code></td><td class="n">12297</td><td>não</td><td><a href="https://arquivo.pt/wayback/20180403092439/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-04 10:24</td><td>20180404102408</td><td>200</td><td><code>I4JNVOMVOM7YRFLOEAYOL27SGQZ5THKQ</code></td><td class="n">11948</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180404102408/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-06 09:41</td><td>20180406094115</td><td>200</td><td><code>ANSMU4HKPI5O672T3WB2O2TSQQOEM7ZG</code></td><td class="n">12339</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180406094115/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-08 09:54</td><td>20180408095442</td><td>200</td><td><code>KOOS6JPFVPJGNG6ODYIHTQLYDZXJ4D44</code></td><td class="n">12441</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180408095442/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-09 10:10</td><td>20180409101021</td><td>200</td><td><code>VAFHYBNDRK6D5DJWAXDETZ5AECIB26M4</code></td><td class="n">12323</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180409101021/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-10 09:55</td><td>20180410095514</td><td>200</td><td><code>JWYQKSQ2RL6OITCJMTDVR46KQPMXHLEM</code></td><td class="n">12428</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180410095514/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-14 12:45</td><td>20180414124542</td><td>200</td><td><code>TBQTSCZPCESF7NQBLFMBHXEB6ICT4UZL</code></td><td class="n">12446</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180414124542/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-18 11:26</td><td>20180418112603</td><td>200</td><td><code>KKPFUXS62MDT3WOC3FR23NC5NKO3MV42</code></td><td class="n">12475</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180418112603/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-19 11:00</td><td>20180419110021</td><td>200</td><td><code>W47QNDQWCJQWDLSSS56PSCOZCYROJKSO</code></td><td class="n">12295</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180419110021/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-21 02:55</td><td>20180421025511</td><td>200</td><td><code>OWN62ZDUTR34O3TDI4VHFNZFIAAFCE6A</code></td><td class="n">12309</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180421025511/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr><tr><td>2018-04-21 10:52</td><td>20180421105202</td><td>200</td><td><code>XZV6CFKZ4MTNBY7HKRRXYNB73YQDQVQ2</code></td><td class="n">12368</td><td>sim</td><td><a href="https://arquivo.pt/wayback/20180421105202/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Arquivo.pt</a></td></tr></tbody></table><footer><p>Gerado por <code>semantic_harvester.navigation_prototype</code> a partir de <code>output/corpus_articles.ttl</code> com as queries de <code>queries/</code>.</p></footer></body></html>
+thead th, td.date { white-space: nowrap; }
+td.date { color: var(--muted); font-variant-numeric: tabular-nums; }
+td.url { color: var(--muted); max-width: 26rem; overflow: hidden; text-overflow: ellipsis;
+         white-space: nowrap; }
+td.url a { color: inherit; }
+td.title a { font-weight: 550; }
+.rank { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; margin-right: .5rem;
+        border-radius: 999px; background: var(--accent-soft); color: var(--accent);
+        font-size: .75rem; font-weight: 700; }
+.badge { display: inline-block; padding: .12rem .55rem; border-radius: 999px; font-size: .76rem;
+         font-weight: 600; font-variant-numeric: tabular-nums; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.warn { color: var(--warn); background: var(--warn-bg); }
+.badge.bad { color: var(--bad); background: var(--bad-bg); }
+.badge.muted { color: var(--muted); background: var(--row-hover); }
+.bar { position: relative; height: .5rem; min-width: 6rem; border-radius: 999px; background: var(--bar);
+       overflow: hidden; }
+.bar span { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: var(--bar-strong); }
+.filtros { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: 0 0 1rem; }
+.filtros input, .filtros select { font: inherit; color: var(--text); background: var(--bg);
+       border: 1px solid var(--border); border-radius: 10px; padding: .6rem .8rem; outline: none;
+       transition: border-color .12s ease, box-shadow .12s ease; }
+.filtros input { flex: 1 1 20rem; padding-left: 2.2rem;
+       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+       background-repeat: no-repeat; background-position: .75rem center; }
+.filtros input:focus, .filtros select:focus { border-color: var(--accent);
+       box-shadow: 0 0 0 3px var(--accent-soft); }
+#contagem { color: var(--accent); background: var(--accent-soft); border-radius: 999px;
+            padding: .3rem .75rem; font-size: .82rem; font-weight: 600; white-space: nowrap; }
+.chip { display: inline-flex; align-items: center; gap: .35rem; max-width: 100%;
+        background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .25);
+        border-radius: 999px; padding: .3rem .8rem; font-size: .82rem; margin-top: 1rem;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+footer { color: var(--muted); font-size: .8rem; padding: 0 0 2.5rem; }
+@media (max-width: 640px) {
+  header.hero { padding: 1.75rem 0 4rem; }
+  td.url { max-width: 12rem; }
+  .table-wrap { margin: 0 -1.25rem; }
+}
+</style></head><body><header class="hero"><div class="wrap"><p class="crumb"><a href="../index.html">← Todos os artigos</a></p><h1>Yusupha com pouca margem</h1><a class="chip" href="https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html ↗</a></div></header><main class="wrap"><div class="stats"><div class="stat"><div class="label">Capturas</div><div class="value">14</div></div><div class="stat"><div class="label">Com texto</div><div class="value">13</div></div><div class="stat"><div class="label">Primeira captura</div><div class="value small">2018-03-29 09:09</div></div><div class="stat"><div class="label">Última captura</div><div class="value small">2018-04-21 10:52</div></div></div><section class="card"><h2>Histórico de capturas</h2><p class="sub">Por ordem cronológica, uma linha por captura.</p><div class="table-wrap"><table><thead><tr><th>Data</th><th>tstamp</th><th class="n">statusCode</th><th>digest</th><th class="n">Tamanho (bytes)</th><th class="n">Texto</th><th>Arquivo.pt</th></tr></thead><tbody><tr><td class="date">2018-03-29 09:09</td><td><span class="mono">20180329090955</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">CRG2XBGBXFX5UFIOZMXULYQXVT2ND225</span></td><td class="n">12183</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180329090955/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-03-30 07:59</td><td><span class="mono">20180330075931</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">QU4HLEWWBVHQ7EHWM5U5HYCETGCXPWLU</span></td><td class="n">12306</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180330075931/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-01 10:16</td><td><span class="mono">20180401101656</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">S4LBGT2QKTXNKFWR5BCUQK5ZFOHBCIQU</span></td><td class="n">12134</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180401101656/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-03 09:24</td><td><span class="mono">20180403092439</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">AXLU6DBMABGXW5XAHSRJMQ67ITNWPDJC</span></td><td class="n">12297</td><td class="n"><span class="badge muted">não</span></td><td><a href="https://arquivo.pt/wayback/20180403092439/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-04 10:24</td><td><span class="mono">20180404102408</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">I4JNVOMVOM7YRFLOEAYOL27SGQZ5THKQ</span></td><td class="n">11948</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180404102408/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-06 09:41</td><td><span class="mono">20180406094115</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">ANSMU4HKPI5O672T3WB2O2TSQQOEM7ZG</span></td><td class="n">12339</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180406094115/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-08 09:54</td><td><span class="mono">20180408095442</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">KOOS6JPFVPJGNG6ODYIHTQLYDZXJ4D44</span></td><td class="n">12441</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180408095442/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-09 10:10</td><td><span class="mono">20180409101021</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">VAFHYBNDRK6D5DJWAXDETZ5AECIB26M4</span></td><td class="n">12323</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180409101021/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-10 09:55</td><td><span class="mono">20180410095514</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">JWYQKSQ2RL6OITCJMTDVR46KQPMXHLEM</span></td><td class="n">12428</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180410095514/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-14 12:45</td><td><span class="mono">20180414124542</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">TBQTSCZPCESF7NQBLFMBHXEB6ICT4UZL</span></td><td class="n">12446</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180414124542/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-18 11:26</td><td><span class="mono">20180418112603</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">KKPFUXS62MDT3WOC3FR23NC5NKO3MV42</span></td><td class="n">12475</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180418112603/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-19 11:00</td><td><span class="mono">20180419110021</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">W47QNDQWCJQWDLSSS56PSCOZCYROJKSO</span></td><td class="n">12295</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180419110021/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-21 02:55</td><td><span class="mono">20180421025511</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">OWN62ZDUTR34O3TDI4VHFNZFIAAFCE6A</span></td><td class="n">12309</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180421025511/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr><tr><td class="date">2018-04-21 10:52</td><td><span class="mono">20180421105202</span></td><td class="n"><span class="badge ok">200</span></td><td><span class="mono">XZV6CFKZ4MTNBY7HKRRXYNB73YQDQVQ2</span></td><td class="n">12368</td><td class="n"><span class="badge ok">sim</span></td><td><a href="https://arquivo.pt/wayback/20180421105202/https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html">Abrir ↗</a></td></tr></tbody></table></div></section></main><footer class="wrap"><p>Gerado por <code>semantic_harvester.navigation_prototype</code> a partir de <code>output/corpus_articles.ttl</code> com as queries SPARQL de <code>queries/</code>.</p></footer></body></html>
