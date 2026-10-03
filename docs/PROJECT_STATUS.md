@@ -135,7 +135,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 150 testes em nove módulos de `tests/`.
+pacote conforme o README. Existem 154 testes em dez módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -157,10 +157,12 @@ separação dos rótulos e execução não destrutiva) e os temas/entidades do C
 variantes, chrome do menu removido, persistência entre capturas, temas a
 partir de URLs) e o vocabulário da Wikidata (`test_wikidata_vocabulary.py`:
 sobreposição de datas, regras de variantes e homónimos, respostas guardadas
-em bruto, com sessão simulada).
+em bruto, com sessão simulada) e o protótipo de navegação
+(`test_navigation_prototype.py`: contagens das queries sobre um grafo pequeno,
+ordem e filtro do histórico, ligações entre páginas e escape de títulos).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **150 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **154 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -412,6 +414,18 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
    construída cedo (não deixada para o fim) para reduzir o risco de ficar sem
    este entregável; uma interface mais interativa fica condicional a sobrar tempo.
+
+   **Versão mínima implementada e gerada em 2026-10-03**
+   (`src/semantic_harvester/navigation_prototype.py`, queries em `queries/`):
+   páginas HTML estáticas em `output/prototipo/` (abrir `index.html`), geradas
+   com `rdflib` a partir de 5 queries SPARQL sobre `output/corpus_articles.ttl`
+   — artigos com RecursoWeb e nº de capturas, histórico cronológico de cada
+   artigo (ligado ao Arquivo.pt), artigos mais capturados, capturas por ano e
+   texto por `statusCode`. Sem servidor nem dependências novas. Resultado real:
+   127 páginas de artigo, 941 linhas de histórico, totais iguais aos do
+   Caminho A; tornou visível que as capturas vão de 2017 a 2023 (nenhuma de
+   2015–2016) e que as 24 de 2020–2023 não têm texto. Fora desta versão: dados
+   de D e B (sem RDF ainda) e interatividade (pesquisa/filtros).
 
 **Trabalho relacionado consultado:** *Major Minors* (Martins & Costa, Prémio
 Arquivo.pt 2021, também referido no RPD) deduplica apenas por título exato

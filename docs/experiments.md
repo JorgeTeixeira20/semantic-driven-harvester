@@ -2270,7 +2270,7 @@ capturas espaçadas no tempo e não atua nos 41 artigos de uma captura; o sinal
 de clube cobre apenas os 50 artigos com clube no URL e não distingue
 menções legítimas a outros clubes.
 
-## Protótipo de navegação (proposta, 2026-10-03)
+## Protótipo de navegação (implementado e gerado, 2026-10-03)
 
 **Âmbito já decidido (PROJECT_STATUS.md):** versão mínima baseada em SPARQL
 sobre o grafo existente; interface mais interativa só se sobrar tempo. Por
@@ -2315,6 +2315,56 @@ sobre um grafo pequeno (o risco real é a contagem errada com `OPTIONAL` +
 `COUNT`), a ordem e o filtro por artigo do histórico, e a geração (todas as
 ligações entre páginas apontam para ficheiros gerados; títulos com `<`/`&`
 escapados). A formatação das tabelas não tem teste dedicado.
+
+### Resultado real (2026-10-03)
+
+`python -m semantic_harvester.navigation_prototype` (cerca de 3 s; sem rede;
+checksum de `output/corpus_articles.ttl` igual antes e depois) gerou
+`output/prototipo/` (816 KB): `index.html` + 127 páginas de artigo, com 127
+ligações locais (todas para ficheiros gerados) e 941 linhas de histórico no
+total. Os totais coincidem com os do Caminho A: 127 artigos, 941 capturas, 789
+com texto.
+
+Exemplos de saída (valores reais das queries):
+
+*Capturas por ano* (`capturas_por_ano.rq`):
+
+| Ano | Capturas | Com texto | Artigos |
+| ---: | ---: | ---: | ---: |
+| 2017 | 554 | 491 | 52 |
+| 2018 | 246 | 194 | 43 |
+| 2019 | 117 | 104 | 47 |
+| 2020 | 12 | 0 | 4 |
+| 2021 | 6 | 0 | 2 |
+| 2022 | 4 | 0 | 1 |
+| 2023 | 2 | 0 | 1 |
+
+Observação que o protótipo tornou visível e não estava registada: **não há
+capturas de 2015 nem de 2016** (a pesquisa da Fase 1 foi feita para 2015–2020,
+mas as capturas do `version_history` começam em 2017), e as 24 capturas de
+2020–2023 não têm nenhum texto.
+
+*Texto disponível por `statusCode`* (`textos_por_status.rq`): 200 → 906
+capturas, 789 com texto; 302 → 32, 0; 404 → 2, 0; 301 → 1, 0 (as 35 capturas
+não-200 já documentadas, todas sem texto).
+
+*Artigos com mais capturas* (`mais_capturados.rq`, os 3 primeiros): vídeo
+"Zungu aproveitou distração da defesa do Benfica para marcar", 73 capturas
+(2017-05-30 a 2017-08-11); vídeo "Abel Xavier: «Vemos o FC Porto à imagem de
+Sérgio Conceição»", 72 (2018-02-15 a 2018-04-28); "Exibição de Zivkovic não
+espanta 'Drulo'", 51 (2017-01-05 a 2017-03-03).
+
+*Histórico de um artigo* (`historico_artigo.rq`, página do vídeo do Zungu,
+primeiras linhas): `2017-05-30 01:01 · 20170530010157 · 200 ·
+VMAEIADT… · 23319 · texto sim · Arquivo.pt`, `2017-05-31 01:00 ·
+20170531010057 · 200 · SQQKVPJJ… · 23284 · sim`, … — uma linha por captura,
+com ligação à captura no Arquivo.pt.
+
+**Limitações:** HTML estático (sem pesquisa nem filtros; cada nova pergunta
+exige uma nova query `.rq` e regenerar); só o grafo do Caminho A — redundância
+(D) e temas/entidades (B) continuam fora até terem representação RDF; as
+ligações para o Arquivo.pt dependem da disponibilidade do serviço; os textos
+extraídos não são mostrados (estão fora do Git).
 
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 

@@ -58,6 +58,7 @@ output/*
 !output/corpus_redundancy_versions.csv
 !output/corpus_entities.csv
 !output/corpus_entities_summary.md
+!output/prototipo/
 data/processed/corpus_articles_triples.nt.pre-rebuild
 
 # Metadados do Finder (macOS)
