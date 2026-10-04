@@ -727,6 +727,22 @@ class TrackingVariantsTests(OfflineTestCase):
         self.assertFalse(states["variantes_fundidas"])
         self.assertFalse(states["antigo_contido_no_novo"])
 
+    def test_retry_recovery_of_a_merged_variant_is_not_counted_again(self) -> None:
+        """O relatório da retentativa usa o URL da variante; depois da fusão o
+        texto tem o URI do artigo canónico e não pode contar como em falta."""
+
+        self.write_classification([
+            {"original_url": VARIANT_B, "title": "Variante", "captures": "3", "is_artigo": "True",
+             "reason": "artigo", "variantes": VARIANT_A},
+        ])
+        rebuild_offline(self.root)
+        with (self.output_dir / "corpus_text_retry_report.csv").open("w", encoding="utf-8", newline="") as h:
+            h.write(f"original_url,tstamp,outcome\n{VARIANT_A},20200101000000,success\n")
+
+        checks, _, _ = rebuild_offline(self.root, apply=False)
+
+        self.assertTrue({c.name: c.passed for c in checks}["textos_esperados"], checks)
+
 
 if __name__ == "__main__":
     unittest.main()

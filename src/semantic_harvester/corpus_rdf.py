@@ -65,7 +65,7 @@ from rdflib import RDF, RDFS, Graph, XSD
 
 from .arquivo_client import ArquivoClient, TextDownloadResult
 from .history_pipeline import build_manifest_records
-from .rdf_mapper import SDH, build_article_history_graph, extracted_text_uri, stable_hash
+from .rdf_mapper import SDH, build_article_history_graph, stable_hash
 from .url_identity import strip_scheme, strip_tracking_params
 
 LOGGER = logging.getLogger(__name__)
@@ -426,7 +426,7 @@ def build_corpus_graph(
 
         with report_csv.open("a", encoding="utf-8", newline="") as report_handle:
             with triples_path.open("a", encoding="utf-8") as triples_handle:
-                writer = csv.DictWriter(report_handle, fieldnames=list(RESULT_FIELDS))
+                writer = csv.DictWriter(report_handle, fieldnames=list(RESULT_FIELDS), lineterminator="\n")
                 if write_header:
                     writer.writeheader()
 
@@ -583,12 +583,16 @@ def _count(graph: Graph, rdf_class: Any) -> int:
 def _recovered_by_retry(retry_report: Path, old_graph: Graph) -> tuple[int, int]:
     """(recuperadas pela retentativa, das quais ainda sem texto no grafo antigo)."""
 
-    old_texts = set(old_graph.subjects(RDF.type, SDH.TextoExtraido))
+    # Compara pelo ficheiro, não pelo URI do texto: depois de fundir variantes de
+    # URL, o texto de uma variante passa a ter o URI do artigo canónico.
+    old_files = {Path(str(o)).name for o in old_graph.objects(None, SDH.filePath)}
     with retry_report.open(encoding="utf-8", newline="") as handle:
         recovered = [row for row in csv.DictReader(handle) if row["outcome"] != "failed"]
     new = sum(
         1 for row in recovered
-        if extracted_text_uri(row["original_url"], row["tstamp"]) not in old_texts
+        if ArquivoClient._text_filename(
+            {"originalURL": row["original_url"], "tstamp": row["tstamp"]}
+        ) not in old_files
     )
     return len(recovered), new
 
@@ -775,7 +779,7 @@ def rebuild_offline(
         triples_path.parent.mkdir(parents=True, exist_ok=True)
         new_graph.serialize(destination=triples_path, format="nt", encoding="utf-8")
         with report_csv.open("w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=list(RESULT_FIELDS))
+            writer = csv.DictWriter(handle, fieldnames=list(RESULT_FIELDS), lineterminator="\n")
             writer.writeheader()
             writer.writerows(asdict(result) for result in results)
         new_graph.serialize(destination=ttl_path, format="turtle")

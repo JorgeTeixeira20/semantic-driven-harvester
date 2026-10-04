@@ -149,7 +149,7 @@ def classify_corpus(
 def write_csv(results: list[ClassificationResult], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(asdict(results[0])))
+        writer = csv.DictWriter(handle, fieldnames=list(asdict(results[0])), lineterminator="\n")
         writer.writeheader()
         writer.writerows(asdict(result) for result in results)
 
