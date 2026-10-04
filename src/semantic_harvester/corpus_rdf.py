@@ -593,6 +593,25 @@ def _recovered_by_retry(retry_report: Path, old_graph: Graph) -> tuple[int, int]
     return len(recovered), new
 
 
+def _found_by_capture_url(old_graph: Graph, new_graph: Graph) -> int:
+    """Textos novos cujo ficheiro tem o hash de outra forma do URL (não do canónico).
+
+    São textos já em cache, guardados com o hash do URL real da captura (por
+    exemplo com barra dupla, antes da correção das variantes cosméticas), que
+    a procura só pelo hash canónico não encontrava (`docs/experiments.md`).
+    """
+
+    old_files = {str(o) for o in old_graph.objects(None, SDH.filePath)}
+    count = 0
+    for text, path in new_graph.subject_objects(SDH.filePath):
+        if str(path) in old_files:
+            continue
+        canonical_hash16 = str(text).rsplit("/", 2)[-2][:16]
+        file_hash16 = Path(str(path)).stem.rsplit("_", 1)[-1]
+        count += file_hash16 != canonical_hash16
+    return count
+
+
 def _merged_variants(
     old_graph: Graph, new_graph: Graph, retained: list[dict[str, str]]
 ) -> tuple[set[str], set[str], set[str]]:
@@ -655,12 +674,15 @@ def verify_rebuild(
     else:
         old_texts = _count(old_graph, SDH.TextoExtraido)
         recovered, recovered_new = _recovered_by_retry(retry_report, old_graph)
+        by_capture_url = _found_by_capture_url(old_graph, new_graph)
+        expected = old_texts + recovered_new + by_capture_url
         checks.append(Check(
             "textos_esperados",
-            new_texts == old_texts + recovered_new,
+            new_texts == expected,
             f"{new_texts} TextoExtraido no novo; {old_texts} no antigo + "
             f"{recovered_new} recuperadas pela retentativa ainda não incorporadas "
-            f"(de {recovered}) = {old_texts + recovered_new}",
+            f"(de {recovered}) + {by_capture_url} já em cache encontrados pelo URL "
+            f"real da captura = {expected}",
         ))
 
     if old_graph is None:

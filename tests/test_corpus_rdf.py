@@ -618,6 +618,29 @@ class RebuildOfflineTests(OfflineRebuildTestCase):
 
         self.assertEqual(self.check_map(checks)["textos_esperados"], False)
 
+    def test_text_cached_under_the_capture_url_is_found_and_explained(self) -> None:
+        """Um texto guardado com o hash do URL real da captura (barra dupla) já
+        estava em cache: passa a ser encontrado e a verificação explica-o."""
+
+        double_slash = REBUILD_URL.replace("/articles/", "//articles/")
+        raw = self.raw_dir / "version_history"
+        page = next(raw.glob("*.json"))
+        payload = json.loads(page.read_text(encoding="utf-8"))
+        payload["response_items"][1]["originalURL"] = double_slash
+        page.write_text(json.dumps(payload), encoding="utf-8")
+        self.cache_text(REBUILD_TSTAMPS[0])
+        self.write_retry_report("success", "failed")
+        rebuild_offline(self.root)
+        name = ArquivoClient._text_filename({"originalURL": double_slash, "tstamp": REBUILD_TSTAMPS[1]})
+        (self.raw_dir / "texts" / name).write_bytes(b"texto antigo")
+
+        checks, _, graph = rebuild_offline(self.root, apply=False)
+
+        states = self.check_map(checks)
+        self.assertTrue(states["textos_esperados"], checks)
+        self.assertNotIn(False, states.values())
+        self.assertEqual(len(set(graph.subjects(RDF.type, SDH.TextoExtraido))), 2)
+
     def test_check_only_requires_rebuild_offline(self) -> None:
         with self.assertRaises(SystemExit) as raised:
             corpus_rdf_main(["--check-only"])
