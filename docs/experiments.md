@@ -2375,6 +2375,87 @@ nova pergunta ao grafo exige uma nova query `.rq` e regenerar); só o grafo do C
 ligações para o Arquivo.pt dependem da disponibilidade do serviço; os textos
 extraídos não são mostrados (estão fora do Git).
 
+## Correção da identidade dos artigos: variantes de URL por parâmetros de rastreio (2026-10-04)
+
+**Achado (do autor e do Jorge, ao navegar no protótipo).** Dois dos 127
+artigos eram o mesmo artigo contado duas vezes, porque `originalURL` só
+diferia em parâmetros de rastreio da origem do clique:
+
+- `…/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_4BucketDestaquesPrincipais`
+  (1 captura) e `…?ref=HP_BlocoColoridoSec%C3%A7%C3%A3oDestaque` (7);
+- `…/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez`
+  (2) e o mesmo com `?utm_medium=Social&…&act=0&est=Aberto` (1).
+
+Causa: `canonical_key()`/`choose_canonical_url()` (classificação) e
+`normalize_for_grouping()` (RDF) só normalizavam esquema e barras, nunca a
+query string. Verificado: em cada par o caminho e o título são iguais e as
+capturas não se repetem (0 `tstamp` em comum).
+
+**A query não pode ser ignorada por inteiro.** Dos 159 URLs da Fase 1, 28
+têm query: 15 do site novo (`/detalhe/<slug>`), todos só com `ref`, `utm_*`,
+`act`, `est`; e 13 do site antigo (`interior.aspx?content_id/x3d…`), onde a
+query **é** o identificador do artigo — ignorá-la fundiria 8 artigos
+diferentes em 3 (todos "Object moved", sem efeito nos artigos retidos, mas
+com relatório de classificação errado). **Decisão do autor (opção A):**
+ignorar só os parâmetros de rastreio conhecidos `ref`, `utm_*`, `act`, `est`;
+qualquer outro parâmetro é mantido.
+
+**Correção** (`src/semantic_harvester/url_identity.py`, regra única usada
+por `corpus_classification` e `corpus_rdf`):
+
+- a classificação agrupa por esquema + rastreio; o URL canónico guardado é
+  um URL real do grupo (prefere `https`, depois sem rastreio, depois o de
+  mais capturas); capturas de variantes de rastreio somam-se (as de esquema
+  não, porque devolveram os mesmos `tstamp`); nova coluna `variantes`;
+- `corpus_rdf` junta o raw de `version_history` de todas as variantes (já em
+  cache, sem pedidos novos), sem `tstamp` repetidos, e a reconstrução
+  offline procura cada texto também pelo hash do **URL real da captura**
+  (os textos das variantes foram guardados com esse hash);
+- as verificações de `--rebuild-offline` foram generalizadas: só podem
+  desaparecer triplos de URLs declarados como variante (`variantes_fundidas`,
+  `antigo_contido_no_novo`), nenhum ficheiro de texto pode deixar de ser
+  referenciado (`ficheiros_de_texto_preservados`) e os textos novos têm de
+  ser explicados (`textos_esperados`).
+
+**Segundo achado, apanhado pela verificação.** A primeira reconstrução
+falhou `textos_esperados`: 793 textos em vez de 789. Os 4 a mais são textos
+**já em cache desde 2026-09-18**, guardados com o hash de URLs com barra
+dupla (`http://www.record.pt//futebol/…/fc-porto-b-sp-braga-b-1-3-…`, 3
+capturas; `…/entrevistas//detalhe/daniel-ramos-expulsao-de-zainadine-e-estranha.html`,
+1), descarregados antes da correção das variantes cosméticas; depois dessa
+correção a procura só pelo hash canónico deixou de os ver. Conteúdo
+verificado (título do artigo certo, `tstamp` da captura). Decisão do autor:
+incorporá-los; `textos_esperados` conta-os numa categoria explícita.
+
+**Execução offline de toda a cadeia** (classificação → `corpus_rdf
+--rebuild-offline` → D com limiar 0,80 → B com o mesmo vocabulário →
+protótipo), todas as verificações OK:
+
+| | Antes | Depois |
+| --- | ---: | ---: |
+| Recursos distintos na classificação | 158 | 156 |
+| Artigos | 127 | **125** |
+| Capturas | 941 | 941 |
+| Textos disponíveis | 789 (83,8%) | **793 (84,3%)** |
+| Triplos | 13 482 | 13 482 |
+| Yamila Rodríguez (capturas / textos) | 1/1 + 7/7 | 8/8 |
+| Equipamento do Barcelona (capturas / textos) | 2 + 1 | 3/2 |
+| D — Camada 1 / Camada 2 / não avaliáveis | 789 / 150 / 2 | 793 / 146 / 2 |
+| D — versões distintas / redundantes (0,80) | 665 / 124 | 666 / 127 |
+| D — validação na amostra (alterado ≥ 0,80; mesma < 0,80) | 0/2; 28/58 | 0/2; 28/58 |
+| B — pares artigo–jogador, persistência / fraca | 291 / 1 424 | 287 / 1 427 |
+| B — artigos com jogador, persistência / fraca | 93 / 118 | 91 / 116 |
+| B — `clube_coerente` (persistência) sim / nao / sem_tema | 82 / 41 / 168 | 82 / 41 / 164 |
+| Protótipo — páginas de artigo | 127 | 125 |
+
+As capturas totais não mudam (só passam a pertencer a um artigo). A
+amostra rotulada do Caminho D não foi reescrita (proteção existente) e os
+seus 60 pares não incluem os artigos fundidos. As secções anteriores deste
+documento mantêm os números medidos na altura; os números atuais são os
+desta tabela. As saídas da variante (b) do Caminho D
+(`output/corpus_chrome_*`, testada e não adotada) não foram regeneradas e
+continuam a descrever o corpus de 127 artigos.
+
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 
 **Estado em 2026-09-20: script escrito e testado em 2026-09-19 e executado pelo

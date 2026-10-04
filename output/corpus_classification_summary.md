@@ -4,8 +4,9 @@ Regra e justificação em `docs/experiments.md`. Execução real sobre os dados 
 
 ## Resumo
 
-- Recursos distintos (depois de normalizar esquema http/https): 158
-- Classificados como Artigo: 127
+- Recursos distintos (depois de agrupar variantes de esquema http/https e de parâmetros de rastreio): 156
+- Recursos com variantes de URL agrupadas: 3
+- Classificados como Artigo: 125
 - Excluídos — `/sabermais/`: 12
 - Excluídos — `Object moved`: 13
 - Excluídos — capturas > 100: 6

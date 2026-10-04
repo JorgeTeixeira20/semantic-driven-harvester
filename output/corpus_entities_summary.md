@@ -2,13 +2,13 @@
 
 Sem pedidos à API; não altera o grafo nem o raw. Anotação por artigo. Vocabulário: `data/processed/caminho_b_vocabulario_wikidata.csv`. Texto pesquisado: sem o chrome persistente (5-gramas em ≥ 0,10 dos artigos).
 
-- Artigos: 127; com texto (Camada 1): 125; com uma só captura com texto (sem proteção de persistência): 41.
+- Artigos: 125; com texto (Camada 1): 123; com uma só captura com texto (sem proteção de persistência): 38.
 
 ## Temas (a partir do `originalURL`)
 
 | Categoria | Artigos com tema | Valores distintos |
 | --- | ---: | ---: |
-| secao | 127 | 14 |
+| secao | 125 | 14 |
 | modalidade | 71 | 9 |
 | competicao | 62 | 7 |
 | clube | 50 | 10 |
@@ -56,9 +56,9 @@ Sem pedidos à API; não altera o grafo nem o raw. Anotação por artigo. Vocabu
 
 ## Entidades mencionadas (vocabulário fechado, no texto)
 
-- Artigos com pelo menos uma entidade, regra de persistência (todas as capturas com texto): 93
-- Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): 118
-- Pares artigo–entidade: 1424 pela regra fraca, 291 pela regra de persistência; destes, 163 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
+- Artigos com pelo menos uma entidade, regra de persistência (todas as capturas com texto): 91
+- Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): 116
+- Pares artigo–entidade: 1427 pela regra fraca, 287 pela regra de persistência; destes, 158 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
 
 ### Coerência de clube (sinal, não filtro)
 
@@ -68,26 +68,26 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | --- | ---: | ---: |
 | sim | 189 | 82 |
 | nao | 333 | 41 |
-| sem_tema | 902 | 168 |
+| sem_tema | 905 | 164 |
 
 | Entidade | Artigos (persistência) | Artigos (≥ 1 captura) |
 | --- | ---: | ---: |
 | Jonas | 16 | 41 |
-| João Félix | 16 | 38 |
 | Bruno Fernandes | 15 | 41 |
+| João Félix | 15 | 37 |
 | Bas Dost | 11 | 37 |
 | Luisão | 11 | 31 |
 | Bernardo Silva | 9 | 29 |
 | Luís Miguel Afonso Fernandes | 7 | 28 |
 | Pepe | 7 | 26 |
-| Renato Sanches | 6 | 36 |
+| Renato Sanches | 5 | 35 |
 | Alan Ruiz | 5 | 29 |
 | Gelson Martins | 5 | 22 |
-| Moreira | 5 | 14 |
 | Rodrigo José Lima dos Santos | 5 | 13 |
 | Paulo Sérgio Mota | 4 | 23 |
 | Douglas Pereira dos Santos | 4 | 17 |
 | Ricardo Costa | 4 | 15 |
+| Moreira | 4 | 13 |
 | Nuno Santos | 4 | 12 |
 | Judilson Mamadu Tuncará Gomes | 4 | 10 |
 | Éderzito António Macedo Lopes | 4 | 9 |
@@ -106,10 +106,10 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Marvin Zeegelaar | 3 | 4 |
 | Rui Patrício | 2 | 25 |
 | Gabriel | 2 | 24 |
+| André Gomes | 2 | 21 |
 | Júlio César Oliveira Martins | 2 | 21 |
-| André Gomes | 2 | 20 |
 | Rúben Dias | 2 | 20 |
-| Gonçalo Guedes | 2 | 14 |
+| Gonçalo Guedes | 2 | 15 |
 | João Palhinha | 2 | 14 |
 | Diogo Gonçalves | 2 | 9 |
 | Francisco Geraldes | 2 | 9 |
@@ -127,18 +127,17 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Lionn | 2 | 2 |
 | Pedro Mendes | 2 | 2 |
 | Gabigol | 1 | 16 |
+| Adrien Silva | 1 | 13 |
 | Bryan Ruiz | 1 | 13 |
-| Adrien Silva | 1 | 12 |
 | Fábio Coentrão | 1 | 12 |
 | António Alberto Bastos Pimparel | 1 | 9 |
+| Casemiro | 1 | 9 |
 | Rodrigo Moreno Machado | 1 | 9 |
 | Rui Daniel Morais Gomes | 1 | 9 |
 | Yannick Djaló | 1 | 9 |
-| Casemiro | 1 | 8 |
 | Rafael Leão | 1 | 8 |
 | Alex Telles | 1 | 7 |
 | Matheus Pereira | 1 | 7 |
-| João Cancelo | 1 | 6 |
 | Raphinha | 1 | 6 |
 | Ryan Gauld | 1 | 6 |
 | Cafú | 1 | 5 |
@@ -156,12 +155,14 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Ahmed Sayed | 1 | 2 |
 | André Sousa | 1 | 2 |
 | Edgar Ié | 1 | 2 |
+| Edinaldo Gomes Pereira | 1 | 2 |
 | Fabinho | 1 | 2 |
 | Fábio Daniel Soares Silva | 1 | 2 |
 | Fábio Fortes | 1 | 2 |
 | Hélder Postiga | 1 | 2 |
 | Moussa Marega | 1 | 2 |
 | Paulo Jorge Pedro Lopes | 1 | 2 |
+| Pintassilgo | 1 | 2 |
 | Rafael Ferreira Silva | 1 | 2 |
 | Rolando Jorge Pires da Fonseca | 1 | 2 |
 | Vítor Bruno | 1 | 2 |
@@ -172,7 +173,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Cédric Soares | 1 | 1 |
 | David Martins Simão | 1 | 1 |
 | Diogo Queirós | 1 | 1 |
-| Edinaldo Gomes Pereira | 1 | 1 |
 | Ezequiel Schelotto | 1 | 1 |
 | Filipe Chaby | 1 | 1 |
 | Fábio Vieira | 1 | 1 |
@@ -181,7 +181,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Luís Pinto | 1 | 1 |
 | Luíz Carlos | 1 | 1 |
 | Nuno Miguel Sousa Pinto | 1 | 1 |
-| Pintassilgo | 1 | 1 |
 | Raphael Guzzo | 1 | 1 |
 | Ricardo Pereira | 1 | 1 |
 | Ricardo Quaresma | 1 | 1 |
@@ -206,6 +205,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Dyego Sousa | 0 | 5 |
 | Joaquim Manuel Sampaio Silva | 0 | 5 |
 | Joel Campbell | 0 | 5 |
+| João Cancelo | 0 | 5 |
 | Claudiano Bezerra da Silva | 0 | 4 |
 | Fábio Espinho | 0 | 4 |
 | Fábio Martins | 0 | 4 |
@@ -278,6 +278,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Eduardo Salvio | 0 | 1 |
 | Fábio Cardoso | 0 | 1 |
 | Hugo Rogério Ferreira Monteiro | 0 | 1 |
+| Hugo Vieira | 0 | 1 |
 | José Henrique da Silva Dourado | 0 | 1 |
 | João Amaral | 0 | 1 |
 | Jubal | 0 | 1 |

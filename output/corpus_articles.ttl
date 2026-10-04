@@ -277,11 +277,6 @@
     sdh:publicadoPor <urn:semantic-driven-harvester:prototype:newspaper/record> ;
     sdh:temRecursoWeb <urn:semantic-driven-harvester:prototype:resource-web/6c6473b54e5c600729c69afdcdd56e6992ee935ad841f139a1eb6abd2e0ffa96> .
 
-<urn:semantic-driven-harvester:prototype:article/6f1519665bb5d1a6c5f3937bdac39091424a0f951da22579552a6acfc5e849f3> a sdh:Artigo ;
-    rdfs:label "Equipamento do Barcelona para 2019/2020 vai ser em... xadrez - Fotogalerias - Jornal Record" ;
-    sdh:publicadoPor <urn:semantic-driven-harvester:prototype:newspaper/record> ;
-    sdh:temRecursoWeb <urn:semantic-driven-harvester:prototype:resource-web/6f1519665bb5d1a6c5f3937bdac39091424a0f951da22579552a6acfc5e849f3> .
-
 <urn:semantic-driven-harvester:prototype:article/6ff3cda7aef750e94c58be6a36666a0d44f60480e7e370eb6c4429e1f4192520> a sdh:Artigo ;
     rdfs:label "Wilson Eduardo já marca pelo Dinamo Zagreb - Vídeos - Jornal Record" ;
     sdh:publicadoPor <urn:semantic-driven-harvester:prototype:newspaper/record> ;
@@ -321,11 +316,6 @@
     rdfs:label "Jorge Jesus assina com Pini Zahavi - Internacional - Jornal Record" ;
     sdh:publicadoPor <urn:semantic-driven-harvester:prototype:newspaper/record> ;
     sdh:temRecursoWeb <urn:semantic-driven-harvester:prototype:resource-web/7dca6c5b40bdf9a38809fbcf378f18b334f3ee29250b6c83307ec1bec0c782bb> .
-
-<urn:semantic-driven-harvester:prototype:article/7f6e6ad19cd74e87e19c450d71dc173870ac3d21930d665d85ab6f33cb01ec46> a sdh:Artigo ;
-    rdfs:label "Yamila Rodríguez: Argentina louca por Ronaldo - Record mais - Jornal Record" ;
-    sdh:publicadoPor <urn:semantic-driven-harvester:prototype:newspaper/record> ;
-    sdh:temRecursoWeb <urn:semantic-driven-harvester:prototype:resource-web/7f6e6ad19cd74e87e19c450d71dc173870ac3d21930d665d85ab6f33cb01ec46> .
 
 <urn:semantic-driven-harvester:prototype:article/7f8a3485af6fc0127d80fa7d87c76c056c2d3ad3182ec2ef81057dd597512c75> a sdh:Artigo ;
     rdfs:label "Yusupha rende 2,5 milhões - Boavista - Jornal Record" ;
@@ -3048,6 +3038,18 @@
     sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/34d1433953d8e63ad02950144671bec7823d59375b58bcd3a9de17d4a0ecc4f5/20180416022448> ;
     sdh:title "https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/bruno-de-carvalhoquer-ano-de-grande-apoio-masde-tolerancia-zero.html"^^xsd:string ;
     sdh:tstamp "20180416022448"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:capture/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190407184501> a sdh:CapturaArquivada ;
+    sdh:archiveURL "https://arquivo.pt/wayback/20190407184501/https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_4BucketDestaquesPrincipais"^^xsd:anyURI ;
+    sdh:capturedAt "2019-04-07T18:45:01+00:00"^^xsd:dateTime ;
+    sdh:collection "FAWP37"^^xsd:string ;
+    sdh:contentLength "30997"^^xsd:nonNegativeInteger ;
+    sdh:digest "BC37WX3JIKH2RR4VUHDGKQYLLMRXNJMV"^^xsd:string ;
+    sdh:mimeType "text/html"^^xsd:string ;
+    sdh:statusCode 200 ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190407184501> ;
+    sdh:title "https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_4BucketDestaquesPrincipais"^^xsd:string ;
+    sdh:tstamp "20190407184501"^^xsd:string .
 
 <urn:semantic-driven-harvester:prototype:capture/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190407185044> a sdh:CapturaArquivada ;
     sdh:archiveURL "https://arquivo.pt/wayback/20190407185044/https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_BlocoColoridoSec%C3%A7%C3%A3oDestaque"^^xsd:anyURI ;
@@ -5959,18 +5961,6 @@
     sdh:title "https://www.record.pt/multimedia/videos/detalhe/video-arbitro-e-o-arbitro-principal-viveram-momentos-dificeis-no-mexico-nova-zelandia.html"^^xsd:string ;
     sdh:tstamp "20180416014122"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:capture/6f1519665bb5d1a6c5f3937bdac39091424a0f951da22579552a6acfc5e849f3/20190324201331> a sdh:CapturaArquivada ;
-    sdh:archiveURL "https://arquivo.pt/wayback/20190324201331/https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto"^^xsd:anyURI ;
-    sdh:capturedAt "2019-03-24T20:13:31+00:00"^^xsd:dateTime ;
-    sdh:collection "AWP29"^^xsd:string ;
-    sdh:contentLength "32021"^^xsd:nonNegativeInteger ;
-    sdh:digest "AIXUDQXQZIA22KPIRC744PTKUILEMVFN"^^xsd:string ;
-    sdh:mimeType "text/html"^^xsd:string ;
-    sdh:statusCode 200 ;
-    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/6f1519665bb5d1a6c5f3937bdac39091424a0f951da22579552a6acfc5e849f3/20190324201331> ;
-    sdh:title "https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto"^^xsd:string ;
-    sdh:tstamp "20190324201331"^^xsd:string .
-
 <urn:semantic-driven-harvester:prototype:capture/6ff3cda7aef750e94c58be6a36666a0d44f60480e7e370eb6c4429e1f4192520/20190201042914> a sdh:CapturaArquivada ;
     sdh:archiveURL "https://arquivo.pt/wayback/20190201042914/https://www.record.pt/multimedia/videos/detalhe/wilson-eduardo-ja-marca-pelo-dinamo-zagreb-904334"^^xsd:anyURI ;
     sdh:capturedAt "2019-02-01T04:29:14+00:00"^^xsd:dateTime ;
@@ -6487,18 +6477,6 @@
     sdh:title "https://www.record.pt/internacional/amp/jorge-jesus-assina-com-pini-zahavi"^^xsd:string ;
     sdh:tstamp "20190424110517"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:capture/7f6e6ad19cd74e87e19c450d71dc173870ac3d21930d665d85ab6f33cb01ec46/20190407184501> a sdh:CapturaArquivada ;
-    sdh:archiveURL "https://arquivo.pt/wayback/20190407184501/https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_4BucketDestaquesPrincipais"^^xsd:anyURI ;
-    sdh:capturedAt "2019-04-07T18:45:01+00:00"^^xsd:dateTime ;
-    sdh:collection "FAWP37"^^xsd:string ;
-    sdh:contentLength "30997"^^xsd:nonNegativeInteger ;
-    sdh:digest "BC37WX3JIKH2RR4VUHDGKQYLLMRXNJMV"^^xsd:string ;
-    sdh:mimeType "text/html"^^xsd:string ;
-    sdh:statusCode 200 ;
-    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/7f6e6ad19cd74e87e19c450d71dc173870ac3d21930d665d85ab6f33cb01ec46/20190407184501> ;
-    sdh:title "https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_4BucketDestaquesPrincipais"^^xsd:string ;
-    sdh:tstamp "20190407184501"^^xsd:string .
-
 <urn:semantic-driven-harvester:prototype:capture/7f8a3485af6fc0127d80fa7d87c76c056c2d3ad3182ec2ef81057dd597512c75/20180717145202> a sdh:CapturaArquivada ;
     sdh:archiveURL "https://arquivo.pt/wayback/20180717145202/http://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/yusupha-rende-25-milhoes.html"^^xsd:anyURI ;
     sdh:capturedAt "2018-07-17T14:52:02+00:00"^^xsd:dateTime ;
@@ -6737,6 +6715,18 @@
     sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190324180407> ;
     sdh:title "https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez"^^xsd:string ;
     sdh:tstamp "20190324180407"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:capture/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190324201331> a sdh:CapturaArquivada ;
+    sdh:archiveURL "https://arquivo.pt/wayback/20190324201331/https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto"^^xsd:anyURI ;
+    sdh:capturedAt "2019-03-24T20:13:31+00:00"^^xsd:dateTime ;
+    sdh:collection "AWP29"^^xsd:string ;
+    sdh:contentLength "32021"^^xsd:nonNegativeInteger ;
+    sdh:digest "AIXUDQXQZIA22KPIRC744PTKUILEMVFN"^^xsd:string ;
+    sdh:mimeType "text/html"^^xsd:string ;
+    sdh:statusCode 200 ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190324201331> ;
+    sdh:title "https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto"^^xsd:string ;
+    sdh:tstamp "20190324201331"^^xsd:string .
 
 <urn:semantic-driven-harvester:prototype:capture/90ab563b8faa328f14444f8760e07629a91d30c01a394db009dfca5e0a7b7a54/20170302185722> a sdh:CapturaArquivada ;
     sdh:archiveURL "https://arquivo.pt/wayback/20170302185722/http://www.record.pt/futebol/arbitragem/detalhe/arbitragem-ao-raio-x-futebol-como-espetaculo-desportivo.html/"^^xsd:anyURI ;
@@ -8928,6 +8918,7 @@
     sdh:digest "66HOVJ5FCC35M32STBAEA2LVJVYDR4XP"^^xsd:string ;
     sdh:mimeType "text/html"^^xsd:string ;
     sdh:statusCode 200 ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9/20170106072631> ;
     sdh:title "http://www.record.pt//futebol/futebol-nacional/2--liga/detalhe/fc-porto-b-sp-braga-b-1-3-guerreiros-escapam-a-zona-de-despromocao.html"^^xsd:string ;
     sdh:tstamp "20170106072631"^^xsd:string .
 
@@ -8939,6 +8930,7 @@
     sdh:digest "ARTA7ICZ5MGY2CWUQZRJKJTR5TL4RY7E"^^xsd:string ;
     sdh:mimeType "text/html"^^xsd:string ;
     sdh:statusCode 200 ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9/20170108032504> ;
     sdh:title "http://www.record.pt//futebol/futebol-nacional/2--liga/detalhe/fc-porto-b-sp-braga-b-1-3-guerreiros-escapam-a-zona-de-despromocao.html"^^xsd:string ;
     sdh:tstamp "20170108032504"^^xsd:string .
 
@@ -8962,6 +8954,7 @@
     sdh:digest "KNXYFNURYQKDT4PCJ4EV32FYVZC24WWK"^^xsd:string ;
     sdh:mimeType "text/html"^^xsd:string ;
     sdh:statusCode 200 ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9/20170109015204> ;
     sdh:title "http://www.record.pt//futebol/futebol-nacional/2--liga/detalhe/fc-porto-b-sp-braga-b-1-3-guerreiros-escapam-a-zona-de-despromocao.html"^^xsd:string ;
     sdh:tstamp "20170109015204"^^xsd:string .
 
@@ -10096,6 +10089,7 @@
     sdh:digest "4EC4TRJ7ABIEZ34S4UTPL7HHTX6Q2ZTW"^^xsd:string ;
     sdh:mimeType "text/html"^^xsd:string ;
     sdh:statusCode 200 ;
+    sdh:temTextoExtraido <urn:semantic-driven-harvester:prototype:extracted-text/e162d51872a140a02739e844cbc541244ef4491e37dc68d48707ee4e45372f9e/20171025042728> ;
     sdh:title "http://www.record.pt/entrevistas//detalhe/daniel-ramos-expulsao-de-zainadine-e-estranha.html"^^xsd:string ;
     sdh:tstamp "20171025042728"^^xsd:string .
 
@@ -12248,6 +12242,9 @@
 <urn:semantic-driven-harvester:prototype:extracted-text/34d1433953d8e63ad02950144671bec7823d59375b58bcd3a9de17d4a0ecc4f5/20180416022448> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20180416022448_34d1433953d8e63a.txt"^^xsd:string .
 
+<urn:semantic-driven-harvester:prototype:extracted-text/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190407184501> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20190407184501_7f6e6ad19cd74e87.txt"^^xsd:string .
+
 <urn:semantic-driven-harvester:prototype:extracted-text/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190407185044> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20190407185044_3655fec2ab3ec344.txt"^^xsd:string .
 
@@ -12893,9 +12890,6 @@
 <urn:semantic-driven-harvester:prototype:extracted-text/6c6473b54e5c600729c69afdcdd56e6992ee935ad841f139a1eb6abd2e0ffa96/20180416014122> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20180416014122_6c6473b54e5c6007.txt"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:extracted-text/6f1519665bb5d1a6c5f3937bdac39091424a0f951da22579552a6acfc5e849f3/20190324201331> a sdh:TextoExtraido ;
-    sdh:filePath "data/raw/texts/20190324201331_6f1519665bb5d1a6.txt"^^xsd:string .
-
 <urn:semantic-driven-harvester:prototype:extracted-text/6ff3cda7aef750e94c58be6a36666a0d44f60480e7e370eb6c4429e1f4192520/20190201042914> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20190201042914_6ff3cda7aef750e9.txt"^^xsd:string .
 
@@ -12992,9 +12986,6 @@
 <urn:semantic-driven-harvester:prototype:extracted-text/7dca6c5b40bdf9a38809fbcf378f18b334f3ee29250b6c83307ec1bec0c782bb/20190424110517> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20190424110517_7dca6c5b40bdf9a3.txt"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:extracted-text/7f6e6ad19cd74e87e19c450d71dc173870ac3d21930d665d85ab6f33cb01ec46/20190407184501> a sdh:TextoExtraido ;
-    sdh:filePath "data/raw/texts/20190407184501_7f6e6ad19cd74e87.txt"^^xsd:string .
-
 <urn:semantic-driven-harvester:prototype:extracted-text/7f8a3485af6fc0127d80fa7d87c76c056c2d3ad3182ec2ef81057dd597512c75/20180717145202> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20180717145202_7f8a3485af6fc012.txt"^^xsd:string .
 
@@ -13018,6 +13009,9 @@
 
 <urn:semantic-driven-harvester:prototype:extracted-text/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190324180407> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20190324180407_8526ad890688e8c3.txt"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:extracted-text/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190324201331> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20190324201331_6f1519665bb5d1a6.txt"^^xsd:string .
 
 <urn:semantic-driven-harvester:prototype:extracted-text/90ab563b8faa328f14444f8760e07629a91d30c01a394db009dfca5e0a7b7a54/20170302185722> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20170302185722_90ab563b8faa328f.txt"^^xsd:string .
@@ -13493,8 +13487,17 @@
 <urn:semantic-driven-harvester:prototype:extracted-text/cfae465bb145d0bf26f77d14e20a6bcad76955158094bb8f076030693b09e0ce/20171225155947> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20171225155947_cfae465bb145d0bf.txt"^^xsd:string .
 
+<urn:semantic-driven-harvester:prototype:extracted-text/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9/20170106072631> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20170106072631_81102fa33d456a4f.txt"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:extracted-text/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9/20170108032504> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20170108032504_81102fa33d456a4f.txt"^^xsd:string .
+
 <urn:semantic-driven-harvester:prototype:extracted-text/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9/20170108034345> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20170108034345_d14a83bbecd98e3c.txt"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:extracted-text/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9/20170109015204> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20170109015204_81102fa33d456a4f.txt"^^xsd:string .
 
 <urn:semantic-driven-harvester:prototype:extracted-text/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9/20170109093525> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20170109093525_d14a83bbecd98e3c.txt"^^xsd:string .
@@ -13762,6 +13765,9 @@
 
 <urn:semantic-driven-harvester:prototype:extracted-text/e162d51872a140a02739e844cbc541244ef4491e37dc68d48707ee4e45372f9e/20171013025023> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20171013025023_e162d51872a140a0.txt"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:extracted-text/e162d51872a140a02739e844cbc541244ef4491e37dc68d48707ee4e45372f9e/20171025042728> a sdh:TextoExtraido ;
+    sdh:filePath "data/raw/texts/20171025042728_c567c54699bdd308.txt"^^xsd:string .
 
 <urn:semantic-driven-harvester:prototype:extracted-text/e1f7a426f22f3ac174a34bf90764e5bafd348f32dc0710af9f28abca24fe1867/20180421014625> a sdh:TextoExtraido ;
     sdh:filePath "data/raw/texts/20180421014625_e1f7a426f22f3ac1.txt"^^xsd:string .
@@ -14408,7 +14414,8 @@
 
 <urn:semantic-driven-harvester:prototype:resource-web/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29> a sdh:RecursoWeb ;
     sdh:originalURL "https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_BlocoColoridoSec%C3%A7%C3%A3oDestaque"^^xsd:anyURI ;
-    sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190407185044>,
+    sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190407184501>,
+        <urn:semantic-driven-harvester:prototype:capture/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190407185044>,
         <urn:semantic-driven-harvester:prototype:capture/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190408184553>,
         <urn:semantic-driven-harvester:prototype:capture/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190409184842>,
         <urn:semantic-driven-harvester:prototype:capture/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29/20190410184640>,
@@ -14759,10 +14766,6 @@
         <urn:semantic-driven-harvester:prototype:capture/6c6473b54e5c600729c69afdcdd56e6992ee935ad841f139a1eb6abd2e0ffa96/20180413212306>,
         <urn:semantic-driven-harvester:prototype:capture/6c6473b54e5c600729c69afdcdd56e6992ee935ad841f139a1eb6abd2e0ffa96/20180416014122> .
 
-<urn:semantic-driven-harvester:prototype:resource-web/6f1519665bb5d1a6c5f3937bdac39091424a0f951da22579552a6acfc5e849f3> a sdh:RecursoWeb ;
-    sdh:originalURL "https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto"^^xsd:anyURI ;
-    sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/6f1519665bb5d1a6c5f3937bdac39091424a0f951da22579552a6acfc5e849f3/20190324201331> .
-
 <urn:semantic-driven-harvester:prototype:resource-web/6ff3cda7aef750e94c58be6a36666a0d44f60480e7e370eb6c4429e1f4192520> a sdh:RecursoWeb ;
     sdh:originalURL "https://www.record.pt/multimedia/videos/detalhe/wilson-eduardo-ja-marca-pelo-dinamo-zagreb-904334"^^xsd:anyURI ;
     sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/6ff3cda7aef750e94c58be6a36666a0d44f60480e7e370eb6c4429e1f4192520/20190201042914>,
@@ -14831,10 +14834,6 @@
     sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/7dca6c5b40bdf9a38809fbcf378f18b334f3ee29250b6c83307ec1bec0c782bb/20190228191520>,
         <urn:semantic-driven-harvester:prototype:capture/7dca6c5b40bdf9a38809fbcf378f18b334f3ee29250b6c83307ec1bec0c782bb/20190424110517> .
 
-<urn:semantic-driven-harvester:prototype:resource-web/7f6e6ad19cd74e87e19c450d71dc173870ac3d21930d665d85ab6f33cb01ec46> a sdh:RecursoWeb ;
-    sdh:originalURL "https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_4BucketDestaquesPrincipais"^^xsd:anyURI ;
-    sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/7f6e6ad19cd74e87e19c450d71dc173870ac3d21930d665d85ab6f33cb01ec46/20190407184501> .
-
 <urn:semantic-driven-harvester:prototype:resource-web/7f8a3485af6fc0127d80fa7d87c76c056c2d3ad3182ec2ef81057dd597512c75> a sdh:RecursoWeb ;
     sdh:originalURL "https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/yusupha-rende-25-milhoes.html"^^xsd:anyURI ;
     sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/7f8a3485af6fc0127d80fa7d87c76c056c2d3ad3182ec2ef81057dd597512c75/20180717145202>,
@@ -14863,7 +14862,8 @@
 <urn:semantic-driven-harvester:prototype:resource-web/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda> a sdh:RecursoWeb ;
     sdh:originalURL "https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez"^^xsd:anyURI ;
     sdh:temCaptura <urn:semantic-driven-harvester:prototype:capture/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190321192436>,
-        <urn:semantic-driven-harvester:prototype:capture/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190324180407> .
+        <urn:semantic-driven-harvester:prototype:capture/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190324180407>,
+        <urn:semantic-driven-harvester:prototype:capture/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda/20190324201331> .
 
 <urn:semantic-driven-harvester:prototype:resource-web/90ab563b8faa328f14444f8760e07629a91d30c01a394db009dfca5e0a7b7a54> a sdh:RecursoWeb ;
     sdh:originalURL "http://www.record.pt/futebol/arbitragem/detalhe/arbitragem-ao-raio-x-futebol-como-espetaculo-desportivo.html/"^^xsd:anyURI ;

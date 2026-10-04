@@ -14,21 +14,21 @@ Contra os 60 pares rotulados manualmente em `output/corpus_redundancy_label_samp
 
 ## Estrutura do corpus
 
-- Artigos: 127; capturas: 941; capturas com texto: 789
+- Artigos: 125; capturas: 941; capturas com texto: 793
 
 | Situação | Artigos |
 | --- | ---: |
-| Só 1 captura | 31 |
+| Só 1 captura | 29 |
 | Nenhuma captura com texto (não avaliáveis) | 2 |
-| Exatamente 1 captura com texto | 41 |
-| 2 ou mais capturas com texto (comparáveis) | 84 |
+| Exatamente 1 captura com texto | 38 |
+| 2 ou mais capturas com texto (comparáveis) | 85 |
 
 ## Contagens por camada
 
 | Camada | Capturas |
 | --- | ---: |
-| Camada 1 — com texto e `statusCode` 200 | 789 |
-| Camada 2 — sem texto, em artigos com algum texto | 150 |
+| Camada 1 — com texto e `statusCode` 200 | 793 |
+| Camada 2 — sem texto, em artigos com algum texto | 146 |
 | Não avaliáveis — artigos sem nenhum texto | 2 |
 | Total | 941 |
 
@@ -47,23 +47,23 @@ Todas as capturas sem texto são mantidas. Estas contagens são apenas um limite
 
 | n | mín. | p10 | mediana | p90 | máx. |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| 664 | 0,434 | 0,561 | 0,655 | 0,995 | 1,000 |
+| 670 | 0,434 | 0,562 | 0,655 | 0,996 | 1,000 |
 
 | Faixa | Pares |
 | --- | ---: |
 | [0,400; 0,450) | 2 |
 | [0,450; 0,500) | 14 |
 | [0,500; 0,550) | 40 |
-| [0,550; 0,600) | 68 |
-| [0,600; 0,650) | 188 |
+| [0,550; 0,600) | 69 |
+| [0,600; 0,650) | 189 |
 | [0,650; 0,700) | 140 |
 | [0,700; 0,750) | 44 |
-| [0,750; 0,800) | 39 |
-| [0,800; 0,850) | 41 |
+| [0,750; 0,800) | 40 |
+| [0,800; 0,850) | 42 |
 | [0,850; 0,900) | 7 |
 | [0,900; 0,950) | 5 |
-| [0,950; 1,000) | 12 |
-| = 1,000 | 64 |
+| [0,950; 1,000) | 13 |
+| = 1,000 | 65 |
 
 ## Sensibilidade ao limiar (Camada 1)
 
@@ -71,25 +71,25 @@ Redundantes = capturas com similaridade ≥ limiar face ao termo de comparação
 
 | Limiar | Redundantes (último rep.) | Redundantes (consecutiva) | Versões (último rep.) | Versões (consecutiva) | Divergências | Artigos com redundantes (último rep.) |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0,500 | 624 | 648 | 165 | 141 | 108 | 84 |
-| 0,600 | 518 | 540 | 271 | 249 | 72 | 72 |
-| 0,700 | 210 | 212 | 579 | 577 | 5 | 57 |
-| 0,800 | 124 | 129 | 665 | 660 | 34 | 34 |
-| 0,850 | 88 | 88 | 701 | 701 | 0 | 22 |
-| 0,900 | 81 | 81 | 708 | 708 | 0 | 15 |
-| 0,950 | 75 | 76 | 714 | 713 | 3 | 12 |
-| 0,990 | 70 | 70 | 719 | 719 | 0 | 12 |
-| 1,000 | 64 | 64 | 725 | 725 | 0 | 12 |
+| 0,500 | 630 | 654 | 163 | 139 | 108 | 85 |
+| 0,600 | 522 | 545 | 271 | 248 | 78 | 73 |
+| 0,700 | 214 | 216 | 579 | 577 | 5 | 58 |
+| 0,800 | 127 | 132 | 666 | 661 | 34 | 36 |
+| 0,850 | 90 | 90 | 703 | 703 | 0 | 24 |
+| 0,900 | 83 | 83 | 710 | 710 | 0 | 17 |
+| 0,950 | 77 | 78 | 716 | 715 | 3 | 14 |
+| 0,990 | 71 | 71 | 722 | 722 | 0 | 13 |
+| 1,000 | 65 | 65 | 728 | 728 | 0 | 13 |
 
 ## Versões textuais distintas por artigo (Camada 1)
 
-- Artigos com texto: 125; capturas da Camada 1: 789; versões textuais distintas: **665**; capturas redundantes: 124.
+- Artigos com texto: 123; capturas da Camada 1: 793; versões textuais distintas: **666**; capturas redundantes: 127.
 - Detalhe por artigo em `output/corpus_redundancy_versions.csv`.
 
 | Versões distintas | Artigos |
 | --- | ---: |
-| 1 | 55 |
-| 2 | 21 |
+| 1 | 52 |
+| 2 | 22 |
 | 3–5 | 28 |
 | 6–10 | 7 |
 | ≥ 11 | 14 |
@@ -101,8 +101,8 @@ Redundantes = capturas com similaridade ≥ limiar face ao termo de comparação
 
 | Faixa | Intervalo | Pares na amostra | Pares disponíveis |
 | --- | --- | ---: | ---: |
-| baixa | [0,000; 0,700) | 20 | 452 |
-| media | [0,700; 0,900) | 20 | 131 |
-| alta | [0,900; 1,000] | 20 | 81 |
+| baixa | [0,000; 0,700) | 20 | 454 |
+| media | [0,700; 0,900) | 20 | 133 |
+| alta | [0,900; 1,000] | 20 | 83 |
 
 Estes valores são o resultado real desta execução, não uma estimativa.

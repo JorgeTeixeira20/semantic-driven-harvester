@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-10-03** (Caminho B), a partir do código, testes,
+Atualizado em **2026-10-04** (correção da identidade dos artigos), a partir do código, testes,
 documentação e histórico; a última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
@@ -103,7 +103,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 
 - O Git continua a ignorar `data/raw/` e o `data/processed/corpus_articles_triples.nt`
   (ver `.gitignore`); um clone deste repositório não inclui esses artefactos,
-  incluindo os 789 textos referenciados por `output/corpus_articles.ttl`. As
+  incluindo os 793 textos referenciados por `output/corpus_articles.ttl`. As
   afirmações de preservação nas observações descrevem a execução histórica,
   não disponibilidade automática a partir de um novo checkout.
 - **Preservação do raw fora do Git (decisão tomada em 2026-09-24):** a pasta
@@ -135,7 +135,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 154 testes em dez módulos de `tests/`.
+pacote conforme o README. Existem 162 testes em dez módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -162,7 +162,7 @@ em bruto, com sessão simulada) e o protótipo de navegação
 ordem e filtro do histórico, ligações entre páginas e escape de títulos).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **154 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **162 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -312,6 +312,19 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    `texts_reused` do relatório perdem a divisão histórica (todos "reutilizados").
    Detalhe em `experiments.md`.
 
+   **Correção da identidade dos artigos em 2026-10-04 (achado ao navegar no
+   protótipo):** dois artigos eram o mesmo, porque os `originalURL` só
+   diferiam em parâmetros de rastreio (`?ref=…`, `?utm_…&act=0&est=Aberto`).
+   A classificação e o RDF passam a ignorar só `ref`, `utm_*`, `act` e `est`
+   (`url_identity.py`); a query inteira não, porque no site antigo
+   (`interior.aspx?content_id/…`) ela identifica o artigo. A reconstrução
+   offline juntou as capturas das variantes e encontrou ainda 4 textos já em
+   cache, guardados com o hash de URLs com barra dupla, que a procura só pelo
+   URL canónico não via. **Números atuais do Caminho A: 125 artigos, 941
+   capturas, 793 textos disponíveis (84,3%) e 148 indisponíveis, 13 482
+   triplos.** D, B e o protótipo foram regenerados. Detalhe em
+   `experiments.md` ("Correção da identidade dos artigos").
+
    O Caminho D foi concluído em 2026-10-02 (passo 3 abaixo).
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
@@ -323,9 +336,10 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
 
    **Concluído em 2026-10-02: variante (a) (texto completo, com chrome) com
    limiar 0,80**, decisão dos autores. `output/corpus_redundancy.csv` final
-   (sem `pendente_limiar`): das 789 capturas da Camada 1 de 125 artigos, **665
-   versões textuais distintas** e 124 redundantes; Camada 2 com 150 capturas
-   (14 candidatas por `digest`, não verificadas) e 2 não avaliáveis; versões
+   (sem `pendente_limiar`), após a correção de 2026-10-04: das 793 capturas
+   da Camada 1 de 123 artigos, **666 versões textuais distintas** e 127
+   redundantes; Camada 2 com 146 capturas (14 candidatas por `digest`, não
+   verificadas) e 2 não avaliáveis (antes da correção: 789, 665, 124, 150); versões
    por artigo em `output/corpus_redundancy_versions.csv`. **Escolha
    pragmática, não calibração limpa:** nem a variante (a) nem a (b) separam os
    60 rótulos manuais com nenhum limiar de Jaccard de palavras testado. A
@@ -333,7 +347,7 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    evitado na amostra), mas 28 dos 58 "mesma versão" ficam como versões
    distintas (erro conservador, aceite porque D é anotação não destrutiva).
    Esse erro concentra-se nos artigos muito capturados (por exemplo, um vídeo
-   com 71 versões em 71 capturas), pelo que 665 é um limite superior. A
+   com 71 versões em 71 capturas), pelo que 666 é um limite superior. A
    variante (b) (remoção do chrome) fica testada e não adotada. Amostra de
    validação limitada: 34 artigos, um vídeo com 11 dos 60 pares, 2 pares
    "texto alterado".
@@ -399,7 +413,9 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    palavra; a remoção do chrome quase não afeta os jogadores (estão nas
    manchetes rotativas, não nos menus); cobertura limitada pela Wikidata.
    Contagens de correspondências, sem avaliação de precisão (decisão de
-   âmbito). **Contaminação por chrome investigada em 2026-10-03:** os falsos
+   âmbito). *Após a correção de 2026-10-04 (125 artigos, 793 textos):*
+   persistência 287 pares em 91 artigos (118 jogadores), regra fraca 1 427
+   pares em 116 artigos; 158 dos 287 de artigos com uma só captura. **Contaminação por chrome investigada em 2026-10-03:** os falsos
    positivos vêm de manchetes rotativas (blocos "Últimas Notícias", "Mais
    notícias", "Notícias MAIS", faixa sob o menu), confirmado em dois casos
    reais (artigo Nike AMP; crónica Premium Boavista-Moreirense com 49 jogadores
@@ -407,7 +423,8 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    com capturas próximas no tempo. **Sinal `clube_coerente`** (só sinal, nada
    removido; tabela slug → clube em `data/processed/caminho_b_clubes_url.csv`):
    pela regra fraca 189 `sim`, 333 `nao`, 902 `sem_tema`; pela persistência 82
-   `sim`, 41 `nao`, 168 `sem_tema`. Só 50 artigos têm clube no URL, por isso os
+   `sim`, 41 `nao`, 168 `sem_tema` (após a correção de 2026-10-04: fraca 189 /
+   333 / 905, persistência 82 / 41 / 164). Só 50 artigos têm clube no URL, por isso os
    dois casos investigados ficam `sem_tema`. Por fazer: representação em RDF
    (`temTema`/`mencionaEntidade`).
 5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
@@ -422,7 +439,8 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    — artigos com RecursoWeb e nº de capturas, histórico cronológico de cada
    artigo (ligado ao Arquivo.pt), artigos mais capturados, capturas por ano e
    texto por `statusCode`. Sem servidor nem dependências novas. Resultado real:
-   127 páginas de artigo, 941 linhas de histórico, totais iguais aos do
+   125 páginas de artigo (127 antes da correção de 2026-10-04), 941 linhas de
+   histórico, totais iguais aos do
    Caminho A; tornou visível que as capturas vão de 2017 a 2023 (nenhuma de
    2015–2016) e que as 24 de 2020–2023 não têm texto. A lista de artigos tem
    pesquisa por título/URL e filtro por secção (JavaScript embutido, sem

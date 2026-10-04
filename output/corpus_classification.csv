@@ -1,159 +1,157 @@
-original_url,title,captures,is_artigo,reason
-http://www.record.pt/Futebol/Internacional/interior.aspx?content_id/x3d730429,Object moved,4,False,object_moved
-http://www.record.pt/Futebol/Internacional/interior.aspx?content_id/x3d757134,Object moved,4,False,object_moved
-http://www.record.pt/Futebol/Internacional/interior.aspx?content_id/x3d817327,Object moved,4,False,object_moved
-http://www.record.pt/Futebol/Internacional/real_madrid/interior.aspx?content_id/x3d769710,Object moved,4,False,object_moved
-http://www.record.pt/Futebol/Nacional/1a_liga/Benfica/interior.aspx?content_id/x3d750833,Object moved,4,False,object_moved
-http://www.record.pt/Futebol/Nacional/1a_liga/Benfica/interior.aspx?content_id/x3d930690,Object moved,3,False,object_moved
-http://www.record.pt/Futebol/Nacional/1a_liga/Porto/interior.aspx?content_id/x3d729433,Object moved,4,False,object_moved
-http://www.record.pt/Futebol/Nacional/1a_liga/Sporting/interior.aspx?content_id/x3d688186,Object moved,4,False,object_moved
-http://www.record.pt/Futebol/Nacional/1a_liga/Sporting/interior.aspx?content_id/x3d808398,Object moved,1,False,object_moved
-http://www.record.pt/Futebol/Nacional/1a_liga/Sporting/interior.aspx?content_id/x3d906264,Object moved,4,False,object_moved
-http://www.record.pt/Futebol/Nacional/Futsal/interior.aspx?content_id/x3d479491,Object moved,3,False,object_moved
-http://www.record.pt/Futebol/Nacional/interior.aspx?content_id/x3d901269,Object moved,3,False,object_moved
-http://www.record.pt/Modalidades/Basquetebol/NBA/interior.aspx?content_id/x3d788683,Object moved,4,False,object_moved
-http://www.record.pt/entrevistas/detalhe/daniel-ramos-expulsao-de-zainadine-e-estranha.html,Daniel Ramos: «Expulsão de Zainadine é estranha» - Entrevistas - Jornal Record,16,True,artigo
-http://www.record.pt/futebol/arbitragem/detalhe/arbitragem-ao-raio-x-futebol-como-espetaculo-desportivo.html/,Arbitragem ao Raio-X: Futebol como espetáculo desportivo - Arbitragem - Jornal Record,1,True,artigo
-http://www.record.pt/futebol/arbitragem/detalhe/carlos-xistra-vai-arbitrar-o-v-guimaraes-benfica.html,Carlos Xistra vai arbitrar o V. Guimarães-Benfica - Arbitragem - Jornal Record,4,True,artigo
-http://www.record.pt/futebol/futebol-nacional/2--liga/detalhe/fc-porto-b-sp-braga-b-1-3-guerreiros-escapam-a-zona-de-despromocao.html,"FC Porto B-Sp. Braga B, 1-3: Guerreiros escapam à zona de despromoção - 2ª Liga - Jornal Record",48,True,artigo
-http://www.record.pt/futebol/futebol-nacional/2--liga/detalhe/penafiel-spcovilha-1-0-zarabi-da-triunfo-na-baliza-errada.html,"Penafiel-Sp. Covilhã, 1-0: Zarabi dá triunfo... na baliza errada - 2ª Liga - Jornal Record",45,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/aves/detalhe/youssouf-sow-emprestado-ao-leixoes.html,Youssouf Sow emprestado ao Leixões - Aves - Jornal Record,15,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/AMP/uefa-destaca-joao-felix-como-um-dos-jogadores-a-seguir-da-youth-league.html,UEFA destaca benfiquista João Félix como um dos jogadores a seguir,3,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/a-incubadora-do-seixal-ao-raio-x.html,A 'incubadora' do Seixal ao raio-x: os nomes que dão segurança ao Benfica - Benfica - Jornal Record,3,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/exibicao-de-zivkovic-nao-espanta-drulo.html,Exibição de Zivkovic não espanta ‘Drulo’ - Benfica - Jornal Record,51,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yuri-ribeiro-tambem-volta.html,Yuri Ribeiro também volta - Benfica - Jornal Record,14,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zivkovic-quase-a-100-por-cento.html,Zivkovic quase a 100 por cento - Benfica - Jornal Record,1,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/detalhe/AMP/carlos-xistra-apita-benfica-sp-braga.html,Carlos Xistra apita Benfica-Sp. Braga,1,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/fc-porto/detalhe/danny-os-benfiquistas-querem-que-o-zenit-ganhe-719043.html,Danny: «Os benfiquistas querem que o Zenit ganhe» - FC Porto - Jornal Record,5,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/maritimo/detalhe/charles-entende-que-parte-do-zero.html,Charles entende que parte do zero - Marítimo - Jornal Record,7,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/portimonense/detalhe/yuta-koike-podera-ter-primeiro-teste-de-fogo.html,Yuta Koike poderá ter primeiro teste de fogo - Portimonense - Jornal Record,5,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/sp--braga/detalhe/xeka-emprestado-ao-lille.html,Xeka emprestado ao Lille - Sp. Braga - Jornal Record,2,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/domingos-conta-com-yannick-692618.html,Domingos conta com Yannick - Sporting - Jornal Record,4,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/o-melhor-yannick-692303.html,O melhor Yannick - Sporting - Jornal Record,4,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/reforcos-ao-raio-x-690811.html,Reforços ao raio X - Sporting - Jornal Record,4,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zahavi-espera-contacto-leonino-692448.html,Zahavi espera contacto leonino - Sporting - Jornal Record,4,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zeegelaar-desagradado-com-fim-das-negociacoes-entre-sporting-e-sevilha.html,Zeegelaar desagradado com fim das negociações entre Sporting e Sevilha - Sporting - Jornal Record,1,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zeegelaar-e-as-aulas-do-mister-jesus.html,Zeegelaar e as aulas do Mister Jesus - Sporting - Jornal Record,17,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zeegelaar-na-lista-de-dispensaveis.html/,Zeegelaar na lista de dispensáveis - Sporting - Jornal Record,2,True,artigo
-http://www.record.pt/futebol/futebol-nacional/liga-nos/v--guimaraes/detalhe/xande-fica-ate-2021.html,Xande fica até 2021 - V. Guimarães - Jornal Record,10,True,artigo
-http://www.record.pt/internacional/competicoes-de-selecoes/europeu/euro-2016/detalhe/irmaos-xhaka-dao-80-por-cento-do-salario-aos-pais.html,Irmãos Xhaka dão 80 por cento do salário aos pais - Euro 2016 - Jornal Record,1,True,artigo
-http://www.record.pt/internacional/competicoes-de-selecoes/taca-das-confederacoes/taca-das-confederacoes-2017/detalhe/danilo-nova-zelandia-tem-bons-argumentos-para-defrontar-qualquer-equipa.html,Danilo: «Nova Zelândia tem bons argumentos para defrontar qualquer equipa» - Taça das Confederações ,1,True,artigo
-http://www.record.pt/internacional/detalhe/afinal-quem-e-que-vai-para-los-angeles-ibrahimovic-ou-a-a-z.html,"Afinal quem é que vai para Los Angeles, Ibrahimovic ou a A-Z? - Internacional - Jornal Record",2,True,artigo
-http://www.record.pt/internacional/detalhe/china-tevez-indigna-adeptos-por-ter-visitado-disneyland-de-xangai.html,China: Tévez indigna adeptos por ter visitado Disneyland de Xangai - Internacional - Jornal Record,2,True,artigo
-http://www.record.pt/internacional/detalhe/danny-deixa-zenit-respeito-a-decisao-de-nao-renovarem-comigo.html,Danny deixa Zenit: «Respeito a decisão de não renovarem comigo» - Internacional - Jornal Record,3,True,artigo
-http://www.record.pt/internacional/detalhe/xabi-alonso-conta-quem-foi-o-culpado-por-nao-ter-assinado-pelo-barcelona.html,Xabi Alonso conta quem foi o culpado por não ter assinado pelo Barcelona - Internacional - Jornal Re,2,True,artigo
-http://www.record.pt/internacional/paises/alemanha/detalhe/ron-robert-zieler-troca-leicester-pelo-estugarda.html,Ron-Robert Zieler troca Leicester pelo Estugarda - Alemanha - Jornal Record,3,True,artigo
-http://www.record.pt/internacional/paises/espanha/detalhe/zheng-zhi-mostra-se-orgulhoso-com-a-saida-de-paulinho-para-o-barcelona.html,Zheng Zhi mostra-se orgulhoso com a saída de Paulinho para o Barcelona - Espanha - Jornal Record,3,True,artigo
-http://www.record.pt/internacional/paises/inglaterra/detalhe/pep-guadiola-eu-e-o-zidane-somos-parecidos-no-cabelo.html,Pep Guardiola: «Eu e o Zidane somos parecidos no cabelo» - Inglaterra - Jornal Record,2,True,artigo
-http://www.record.pt/internacional/real-madrid/detalhe/zidade-ronaldo-so-quis-ver-se-a-ferida-era-profunda.html,Zidane: «Ronaldo só quis ver se a ferida era profunda...» - Real Madrid - Jornal Record,7,True,artigo
-http://www.record.pt/liga-record/detalhe/xadas-torna-se-compra-obrigatoria.html,Xadas torna-se compra obrigatória? - Liga Record - Jornal Record,4,True,artigo
-http://www.record.pt/modalidades/andebol/detalhe/campeonato-esta-suspenso.html,Campeonato está suspenso - Andebol - Jornal Record,4,True,artigo
-http://www.record.pt/modalidades/atletismo/detalhe/sporting-pretende-yazaldes-nascimento.html,Sporting pretende Yazaldes Nascimento - Atletismo - Jornal Record,2,True,artigo
-http://www.record.pt/modalidades/atletismo/detalhe/zach-miller-vence-oitava-edicao-do-madeira-island-ultra-trail.html,Zach Miller vence oitava edição do Madeira Island Ultra Trail - Atletismo - Jornal Record,13,True,artigo
-http://www.record.pt/modalidades/judo/detalhe/yahima-sente-se-vitima-de-xenofobia.html,Yahima sente-se vítima de xenofobia - Judo - Jornal Record,1,True,artigo
-http://www.record.pt/multimedia/fotogalerias/detalhe/esta-falta-tirou-zeegelaar-do-derbi-com-o-benfica.html,Esta falta tirou Zeegelaar do dérbi com o Benfica - Fotogalerias - Jornal Record,472,False,captures_outlier
-http://www.record.pt/multimedia/fotogalerias/detalhe/zeegelaar-no-sofa-atento-ao-benfica.html,Zeegelaar no sofá... atento ao Benfica - Fotogalerias - Jornal Record,43,True,artigo
-http://www.record.pt/multimedia/videos/detalhe/centro-teleguiado-de-zivkovic-e-jonas-a-faturar-de-cabeca.html,Centro teleguiado de Zivkovic e Jonas a faturar de cabeça - Vídeos - Jornal Record,43,True,artigo
-http://www.record.pt/multimedia/videos/detalhe/cristiano-ronaldo-quis-entrar-com-o-pe-direito-e-ainda-aqueceu-em-xangai.html,Cristiano Ronaldo quis entrar com o pé direito e ainda aqueceu em Xangai - Vídeos - Jornal Record,27,True,artigo
-http://www.record.pt/multimedia/videos/detalhe/neymar-a-dar-no-duro-enquanto-ronaldo-festejava-em-zurique.html,Neymar a dar no duro enquanto Ronaldo festejava em Zurique - Vídeos - Jornal Record,1,True,artigo
-http://www.record.pt/multimedia/videos/detalhe/video-arbitro-e-o-arbitro-principal-viveram-momentos-dificeis-no-mexico-nova-zelandia.html,Vídeo-árbitro (e o árbitro principal) viveram momentos difíceis no México-Nova Zelândia - Vídeos - J,5,True,artigo
-http://www.record.pt/multimedia/videos/detalhe/zainadine-cortou-mal-a-bola-e-otavio-abriu-o-marcador.html,Zainadine cortou mal a bola e Otávio abriu o marcador - Vídeos - Jornal Record,135,False,captures_outlier
-http://www.record.pt/multimedia/videos/detalhe/zungu-aproveitou-distracao-da-defesa-do-benfica-para-marcar.html,Zungu aproveitou distração da defesa do Benfica para marcar - Vídeos - Jornal Record,73,True,artigo
-http://www.record.pt/o-diario-de-cr7-by-meo/detalhe/AMP/la-dodgers-recebem-ny-yankees-e-a-estrela-e-ronaldo.html,LA Dodgers recebem NY Yankees e a estrela é Ronaldo,8,True,artigo
-http://www.record.pt/opiniao/cronistas/bruno-prata/detalhe/o-xeque-mate-do-barca.html,O xeque-mate do Barça - Bruno Prata - Jornal Record,18,True,artigo
-http://www.record.pt/opiniao/detalhe/hora-zero-hora-de-recomecar-ou-de-continuar.html,Hora zero: hora de recomeçar ou de continuar? - Opinião - Jornal Record,26,True,artigo
-https://www.record.pt//futebol/futebol-nacional/liga-nos/fc-porto/detalhe/fase-final-da-youth-league-ja-e-conhecida.html,Fase final da Youth League já é conhecida - FC Porto - Jornal Record,5,True,artigo
-https://www.record.pt//internacional/competicoes-de-selecoes/europeu/euro-2016/grupos/grupo-f/austria/detalhe/cr7-na-zona-mista-da-austria.html,CR7 na zona mista... da Áustria - Áustria - Jornal Record,11,True,artigo
-https://www.record.pt/fora-de-campo/detalhe/AMP/isabel-dos-santos-escolhe-jose-carlos-lourenco-para-director-geral-da-zap.html,Isabel dos Santos escolhe José Carlos Lourenço para director-geral da ZAP,1,True,artigo
-https://www.record.pt/fora-de-campo/detalhe/AMP/zuckerberg-admite-que-a-cambridge-analytica-obteve-os-seus-dados-pessoais.html,Zuckerberg admite que a Cambridge Analytica obteve os seus dados pessoais,2,True,artigo
-https://www.record.pt/futebol/detalhe/carlos-xistra-castigado-por-erro-no-golo-do-p-ferreira-frente-ao-sporting,Carlos Xistra castigado por erro no golo do P. Ferreira frente ao Sporting - Futebol - Jornal Record,5,True,artigo
-https://www.record.pt/futebol/futebol-de-praia/amp/sporting-entre-as-equipas-presentes-na-madjer-youth-cup,Sporting entre as equipas presentes na Madjer Youth Cup - Futebol de Praia - Jornal Record,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica,Benfica - Jornal Record,916,False,captures_outlier
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/amp/rafa-jogou-limitado-contra-o-zenit,Rafa jogou limitado contra o Zenit - Benfica - Jornal Record,1,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/amp/zanga-de-joao-felix-com-pepe-ficou-no-relvado,’Zanga’ de João Félix com Pepe ficou no relvado - Benfica - Jornal Record,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/AMP/tim-ze-pedro-mandava-mensagens-a-dizer-carrega-benfica.html,Tim: «Zé Pedro mandava mensagens a dizer 'Carrega Benfica'»,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/sad-do-benfica-nao-considera-vender-zlobin-tao-cedo,SAD do Benfica não considera vender Zlobin tão cedo - Benfica - Jornal Record,3,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yohan-boli-observado,Yohan Boli observado - Benfica - Jornal Record,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica,Yony González é reforço para o Benfica - Benfica - Jornal Record,3,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yuri-ribeiro-parece-que-nunca-sai-do-benfica.html,Yuri Ribeiro: «Parece que nunca saí do Benfica» - Benfica - Jornal Record,6,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zanga-de-joao-felix-com-pepe-ficou-no-relvado,’Zanga’ de João Félix com Pepe ficou no relvado - Benfica - Jornal Record,4,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zivkovic-mostrou-se-a-mourinho?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto,Zivkovic mostrou-se a Mourinho - Benfica - Jornal Record,1,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zivkovic-precavido-em-novo-teste-de-fogo.html,Zivkovic precavido em novo teste de fogo - Benfica - Jornal Record,7,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zivkovic-pronto-para-sair,Zivkovic pronto para sair - Benfica - Jornal Record,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html,Yusupha com pouca margem,14,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/yusupha-rende-25-milhoes.html,"Yusupha rende 2,5 milhões - Boavista - Jornal Record",6,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/detalhe/a-cronica-do-boavista-moreirense-1-0-um-tiro-certeiro-e-xeque-mate.html,"A crónica do Boavista-Moreirense, 1-0: Um tiro certeiro e... xeque-mate - Liga NOS - Jornal Record",31,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/fc-porto/detalhe/alex-telles-na-lista-de-zidane,Alex Telles na lista de Zidane para o Chelsea - FC Porto - Jornal Record,4,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/fc-porto/detalhe/turcos-insistem-que-quaresma-vai-reforcar-dragoes-a-custo-zero,Turcos insistem que Quaresma vai reforçar dragões a custo zero - FC Porto - Jornal Record,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/fc-porto/detalhe/ze-luis-oficializado-no-fc-porto?ref=Detalhe_BlocoUltimasArea,Zé Luís oficializado no FC Porto - FC Porto - Jornal Record,1,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/moreirense/detalhe/AMP/petit-queremos-fugir-rapidamente-da-zona-de-despromocao.html,Petit: «Queremos fugir rapidamente da zona de despromoção»,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/moreirense/detalhe/zizo-tem-de-dar-explicacoes.html,Zizo tem de dar explicações - Moreirense - Jornal Record,3,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sp--braga/detalhe/AMP/xadas-imune-ao-interesse-do-benfica.html,Xadas imune ao interesse do Benfica,8,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/amp/salgado-zenha-e-a-origem-dos-65-me-fc-porto-e-benfica-tambem-nao-revelam-financiadores,Salgado Zenha e a origem dos 65 ME: «FC Porto e Benfica também não revelam financiadores» - Sporting,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/AMP/leao-sem-joqueres-tenta-xeque-mate.html,Leão sem jóqueres tenta xeque-mate,1,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/belenenses-sad-quer-receber-por-ze-pedro,Belenenses SAD quer receber por Zé Pedro - Sporting - Jornal Record,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/bruno-de-carvalho-jorge-jesus-nao-cumpria-a-sua-postura-de-zelo?ref=Detalhe_BlocoUltimasArea&act=0&est=Aberto,Bruno de Carvalho: «Jorge Jesus não cumpria a sua postura de zelo» - Sporting - Jornal Record,1,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/bruno-de-carvalhoquer-ano-de-grande-apoio-masde-tolerancia-zero.html,"Bruno de Carvalho quer ano de grande apoio, mas de tolerância zero - Sporting - Jornal Record",4,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/diretivo-ultras-xxi-acusa-direcao-de-tentar-camuflar-a-crise-no-sporting?ref=Liga%20NOS_1BlocoAreasemDestaques,Diretivo Ultras XXI acusa direção de tentar camuflar a crise no Sporting - Sporting - Jornal Record,1,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/mas-eu-fui-so-fazer-xixi-bruno-de-carvalho-recorda-quando-a-reestruturacao-financeira-quase-ruiu,'Mas eu fui só fazer xixi': Bruno de Carvalho recorda quando a reestruturação financeira quase ruiu ,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/salgado-zenha-e-as-contas-do-sporting-nao-andamos-a-cortar-a-eito,Salgado Zenha e as contas do Sporting: «Não andamos a cortar a eito» - Sporting - Jornal Record,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/salgado-zenha-explica-por-que-motivo-bruno-fernandes-nao-precisa-de-sair-em-janeiro,Salgado Zenha explica por que motivo Bruno Fernandes não precisa de sair em janeiro - Sporting - Jor,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zenit-quer-acua-e-acena-com-20-milhoes,Zenit quer Acuña e acena com 20 milhões - Sporting - Jornal Record,2,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/v--guimaraes/detalhe/vitorianos-dizem-que-mudaram-zona-destinada-aos-adeptos-do-sp-braga-por-indicacao-da-psp,V. Guimarães diz que mudou zona destinada aos adeptos do Sp. Braga por indicação da PSP - V. Guimarã,1,True,artigo
-https://www.record.pt/futebol/futebol-nacional/liga-nos/v--guimaraes/detalhe/yordan-osorio-reforca-v-guimaraes.html,Yordan Osorio reforça V. Guimarães - V. Guimarães - Jornal Record,6,True,artigo
-https://www.record.pt/futebol/futebol-nacional/taca-de-portugal/detalhe/AMP/carlos-xistra-apita-fc-porto-v-guimaraes.html,Carlos Xistra apita FC Porto-V. Guimarães,10,True,artigo
-https://www.record.pt/internacional/amp/abel-xavier-apela-a-pessoas-e-paises-para-ajudarem-mocambique,Abel Xavier apela a pessoas e países para ajudarem Moçambique - Internacional - Jornal Record,1,True,artigo
-https://www.record.pt/internacional/amp/jorge-jesus-assina-com-pini-zahavi,Jorge Jesus assina com Pini Zahavi - Internacional - Jornal Record,2,True,artigo
-https://www.record.pt/internacional/competicoes-de-clubes/liga-jovem-da-uefa/detalhe/fc-porto-chelsea-final-da-uefa-youth-league-em-direto,FC Porto-Chelsea: final da UEFA Youth League em direto - Liga Jovem da UEFA - Jornal Record,4,True,artigo
-https://www.record.pt/internacional/competicoes-de-selecoes/can/detalhe/abel-xavier-e-com-muita-tristeza-que-mocambique-falha-objetivo-da-can,Abel Xavier «É com muita tristeza que Moçambique falha objetivo da CAN» - CAN - Jornal Record,2,True,artigo
-https://www.record.pt/internacional/competicoes-de-selecoes/europeu/euro-2016/grupos/grupo-d/turquia/detalhe/AMP/os-zero-pontos-que-nao-deprimem-gnul.html,Os zero pontos que não deprimem Gönul,2,True,artigo
-https://www.record.pt/internacional/competicoes-de-selecoes/europeu/euro-2020/amp/zinchenko-elogia-bernardo-silva-e-o-melhor-jogador-portugues,Zinchenko elogia Bernardo Silva: «É o melhor jogador português» - Euro 2020 - Jornal Record,1,True,artigo
-https://www.record.pt/internacional/detalhe/capita-do-young-boys-encontrada-sem-vida-no-lago-de-como?ref=Pesquisa_Vistas&act=0&est=Aberto,Capitã do Young Boys encontrada sem vida no lago de Como - Internacional - Jornal Record,1,True,artigo
-https://www.record.pt/internacional/detalhe/dois-jogadores-no-total-93-anos-a-curiosa-dupla-de-ataque-do-yokohama-fc?ref=V%C3%ADdeos_Ultimas,"Dois jogadores, no total 93 anos: a curiosa dupla de ataque do Yokohama FC - Internacional - Jornal ",1,True,artigo
-https://www.record.pt/internacional/paises/espanha/detalhe/xavi-pensava-que-o-real-iria-melhorar-sem-ronaldo,Xavi: «Pensava que o Real iria melhorar sem Ronaldo» - Espanha - Jornal Record,1,True,artigo
-https://www.record.pt/internacional/paises/inglaterra/detalhe/zil-recorda-palavras-de-ronaldo-quando-trocou-o-real-madrid-pelo-arsenal,Özil recorda palavras de Ronaldo quando trocou o Real Madrid pelo Arsenal - Inglaterra - Jornal Reco,7,True,artigo
-https://www.record.pt/internacional/paises/italia/detalhe/zidane-com-futuro-dividido-entre-mourinho-e-cristiano-ronaldo,Zidane com futuro dividido entre Mourinho e Cristiano Ronaldo - Itália - Jornal Record,1,True,artigo
-https://www.record.pt/jogo-da-vida/detalhe/georgina-irritada-com-zoo-de-madrid-zero-profissionalismo-para-com-os-clientes,Georgina irritada com Zoo de Madrid: «Zero profissionalismo para com os clientes» - Jogo da Vida - J,2,True,artigo
-https://www.record.pt/jogos-em-direto/live/78799,SC Braga x Vitória SC - Record Jogos em Direto,10,True,artigo
-https://www.record.pt/liga-allianz-running-record/running---equipamento/amp/divulgadas-primeiras-imagens-dos-novos-nike-pegasus-36-turbo-e-zoom-fly-3,"Divulgadas primeiras imagens dos novos Nike Pegasus 36, Turbo e Zoom Fly 3 - Running - Equipamento -",4,True,artigo
-https://www.record.pt/modalidades/basquetebol?ref=Masterpage_Menu,Basquetebol - Jornal Record,829,False,captures_outlier
-https://www.record.pt/modalidades/ciclismo/amp/alaphilippe-vence-segunda-etapa-e-yates-sobe-a-lideranca-da-tirreno-adriatico,Alaphilippe vence segunda etapa e Yates sobe à liderança da Tirreno-Adriático - Ciclismo - Jornal Re,2,True,artigo
-https://www.record.pt/modalidades/ciclismo/detalhe/alaphilippe-vence-segunda-etapa-e-yates-sobe-a-lideranca-da-tirreno-adriatico,Alaphilippe vence segunda etapa e Yates sobe à liderança da Tirreno-Adriático - Ciclismo - Jornal Re,2,True,artigo
-https://www.record.pt/modalidades/desporto-universitario/detalhe/AMP/universidade-do-porto-vence-no-xadrez.html,Universidade do Porto vence no xadrez,3,True,artigo
-https://www.record.pt/modalidades/jogos-europeus/detalhe/jieni-shao-junta-se-a-fu-yu-na-terceira-ronda-de-tenis-de-mesa?act=0&est=Aberto&act=0&est=Aberto,Jieni Shao junta-se a Fu Yu na terceira ronda de ténis de mesa - Jogos Europeus - Jornal Record,1,True,artigo
-https://www.record.pt/modalidades/judo/detalhe/telma-monteiro-foi-7-no-grande-premio-de-zagreb,Telma Monteiro foi 7.ª no Grande Prémio de Zagreb - Judo - Jornal Record,1,True,artigo
-https://www.record.pt/modalidades/motores/motociclismo/motogp/amp/zarco-pode-estar-a-caminho-das-superbikes-e-miguel-oliveira-espreita-equipa-oficial-da-ktm,Zarco pode estar a caminho das Superbikes e Miguel Oliveira 'espreita' equipa oficial da KTM - MotoG,3,True,artigo
-https://www.record.pt/modalidades/motores/record-auto/detalhe/xiaomi-gigante-dos-telemoveis-vai-lancar-suv-de-11915-euros,Xiaomi: gigante dos telemóveis vai lançar SUV de 11.915 euros - Record Auto - Jornal Record,4,True,artigo
-https://www.record.pt/modalidades/natacao/detalhe/liu-xiang-bate-recorde-do-mundo-dos-50-metros-costas?ref=HP_3BlocoAreasemDestaques,Liu Xiang bate recorde do mundo dos 50 metros costas - Natação - Jornal Record,2,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/AMP/benfica-e-uma-lesao-que-ainda-nao-foi-curada-assim-foi-o-aniversario-de-zivkovic.html,Benfica e uma lesão que ainda não foi curada: assim foi o aniversário de Zivkovic,9,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/AMP/benfica-rumo-a-final-four-da-uefa-youth-league.html,Benfica rumo à final four da UEFA Youth League,1,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/AMP/o-que-e-feito-dos-benfiquistas-finalistas-da-youth-league-de-201314.html,O que é feito dos benfiquistas finalistas da Youth League de 2013/14?,2,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/AMP/vlachodimos-foi-ver-basquetebol-com-zeca.html,Vlachodimos foi ver basquetebol com... Zeca,1,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/as-borlas-do-mercado-de-transferencias-craques-que-podem-assinar-ja-a-custo-zero?ref=Detalhe_DestaquesTopo,As 'borlas' do mercado de transferências: craques que podem assinar já a custo zero - Fotogalerias -,2,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez,Equipamento do Barcelona para 2019/2020 vai ser em... xadrez - Fotogalerias - Jornal Record,2,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto,Equipamento do Barcelona para 2019/2020 vai ser em... xadrez - Fotogalerias - Jornal Record,1,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/georgina-em-xangai-da-roupa-verde-que-chamou-todas-as-atencoes-a-foto-que-levantou-duvidas?ref=Iniciativas_BlocoFotos,Georgina em Xangai: da roupa verde que chamou todas as atenções à foto que levantou dúvidas - Fotoga,1,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/o-sorriso-de-ronaldo-em-dia-d-para-real-madrid-de-zidane-na-champions,O sorriso de Ronaldo em dia D para Real Madrid de Zidane na Champions - Fotogalerias - Jornal Record,1,True,artigo
-https://www.record.pt/multimedia/fotogalerias/detalhe/zagreb-foi-abaixo-com-a-chegada-dos-vice-campeoes-do-mundo.html,Zagreb foi 'abaixo' com a chegada dos vice-campeões do Mundo - Fotogalerias - Jornal Record,31,True,artigo
-https://www.record.pt/multimedia/hora-record/detalhe/abel-xavier-vemos-o-fc-porto-a-imagem-de-sergio-conceicao.html,Abel Xavier: «Vemos o FC Porto à imagem de Sérgio Conceição» - Hora Record - Jornal Record,72,True,artigo
-https://www.record.pt/multimedia/videos/detalhe/cristiano-ronaldo-passou-pela-zona-mista-e-deu-um-beijo-a-dybala?ref=HP_4BucketDestaquesPrincipais,Cristiano Ronaldo passou pela zona mista e deu um beijo a Dybala - Vídeos - Jornal Record,1,True,artigo
-https://www.record.pt/multimedia/videos/detalhe/wilson-eduardo-ja-marca-pelo-dinamo-zagreb-904334,Wilson Eduardo já marca pelo Dinamo Zagreb - Vídeos - Jornal Record,12,True,artigo
-https://www.record.pt/multimedia/videos/detalhe/yuri-ribeiro-apresenta-se-aos-adeptos-do-rio-ave.html,Yuri Ribeiro apresenta-se aos adeptos do Rio Ave - Vídeos - Jornal Record,162,False,captures_outlier
-https://www.record.pt/multimedia/videos/detalhe/zlobin-fez-de-paulo-lopes-e-subiu-a-baliza-para-erguer-a-taca-de-campeao,Zlobin fez de Paulo Lopes e subiu à baliza para erguer a taça de campeão - Vídeos - Jornal Record,3,True,artigo
-https://www.record.pt/o-diario-de-cr7-by-meo/detalhe/AMP/zidane-recorda-aviso-que-tinha-feito-sobre-cristiano-ronaldo.html,Zidane recorda aviso que tinha feito sobre Cristiano Ronaldo,3,True,artigo
-https://www.record.pt/record-gaming/amp/ps4-vai-receber-um-novo-yakuza,PS4 vai receber um novo Yakuza - Record Gaming - Jornal Record,7,True,artigo
-https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_4BucketDestaquesPrincipais,Yamila Rodríguez: Argentina louca por Ronaldo - Record mais - Jornal Record,1,True,artigo
-https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_BlocoColoridoSec%C3%A7%C3%A3oDestaque,Yamila Rodríguez: Argentina louca por Ronaldo - Record mais - Jornal Record,7,True,artigo
-https://www.record.pt/resultados-e-classificacoes/modalidades/voleibol/resultados,Voleibol - Jornal Record,822,False,captures_outlier
-https://www.record.pt/sabermais/ano-zero,Saber Mais: Ano Zero,1,False,sabermais
-https://www.record.pt/sabermais/bruno-fernandes,Saber Mais: Bruno Fernandes,143,False,sabermais
-https://www.record.pt/sabermais/cristiano-ronaldo,Saber Mais: Cristiano Ronaldo,306,False,sabermais
-https://www.record.pt/sabermais/futebol,Saber Mais: Futebol,1282,False,sabermais
-https://www.record.pt/sabermais/jo%C3%A3o-f%C3%A9lix,Saber Mais: João Félix,119,False,sabermais
-https://www.record.pt/sabermais/nelson-%C3%A9vora,Saber Mais: Nelson Évora,5,False,sabermais
-https://www.record.pt/sabermais/porto,Saber Mais: Porto,118,False,sabermais
-https://www.record.pt/sabermais/sporting,Saber Mais: Sporting,1084,False,sabermais
-https://www.record.pt/sabermais/telma-monteiro,Saber Mais: Telma Monteiro,13,False,sabermais
-https://www.record.pt/sabermais/yebda,YEBDA - Saber Mais - Record,3,False,sabermais
-https://www.record.pt/sabermais/ze-pedro,ze pedro - Saber Mais - Record,1,False,sabermais
-https://www.record.pt/sabermais/zurique,Saber Mais: Zurique,12,False,sabermais
+original_url,title,captures,is_artigo,reason,variantes
+http://www.record.pt/Futebol/Internacional/interior.aspx?content_id/x3d730429,Object moved,4,False,object_moved,
+http://www.record.pt/Futebol/Internacional/interior.aspx?content_id/x3d757134,Object moved,4,False,object_moved,
+http://www.record.pt/Futebol/Internacional/interior.aspx?content_id/x3d817327,Object moved,4,False,object_moved,
+http://www.record.pt/Futebol/Internacional/real_madrid/interior.aspx?content_id/x3d769710,Object moved,4,False,object_moved,
+http://www.record.pt/Futebol/Nacional/1a_liga/Benfica/interior.aspx?content_id/x3d750833,Object moved,4,False,object_moved,
+http://www.record.pt/Futebol/Nacional/1a_liga/Benfica/interior.aspx?content_id/x3d930690,Object moved,3,False,object_moved,
+http://www.record.pt/Futebol/Nacional/1a_liga/Porto/interior.aspx?content_id/x3d729433,Object moved,4,False,object_moved,
+http://www.record.pt/Futebol/Nacional/1a_liga/Sporting/interior.aspx?content_id/x3d688186,Object moved,4,False,object_moved,
+http://www.record.pt/Futebol/Nacional/1a_liga/Sporting/interior.aspx?content_id/x3d808398,Object moved,1,False,object_moved,
+http://www.record.pt/Futebol/Nacional/1a_liga/Sporting/interior.aspx?content_id/x3d906264,Object moved,4,False,object_moved,
+http://www.record.pt/Futebol/Nacional/Futsal/interior.aspx?content_id/x3d479491,Object moved,3,False,object_moved,
+http://www.record.pt/Futebol/Nacional/interior.aspx?content_id/x3d901269,Object moved,3,False,object_moved,
+http://www.record.pt/Modalidades/Basquetebol/NBA/interior.aspx?content_id/x3d788683,Object moved,4,False,object_moved,
+http://www.record.pt/entrevistas/detalhe/daniel-ramos-expulsao-de-zainadine-e-estranha.html,Daniel Ramos: «Expulsão de Zainadine é estranha» - Entrevistas - Jornal Record,16,True,artigo,
+http://www.record.pt/futebol/arbitragem/detalhe/arbitragem-ao-raio-x-futebol-como-espetaculo-desportivo.html/,Arbitragem ao Raio-X: Futebol como espetáculo desportivo - Arbitragem - Jornal Record,1,True,artigo,
+http://www.record.pt/futebol/arbitragem/detalhe/carlos-xistra-vai-arbitrar-o-v-guimaraes-benfica.html,Carlos Xistra vai arbitrar o V. Guimarães-Benfica - Arbitragem - Jornal Record,4,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/2--liga/detalhe/fc-porto-b-sp-braga-b-1-3-guerreiros-escapam-a-zona-de-despromocao.html,"FC Porto B-Sp. Braga B, 1-3: Guerreiros escapam à zona de despromoção - 2ª Liga - Jornal Record",48,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/2--liga/detalhe/penafiel-spcovilha-1-0-zarabi-da-triunfo-na-baliza-errada.html,"Penafiel-Sp. Covilhã, 1-0: Zarabi dá triunfo... na baliza errada - 2ª Liga - Jornal Record",45,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/aves/detalhe/youssouf-sow-emprestado-ao-leixoes.html,Youssouf Sow emprestado ao Leixões - Aves - Jornal Record,15,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/AMP/uefa-destaca-joao-felix-como-um-dos-jogadores-a-seguir-da-youth-league.html,UEFA destaca benfiquista João Félix como um dos jogadores a seguir,3,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/a-incubadora-do-seixal-ao-raio-x.html,A 'incubadora' do Seixal ao raio-x: os nomes que dão segurança ao Benfica - Benfica - Jornal Record,3,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/exibicao-de-zivkovic-nao-espanta-drulo.html,Exibição de Zivkovic não espanta ‘Drulo’ - Benfica - Jornal Record,51,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yuri-ribeiro-tambem-volta.html,Yuri Ribeiro também volta - Benfica - Jornal Record,14,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zivkovic-quase-a-100-por-cento.html,Zivkovic quase a 100 por cento - Benfica - Jornal Record,1,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/detalhe/AMP/carlos-xistra-apita-benfica-sp-braga.html,Carlos Xistra apita Benfica-Sp. Braga,1,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/fc-porto/detalhe/danny-os-benfiquistas-querem-que-o-zenit-ganhe-719043.html,Danny: «Os benfiquistas querem que o Zenit ganhe» - FC Porto - Jornal Record,5,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/maritimo/detalhe/charles-entende-que-parte-do-zero.html,Charles entende que parte do zero - Marítimo - Jornal Record,7,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/portimonense/detalhe/yuta-koike-podera-ter-primeiro-teste-de-fogo.html,Yuta Koike poderá ter primeiro teste de fogo - Portimonense - Jornal Record,5,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/sp--braga/detalhe/xeka-emprestado-ao-lille.html,Xeka emprestado ao Lille - Sp. Braga - Jornal Record,2,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/domingos-conta-com-yannick-692618.html,Domingos conta com Yannick - Sporting - Jornal Record,4,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/o-melhor-yannick-692303.html,O melhor Yannick - Sporting - Jornal Record,4,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/reforcos-ao-raio-x-690811.html,Reforços ao raio X - Sporting - Jornal Record,4,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zahavi-espera-contacto-leonino-692448.html,Zahavi espera contacto leonino - Sporting - Jornal Record,4,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zeegelaar-desagradado-com-fim-das-negociacoes-entre-sporting-e-sevilha.html,Zeegelaar desagradado com fim das negociações entre Sporting e Sevilha - Sporting - Jornal Record,1,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zeegelaar-e-as-aulas-do-mister-jesus.html,Zeegelaar e as aulas do Mister Jesus - Sporting - Jornal Record,17,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zeegelaar-na-lista-de-dispensaveis.html/,Zeegelaar na lista de dispensáveis - Sporting - Jornal Record,2,True,artigo,
+http://www.record.pt/futebol/futebol-nacional/liga-nos/v--guimaraes/detalhe/xande-fica-ate-2021.html,Xande fica até 2021 - V. Guimarães - Jornal Record,10,True,artigo,
+http://www.record.pt/internacional/competicoes-de-selecoes/europeu/euro-2016/detalhe/irmaos-xhaka-dao-80-por-cento-do-salario-aos-pais.html,Irmãos Xhaka dão 80 por cento do salário aos pais - Euro 2016 - Jornal Record,1,True,artigo,
+http://www.record.pt/internacional/competicoes-de-selecoes/taca-das-confederacoes/taca-das-confederacoes-2017/detalhe/danilo-nova-zelandia-tem-bons-argumentos-para-defrontar-qualquer-equipa.html,Danilo: «Nova Zelândia tem bons argumentos para defrontar qualquer equipa» - Taça das Confederações ,1,True,artigo,
+http://www.record.pt/internacional/detalhe/afinal-quem-e-que-vai-para-los-angeles-ibrahimovic-ou-a-a-z.html,"Afinal quem é que vai para Los Angeles, Ibrahimovic ou a A-Z? - Internacional - Jornal Record",2,True,artigo,
+http://www.record.pt/internacional/detalhe/china-tevez-indigna-adeptos-por-ter-visitado-disneyland-de-xangai.html,China: Tévez indigna adeptos por ter visitado Disneyland de Xangai - Internacional - Jornal Record,2,True,artigo,
+http://www.record.pt/internacional/detalhe/danny-deixa-zenit-respeito-a-decisao-de-nao-renovarem-comigo.html,Danny deixa Zenit: «Respeito a decisão de não renovarem comigo» - Internacional - Jornal Record,3,True,artigo,
+http://www.record.pt/internacional/detalhe/xabi-alonso-conta-quem-foi-o-culpado-por-nao-ter-assinado-pelo-barcelona.html,Xabi Alonso conta quem foi o culpado por não ter assinado pelo Barcelona - Internacional - Jornal Re,2,True,artigo,
+http://www.record.pt/internacional/paises/alemanha/detalhe/ron-robert-zieler-troca-leicester-pelo-estugarda.html,Ron-Robert Zieler troca Leicester pelo Estugarda - Alemanha - Jornal Record,3,True,artigo,
+http://www.record.pt/internacional/paises/espanha/detalhe/zheng-zhi-mostra-se-orgulhoso-com-a-saida-de-paulinho-para-o-barcelona.html,Zheng Zhi mostra-se orgulhoso com a saída de Paulinho para o Barcelona - Espanha - Jornal Record,3,True,artigo,
+http://www.record.pt/internacional/paises/inglaterra/detalhe/pep-guadiola-eu-e-o-zidane-somos-parecidos-no-cabelo.html,Pep Guardiola: «Eu e o Zidane somos parecidos no cabelo» - Inglaterra - Jornal Record,2,True,artigo,
+http://www.record.pt/internacional/real-madrid/detalhe/zidade-ronaldo-so-quis-ver-se-a-ferida-era-profunda.html,Zidane: «Ronaldo só quis ver se a ferida era profunda...» - Real Madrid - Jornal Record,7,True,artigo,
+http://www.record.pt/liga-record/detalhe/xadas-torna-se-compra-obrigatoria.html,Xadas torna-se compra obrigatória? - Liga Record - Jornal Record,4,True,artigo,
+http://www.record.pt/modalidades/andebol/detalhe/campeonato-esta-suspenso.html,Campeonato está suspenso - Andebol - Jornal Record,4,True,artigo,
+http://www.record.pt/modalidades/atletismo/detalhe/sporting-pretende-yazaldes-nascimento.html,Sporting pretende Yazaldes Nascimento - Atletismo - Jornal Record,2,True,artigo,
+http://www.record.pt/modalidades/atletismo/detalhe/zach-miller-vence-oitava-edicao-do-madeira-island-ultra-trail.html,Zach Miller vence oitava edição do Madeira Island Ultra Trail - Atletismo - Jornal Record,13,True,artigo,
+http://www.record.pt/modalidades/judo/detalhe/yahima-sente-se-vitima-de-xenofobia.html,Yahima sente-se vítima de xenofobia - Judo - Jornal Record,1,True,artigo,
+http://www.record.pt/multimedia/fotogalerias/detalhe/esta-falta-tirou-zeegelaar-do-derbi-com-o-benfica.html,Esta falta tirou Zeegelaar do dérbi com o Benfica - Fotogalerias - Jornal Record,472,False,captures_outlier,
+http://www.record.pt/multimedia/fotogalerias/detalhe/zeegelaar-no-sofa-atento-ao-benfica.html,Zeegelaar no sofá... atento ao Benfica - Fotogalerias - Jornal Record,43,True,artigo,
+http://www.record.pt/multimedia/videos/detalhe/centro-teleguiado-de-zivkovic-e-jonas-a-faturar-de-cabeca.html,Centro teleguiado de Zivkovic e Jonas a faturar de cabeça - Vídeos - Jornal Record,43,True,artigo,
+http://www.record.pt/multimedia/videos/detalhe/cristiano-ronaldo-quis-entrar-com-o-pe-direito-e-ainda-aqueceu-em-xangai.html,Cristiano Ronaldo quis entrar com o pé direito e ainda aqueceu em Xangai - Vídeos - Jornal Record,27,True,artigo,
+http://www.record.pt/multimedia/videos/detalhe/neymar-a-dar-no-duro-enquanto-ronaldo-festejava-em-zurique.html,Neymar a dar no duro enquanto Ronaldo festejava em Zurique - Vídeos - Jornal Record,1,True,artigo,
+http://www.record.pt/multimedia/videos/detalhe/video-arbitro-e-o-arbitro-principal-viveram-momentos-dificeis-no-mexico-nova-zelandia.html,Vídeo-árbitro (e o árbitro principal) viveram momentos difíceis no México-Nova Zelândia - Vídeos - J,5,True,artigo,
+http://www.record.pt/multimedia/videos/detalhe/zainadine-cortou-mal-a-bola-e-otavio-abriu-o-marcador.html,Zainadine cortou mal a bola e Otávio abriu o marcador - Vídeos - Jornal Record,135,False,captures_outlier,
+http://www.record.pt/multimedia/videos/detalhe/zungu-aproveitou-distracao-da-defesa-do-benfica-para-marcar.html,Zungu aproveitou distração da defesa do Benfica para marcar - Vídeos - Jornal Record,73,True,artigo,
+http://www.record.pt/o-diario-de-cr7-by-meo/detalhe/AMP/la-dodgers-recebem-ny-yankees-e-a-estrela-e-ronaldo.html,LA Dodgers recebem NY Yankees e a estrela é Ronaldo,8,True,artigo,
+http://www.record.pt/opiniao/cronistas/bruno-prata/detalhe/o-xeque-mate-do-barca.html,O xeque-mate do Barça - Bruno Prata - Jornal Record,18,True,artigo,
+http://www.record.pt/opiniao/detalhe/hora-zero-hora-de-recomecar-ou-de-continuar.html,Hora zero: hora de recomeçar ou de continuar? - Opinião - Jornal Record,26,True,artigo,
+https://www.record.pt//futebol/futebol-nacional/liga-nos/fc-porto/detalhe/fase-final-da-youth-league-ja-e-conhecida.html,Fase final da Youth League já é conhecida - FC Porto - Jornal Record,5,True,artigo,
+https://www.record.pt//internacional/competicoes-de-selecoes/europeu/euro-2016/grupos/grupo-f/austria/detalhe/cr7-na-zona-mista-da-austria.html,CR7 na zona mista... da Áustria - Áustria - Jornal Record,11,True,artigo,
+https://www.record.pt/fora-de-campo/detalhe/AMP/isabel-dos-santos-escolhe-jose-carlos-lourenco-para-director-geral-da-zap.html,Isabel dos Santos escolhe José Carlos Lourenço para director-geral da ZAP,1,True,artigo,
+https://www.record.pt/fora-de-campo/detalhe/AMP/zuckerberg-admite-que-a-cambridge-analytica-obteve-os-seus-dados-pessoais.html,Zuckerberg admite que a Cambridge Analytica obteve os seus dados pessoais,2,True,artigo,
+https://www.record.pt/futebol/detalhe/carlos-xistra-castigado-por-erro-no-golo-do-p-ferreira-frente-ao-sporting,Carlos Xistra castigado por erro no golo do P. Ferreira frente ao Sporting - Futebol - Jornal Record,5,True,artigo,
+https://www.record.pt/futebol/futebol-de-praia/amp/sporting-entre-as-equipas-presentes-na-madjer-youth-cup,Sporting entre as equipas presentes na Madjer Youth Cup - Futebol de Praia - Jornal Record,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica,Benfica - Jornal Record,916,False,captures_outlier,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/amp/rafa-jogou-limitado-contra-o-zenit,Rafa jogou limitado contra o Zenit - Benfica - Jornal Record,1,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/amp/zanga-de-joao-felix-com-pepe-ficou-no-relvado,’Zanga’ de João Félix com Pepe ficou no relvado - Benfica - Jornal Record,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/AMP/tim-ze-pedro-mandava-mensagens-a-dizer-carrega-benfica.html,Tim: «Zé Pedro mandava mensagens a dizer 'Carrega Benfica'»,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/sad-do-benfica-nao-considera-vender-zlobin-tao-cedo,SAD do Benfica não considera vender Zlobin tão cedo - Benfica - Jornal Record,3,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yohan-boli-observado,Yohan Boli observado - Benfica - Jornal Record,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yony-gonzalez-e-reforco-para-o-benfica,Yony González é reforço para o Benfica - Benfica - Jornal Record,3,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/yuri-ribeiro-parece-que-nunca-sai-do-benfica.html,Yuri Ribeiro: «Parece que nunca saí do Benfica» - Benfica - Jornal Record,6,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zanga-de-joao-felix-com-pepe-ficou-no-relvado,’Zanga’ de João Félix com Pepe ficou no relvado - Benfica - Jornal Record,4,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zivkovic-mostrou-se-a-mourinho?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto,Zivkovic mostrou-se a Mourinho - Benfica - Jornal Record,1,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zivkovic-precavido-em-novo-teste-de-fogo.html,Zivkovic precavido em novo teste de fogo - Benfica - Jornal Record,7,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/zivkovic-pronto-para-sair,Zivkovic pronto para sair - Benfica - Jornal Record,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/AMP/yusupha-com-pouca-margem.html,Yusupha com pouca margem,14,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/yusupha-rende-25-milhoes.html,"Yusupha rende 2,5 milhões - Boavista - Jornal Record",6,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/detalhe/a-cronica-do-boavista-moreirense-1-0-um-tiro-certeiro-e-xeque-mate.html,"A crónica do Boavista-Moreirense, 1-0: Um tiro certeiro e... xeque-mate - Liga NOS - Jornal Record",31,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/fc-porto/detalhe/alex-telles-na-lista-de-zidane,Alex Telles na lista de Zidane para o Chelsea - FC Porto - Jornal Record,4,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/fc-porto/detalhe/turcos-insistem-que-quaresma-vai-reforcar-dragoes-a-custo-zero,Turcos insistem que Quaresma vai reforçar dragões a custo zero - FC Porto - Jornal Record,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/fc-porto/detalhe/ze-luis-oficializado-no-fc-porto?ref=Detalhe_BlocoUltimasArea,Zé Luís oficializado no FC Porto - FC Porto - Jornal Record,1,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/moreirense/detalhe/AMP/petit-queremos-fugir-rapidamente-da-zona-de-despromocao.html,Petit: «Queremos fugir rapidamente da zona de despromoção»,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/moreirense/detalhe/zizo-tem-de-dar-explicacoes.html,Zizo tem de dar explicações - Moreirense - Jornal Record,3,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sp--braga/detalhe/AMP/xadas-imune-ao-interesse-do-benfica.html,Xadas imune ao interesse do Benfica,8,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/amp/salgado-zenha-e-a-origem-dos-65-me-fc-porto-e-benfica-tambem-nao-revelam-financiadores,Salgado Zenha e a origem dos 65 ME: «FC Porto e Benfica também não revelam financiadores» - Sporting,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/AMP/leao-sem-joqueres-tenta-xeque-mate.html,Leão sem jóqueres tenta xeque-mate,1,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/belenenses-sad-quer-receber-por-ze-pedro,Belenenses SAD quer receber por Zé Pedro - Sporting - Jornal Record,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/bruno-de-carvalho-jorge-jesus-nao-cumpria-a-sua-postura-de-zelo?ref=Detalhe_BlocoUltimasArea&act=0&est=Aberto,Bruno de Carvalho: «Jorge Jesus não cumpria a sua postura de zelo» - Sporting - Jornal Record,1,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/bruno-de-carvalhoquer-ano-de-grande-apoio-masde-tolerancia-zero.html,"Bruno de Carvalho quer ano de grande apoio, mas de tolerância zero - Sporting - Jornal Record",4,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/diretivo-ultras-xxi-acusa-direcao-de-tentar-camuflar-a-crise-no-sporting?ref=Liga%20NOS_1BlocoAreasemDestaques,Diretivo Ultras XXI acusa direção de tentar camuflar a crise no Sporting - Sporting - Jornal Record,1,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/mas-eu-fui-so-fazer-xixi-bruno-de-carvalho-recorda-quando-a-reestruturacao-financeira-quase-ruiu,'Mas eu fui só fazer xixi': Bruno de Carvalho recorda quando a reestruturação financeira quase ruiu ,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/salgado-zenha-e-as-contas-do-sporting-nao-andamos-a-cortar-a-eito,Salgado Zenha e as contas do Sporting: «Não andamos a cortar a eito» - Sporting - Jornal Record,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/salgado-zenha-explica-por-que-motivo-bruno-fernandes-nao-precisa-de-sair-em-janeiro,Salgado Zenha explica por que motivo Bruno Fernandes não precisa de sair em janeiro - Sporting - Jor,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/zenit-quer-acua-e-acena-com-20-milhoes,Zenit quer Acuña e acena com 20 milhões - Sporting - Jornal Record,2,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/v--guimaraes/detalhe/vitorianos-dizem-que-mudaram-zona-destinada-aos-adeptos-do-sp-braga-por-indicacao-da-psp,V. Guimarães diz que mudou zona destinada aos adeptos do Sp. Braga por indicação da PSP - V. Guimarã,1,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/liga-nos/v--guimaraes/detalhe/yordan-osorio-reforca-v-guimaraes.html,Yordan Osorio reforça V. Guimarães - V. Guimarães - Jornal Record,6,True,artigo,
+https://www.record.pt/futebol/futebol-nacional/taca-de-portugal/detalhe/AMP/carlos-xistra-apita-fc-porto-v-guimaraes.html,Carlos Xistra apita FC Porto-V. Guimarães,10,True,artigo,
+https://www.record.pt/internacional/amp/abel-xavier-apela-a-pessoas-e-paises-para-ajudarem-mocambique,Abel Xavier apela a pessoas e países para ajudarem Moçambique - Internacional - Jornal Record,1,True,artigo,
+https://www.record.pt/internacional/amp/jorge-jesus-assina-com-pini-zahavi,Jorge Jesus assina com Pini Zahavi - Internacional - Jornal Record,2,True,artigo,
+https://www.record.pt/internacional/competicoes-de-clubes/liga-jovem-da-uefa/detalhe/fc-porto-chelsea-final-da-uefa-youth-league-em-direto,FC Porto-Chelsea: final da UEFA Youth League em direto - Liga Jovem da UEFA - Jornal Record,4,True,artigo,
+https://www.record.pt/internacional/competicoes-de-selecoes/can/detalhe/abel-xavier-e-com-muita-tristeza-que-mocambique-falha-objetivo-da-can,Abel Xavier «É com muita tristeza que Moçambique falha objetivo da CAN» - CAN - Jornal Record,2,True,artigo,
+https://www.record.pt/internacional/competicoes-de-selecoes/europeu/euro-2016/grupos/grupo-d/turquia/detalhe/AMP/os-zero-pontos-que-nao-deprimem-gnul.html,Os zero pontos que não deprimem Gönul,2,True,artigo,
+https://www.record.pt/internacional/competicoes-de-selecoes/europeu/euro-2020/amp/zinchenko-elogia-bernardo-silva-e-o-melhor-jogador-portugues,Zinchenko elogia Bernardo Silva: «É o melhor jogador português» - Euro 2020 - Jornal Record,1,True,artigo,
+https://www.record.pt/internacional/detalhe/capita-do-young-boys-encontrada-sem-vida-no-lago-de-como?ref=Pesquisa_Vistas&act=0&est=Aberto,Capitã do Young Boys encontrada sem vida no lago de Como - Internacional - Jornal Record,1,True,artigo,
+https://www.record.pt/internacional/detalhe/dois-jogadores-no-total-93-anos-a-curiosa-dupla-de-ataque-do-yokohama-fc?ref=V%C3%ADdeos_Ultimas,"Dois jogadores, no total 93 anos: a curiosa dupla de ataque do Yokohama FC - Internacional - Jornal ",1,True,artigo,
+https://www.record.pt/internacional/paises/espanha/detalhe/xavi-pensava-que-o-real-iria-melhorar-sem-ronaldo,Xavi: «Pensava que o Real iria melhorar sem Ronaldo» - Espanha - Jornal Record,1,True,artigo,
+https://www.record.pt/internacional/paises/inglaterra/detalhe/zil-recorda-palavras-de-ronaldo-quando-trocou-o-real-madrid-pelo-arsenal,Özil recorda palavras de Ronaldo quando trocou o Real Madrid pelo Arsenal - Inglaterra - Jornal Reco,7,True,artigo,
+https://www.record.pt/internacional/paises/italia/detalhe/zidane-com-futuro-dividido-entre-mourinho-e-cristiano-ronaldo,Zidane com futuro dividido entre Mourinho e Cristiano Ronaldo - Itália - Jornal Record,1,True,artigo,
+https://www.record.pt/jogo-da-vida/detalhe/georgina-irritada-com-zoo-de-madrid-zero-profissionalismo-para-com-os-clientes,Georgina irritada com Zoo de Madrid: «Zero profissionalismo para com os clientes» - Jogo da Vida - J,2,True,artigo,
+https://www.record.pt/jogos-em-direto/live/78799,SC Braga x Vitória SC - Record Jogos em Direto,10,True,artigo,
+https://www.record.pt/liga-allianz-running-record/running---equipamento/amp/divulgadas-primeiras-imagens-dos-novos-nike-pegasus-36-turbo-e-zoom-fly-3,"Divulgadas primeiras imagens dos novos Nike Pegasus 36, Turbo e Zoom Fly 3 - Running - Equipamento -",4,True,artigo,
+https://www.record.pt/modalidades/basquetebol?ref=Masterpage_Menu,Basquetebol - Jornal Record,829,False,captures_outlier,
+https://www.record.pt/modalidades/ciclismo/amp/alaphilippe-vence-segunda-etapa-e-yates-sobe-a-lideranca-da-tirreno-adriatico,Alaphilippe vence segunda etapa e Yates sobe à liderança da Tirreno-Adriático - Ciclismo - Jornal Re,2,True,artigo,
+https://www.record.pt/modalidades/ciclismo/detalhe/alaphilippe-vence-segunda-etapa-e-yates-sobe-a-lideranca-da-tirreno-adriatico,Alaphilippe vence segunda etapa e Yates sobe à liderança da Tirreno-Adriático - Ciclismo - Jornal Re,2,True,artigo,
+https://www.record.pt/modalidades/desporto-universitario/detalhe/AMP/universidade-do-porto-vence-no-xadrez.html,Universidade do Porto vence no xadrez,3,True,artigo,
+https://www.record.pt/modalidades/jogos-europeus/detalhe/jieni-shao-junta-se-a-fu-yu-na-terceira-ronda-de-tenis-de-mesa?act=0&est=Aberto&act=0&est=Aberto,Jieni Shao junta-se a Fu Yu na terceira ronda de ténis de mesa - Jogos Europeus - Jornal Record,1,True,artigo,
+https://www.record.pt/modalidades/judo/detalhe/telma-monteiro-foi-7-no-grande-premio-de-zagreb,Telma Monteiro foi 7.ª no Grande Prémio de Zagreb - Judo - Jornal Record,1,True,artigo,
+https://www.record.pt/modalidades/motores/motociclismo/motogp/amp/zarco-pode-estar-a-caminho-das-superbikes-e-miguel-oliveira-espreita-equipa-oficial-da-ktm,Zarco pode estar a caminho das Superbikes e Miguel Oliveira 'espreita' equipa oficial da KTM - MotoG,3,True,artigo,
+https://www.record.pt/modalidades/motores/record-auto/detalhe/xiaomi-gigante-dos-telemoveis-vai-lancar-suv-de-11915-euros,Xiaomi: gigante dos telemóveis vai lançar SUV de 11.915 euros - Record Auto - Jornal Record,4,True,artigo,
+https://www.record.pt/modalidades/natacao/detalhe/liu-xiang-bate-recorde-do-mundo-dos-50-metros-costas?ref=HP_3BlocoAreasemDestaques,Liu Xiang bate recorde do mundo dos 50 metros costas - Natação - Jornal Record,2,True,artigo,
+https://www.record.pt/multimedia/fotogalerias/detalhe/AMP/benfica-e-uma-lesao-que-ainda-nao-foi-curada-assim-foi-o-aniversario-de-zivkovic.html,Benfica e uma lesão que ainda não foi curada: assim foi o aniversário de Zivkovic,9,True,artigo,
+https://www.record.pt/multimedia/fotogalerias/detalhe/AMP/benfica-rumo-a-final-four-da-uefa-youth-league.html,Benfica rumo à final four da UEFA Youth League,1,True,artigo,
+https://www.record.pt/multimedia/fotogalerias/detalhe/AMP/o-que-e-feito-dos-benfiquistas-finalistas-da-youth-league-de-201314.html,O que é feito dos benfiquistas finalistas da Youth League de 2013/14?,2,True,artigo,
+https://www.record.pt/multimedia/fotogalerias/detalhe/AMP/vlachodimos-foi-ver-basquetebol-com-zeca.html,Vlachodimos foi ver basquetebol com... Zeca,1,True,artigo,
+https://www.record.pt/multimedia/fotogalerias/detalhe/as-borlas-do-mercado-de-transferencias-craques-que-podem-assinar-ja-a-custo-zero?ref=Detalhe_DestaquesTopo,As 'borlas' do mercado de transferências: craques que podem assinar já a custo zero - Fotogalerias -,2,True,artigo,
+https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez,Equipamento do Barcelona para 2019/2020 vai ser em... xadrez - Fotogalerias - Jornal Record,3,True,artigo,https://www.record.pt/multimedia/fotogalerias/detalhe/equipamento-do-barcelona-para-20192020-vai-ser-em-xadrez?utm_medium=Social&utm_source=EnviarAmigo&utm_campaign=BotoesSite&utm_content=EnviarAmigo&act=0&est=Aberto
+https://www.record.pt/multimedia/fotogalerias/detalhe/georgina-em-xangai-da-roupa-verde-que-chamou-todas-as-atencoes-a-foto-que-levantou-duvidas?ref=Iniciativas_BlocoFotos,Georgina em Xangai: da roupa verde que chamou todas as atenções à foto que levantou dúvidas - Fotoga,1,True,artigo,
+https://www.record.pt/multimedia/fotogalerias/detalhe/o-sorriso-de-ronaldo-em-dia-d-para-real-madrid-de-zidane-na-champions,O sorriso de Ronaldo em dia D para Real Madrid de Zidane na Champions - Fotogalerias - Jornal Record,1,True,artigo,
+https://www.record.pt/multimedia/fotogalerias/detalhe/zagreb-foi-abaixo-com-a-chegada-dos-vice-campeoes-do-mundo.html,Zagreb foi 'abaixo' com a chegada dos vice-campeões do Mundo - Fotogalerias - Jornal Record,31,True,artigo,
+https://www.record.pt/multimedia/hora-record/detalhe/abel-xavier-vemos-o-fc-porto-a-imagem-de-sergio-conceicao.html,Abel Xavier: «Vemos o FC Porto à imagem de Sérgio Conceição» - Hora Record - Jornal Record,72,True,artigo,
+https://www.record.pt/multimedia/videos/detalhe/cristiano-ronaldo-passou-pela-zona-mista-e-deu-um-beijo-a-dybala?ref=HP_4BucketDestaquesPrincipais,Cristiano Ronaldo passou pela zona mista e deu um beijo a Dybala - Vídeos - Jornal Record,1,True,artigo,
+https://www.record.pt/multimedia/videos/detalhe/wilson-eduardo-ja-marca-pelo-dinamo-zagreb-904334,Wilson Eduardo já marca pelo Dinamo Zagreb - Vídeos - Jornal Record,12,True,artigo,
+https://www.record.pt/multimedia/videos/detalhe/yuri-ribeiro-apresenta-se-aos-adeptos-do-rio-ave.html,Yuri Ribeiro apresenta-se aos adeptos do Rio Ave - Vídeos - Jornal Record,162,False,captures_outlier,http://www.record.pt/multimedia/videos/detalhe/yuri-ribeiro-apresenta-se-aos-adeptos-do-rio-ave.html
+https://www.record.pt/multimedia/videos/detalhe/zlobin-fez-de-paulo-lopes-e-subiu-a-baliza-para-erguer-a-taca-de-campeao,Zlobin fez de Paulo Lopes e subiu à baliza para erguer a taça de campeão - Vídeos - Jornal Record,3,True,artigo,
+https://www.record.pt/o-diario-de-cr7-by-meo/detalhe/AMP/zidane-recorda-aviso-que-tinha-feito-sobre-cristiano-ronaldo.html,Zidane recorda aviso que tinha feito sobre Cristiano Ronaldo,3,True,artigo,
+https://www.record.pt/record-gaming/amp/ps4-vai-receber-um-novo-yakuza,PS4 vai receber um novo Yakuza - Record Gaming - Jornal Record,7,True,artigo,
+https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_BlocoColoridoSec%C3%A7%C3%A3oDestaque,Yamila Rodríguez: Argentina louca por Ronaldo - Record mais - Jornal Record,8,True,artigo,https://www.record.pt/record-mais/detalhe/yamila-rodriguez-argentina-louca-por-ronaldo?ref=HP_4BucketDestaquesPrincipais
+https://www.record.pt/resultados-e-classificacoes/modalidades/voleibol/resultados,Voleibol - Jornal Record,822,False,captures_outlier,
+https://www.record.pt/sabermais/ano-zero,Saber Mais: Ano Zero,1,False,sabermais,
+https://www.record.pt/sabermais/bruno-fernandes,Saber Mais: Bruno Fernandes,143,False,sabermais,
+https://www.record.pt/sabermais/cristiano-ronaldo,Saber Mais: Cristiano Ronaldo,306,False,sabermais,
+https://www.record.pt/sabermais/futebol,Saber Mais: Futebol,1282,False,sabermais,
+https://www.record.pt/sabermais/jo%C3%A3o-f%C3%A9lix,Saber Mais: João Félix,119,False,sabermais,
+https://www.record.pt/sabermais/nelson-%C3%A9vora,Saber Mais: Nelson Évora,5,False,sabermais,
+https://www.record.pt/sabermais/porto,Saber Mais: Porto,118,False,sabermais,
+https://www.record.pt/sabermais/sporting,Saber Mais: Sporting,1084,False,sabermais,
+https://www.record.pt/sabermais/telma-monteiro,Saber Mais: Telma Monteiro,13,False,sabermais,
+https://www.record.pt/sabermais/yebda,YEBDA - Saber Mais - Record,3,False,sabermais,
+https://www.record.pt/sabermais/ze-pedro,ze pedro - Saber Mais - Record,1,False,sabermais,
+https://www.record.pt/sabermais/zurique,Saber Mais: Zurique,12,False,sabermais,
