@@ -6,9 +6,13 @@ em evidência já recolhida nas Fases 1–2 do protocolo de queries — não faz
 pedidos novos à API.
 
 Antes de classificar, agrupa `originalURL` que só diferem no esquema
-(`http://`/`https://`) num único recurso canónico, preferindo `https://`
-quando essa variante existir (Fase 2 confirmou conjuntos de `tstamp`
-idênticos para o único par encontrado nesta amostra).
+(`http://`/`https://`) ou em parâmetros de rastreio (`ref`, `utm_*`, `act`,
+`est`; ver `url_identity.py`) num único recurso. O URL canónico guardado é um
+dos URLs reais do grupo: prefere `https://`, depois o URL sem parâmetros de
+rastreio, depois o de mais capturas. Variantes só de esquema devolveram os
+mesmos `tstamp` na Fase 2 (não se somam); variantes de rastreio devolveram
+capturas distintas (somam-se). As outras formas ficam na coluna `variantes`,
+para `corpus_rdf` juntar o raw de todas.
 
 Um recurso é classificado como `Artigo` só se nenhuma das três condições
 seguintes se verificar:
@@ -23,9 +27,11 @@ seguintes se verificar:
 from __future__ import annotations
 
 import csv
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from urllib.parse import urlsplit
+
+from .url_identity import has_tracking_params, strip_scheme, without_tracking
 
 CAPTURES_THRESHOLD = 100
 
@@ -42,19 +48,35 @@ class ClassificationResult:
     captures: int
     is_artigo: bool
     reason: str
+    variantes: str = ""
 
 
 def canonical_key(url: str) -> str:
-    """Remove o esquema para agrupar variantes http/https da mesma página."""
+    """Chave de agrupamento: sem esquema e sem parâmetros de rastreio."""
 
-    return url.split("://", 1)[-1]
+    return strip_scheme(without_tracking(url))
 
 
-def choose_canonical_url(urls: list[str]) -> str:
-    """Prefere https quando existem variantes http/https da mesma página."""
+def choose_canonical_url(urls: list[str], captures_by_url: dict[str, int] | None = None) -> str:
+    """Prefere https, depois sem parâmetros de rastreio, depois mais capturas."""
 
-    https_variants = [url for url in urls if url.startswith("https://")]
-    return https_variants[0] if https_variants else urls[0]
+    captures_by_url = captures_by_url or {}
+    return min(urls, key=lambda url: (
+        not url.startswith("https://"),
+        has_tracking_params(url),
+        -captures_by_url.get(url, 0),
+        url,
+    ))
+
+
+def group_captures(urls: list[str], captures_by_url: dict[str, int]) -> int:
+    """Capturas do grupo: variantes só de esquema contam uma vez; as de rastreio somam-se."""
+
+    by_scheme_free: dict[str, int] = {}
+    for url in urls:
+        key = strip_scheme(url)
+        by_scheme_free[key] = max(by_scheme_free.get(key, 0), captures_by_url.get(url, 0))
+    return sum(by_scheme_free.values())
 
 
 def classify(original_url: str, title: str | None, captures: int) -> ClassificationResult:
@@ -114,10 +136,11 @@ def classify_corpus(
 
     results: list[ClassificationResult] = []
     for urls in groups.values():
-        chosen = choose_canonical_url(urls)
+        chosen = choose_canonical_url(urls, captures_by_url)
         title = phase1[chosen]["title"]
-        captures = captures_by_url.get(chosen, 0)
-        results.append(classify(chosen, title, captures))
+        result = classify(chosen, title, group_captures(urls, captures_by_url))
+        variants = "|".join(sorted(url for url in urls if url != chosen))
+        results.append(replace(result, variantes=variants))
 
     results.sort(key=lambda result: result.original_url)
     return results
@@ -146,8 +169,10 @@ def write_summary_markdown(results: list[ClassificationResult], path: Path) -> N
         "Regra e justificação em `docs/experiments.md`. Execução real sobre "
         "os dados já recolhidos nas Fases 1–2, sem pedidos novos à API.\n",
         "## Resumo\n",
-        f"- Recursos distintos (depois de normalizar esquema http/https): "
-        f"{len(results)}",
+        f"- Recursos distintos (depois de agrupar variantes de esquema http/https "
+        f"e de parâmetros de rastreio): {len(results)}",
+        f"- Recursos com variantes de URL agrupadas: "
+        f"{sum(1 for r in results if r.variantes)}",
         f"- Classificados como Artigo: {len(artigos)}",
         f"- Excluídos — `/sabermais/`: {len(sabermais)}",
         f"- Excluídos — `Object moved`: {len(moved)}",

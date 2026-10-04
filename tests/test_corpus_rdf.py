@@ -64,6 +64,12 @@ class NormalizeForGroupingTests(unittest.TestCase):
         b = normalize_for_grouping("http://www.record.pt/sporting/detalhe/x.html/")
         self.assertEqual(a, b)
 
+    def test_tracking_parameters_are_ignored_but_content_ids_are_not(self) -> None:
+        base = "https://www.record.pt/record-mais/detalhe/x"
+        self.assertEqual(normalize_for_grouping(base + "?ref=HP_A"), normalize_for_grouping(base))
+        old = "http://www.record.pt/Futebol/interior.aspx?content_id/x3d"
+        self.assertNotEqual(normalize_for_grouping(old + "1"), normalize_for_grouping(old + "2"))
+
     def test_different_path_does_not_normalize_the_same(self) -> None:
         a = normalize_for_grouping("http://www.record.pt/futebol/detalhe/x.html")
         b = normalize_for_grouping("http://www.record.pt/futebol/detalhe/y.html")
@@ -616,6 +622,87 @@ class RebuildOfflineTests(OfflineRebuildTestCase):
         with self.assertRaises(SystemExit) as raised:
             corpus_rdf_main(["--check-only"])
         self.assertEqual(raised.exception.code, 2)
+
+
+VARIANT_A = "https://news.example.test/record-mais/detalhe/variante?ref=HP_A"
+VARIANT_B = "https://news.example.test/record-mais/detalhe/variante?ref=HP_B"
+
+
+class TrackingVariantsTests(OfflineTestCase):
+    """Um artigo cujas capturas estão no raw de duas variantes `?ref=…`."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.raw_dir = self.root / "data" / "raw"
+        self.output_dir = self.root / "output"
+        self.output_dir.mkdir(parents=True)
+        (self.raw_dir / "texts").mkdir(parents=True)
+
+        def item(url: str, tstamp: str) -> dict:
+            return {"originalURL": url, "tstamp": tstamp, "title": url,
+                    "linkToArchive": f"https://archive.example.test/{tstamp}",
+                    "mimeType": "text/html", "contentLength": 100, "digest": f"D-{tstamp}",
+                    "encoding": "UTF-8", "collection": "SYNTHETIC", "statusCode": 200}
+
+        write_version_history_raw(self.raw_dir / "version_history", VARIANT_A, 0,
+                                  [item(VARIANT_A, "20200101000000"), item(VARIANT_A, "20200303000000")])
+        write_version_history_raw(self.raw_dir / "version_history", VARIANT_B, 0,
+                                  [item(VARIANT_B, "20200202000000"), item(VARIANT_B, "20200303000000")])
+        # Os textos ficaram em cache com o hash de cada variante (eram artigos separados).
+        for url, tstamp in ((VARIANT_A, "20200101000000"), (VARIANT_B, "20200202000000")):
+            name = ArquivoClient._text_filename({"originalURL": url, "tstamp": tstamp})
+            (self.raw_dir / "texts" / name).write_bytes(b"texto")
+
+    def write_classification(self, rows: list[dict]) -> None:
+        with (self.output_dir / "corpus_classification.csv").open("w", encoding="utf-8", newline="") as h:
+            writer = csv.DictWriter(h, fieldnames=["original_url", "title", "captures", "is_artigo",
+                                                   "reason", "variantes"])
+            writer.writeheader()
+            writer.writerows(rows)
+
+    def test_captures_of_all_variants_are_merged_and_cached_texts_found(self) -> None:
+        graph, result = build_one_article_graph(
+            CacheOnlyClient(data_dir=self.raw_dir), VARIANT_B, "Variante",
+            self.raw_dir / "version_history", self.root, [VARIANT_A],
+        )
+        self.assertIsNone(result.error)
+        # 2 + 2 capturas, uma repetida nas duas variantes.
+        self.assertEqual(result.captures_used, 3)
+        self.assertEqual(len(set(graph.subjects(RDF.type, SDH.CapturaArquivada))), 3)
+        self.assertEqual({str(o) for o in graph.objects(None, SDH.originalURL)}, {VARIANT_B})
+        # O texto guardado com o hash da variante A continua a ser encontrado.
+        self.assertEqual(result.texts_reused, 2)
+
+    def test_rebuild_merging_variants_passes_checks_and_detects_lost_articles(self) -> None:
+        self.write_classification([
+            {"original_url": VARIANT_A, "title": "Variante", "captures": "2", "is_artigo": "True",
+             "reason": "artigo", "variantes": ""},
+            {"original_url": VARIANT_B, "title": "Variante", "captures": "2", "is_artigo": "True",
+             "reason": "artigo", "variantes": ""},
+        ])
+        rebuild_offline(self.root)  # estado antigo: dois artigos separados
+        self.write_classification([
+            {"original_url": VARIANT_B, "title": "Variante", "captures": "3", "is_artigo": "True",
+             "reason": "artigo", "variantes": VARIANT_A},
+        ])
+
+        checks, _, graph = rebuild_offline(self.root, apply=False)
+
+        states = {c.name: c.passed for c in checks}
+        self.assertNotIn(False, states.values(), checks)
+        self.assertTrue(states["variantes_fundidas"])
+        self.assertTrue(states["ficheiros_de_texto_preservados"])
+        self.assertEqual(len(set(graph.subjects(RDF.type, SDH.Artigo))), 1)
+
+        # Sem declarar a variante, o desaparecimento da variante A é um artigo perdido.
+        self.write_classification([
+            {"original_url": VARIANT_B, "title": "Variante", "captures": "2", "is_artigo": "True",
+             "reason": "artigo", "variantes": ""},
+        ])
+        checks, _, _ = rebuild_offline(self.root, apply=False)
+        states = {c.name: c.passed for c in checks}
+        self.assertFalse(states["variantes_fundidas"])
+        self.assertFalse(states["antigo_contido_no_novo"])
 
 
 if __name__ == "__main__":

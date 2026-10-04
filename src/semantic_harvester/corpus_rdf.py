@@ -32,6 +32,12 @@ por isso retomável por artigo: `build_corpus_graph()` salta os artigos já
 presentes em `output/corpus_rdf_report.csv` e os seus triplos já
 preservados em `data/processed/corpus_articles_triples.nt`.
 
+Quarto ponto (2026-10-04, `docs/experiments.md`): duas variantes do mesmo
+artigo que só diferem em parâmetros de rastreio (`?ref=…`, `?utm_…`) eram
+contadas como dois artigos. A classificação passa a agrupá-las
+(`url_identity.py`) e a listar as outras formas na coluna `variantes`; aqui
+junta-se o raw de todas as variantes antes de mapear, sem pedidos novos.
+
 Terceiro ponto: textos obtidos depois de um artigo ter sido dado como concluído
 (por exemplo, pela retentativa em `corpus_text_retry.py`) não entram no grafo
 por esta retoma. `--rebuild-offline` reconstrói o grafo de todos os artigos a
@@ -59,7 +65,8 @@ from rdflib import RDF, RDFS, Graph, XSD
 
 from .arquivo_client import ArquivoClient, TextDownloadResult
 from .history_pipeline import build_manifest_records
-from .rdf_mapper import SDH, build_article_history_graph
+from .rdf_mapper import SDH, build_article_history_graph, extracted_text_uri, stable_hash
+from .url_identity import strip_scheme, strip_tracking_params
 
 LOGGER = logging.getLogger(__name__)
 
@@ -92,23 +99,52 @@ def load_captures_from_raw(
     return captures
 
 
+def load_article_captures(
+    original_url: str, variants: list[str], version_history_dir: Path
+) -> tuple[list[dict[str, Any]], int]:
+    """Capturas do URL canónico e de todas as variantes, sem `tstamp` repetidos.
+
+    Devolve `(capturas, repetidas_descartadas)`. O raw de cada variante já está
+    preservado da Fase 2; não há pedidos novos.
+    """
+
+    captures: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    repeated = 0
+    for url in [original_url, *variants]:
+        for capture in load_captures_from_raw(url, version_history_dir):
+            tstamp = str(capture.get("tstamp"))
+            if tstamp in seen:
+                repeated += 1
+                continue
+            seen.add(tstamp)
+            captures.append(capture)
+    return captures, repeated
+
+
+def variants_of(row: dict[str, str]) -> list[str]:
+    return [url for url in (row.get("variantes") or "").split("|") if url]
+
+
 def normalize_for_grouping(url: str) -> str:
-    """Remove esquema, colapsa barras repetidas e uma barra final.
+    """Remove esquema, parâmetros de rastreio, barras repetidas e uma barra final.
 
     Usado só para decidir se dois URLs são a mesma página modulo variação
     cosmética — nunca para gerar identificadores (esses continuam a usar o
     `originalURL` canónico tal como veio da descoberta/classificação).
     """
 
-    scheme_stripped = url.split("://", 1)[-1]
-    collapsed = re.sub(r"/{2,}", "/", scheme_stripped)
-    return collapsed.rstrip("/")
+    head, _, query = strip_scheme(url).partition("?")
+    collapsed = re.sub(r"/{2,}", "/", head).rstrip("/")
+    query = strip_tracking_params(query)
+    return f"{collapsed}?{query}" if query else collapsed
 
 
 def normalize_captures_to_canonical_url(
     captures: list[dict[str, Any]], canonical_url: str
 ) -> tuple[list[dict[str, Any]], int, int]:
-    """Reatribui `originalURL` ao valor canónico quando só varia em esquema/barras.
+    """Reatribui `originalURL` ao valor canónico quando só varia em esquema, barras
+    ou parâmetros de rastreio.
 
     Descarta (e conta) capturas cujo `originalURL` nem sequer seja uma
     variante cosmética do URL canónico — não observado nos dados desta
@@ -126,7 +162,9 @@ def normalize_captures_to_canonical_url(
             dropped += 1
             continue
         if capture_url != canonical_url:
-            capture = {**capture, "originalURL": canonical_url}
+            # O URL real da captura fica registado: os textos já em cache foram
+            # guardados com o hash dele (CacheOnlyClient procura também assim).
+            capture = {**capture, "originalURL": canonical_url, "sourceOriginalURL": capture_url}
             rewritten += 1
         normalized.append(capture)
     return normalized, dropped, rewritten
@@ -195,13 +233,19 @@ def build_one_article_graph(
     title: str,
     version_history_dir: Path,
     project_root: Path,
+    variants: list[str] | None = None,
 ) -> tuple[Graph | None, ArticleGraphResult]:
     try:
-        raw_captures = load_captures_from_raw(original_url, version_history_dir)
+        raw_captures, repeated = load_article_captures(
+            original_url, variants or [], version_history_dir
+        )
     except FileNotFoundError as exc:
         LOGGER.error("%s", exc)
         return None, ArticleGraphResult(original_url, 0, 0, 0, 0, 0, 0, str(exc))
 
+    if repeated:
+        LOGGER.info("%s: %d captura(s) repetida(s) entre variantes de URL ignorada(s).",
+                    original_url, repeated)
     captures, dropped, variants_normalized = normalize_captures_to_canonical_url(
         raw_captures, original_url
     )
@@ -391,7 +435,7 @@ def build_corpus_graph(
                     url = row["original_url"]
                     title = row["title"]
                     graph, result = build_one_article_graph(
-                        client, url, title, version_history_dir, root
+                        client, url, title, version_history_dir, root, variants_of(row)
                     )
                     if graph is not None:
                         triples_handle.write(graph.serialize(format="nt"))
@@ -468,7 +512,12 @@ class CacheOnlyClient(ArquivoClient):
         skip_existing: bool = True,
         derive_url_when_missing: bool = False,
     ) -> TextDownloadResult:
-        destination = self.texts_dir / self._text_filename(result)
+        candidates = [self.texts_dir / self._text_filename(result)]
+        if result.get("sourceOriginalURL"):
+            candidates.append(self.texts_dir / self._text_filename(
+                {**result, "originalURL": result["sourceOriginalURL"]}
+            ))
+        destination = next((path for path in candidates if path.is_file()), candidates[0])
         if destination.is_file():
             return TextDownloadResult(
                 success=True,
@@ -511,7 +560,8 @@ def rebuild_graph_offline(
     results: list[ArticleGraphResult] = []
     for row in articles:
         graph, result = build_one_article_graph(
-            client, row["original_url"], row["title"], version_history_dir, root
+            client, row["original_url"], row["title"], version_history_dir, root,
+            variants_of(row),
         )
         if graph is not None:
             combined += graph
@@ -530,9 +580,40 @@ def _count(graph: Graph, rdf_class: Any) -> int:
     return len(set(graph.subjects(RDF.type, rdf_class)))
 
 
-def _recovered_by_retry(retry_report: Path) -> int:
+def _recovered_by_retry(retry_report: Path, old_graph: Graph) -> tuple[int, int]:
+    """(recuperadas pela retentativa, das quais ainda sem texto no grafo antigo)."""
+
+    old_texts = set(old_graph.subjects(RDF.type, SDH.TextoExtraido))
     with retry_report.open(encoding="utf-8", newline="") as handle:
-        return sum(1 for row in csv.DictReader(handle) if row["outcome"] != "failed")
+        recovered = [row for row in csv.DictReader(handle) if row["outcome"] != "failed"]
+    new = sum(
+        1 for row in recovered
+        if extracted_text_uri(row["original_url"], row["tstamp"]) not in old_texts
+    )
+    return len(recovered), new
+
+
+def _merged_variants(
+    old_graph: Graph, new_graph: Graph, retained: list[dict[str, str]]
+) -> tuple[set[str], set[str], set[str]]:
+    """URLs que deixaram de ser recurso próprio: (fundidos, que os absorveram, perdidos).
+
+    Um URL só pode desaparecer se estiver declarado como variante de um artigo
+    retido (coluna `variantes`); caso contrário é um artigo perdido.
+    """
+
+    old_urls = {str(o) for o in old_graph.objects(None, SDH.originalURL)}
+    new_urls = {str(o) for o in new_graph.objects(None, SDH.originalURL)}
+    removed = old_urls - new_urls
+    declared = {variant: row["original_url"] for row in retained for variant in variants_of(row)}
+    merged = {url for url in removed if url in declared}
+    return merged, {declared[url] for url in merged}, removed - merged
+
+
+def _about(subject: Any, urls: set[str]) -> bool:
+    """O sujeito é um artigo/recurso/captura/texto de um destes URLs (hash no URI)."""
+
+    return any(f"/{stable_hash(url)}" in str(subject) for url in urls)
 
 
 def verify_rebuild(
@@ -573,35 +654,57 @@ def verify_rebuild(
         ))
     else:
         old_texts = _count(old_graph, SDH.TextoExtraido)
-        recovered = _recovered_by_retry(retry_report)
+        recovered, recovered_new = _recovered_by_retry(retry_report, old_graph)
         checks.append(Check(
             "textos_esperados",
-            new_texts == old_texts + recovered,
+            new_texts == old_texts + recovered_new,
             f"{new_texts} TextoExtraido no novo; {old_texts} no antigo + "
-            f"{recovered} recuperadas pela retentativa = {old_texts + recovered}",
+            f"{recovered_new} recuperadas pela retentativa ainda não incorporadas "
+            f"(de {recovered}) = {old_texts + recovered_new}",
         ))
 
     if old_graph is None:
-        checks.append(Check("antigo_contido_no_novo", None, "saltada: sem grafo antigo"))
-        checks.append(Check("diferenca_so_textos", None, "saltada: sem grafo antigo"))
+        for name in ("variantes_fundidas", "antigo_contido_no_novo",
+                     "diferenca_so_textos", "ficheiros_de_texto_preservados"):
+            checks.append(Check(name, None, "saltada: sem grafo antigo"))
     else:
+        merged, absorbing, lost = _merged_variants(old_graph, new_graph, retained)
+        checks.append(Check(
+            "variantes_fundidas",
+            not lost,
+            f"{len(merged)} URL(s) fundido(s) como variante noutro artigo"
+            + (f": {sorted(merged)} → {sorted(absorbing)}" if merged else "")
+            + f"; {len(lost)} desaparecido(s) sem ser variante declarada",
+        ))
         missing = old_graph - new_graph
+        unexplained = [triple for triple in missing if not _about(triple[0], merged)]
         checks.append(Check(
             "antigo_contido_no_novo",
-            len(missing) == 0,
-            f"{len(old_graph)} triplos no antigo; {len(missing)} ausentes do novo",
+            not unexplained,
+            f"{len(old_graph)} triplos no antigo; {len(missing)} ausentes do novo, "
+            f"dos quais {len(missing) - len(unexplained)} de URLs fundidos e "
+            f"{len(unexplained)} sem explicação",
         ))
         text_subjects = set(new_graph.subjects(RDF.type, SDH.TextoExtraido))
         added = new_graph - old_graph
         unexpected = [
             triple for triple in added
             if triple[1] != SDH.temTextoExtraido and triple[0] not in text_subjects
+            and not _about(triple[0], absorbing)
         ]
         checks.append(Check(
             "diferenca_so_textos",
             not unexpected,
             f"{len(added)} triplos acrescentados; {len(unexpected)} que não são "
-            "de TextoExtraido",
+            "de TextoExtraido nem de artigos que absorveram variantes",
+        ))
+        old_files = {str(o) for o in old_graph.objects(None, SDH.filePath)}
+        new_files = {str(o) for o in new_graph.objects(None, SDH.filePath)}
+        checks.append(Check(
+            "ficheiros_de_texto_preservados",
+            old_files <= new_files,
+            f"{len(old_files - new_files)} ficheiro(s) de texto do grafo antigo "
+            "deixaram de ser referenciados",
         ))
 
     missing_files = [
