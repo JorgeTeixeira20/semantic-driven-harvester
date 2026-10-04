@@ -379,3 +379,15 @@ sobre `output/corpus_articles.ttl` e gera páginas HTML estáticas em
 `output/prototipo/` (abrir `output/prototipo/index.html` no browser): agregados
 por ano e por `statusCode`, artigos mais capturados, lista de artigos e o
 histórico cronológico de capturas de cada artigo, com ligação ao Arquivo.pt.
+
+### Variante (c′): corpo do artigo por âncoras literais
+
+```bash
+python -m semantic_harvester.corpus_body [--vocabulario data/processed/caminho_b_vocabulario_wikidata.csv]
+```
+
+Sem rede e sem alterar as saídas fechadas de D e B. Isola o corpo de cada
+captura entre o título do artigo e o primeiro de 13 marcadores de bloco de
+chrome, e compara com os 60 pares rotulados (D) e, com `--vocabulario`, os
+pares artigo–jogador (B). Escreve `output/corpus_body_summary.md`,
+`output/corpus_body_label_eval.csv` e `output/corpus_body_entities.csv`.
