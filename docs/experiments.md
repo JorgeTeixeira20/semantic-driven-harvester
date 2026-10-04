@@ -2456,6 +2456,140 @@ desta tabela. As saídas da variante (b) do Caminho D
 (`output/corpus_chrome_*`, testada e não adotada) não foram regeneradas e
 continuam a descrever o corpus de 127 artigos.
 
+## Variante (c′): corpo do artigo por âncoras literais (2026-10-04)
+
+**Estado: nova tentativa, avaliada; não altera nenhuma decisão fechada.** O
+Caminho D continua fechado com a variante (a) e limiar 0,80; o Caminho B com
+as limitações documentadas. Esta secção só documenta o resultado e as
+decisões que ficam para o autor.
+
+**Porquê (c′) e não "cortar no primeiro marcador".** A ideia inicial era
+cortar o texto no primeiro marcador de bloco de chrome. Verificado nos 793
+textos antes de implementar: em **712** o primeiro marcador ("Últimas
+Notícias", item do menu do topo) vem **antes** do corpo, pelo que o corte
+apagaria o artigo. Decisão do autor: delimitar o corpo entre duas âncoras
+literais — **início** no título do artigo dentro do texto, a seguir ao
+título da página (nas AMP, que não têm o sufixo " - … - Jornal Record",
+depois de "Home"; ignorando o título quando aparece listado no menu logo
+antes de um marcador), **fim** no primeiro dos 13 marcadores depois do
+início; sem início localizável, a captura fica **"sem corpo"** (terceira
+categoria, fora das comparações).
+
+**Lista de marcadores (13, decisão do autor):** "Mais notícias", "O Record
+recomenda para si", "Mais Fotos", "Mais Hora Record", "Últimas Notícias",
+"Mais Recentes", "Mais Vistas", "Mais Comentadas", "Notícias MAIS" (da
+rotulagem e do diagnóstico do B) e "Veja também", "Mais Vídeos", "Enviar
+artigo por email", "Leia este artigo na íntegra" (do script de apoio da
+rotulagem). Verificação nos 793 textos, antes de confiar na lista: todas as
+ocorrências são cabeçalhos de bloco e começam com maiúscula, **exceto
+"mais recentes" a meio de uma frase** no artigo da Record Auto sobre o SUV
+da Xiaomi (`64ba9625…`, 4 capturas: "Os mais recentes rumores dão conta
+de…"); e sem limites de palavra "cer**veja também**" contaria como "Veja
+também". Decisão do autor: correspondência sem acentos, com limites de
+palavra e com a **primeira letra maiúscula no texto original**. Variações
+reais cobertas por isto: "Últimas notícias", "Notícias Mais", "MAIS
+Notícias". Implementação em `src/semantic_harvester/corpus_body.py` (9
+testes, incluindo a regressão do "mais recentes"); as 4 capturas da Xiaomi
+mantêm o corpo completo.
+
+**Delimitação nas 793 capturas da Camada 1 (real):** 775 com corpo, 18 sem
+corpo (a página `/jogos-em-direto/` e capturas que não contêm o artigo).
+Corpo mediano de 754 caracteres (11,2% do texto). Marcadores que fecharam o
+corpo: "Mais notícias" 216, "Veja também" 168, "O Record recomenda para si"
+117, "Últimas Notícias" 102, "Mais Hora Record" 44, fim do texto 34, "Mais
+Fotos" 29, "Mais Vídeos" 20, "Enviar artigo por email" 15, "Leia este
+artigo na íntegra" 15, "Mais Recentes" 9, "Mais Vistas" 6.
+
+### Caminho D: as três variantes contra os 60 pares rotulados
+
+| Limiar | (a) texto completo: "mesma" < limiar (de 58) / "alterado" ≥ limiar (de 2) | (b) sem chrome por n-gramas | (c′) corpo: "mesma" (de 56) / "alterado" (de 1) |
+| ---: | ---: | ---: | ---: |
+| 0,50 | 5 / 1 | 18 / 1 | 0 / 1 |
+| 0,60 | 13 / 1 | 27 / 1 | 0 / 1 |
+| 0,70 | 19 / 1 | 33 / 1 | 0 / 1 |
+| 0,80 | 28 / 0 | 37 / 0 | 0 / 1 |
+| 0,85 | 33 / 0 | 40 / 0 | **0 / 0** |
+| 0,90 | 38 / 0 | 43 / 0 | **0 / 0** |
+| 0,95 | 43 / 0 | 46 / 0 | **0 / 0** |
+| 0,99 | 48 / 0 | 48 / 0 | 1 / 0 |
+| 1,00 | 51 / 0 | 50 / 0 | 4 / 0 |
+
+Na (c′), 3 pares ficam à parte por terem uma captura sem corpo: **par 1**
+("texto alterado": a captura posterior não contém o artigo — é exatamente o
+que o rótulo dizia) e **pares 50 e 60** ("mesma versão", página
+`/jogos-em-direto/`, sem corpo nas duas capturas). Nos 57 comparáveis,
+**os rótulos separam-se de forma limpa**: mínimo "mesma versão" 0,975 (par
+2), máximo "texto alterado" 0,840 (par 29); qualquer limiar em ]0,840; 0,975]
+separa (na grelha: 0,85, 0,90, 0,95). Com (a) e (b) nenhum limiar separava.
+
+**Ressalvas, sem as quais este resultado seria sobrevalorizado:**
+
+- O lado "texto alterado" assenta **num único par comparável** (o 29, página
+  em direto); o outro (par 1) é a categoria "sem corpo". A margem observada
+  (0,840 → 0,975) é real mas medida com n = 1 de um lado.
+- A amostra continua a ser a mesma: 60 pares de 34 artigos, um vídeo com 11
+  pares.
+- Nos 654 pares consecutivos da Camada 1 com corpo, a distribuição muda de
+  forma radical (mediana 0,655 → 1,000; 609 iguais), mas **23 pares ficam
+  abaixo de 0,90** e foram inspecionados um a um:
+  - 13 são do **layout de 2019**: entre o fim do artigo ("Deixe o seu
+    comentário") e "Últimas Notícias" há um bloco de manchetes rotativas com
+    o cabeçalho **"Mais Premium"**, que não está na lista; entra no corpo;
+  - 4 são do artigo Premium "Exibição de Zivkovic…": umas capturas mostram o
+    aviso Premium e outras o **artigo completo desbloqueado** — diferença
+    real no que foi arquivado;
+  - 3 são falhas da âncora de início (o título encontrado numa listagem de
+    outro bloco antes do artigo: "Vídeo-árbitro…", "Cristiano Ronaldo quis
+    entrar com o pé direito…", "Yuri Ribeiro…");
+  - 3 restantes (0,58–0,89) não foram caracterizados em detalhe; num deles
+    uma captura traz o endereço de um embed de vídeo em vez da legenda.
+- Sensibilidade não aplicada (só calculada): acrescentar "Mais Premium" como
+  14.º marcador baixaria os 23 pares para 12 e não mudaria a separação dos
+  rótulos. **Não foi acrescentado** (a lista foi fixada em 13 pelo autor).
+
+### Caminho B: o corpo (c′) em vez do texto sem chrome persistente
+
+Os dois casos investigados em 2026-10-03:
+
+- **Nike** (`334c91e33971c03a`, 4 capturas, todas com corpo): as 3 menções
+  falsas (Jonas, Bernardo Silva, Wilson Eduardo) **desaparecem** — 0 menções.
+- **Crónica Boavista-Moreirense** (`99f811299bc25610`, 28 capturas, todas com
+  corpo): de 49 jogadores pela regra fraca fica **só Carraça** (28/28, citado
+  no subtítulo, menção legítima).
+
+Corpus inteiro (mesmo vocabulário; "antes" = configuração fechada do B):
+
+| Medida | B fechado (sem chrome persistente) | Corpo (c′) |
+| --- | ---: | ---: |
+| Pares artigo–jogador, regra fraca | 1 427 | 131 |
+| Pares artigo–jogador, persistência | 287 | 114 |
+| Artigos com jogador, regra fraca | 116 | 63 |
+| Artigos com jogador, persistência | 91 | 58 |
+| Jogadores distintos, persistência | 118 | 79 |
+
+Dos 287 pares persistentes do B fechado, 109 mantêm-se e 178 desaparecem.
+Numa amostra aleatória de 12 dos desaparecidos (semente 1), **todos** vinham
+do chrome (blocos "Notícias MAIS", "Últimas Notícias", listas de opinião e
+de mais lidas); um deles era ainda homonímia ("Pedro Santos" dentro de
+"Pedro Santos Guerreiro", um colunista). Não se fez uma avaliação de
+precisão (fora do âmbito do B); isto é uma verificação por amostra. As
+limitações da (c′) acima (bloco "Mais Premium" de 2019, falhas da âncora)
+também afetam o B; com "Mais Premium" (não aplicado) a regra fraca daria
+119 pares.
+
+**Saídas** (`python -m semantic_harvester.corpus_body --vocabulario
+data/processed/caminho_b_vocabulario_wikidata.csv`, sem rede; checksums do
+grafo, dos textos e das saídas fechadas de D e B iguais antes e depois):
+`output/corpus_body_summary.md`, `output/corpus_body_label_eval.csv`,
+`output/corpus_body_entities.csv`.
+
+**Decisões em aberto, para o autor (não tomadas):** (1) se a (c′) deve
+substituir a variante (a) no Caminho D — e, nesse caso, com que limiar
+dentro de ]0,840; 0,975] — sabendo que a separação assenta num só par
+"alterado"; (2) se a (c′) deve passar a ser a base do Caminho B; (3) se
+"Mais Premium" entra como 14.º marcador. O limiar 0,80 da variante (a)
+mantém-se até decisão em contrário.
+
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 
 **Estado em 2026-09-20: script escrito e testado em 2026-09-19 e executado pelo

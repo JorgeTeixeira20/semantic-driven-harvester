@@ -135,7 +135,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 162 testes em dez módulos de `tests/`.
+pacote conforme o README. Existem 171 testes em onze módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -162,7 +162,7 @@ em bruto, com sessão simulada) e o protótipo de navegação
 ordem e filtro do histórico, ligações entre páginas e escape de títulos).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **162 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **171 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -357,6 +357,19 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    depois do Caminho B e do protótipo de navegação e (b) confirmação do
    orientador de que o resultado atual não chega — ainda por validar em
    reunião.
+
+   **Variante (c′), avaliada em 2026-10-04 (não adotada; decisão em aberto):**
+   corpo do artigo delimitado entre o título e o primeiro de 13 marcadores
+   literais de chrome (`corpus_body.py`). Nos 57 pares rotulados com corpo,
+   os rótulos **separam-se de forma limpa** (mín. "mesma versão" 0,975, máx.
+   "texto alterado" 0,840; limiares 0,85–0,95), ao contrário de (a) e (b) —
+   mas o lado "alterado" tem um só par comparável (o par 1 fica "sem corpo",
+   como o rótulo previa). No B, as menções falsas dos casos Nike e
+   Boavista-Moreirense desaparecem (pares persistentes 287 → 114; amostra de
+   12 removidos: todos chrome). Limitações: bloco "Mais Premium" do layout
+   de 2019 fora da lista, 3 falhas da âncora de início, 18 capturas sem
+   corpo. Por decidir pelo autor: adotar (c′) em D e/ou B, o limiar, e o
+   14.º marcador. O limiar 0,80 (variante a) mantém-se.
 
    **Histórico (2026-09-24 a 2026-10-02, antes do fecho).**
    `src/semantic_harvester/corpus_redundancy.py` aplica o desenho de

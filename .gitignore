@@ -59,6 +59,9 @@ output/*
 !output/corpus_entities.csv
 !output/corpus_entities_summary.md
 !output/prototipo/
+!output/corpus_body_summary.md
+!output/corpus_body_label_eval.csv
+!output/corpus_body_entities.csv
 data/processed/corpus_articles_triples.nt.pre-rebuild
 
 # Metadados do Finder (macOS)
