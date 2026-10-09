@@ -1327,7 +1327,7 @@ Concluídos: descoberta (Fase 1), profundidade temporal (Fase 2),
 classificação Artigo/redirecionamento (passo 6) e mapeamento RDF. O Caminho D
 (redução de redundância) não foi iniciado.
 
-## Caminho D — redução de redundância entre capturas (concluído: variante a, limiar 0,80)
+## Caminho D — redução de redundância entre capturas (concluído: variante c′, limiar 0,90; variantes a e b como histórico)
 
 **Estado em 2026-09-24: desenho validado pelo autor e implementado em
 `src/semantic_harvester/corpus_redundancy.py`; executado sobre o corpus real
@@ -1335,8 +1335,10 @@ classificação Artigo/redirecionamento (passo 6) e mapeamento RDF. O Caminho D
 60 pares rotulada manualmente pelo autor em 2026-10-02 ("Rotulagem manual da
 amostra"); variante (b), remoção do chrome, implementada e avaliada contra esses
 rótulos no mesmo dia, sem separação ("Variante (b): remoção do chrome").
-Caminho D fechado em 2026-10-02 com a variante (a) e limiar 0,80, por decisão
-dos autores ("Fecho do Caminho D").** O texto abaixo
+Caminho D fechado em 2026-10-02 com a variante (a) e limiar 0,80 ("Fecho do
+Caminho D"); em 2026-10-09 os autores adotaram a variante (c′) com limiar 0,90,
+que passa a ser o resultado reportado ("Adoção da variante (c′)"); (a) e (b)
+ficam como histórico, testadas e não adotadas.** O texto abaixo
 até "Atualização com os textos finais" é a proposta tal como foi escrita,
 mantida como registo; na altura: *nada foi implementado e não foram feitos
 pedidos à API.* As estatísticas abaixo foram
@@ -2458,10 +2460,10 @@ continuam a descrever o corpus de 127 artigos.
 
 ## Variante (c′): corpo do artigo por âncoras literais (2026-10-04)
 
-**Estado: nova tentativa, avaliada; não altera nenhuma decisão fechada.** O
-Caminho D continua fechado com a variante (a) e limiar 0,80; o Caminho B com
-as limitações documentadas. Esta secção só documenta o resultado e as
-decisões que ficam para o autor.
+**Estado: avaliada em 2026-10-04; adotada em 2026-10-09 nos Caminhos D
+(limiar 0,90) e B, com "Mais Premium" como 14.º marcador (ver "Adoção da
+variante (c′)", a seguir).** Esta secção regista a avaliação tal como foi
+feita, com 13 marcadores.
 
 **Porquê (c′) e não "cortar no primeiro marcador".** A ideia inicial era
 cortar o texto no primeiro marcador de bloco de chrome. Verificado nos 793
@@ -2583,12 +2585,115 @@ grafo, dos textos e das saídas fechadas de D e B iguais antes e depois):
 `output/corpus_body_summary.md`, `output/corpus_body_label_eval.csv`,
 `output/corpus_body_entities.csv`.
 
-**Decisões em aberto, para o autor (não tomadas):** (1) se a (c′) deve
+**Decisões em aberto na altura (tomadas em 2026-10-09, ver a secção
+seguinte):** (1) se a (c′) deve
 substituir a variante (a) no Caminho D — e, nesse caso, com que limiar
 dentro de ]0,840; 0,975] — sabendo que a separação assenta num só par
 "alterado"; (2) se a (c′) deve passar a ser a base do Caminho B; (3) se
 "Mais Premium" entra como 14.º marcador. O limiar 0,80 da variante (a)
 mantém-se até decisão em contrário.
+
+## Adoção da variante (c′) nos Caminhos D e B (2026-10-09)
+
+**Decisões dos autores.**
+
+1. **Caminho D: (c′) substitui a variante (a), com limiar 0,90.** Na amostra
+   rotulada qualquer limiar em ]0,840; 0,975] separa os rótulos; escolheu-se
+   0,90, a meio caminho entre as duas fronteiras observadas, em vez de 0,85
+   (o mínimo que ainda funciona), por haver um só par "texto alterado" de
+   referência: fica folga dos dois lados.
+2. **Caminho B: (c′) passa a ser a base** (em vez do texto sem o chrome
+   persistente).
+3. **"Mais Premium" entra como 14.º marcador** (bloco de manchetes do layout
+   de 2019; não muda a separação dos rótulos e reduz os pares consecutivos
+   abaixo de 0,90 de 23 para 12).
+
+As variantes (a) (texto completo, limiar 0,80) e (b) (remoção de n-gramas
+frequentes) ficam como **histórico documentado: testadas, não adotadas**.
+
+**Implementação.** A delimitação do corpo passou para
+`src/semantic_harvester/article_body.py` (sem dependências), usada por
+`corpus_redundancy` e `corpus_entities`, ambos com `--texto corpo` por
+omissão (`--texto completo` repõe a variante (a); no B, `--texto sem-chrome`
+repõe a configuração anterior). No D, capturas com texto mas sem corpo
+localizável ficam numa camada própria, `sem_corpo`, fora da Camada 1 e dos
+grupos por `digest`; a validação recalcula a similaridade dos pares
+rotulados sobre o corpo e põe à parte os que não têm corpo. No B, capturas
+sem corpo não contam para a regra de persistência. A amostra rotulada não é
+reescrita. 3 testes novos.
+
+**Os 12 pares consecutivos abaixo de 0,90 (com 14 marcadores), todos
+explicados:**
+
+| Pares | Causa |
+| ---: | --- |
+| 4 | Artigo Premium "Exibição de Zivkovic…": umas capturas mostram o aviso Premium, outras o artigo completo desbloqueado (diferença real no que foi arquivado) |
+| 4 | Âncora de início numa listagem do título noutro bloco antes do artigo ("Vídeo-árbitro…", "Cristiano Ronaldo quis entrar com o pé direito…", "Yuri Ribeiro…", "Özil recorda palavras de Ronaldo…"); o resto do corpo é igual |
+| 1 | Par 29 (página de jogo em direto reescrita depois do fim) — alteração real |
+| 1 | "Centro teleguiado de Zivkovic e Jonas…" (0,581): legenda de ~20 palavras; numa captura aparece o endereço do embed do vídeo e um contador ("511 6"), que num corpo tão curto pesam muito |
+| 1 | "As 'borlas' do mercado de transferências…" (0,815): contadores numéricos ("8") presentes numa captura e não na outra |
+| 1 | "Equipamento do Barcelona…" (0,893): uma manchete rotativa dentro do corpo, vinda de um bloco **"Mais Fotogalerias"** (galerias do layout de 2019), que não está na lista ("Mais Fotos" não corresponde por causa dos limites de palavra) |
+
+**Resultado oficial do Caminho D** (`corpus_redundancy --limiar 0.90`, corpo;
+grafo, textos, amostra rotulada e vocabulário inalterados):
+
+| Camada | Capturas |
+| --- | ---: |
+| Camada 1 — com texto, corpo e `statusCode` 200 | 775 |
+| Sem corpo — com texto, sem corpo de artigo localizável | 18 |
+| Camada 2 — sem texto, em artigos com alguma captura na Camada 1 | 144 (14 candidatas por `digest`) |
+| Não avaliáveis — artigos sem nenhuma captura na Camada 1 | 4 |
+| Total | 941 |
+
+- **133 versões textuais distintas** e 642 capturas redundantes nas 775 da
+  Camada 1, em 121 artigos: 112 artigos com 1 versão, 8 com 2, 1 com 5 (o
+  Zivkovic Premium). O vídeo do Zungu, que a variante (a) dava como 71
+  versões em 71 capturas, tem agora 1.
+- Pares consecutivos com corpo: 654; mediana 1,000 (variante a: 0,655).
+- Validação na amostra: 57 pares comparáveis; 0 de 1 "texto alterado" ≥ 0,90
+  e 0 de 56 "mesma versão" < 0,90; à parte, por terem captura sem corpo, os
+  pares 1 ("texto alterado", a captura posterior não tem o artigo), 50 e 60
+  ("mesma versão", página `/jogos-em-direto/`).
+- Das 133 versões, as 9 a mais (artigos com 2 ou mais versões) vêm todas
+  dos 12 pares acima: só o par 29 e o Zivkovic Premium correspondem a
+  diferenças reais no texto arquivado; as restantes vêm das limitações
+  listadas.
+
+**Resultado oficial do Caminho B** (`corpus_entities`, corpo):
+
+| Medida | Antes (sem chrome persistente) | Agora (corpo, c′) |
+| --- | ---: | ---: |
+| Pares artigo–jogador, regra fraca | 1 427 | 119 |
+| Pares artigo–jogador, persistência | 287 | 113 |
+| Artigos com jogador, regra fraca / persistência | 116 / 91 | 60 / 58 |
+| Pares de artigos com uma só captura com corpo (persistência) | 158 | 31 |
+| `clube_coerente` (persistência): sim / nao / sem_tema | 82 / 41 / 164 | 34 / 16 / 63 |
+
+Os 16 pares `nao` foram inspecionados no corpo: 11 são menções legítimas a
+jogadores de outros clubes (transferências, antigos jogadores, adversários)
+e 5 são falsos positivos — 1 manchete que ficou dentro do corpo (Júlio César
+no artigo "A 'incubadora' do Seixal…") e 4 de **homonímia** ("Pêpê" contado
+como Pepe por a comparação ignorar acentos; "Moreira de Cónegos", a
+localidade; "Fábio Lima", o autor, contado como Lima; Zé Pedro, o músico,
+num artigo sobre o Tim). O chrome deixou de ser a fonte principal de erro;
+a homonímia, adiada por decisão dos autores, continua.
+
+**Limitações (resultado reportado).**
+
+- **Só 1 par "texto alterado" de referência** na amostra rotulada com corpo
+  (o par 29); o limiar 0,90 tem folga dos dois lados, mas a separação foi
+  observada com n = 1 desse lado.
+- A amostra rotulada cobre 34 artigos (um vídeo com 11 dos 60 pares).
+- Âncora de início frágil em páginas onde o título aparece listado noutro
+  bloco antes do artigo (4 casos encontrados); bloco "Mais Fotogalerias"
+  fora da lista; corpos muito curtos (legendas) sensíveis a contadores e
+  embeds; 18 capturas sem corpo.
+- As 133 versões são uma contagem por similaridade do corpo extraído, não
+  uma verificação de cada versão; o B continua sem avaliação de precisão
+  (decisão de âmbito) e com homonímia por resolver.
+- Os resultados das variantes (a) e (b) mantêm-se nas secções anteriores
+  como histórico; `output/corpus_chrome_*` continua a descrever o corpus de
+  127 artigos (variante b, não regenerada).
 
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 

@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-10-04** (correção da identidade dos artigos), a partir do código, testes,
+Atualizado em **2026-10-09** (adoção da variante c′ em D e B), a partir do código, testes,
 documentação e histórico; a última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
@@ -41,8 +41,9 @@ O fluxo é API → raw local → manifesto/metadados → Turtle. A
 [ontologia](../ontology/semantic_harvester.ttl) define as classes e propriedades;
 `Artigo → RecursoWeb → CapturaArquivada → TextoExtraido` resume as relações principais.
 A redução de redundância entre capturas (Caminho D) está concluída como
-anotação por similaridade textual em `corpus_redundancy.py`, com limiar 0,80
-(escolha pragmática; ver "Trabalho em aberto"). Não estão implementados NER,
+anotação por similaridade textual em `corpus_redundancy.py`, sobre o corpo do
+artigo (variante c′, `article_body.py`) com limiar 0,90 (ver "Trabalho em
+aberto"). Não estão implementados NER,
 deduplicação semântica, base de dados,
 frontend ou LLMs. Há parâmetros de deduplicação enviados à API; isso não é uma
 implementação local de deduplicação. `EntidadeMencionada` e `Tema` existem no
@@ -135,7 +136,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 171 testes em onze módulos de `tests/`.
+pacote conforme o README. Existem 174 testes em doze módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -162,7 +163,7 @@ em bruto, com sessão simulada) e o protótipo de navegação
 ordem e filtro do histórico, ligações entre páginas e escape de títulos).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **171 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **174 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -325,7 +326,8 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    triplos.** D, B e o protótipo foram regenerados. Detalhe em
    `experiments.md` ("Correção da identidade dos artigos").
 
-   O Caminho D foi concluído em 2026-10-02 (passo 3 abaixo).
+   O Caminho D foi concluído em 2026-10-02 e revisto em 2026-10-09 (passo 3
+   abaixo).
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com
@@ -334,8 +336,21 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    sofisticada (ex.: embeddings) fica como trabalho futuro, condicional a
    tempo disponível.
 
-   **Concluído em 2026-10-02: variante (a) (texto completo, com chrome) com
-   limiar 0,80**, decisão dos autores. `output/corpus_redundancy.csv` final
+   **Resultado reportado desde 2026-10-09: variante (c′), corpo do artigo,
+   com limiar 0,90** (decisão dos autores; `article_body.py`, 14 marcadores
+   literais de chrome incluindo "Mais Premium"). Das 941 capturas: 775 na
+   Camada 1 (com corpo), 18 com texto mas sem corpo, 144 sem texto e 4 não
+   avaliáveis; **133 versões textuais distintas** e 642 redundantes, em 121
+   artigos (112 com uma só versão). Na amostra rotulada os rótulos
+   separam-se (0 erros a 0,90 nos 57 pares com corpo), **mas há um só par
+   "texto alterado" de referência**; os 12 pares consecutivos abaixo de 0,90
+   estão todos explicados (Premium vs. artigo completo, falhas da âncora de
+   início, o par 29, contadores/embed em legendas curtas, bloco "Mais
+   Fotogalerias"). Detalhe em `experiments.md` ("Adoção da variante (c′)").
+   As variantes (a) e (b) ficam como histórico, testadas e não adotadas.
+
+   *Histórico — fecho de 2026-10-02: variante (a) (texto completo, com
+   chrome) com limiar 0,80*, decisão dos autores na altura. `output/corpus_redundancy.csv` final
    (sem `pendente_limiar`), após a correção de 2026-10-04: das 793 capturas
    da Camada 1 de 123 artigos, **666 versões textuais distintas** e 127
    redundantes; Camada 2 com 146 capturas (14 candidatas por `digest`, não
@@ -358,7 +373,7 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    orientador de que o resultado atual não chega — ainda por validar em
    reunião.
 
-   **Variante (c′), avaliada em 2026-10-04 (não adotada; decisão em aberto):**
+   **Variante (c′), avaliada em 2026-10-04 (adotada em 2026-10-09):**
    corpo do artigo delimitado entre o título e o primeiro de 13 marcadores
    literais de chrome (`corpus_body.py`). Nos 57 pares rotulados com corpo,
    os rótulos **separam-se de forma limpa** (mín. "mesma versão" 0,975, máx.
@@ -368,8 +383,8 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    Boavista-Moreirense desaparecem (pares persistentes 287 → 114; amostra de
    12 removidos: todos chrome). Limitações: bloco "Mais Premium" do layout
    de 2019 fora da lista, 3 falhas da âncora de início, 18 capturas sem
-   corpo. Por decidir pelo autor: adotar (c′) em D e/ou B, o limiar, e o
-   14.º marcador. O limiar 0,80 (variante a) mantém-se.
+   corpo. Decidido em 2026-10-09: adotar (c′) em D (limiar 0,90) e em B, e
+   acrescentar "Mais Premium" como 14.º marcador.
 
    **Histórico (2026-09-24 a 2026-10-02, antes do fecho).**
    `src/semantic_harvester/corpus_redundancy.py` aplica o desenho de
@@ -398,7 +413,14 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    amostra rotulada cobre só 34 artigos (um vídeo com 11 dos 60 pares), o que
    limita a generalização. Por implementar: a representação em RDF da
    anotação. Detalhe em `experiments.md`.
-4. **B** — **O Caminho B foi concluído em 2026-10-03.** Povoamento de
+4. **B** — **O Caminho B foi concluído em 2026-10-03 e revisto em
+   2026-10-09:** desde então o resultado reportado procura os jogadores só no
+   corpo do artigo (variante c′): 113 pares artigo–jogador em 58 artigos pela
+   regra de persistência (119 em 60 pela regra fraca); `clube_coerente` 34
+   `sim`, 16 `nao`, 63 `sem_tema`, e dos 16 `nao` inspecionados 11 são
+   menções legítimas e 5 falsos positivos (1 manchete, 4 de homonímia). Os
+   números abaixo, sobre o texto sem chrome persistente, ficam como
+   histórico. Povoamento de
    `EntidadeMencionada`/`Tema` (definidos na ontologia
    desde o início, nunca usados em código). **Decisão de âmbito:** caracterização
    descritiva/quantitativa (contagens, frequências), não uma avaliação formal

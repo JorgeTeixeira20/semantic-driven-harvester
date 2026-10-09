@@ -693,7 +693,8 @@ def write_summary_markdown(
         *([f"| Sem corpo — com texto, mas sem corpo de artigo localizável | {len(no_body)} |"]
           if use_body else []),
         f"| Camada 2 — sem texto, em artigos com algum texto | {len(layer2)} |",
-        f"| Não avaliáveis — artigos sem nenhum texto | {len(not_evaluable)} |",
+        f"| Não avaliáveis — artigos sem nenhuma captura na Camada 1"
+        f"{' (sem texto ou sem corpo)' if use_body else ' (sem texto)'} | {len(not_evaluable)} |",
         f"| Total | {len(rows)} |",
         "",
         f"- Capturas com `statusCode` ≠ 200: {len(status_not_200)}, das quais "
@@ -894,7 +895,11 @@ def main(argv: list[str] | None = None) -> int:
 
     rows, sensitivity, sample = run(threshold=args.limiar, use_body=args.texto == "corpo")
     print(f"Capturas anotadas: {len(rows)}")
-    print(f"Pares na amostra de rotulagem: {len(sample)}")
+    sample_path = Path(__file__).resolve().parents[2] / "output" / "corpus_redundancy_label_sample.csv"
+    if read_labelled_sample(sample_path) is not None:
+        print("Amostra de rotulagem: já rotulada, mantida (não reescrita)")
+    else:
+        print(f"Pares na amostra de rotulagem: {len(sample)}")
     print(
         "Saídas: output/corpus_redundancy.csv, output/corpus_redundancy_summary.md, "
         "output/corpus_redundancy_label_sample.csv"

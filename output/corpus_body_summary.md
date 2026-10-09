@@ -14,11 +14,12 @@ Sem pedidos à API; não altera o grafo, o raw nem as saídas fechadas de D e B.
 | Mais notícias | 216 |
 | Veja também | 168 |
 | O Record recomenda para si | 117 |
-| Últimas Notícias | 102 |
+| Últimas Notícias | 84 |
 | Mais Hora Record | 44 |
 | (fim do texto) | 34 |
 | Mais Fotos | 29 |
 | Mais Vídeos | 20 |
+| Mais Premium | 18 |
 | Enviar artigo por email | 15 |
 | Leia este artigo na íntegra | 15 |
 | Mais Recentes | 9 |
@@ -32,15 +33,15 @@ Sem pedidos à API; não altera o grafo, o raw nem as saídas fechadas de D e B.
 
 | Limiar | Redundantes (último rep.) | Redundantes (consecutiva) | Versões (último rep.) |
 | ---: | ---: | ---: | ---: |
-| 0,500 | 641 | 643 | 134 |
-| 0,600 | 637 | 637 | 138 |
-| 0,700 | 634 | 634 | 141 |
-| 0,800 | 634 | 634 | 141 |
-| 0,850 | 632 | 632 | 143 |
-| 0,900 | 631 | 631 | 144 |
-| 0,950 | 630 | 630 | 145 |
-| 0,990 | 618 | 618 | 157 |
-| 1,000 | 609 | 609 | 166 |
+| 0,500 | 649 | 649 | 126 |
+| 0,600 | 648 | 648 | 127 |
+| 0,700 | 645 | 645 | 130 |
+| 0,800 | 645 | 645 | 130 |
+| 0,850 | 643 | 643 | 132 |
+| 0,900 | 642 | 642 | 133 |
+| 0,950 | 640 | 640 | 135 |
+| 0,990 | 623 | 623 | 152 |
+| 1,000 | 614 | 614 | 161 |
 
 ## Caminho D: os 60 pares rotulados
 
@@ -67,10 +68,10 @@ Pares comparáveis: 57.
 
 | Medida | B fechado (sem chrome persistente) | Corpo (c′) |
 | --- | ---: | ---: |
-| fraca | 1427 | 131 |
-| persistencia | 287 | 114 |
-| artigos_fraca | 116 | 63 |
+| fraca | 1427 | 119 |
+| persistencia | 287 | 113 |
+| artigos_fraca | 116 | 60 |
 | artigos_persistencia | 91 | 58 |
-| jogadores_persistencia | 118 | 79 |
+| jogadores_persistencia | 118 | 78 |
 
 Estes valores são o resultado real desta execução, não uma estimativa.

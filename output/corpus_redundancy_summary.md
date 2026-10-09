@@ -1,16 +1,17 @@
 # Caminho D — anotação de redundância entre capturas
 
-Execução real, sem pedidos à API, sobre `output/corpus_articles.ttl` e os textos em `data/raw/texts/`. Nada foi removido do grafo nem do raw: o resultado é uma anotação por captura em `output/corpus_redundancy.csv`. Similaridade: Jaccard de conjuntos de palavras (`\w+`) do texto normalizado (NFC, minúsculas, espaços), sem remover o chrome do site.
+Execução real, sem pedidos à API, sobre `output/corpus_articles.ttl` e os textos em `data/raw/texts/`. Nada foi removido do grafo nem do raw: o resultado é uma anotação por captura em `output/corpus_redundancy.csv`. Similaridade: Jaccard de conjuntos de palavras (`\w+`) do texto normalizado (NFC, minúsculas, espaços), calculada só sobre o **corpo do artigo** (variante c′: entre o título e o primeiro marcador de bloco de chrome; `article_body.py`).
 
-**Limiar aplicado no CSV: 0,800.**
+**Limiar aplicado no CSV: 0,900.**
 
 ## Limiar e validação contra a amostra rotulada
 
-Contra os 60 pares rotulados manualmente em `output/corpus_redundancy_label_sample.csv`, com este limiar:
+Contra os 57 pares rotulados manualmente em `output/corpus_redundancy_label_sample.csv`, com este limiar:
 
-- "texto alterado" com similaridade ≥ limiar (seriam tratados como a mesma versão — erro grave): **0 de 2**.
-- "mesma versão" com similaridade < limiar (ficam como versões distintas — erro conservador): **28 de 58**. A anotação é não destrutiva: este erro não apaga nada, só aumenta o número de "versões distintas".
-- Limiares da grelha que separam os rótulos sem erros: **nenhum**. O limiar é uma escolha pragmática dos autores, não uma calibração limpa; critério e limitações em `docs/experiments.md`.
+- "texto alterado" com similaridade ≥ limiar (seriam tratados como a mesma versão — erro grave): **0 de 1**.
+- "mesma versão" com similaridade < limiar (ficam como versões distintas — erro conservador): **0 de 56**. A anotação é não destrutiva: este erro não apaga nada, só aumenta o número de "versões distintas".
+- Limiares da grelha que separam os rótulos sem erros: 0,850, 0,900, 0,950. O lado "texto alterado" assenta em muito poucos pares; critério e limitações em `docs/experiments.md`.
+- Pares rotulados com alguma captura sem corpo (fora desta validação): 3 — par 1 (texto alterado), par 50 (mesma versão), par 60 (mesma versão).
 
 ## Estrutura do corpus
 
@@ -19,17 +20,18 @@ Contra os 60 pares rotulados manualmente em `output/corpus_redundancy_label_samp
 | Situação | Artigos |
 | --- | ---: |
 | Só 1 captura | 29 |
-| Nenhuma captura com texto (não avaliáveis) | 2 |
-| Exatamente 1 captura com texto | 38 |
-| 2 ou mais capturas com texto (comparáveis) | 85 |
+| Nenhuma captura com texto (não avaliáveis) | 4 |
+| Exatamente 1 captura com texto | 37 |
+| 2 ou mais capturas com texto (comparáveis) | 84 |
 
 ## Contagens por camada
 
 | Camada | Capturas |
 | --- | ---: |
-| Camada 1 — com texto e `statusCode` 200 | 793 |
-| Camada 2 — sem texto, em artigos com algum texto | 146 |
-| Não avaliáveis — artigos sem nenhum texto | 2 |
+| Camada 1 — com texto e corpo e `statusCode` 200 | 775 |
+| Sem corpo — com texto, mas sem corpo de artigo localizável | 18 |
+| Camada 2 — sem texto, em artigos com algum texto | 144 |
+| Não avaliáveis — artigos sem nenhuma captura na Camada 1 (sem texto ou sem corpo) | 4 |
 | Total | 941 |
 
 - Capturas com `statusCode` ≠ 200: 35, das quais 0 com texto; todas fora da Camada 1 (contabilizadas à parte, não são redundância).
@@ -47,23 +49,20 @@ Todas as capturas sem texto são mantidas. Estas contagens são apenas um limite
 
 | n | mín. | p10 | mediana | p90 | máx. |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| 670 | 0,434 | 0,562 | 0,655 | 0,996 | 1,000 |
+| 654 | 0,125 | 1,000 | 1,000 | 1,000 | 1,000 |
 
 | Faixa | Pares |
 | --- | ---: |
-| [0,400; 0,450) | 2 |
-| [0,450; 0,500) | 14 |
-| [0,500; 0,550) | 40 |
-| [0,550; 0,600) | 69 |
-| [0,600; 0,650) | 189 |
-| [0,650; 0,700) | 140 |
-| [0,700; 0,750) | 44 |
-| [0,750; 0,800) | 40 |
-| [0,800; 0,850) | 42 |
-| [0,850; 0,900) | 7 |
-| [0,900; 0,950) | 5 |
-| [0,950; 1,000) | 13 |
-| = 1,000 | 65 |
+| [0,100; 0,150) | 4 |
+| [0,400; 0,450) | 1 |
+| [0,550; 0,600) | 1 |
+| [0,600; 0,650) | 2 |
+| [0,650; 0,700) | 1 |
+| [0,800; 0,850) | 2 |
+| [0,850; 0,900) | 1 |
+| [0,900; 0,950) | 2 |
+| [0,950; 1,000) | 26 |
+| = 1,000 | 614 |
 
 ## Sensibilidade ao limiar (Camada 1)
 
@@ -71,29 +70,29 @@ Redundantes = capturas com similaridade ≥ limiar face ao termo de comparação
 
 | Limiar | Redundantes (último rep.) | Redundantes (consecutiva) | Versões (último rep.) | Versões (consecutiva) | Divergências | Artigos com redundantes (último rep.) |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0,500 | 630 | 654 | 163 | 139 | 108 | 85 |
-| 0,600 | 522 | 545 | 271 | 248 | 78 | 73 |
-| 0,700 | 214 | 216 | 579 | 577 | 5 | 58 |
-| 0,800 | 127 | 132 | 666 | 661 | 34 | 36 |
-| 0,850 | 90 | 90 | 703 | 703 | 0 | 24 |
-| 0,900 | 83 | 83 | 710 | 710 | 0 | 17 |
-| 0,950 | 77 | 78 | 716 | 715 | 3 | 14 |
-| 0,990 | 71 | 71 | 722 | 722 | 0 | 13 |
-| 1,000 | 65 | 65 | 728 | 728 | 0 | 13 |
+| 0,500 | 649 | 649 | 126 | 126 | 0 | 84 |
+| 0,600 | 648 | 648 | 127 | 127 | 0 | 84 |
+| 0,700 | 645 | 645 | 130 | 130 | 0 | 84 |
+| 0,800 | 645 | 645 | 130 | 130 | 0 | 84 |
+| 0,850 | 643 | 643 | 132 | 132 | 0 | 83 |
+| 0,900 | 642 | 642 | 133 | 133 | 0 | 82 |
+| 0,950 | 640 | 640 | 135 | 135 | 0 | 81 |
+| 0,990 | 623 | 623 | 152 | 152 | 0 | 73 |
+| 1,000 | 614 | 614 | 161 | 161 | 0 | 72 |
 
 ## Versões textuais distintas por artigo (Camada 1)
 
-- Artigos com texto: 123; capturas da Camada 1: 793; versões textuais distintas: **666**; capturas redundantes: 127.
+- Artigos com texto: 121; capturas da Camada 1: 775; versões textuais distintas: **133**; capturas redundantes: 642.
 - Detalhe por artigo em `output/corpus_redundancy_versions.csv`.
 
 | Versões distintas | Artigos |
 | --- | ---: |
-| 1 | 52 |
-| 2 | 22 |
-| 3–5 | 28 |
-| 6–10 | 7 |
-| ≥ 11 | 14 |
-| Artigos sem texto (não avaliáveis) | 2 |
+| 1 | 112 |
+| 2 | 8 |
+| 3–5 | 1 |
+| 6–10 | 0 |
+| ≥ 11 | 0 |
+| Artigos sem texto (não avaliáveis) | 4 |
 
 ## Amostra para rotulagem manual
 
@@ -101,8 +100,8 @@ Redundantes = capturas com similaridade ≥ limiar face ao termo de comparação
 
 | Faixa | Intervalo | Pares na amostra | Pares disponíveis |
 | --- | --- | ---: | ---: |
-| baixa | [0,000; 0,700) | 20 | 454 |
-| media | [0,700; 0,900) | 20 | 133 |
-| alta | [0,900; 1,000] | 20 | 83 |
+| baixa | [0,000; 0,700) | 20 | 9 |
+| media | [0,700; 0,900) | 20 | 3 |
+| alta | [0,900; 1,000] | 20 | 642 |
 
 Estes valores são o resultado real desta execução, não uma estimativa.
