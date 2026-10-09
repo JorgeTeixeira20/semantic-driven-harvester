@@ -17,8 +17,10 @@ o raw: lê `output/corpus_articles.ttl` e os textos referenciados por
 - **Não avaliáveis**: capturas de artigos sem nenhum texto utilizável.
 
 Similaridade: Jaccard sobre conjuntos de palavras (`\\w+`) do texto
-normalizado (Unicode NFC, minúsculas, espaços colapsados), sem remover o
-"chrome" do site. É a medida da exploração documentada; esta tokenização
+normalizado (Unicode NFC, minúsculas, espaços colapsados). Por omissão na
+linha de comandos, só sobre o corpo do artigo (variante c′, `article_body.py`;
+capturas sem corpo ficam na camada `sem_corpo`); `--texto completo` repõe a
+variante (a), com o "chrome" do site. É a medida da exploração documentada; esta tokenização
 reproduz os números aí publicados.
 
 O limiar **não** é fixado aqui: sem `--limiar`, a Camada 1 fica
@@ -36,10 +38,12 @@ import re
 import statistics
 import unicodedata
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from rdflib import RDF, Graph
+
+from .article_body import extract_body
 
 from .rdf_mapper import SDH
 
@@ -55,11 +59,13 @@ SAMPLE_DIFF_WORDS = 25
 LAYER_TEXT = "1_texto"
 LAYER_NO_TEXT = "2_sem_texto"
 LAYER_NOT_EVALUABLE = "nao_avaliavel"
+LAYER_NO_BODY = "sem_corpo"
 
 LABEL_REPRESENTATIVE = "representante"
 LABEL_REDUNDANT = "redundante"
 LABEL_PENDING = "pendente_limiar"
 LABEL_KEPT_NO_TEXT = "mantida_sem_texto"
+LABEL_KEPT_NO_BODY = "mantida_sem_corpo"
 LABEL_DIGEST_CANDIDATE = "candidata_digest_nao_verificada"
 LABEL_DIGEST_CANDIDATE_MIXED = "candidata_digest_nao_verificada_grupo_misto"
 
@@ -91,6 +97,8 @@ class Capture:
     content_length: int
     status_code: int | None
     text: str | None
+    # Variante (c′): tem texto, mas sem corpo de artigo localizável.
+    body_missing: bool = False
 
     @property
     def has_text(self) -> bool:
@@ -98,7 +106,7 @@ class Capture:
 
     @property
     def in_layer1(self) -> bool:
-        return self.text is not None and self.status_code == 200
+        return self.text is not None and self.status_code == 200 and not self.body_missing
 
 
 def normalize_text(text: str) -> str:
@@ -195,7 +203,8 @@ def digest_annotations(captures: list[Capture]) -> dict[int, tuple[str, str]]:
     for (digest, length), members in groups.items():
         if len(members) < 2:
             continue
-        no_text = [i for i in members if not captures[i].in_layer1]
+        no_text = [i for i in members
+                   if not captures[i].in_layer1 and not captures[i].body_missing]
         if not no_text:
             continue
         group_id = f"{digest}|{length}"
@@ -264,6 +273,9 @@ def annotate_article(
                 row["rotulo"] = LABEL_REPRESENTATIVE
             else:
                 row["rotulo"] = LABEL_PENDING
+        elif capture.body_missing:
+            row["camada"] = LAYER_NO_BODY
+            row["rotulo"] = LABEL_KEPT_NO_BODY
         else:
             row["camada"] = LAYER_NO_TEXT if layer1 else LAYER_NOT_EVALUABLE
             group_id, label = digest.get(index, ("", LABEL_KEPT_NO_TEXT))
@@ -319,6 +331,26 @@ class SensitivityRow:
     versions_consecutive: int
     disagreements: int
     articles_with_redundant: int
+
+
+def to_body_corpus(corpus: dict[str, list[Capture]]) -> dict[str, list[Capture]]:
+    """Variante (c′): o texto de cada captura passa a ser só o corpo do artigo.
+
+    Capturas com texto mas sem corpo localizável ficam `body_missing` (fora da
+    Camada 1, sem deixarem de ter texto).
+    """
+
+    result = {}
+    for article, captures in corpus.items():
+        converted = []
+        for capture in captures:
+            if capture.text is None:
+                converted.append(capture)
+                continue
+            body = extract_body(capture.text)
+            converted.append(replace(capture, text=body.text, body_missing=not body.found))
+        result[article] = converted
+    return result
 
 
 def sensitivity_table(
@@ -564,11 +596,14 @@ def write_summary_markdown(
     path: Path,
     labels: list[dict[str, str]] | None = None,
     versions: list[dict[str, str]] | None = None,
+    use_body: bool = False,
+    labels_without_body: list[dict[str, str]] | None = None,
 ) -> None:
     captures = [c for cs in corpus.values() for c in cs]
     layer1 = [r for r in rows if r["camada"] == LAYER_TEXT]
     layer2 = [r for r in rows if r["camada"] == LAYER_NO_TEXT]
     not_evaluable = [r for r in rows if r["camada"] == LAYER_NOT_EVALUABLE]
+    no_body = [r for r in rows if r["camada"] == LAYER_NO_BODY]
     no_text_rows = layer2 + not_evaluable
 
     layer1_counts = {a: sum(c.in_layer1 for c in cs) for a, cs in corpus.items()}
@@ -595,7 +630,10 @@ def write_summary_markdown(
         "textos em `data/raw/texts/`. Nada foi removido do grafo nem do raw: o "
         "resultado é uma anotação por captura em `output/corpus_redundancy.csv`. "
         "Similaridade: Jaccard de conjuntos de palavras (`\\w+`) do texto "
-        "normalizado (NFC, minúsculas, espaços), sem remover o chrome do site.\n",
+        "normalizado (NFC, minúsculas, espaços), "
+        + ("calculada só sobre o **corpo do artigo** (variante c′: entre o título e o "
+           "primeiro marcador de bloco de chrome; `article_body.py`).\n" if use_body else
+           "sobre o texto completo, sem remover o chrome do site (variante a).\n"),
     ]
     if threshold is None:
         lines.append(
@@ -623,10 +661,20 @@ def write_summary_markdown(
                 "- Limiares da grelha que separam os rótulos sem erros: "
                 + (", ".join(_num(t) for t in check.separating_thresholds)
                    if check.separating_thresholds else "**nenhum**")
-                + ". O limiar é uma escolha pragmática dos autores, não uma "
-                "calibração limpa; critério e limitações em `docs/experiments.md`.",
-                "",
+                + (". O lado \"texto alterado\" assenta em muito poucos pares; "
+                   "critério e limitações em `docs/experiments.md`."
+                   if check.separating_thresholds else
+                   ". O limiar é uma escolha pragmática dos autores, não uma "
+                   "calibração limpa; critério e limitações em `docs/experiments.md`."),
             ]
+            if labels_without_body:
+                lines.append(
+                    f"- Pares rotulados com alguma captura sem corpo (fora desta "
+                    f"validação): {len(labels_without_body)} — "
+                    + ", ".join(f"par {r['par_id']} ({r['rotulo_manual']})"
+                                for r in labels_without_body) + "."
+                )
+            lines.append("")
 
     lines += [
         "## Estrutura do corpus\n",
@@ -640,7 +688,10 @@ def write_summary_markdown(
         "## Contagens por camada\n",
         "| Camada | Capturas |",
         "| --- | ---: |",
-        f"| Camada 1 — com texto e `statusCode` 200 | {len(layer1)} |",
+        f"| Camada 1 — com texto{' e corpo' if use_body else ''} e `statusCode` 200 "
+        f"| {len(layer1)} |",
+        *([f"| Sem corpo — com texto, mas sem corpo de artigo localizável | {len(no_body)} |"]
+          if use_body else []),
         f"| Camada 2 — sem texto, em artigos com algum texto | {len(layer2)} |",
         f"| Não avaliáveis — artigos sem nenhum texto | {len(not_evaluable)} |",
         f"| Total | {len(rows)} |",
@@ -729,8 +780,12 @@ def write_summary_markdown(
         )
 
     band_counts = defaultdict(int)
-    for band, _pair in sample:
-        band_counts[band] += 1
+    if labels:
+        for row in labels + (labels_without_body or []):
+            band_counts[row["faixa"]] += 1
+    else:
+        for band, _pair in sample:
+            band_counts[band] += 1
     lines += [
         "",
         "## Amostra para rotulagem manual\n",
@@ -756,12 +811,35 @@ def write_summary_markdown(
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def labels_on_body(
+    labels: list[dict[str, str]], corpus: dict[str, list[Capture]]
+) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    """Recalcula a similaridade dos pares rotulados sobre o corpo (variante c′).
+
+    Devolve `(pares com corpo, com a similaridade nova; pares com alguma
+    captura sem corpo, à parte)`.
+    """
+
+    by_key = {(c.article, c.tstamp): c for caps in corpus.values() for c in caps}
+    with_body, without_body = [], []
+    for row in labels:
+        a, b = by_key[(row["artigo"], row["tstamp_a"])], by_key[(row["artigo"], row["tstamp_b"])]
+        if a.body_missing or b.body_missing:
+            without_body.append(row)
+        else:
+            sim = jaccard(word_set(a.text or ""), word_set(b.text or ""))
+            with_body.append({**row, "similaridade": f"{sim:.6f}"})
+    return with_body, without_body
+
+
 def run(
-    project_root: Path | None = None, threshold: float | None = None
+    project_root: Path | None = None, threshold: float | None = None, use_body: bool = False,
 ) -> tuple[list[dict[str, str]], list[SensitivityRow], list[tuple[str, Pair]]]:
     root = project_root or Path(__file__).resolve().parents[2]
     output = root / "output"
     corpus = load_corpus(output / "corpus_articles.ttl", root)
+    if use_body:
+        corpus = to_body_corpus(corpus)
 
     rows = [row for captures in corpus.values() for row in annotate_article(captures, threshold)]
     layer1_words = {
@@ -775,16 +853,20 @@ def run(
     sample_path = output / "corpus_redundancy_label_sample.csv"
     # Uma amostra já rotulada à mão nunca é reescrita (os rótulos perder-se-iam).
     labels = read_labelled_sample(sample_path)
+    labels_without_body: list[dict[str, str]] = []
+    if labels and use_body:
+        labels, labels_without_body = labels_on_body(labels, corpus)
     versions = versions_per_article(corpus, rows) if threshold is not None else None
 
     write_redundancy_csv(rows, output / "corpus_redundancy.csv")
-    if labels is None:
+    if labels is None and not labels_without_body:
         write_sample_csv(sample, sample_path)
     if versions is not None:
         write_versions_csv(versions, output / "corpus_redundancy_versions.csv")
     write_summary_markdown(
         corpus, rows, pairs, sensitivity, sample, threshold,
-        output / "corpus_redundancy_summary.md", labels, versions,
+        output / "corpus_redundancy_summary.md", labels, versions, use_body,
+        labels_without_body,
     )
     return rows, sensitivity, sample
 
@@ -801,11 +883,16 @@ def main(argv: list[str] | None = None) -> int:
         help="limiar de Jaccard para a Camada 1; omitido enquanto não houver "
         "calibração por rotulagem manual (Camada 1 fica pendente_limiar)",
     )
+    parser.add_argument(
+        "--texto", choices=("corpo", "completo"), default="corpo",
+        help="corpo do artigo (variante c′, adotada; por omissão) ou texto completo "
+        "com chrome (variante a, histórica)",
+    )
     args = parser.parse_args(argv)
     if args.limiar is not None and not 0.0 <= args.limiar <= 1.0:
         parser.error("--limiar tem de estar entre 0 e 1")
 
-    rows, sensitivity, sample = run(threshold=args.limiar)
+    rows, sensitivity, sample = run(threshold=args.limiar, use_body=args.texto == "corpo")
     print(f"Capturas anotadas: {len(rows)}")
     print(f"Pares na amostra de rotulagem: {len(sample)}")
     print(

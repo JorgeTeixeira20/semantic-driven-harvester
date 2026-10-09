@@ -42,7 +42,7 @@ from .corpus_chrome import (
     DEFAULT_N, article_frequency, chrome_coverage, chrome_ngrams, layer1_tokens,
     tokens,
 )
-from .corpus_redundancy import Capture, load_corpus
+from .corpus_redundancy import Capture, load_corpus, to_body_corpus
 
 DEFAULT_CHROME_FRACTION = 0.10
 ORIGIN_URL = "url"
@@ -293,6 +293,7 @@ def write_summary(
     vocabulary_path: Path,
     chrome_fraction: float | None,
     path: Path,
+    use_body: bool = False,
 ) -> None:
     articles = list(corpus)
     with_text = [a for a, caps in corpus.items() if any(c.in_layer1 for c in caps)]
@@ -312,6 +313,8 @@ def write_summary(
     weak_counts = Counter(r["rotulo"] for r in entities)
     strong_counts = Counter(r["rotulo"] for r in strong)
     chrome_text = (
+        "só o **corpo do artigo** (variante c′, `article_body.py`; capturas sem corpo "
+        "não contam)" if use_body else
         f"sem o chrome persistente (5-gramas em ≥ {chrome_fraction:.2f} dos artigos)".replace(".", ",", 1)
         if chrome_fraction is not None else "completo, **sem** remoção do chrome"
     )
@@ -361,6 +364,7 @@ def run(
     vocabulary_path: Path | None = None,
     chrome_fraction: float | None = DEFAULT_CHROME_FRACTION,
     club_map_path: Path | None = None,
+    use_body: bool = False,
 ) -> list[dict[str, str]]:
     root = project_root or Path(__file__).resolve().parents[2]
     if vocabulary_path is None:
@@ -368,6 +372,9 @@ def run(
     output = root / "output"
     corpus = load_corpus(output / "corpus_articles.ttl", root)
     terms = load_vocabulary(vocabulary_path)
+    if use_body:
+        # Variante (c′): o corpo já exclui o chrome; capturas sem corpo deixam a Camada 1.
+        corpus, chrome_fraction = to_body_corpus(corpus), None
     chrome = build_chrome(corpus, chrome_fraction)
     club_map = load_club_map(club_map_path) if club_map_path is not None else None
 
@@ -377,7 +384,7 @@ def run(
     ]
     write_csv(rows, output / "corpus_entities.csv")
     write_summary(corpus, rows, vocabulary_path, chrome_fraction,
-                  output / "corpus_entities_summary.md")
+                  output / "corpus_entities_summary.md", use_body)
     return rows
 
 
@@ -388,20 +395,22 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--vocabulario", type=Path, required=True,
                         help="CSV do vocabulário fechado de entidades")
+    parser.add_argument("--texto", choices=("corpo", "sem-chrome", "completo"), default="corpo",
+                        help="corpo do artigo (variante c′, adotada; por omissão), texto sem o "
+                        "chrome persistente (histórico) ou texto completo")
     parser.add_argument("--fracao-chrome", type=float, default=DEFAULT_CHROME_FRACTION,
-                        help="fração de artigos para um 5-grama ser chrome (por omissão 0,10)")
-    parser.add_argument("--sem-remocao-chrome", action="store_true",
-                        help="procura no texto completo, sem remover o chrome")
+                        help="com --texto sem-chrome: fração de artigos para um 5-grama ser "
+                        "chrome (por omissão 0,10)")
     parser.add_argument("--clubes-url", type=Path, default=DEFAULT_CLUB_MAP,
                         help="tabela slug do URL → clube do vocabulário, para a coluna "
                         "clube_coerente (por omissão data/processed/caminho_b_clubes_url.csv)")
     args = parser.parse_args(argv)
-    fraction = None if args.sem_remocao_chrome else args.fracao_chrome
+    fraction = args.fracao_chrome if args.texto == "sem-chrome" else None
     if fraction is not None and not 0.0 < fraction <= 1.0:
         parser.error("--fracao-chrome tem de estar em ]0, 1]")
 
     rows = run(vocabulary_path=args.vocabulario, chrome_fraction=fraction,
-               club_map_path=args.clubes_url)
+               club_map_path=args.clubes_url, use_body=args.texto == "corpo")
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")
     print("Saídas: output/corpus_entities.csv, output/corpus_entities_summary.md")
     return 0

@@ -50,8 +50,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   vocabulário fechado no texto sem chrome; sem rede.
 - `wikidata_vocabulary.py`: vocabulário de jogadores do Caminho B a partir da
   Wikidata (rede: endpoint SPARQL); raw em `data/raw/wikidata/`.
-- `corpus_body.py`: variante (c′) — corpo do artigo entre o título e 13
-  marcadores literais de chrome; avaliação contra D e B, sem rede.
+- `article_body.py`: corpo do artigo entre o título e 14 marcadores literais
+  de chrome (variante c′, adotada em D e B); sem dependências.
+- `corpus_body.py`: avaliação da variante (c′) contra D e B, sem rede.
 - `navigation_prototype.py`: protótipo de navegação — corre `queries/*.rq`
   (SPARQL, `rdflib`) sobre o Turtle do corpus e gera HTML estático em
   `output/prototipo/`; sem rede nem servidor.
@@ -95,9 +96,9 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_text_retry` | Rede (até 324 capturas, várias tentativas cada); resumível por captura; grava textos em `data/raw/texts/` e `output/corpus_text_retry_report.csv`. |
 | `python -m semantic_harvester.corpus_rdf --rebuild-offline [--check-only]` | Sem rede; reconstrói o grafo dos artigos retidos a partir do raw e da cache de textos, verifica e só então substitui os outputs. |
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
-| `python -m semantic_harvester.corpus_redundancy [--limiar X]` | Sem rede; lê `output/corpus_articles.ttl` e `data/raw/texts/`; grava `output/corpus_redundancy*`; não altera grafo nem raw. |
+| `python -m semantic_harvester.corpus_redundancy [--limiar X] [--texto corpo\|completo]` | Sem rede; lê `output/corpus_articles.ttl` e `data/raw/texts/`; grava `output/corpus_redundancy*`; não altera grafo nem raw; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.corpus_chrome --so-distribuicao \| --fracao F [--n 5]` | Sem rede; lê o Turtle, `data/raw/texts/` e a amostra rotulada; grava `output/corpus_chrome_*`. |
-| `python -m semantic_harvester.corpus_entities --vocabulario CSV` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`. |
+| `python -m semantic_harvester.corpus_entities --vocabulario CSV [--texto corpo\|sem-chrome\|completo]` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.wikidata_vocabulary` | Rede (28 pedidos SPARQL à Wikidata); grava raw em `data/raw/wikidata/` e `data/processed/caminho_b_vocabulario_wikidata.csv`. |
 | `python -m semantic_harvester.corpus_body [--vocabulario CSV]` | Sem rede; lê o Turtle, os textos e a amostra rotulada; grava `output/corpus_body_*`. |
 | `python -m semantic_harvester.navigation_prototype` | Sem rede; lê `output/corpus_articles.ttl` e `queries/`; regenera `output/prototipo/`. |

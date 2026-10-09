@@ -1,33 +1,21 @@
-"""Variante (c′) — corpo do artigo delimitado por âncoras literais.
+"""Variante (c′) — avaliação do corpo do artigo contra D e B.
 
-Nova tentativa, a comparar com as variantes (a) e (b) do Caminho D e com a
-deteção do Caminho B; não altera as saídas fechadas de D nem de B
-(`docs/experiments.md`, "Variante (c′)").
-
-- **Início:** o título do artigo dentro do texto, a seguir ao título da
-  página (páginas normais: o que vem antes do primeiro " - "; páginas AMP,
-  sem esse sufixo: o que vem antes de " Home ", procurado depois de
-  "Home"). Uma ocorrência do título seguida logo de um marcador é uma
-  listagem do menu e é ignorada.
-- **Fim:** o primeiro dos 13 marcadores de bloco de chrome encontrado depois
-  do início. Comparação sem acentos e sem distinguir o resto da
-  capitalização, mas com limites de palavra e com a **primeira letra
-  maiúscula no texto original**: os cabeçalhos de bloco começam sempre com
-  maiúscula; "os mais recentes rumores", a meio de uma frase, não corta.
-- **Sem início localizável:** corpo vazio, captura "sem corpo" (terceira
-  categoria; não conta como igual nem como diferente).
+A delimitação do corpo está em `article_body.py` (adotada nos Caminhos D e B,
+`docs/experiments.md`). Este módulo compara-a com as variantes anteriores:
+os 60 pares rotulados do Caminho D (pares com captura "sem corpo" à parte)
+e os pares artigo–jogador do Caminho B face à configuração sem chrome
+persistente. Não altera as saídas oficiais de D nem de B.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
-import re
-import unicodedata
 from collections import Counter
-from dataclasses import dataclass, replace
+from dataclasses import replace
 from pathlib import Path
 
+from .article_body import MARKERS, NO_BODY, Body, extract_body  # noqa: F401 (reexportados)
 from .corpus_chrome import errors_by_threshold, load_labelled_pairs, separation
 from .corpus_entities import (
     DEFAULT_CHROME_FRACTION, analyse_article, build_chrome, load_vocabulary,
@@ -35,86 +23,6 @@ from .corpus_entities import (
 from .corpus_redundancy import (
     Capture, describe, jaccard, load_corpus, sensitivity_table, word_set,
 )
-
-MARKERS = (
-    "Mais notícias", "O Record recomenda para si", "Mais Fotos", "Mais Hora Record",
-    "Últimas Notícias", "Mais Recentes", "Mais Vistas", "Mais Comentadas",
-    "Notícias MAIS", "Veja também", "Mais Vídeos", "Enviar artigo por email",
-    "Leia este artigo na íntegra",
-)
-TITLE_WINDOW = 300
-NO_BODY = "sem_corpo"
-
-_SPACES = re.compile(r"\s+")
-
-
-def fold_same_length(text: str) -> str:
-    """Minúsculas e sem acentos, um carácter por carácter (mesmas posições)."""
-
-    return "".join(unicodedata.normalize("NFD", ch)[0].lower() for ch in text)
-
-
-_MARKER_PATTERNS = [
-    re.compile(r"(?<!\w)" + re.escape(fold_same_length(m)) + r"(?!\w)") for m in MARKERS
-]
-
-
-def find_marker(text: str, folded: str, start: int) -> tuple[int, str] | None:
-    """Primeiro marcador a partir de `start` cuja primeira letra é maiúscula no original."""
-
-    best: tuple[int, str] | None = None
-    for marker, pattern in zip(MARKERS, _MARKER_PATTERNS):
-        for hit in pattern.finditer(folded, start):
-            if text[hit.start()].isupper():
-                if best is None or hit.start() < best[0]:
-                    best = (hit.start(), marker)
-                break
-    return best
-
-
-@dataclass(frozen=True)
-class Body:
-    text: str
-    found: bool
-    end_marker: str | None
-
-
-def page_title(text: str) -> tuple[str, int] | None:
-    """(título, posição a partir da qual procurar o corpo), ou None."""
-
-    head = text[:TITLE_WINDOW]
-    dash, home = head.find(" - "), head.find(" Home ")
-    if dash > 0 and (home < 0 or dash < home):
-        return text[:dash].strip(), 1
-    if home > 0:
-        return text[:home].strip(), home + len(" Home ")
-    return None
-
-
-def extract_body(raw: str) -> Body:
-    text = unicodedata.normalize("NFC", _SPACES.sub(" ", raw)).strip()
-    folded = fold_same_length(text)
-    located = page_title(text)
-    if located is None or not located[0]:
-        return Body("", False, None)
-    title, search_from = located
-    title_folded = fold_same_length(title)
-    start = None
-    position = folded.find(title_folded, search_from)
-    while position >= 0:
-        after = position + len(title_folded)
-        following = find_marker(text, folded, after)
-        # Título seguido logo de um marcador: listagem do menu, não o artigo.
-        if following is None or folded[after:following[0]].strip():
-            start = position
-            break
-        position = folded.find(title_folded, after)
-    if start is None:
-        return Body("", False, None)
-    end = find_marker(text, folded, start + len(title_folded))
-    stop = end[0] if end else len(text)
-    return Body(text[start:stop].strip(), True, end[1] if end else None)
-
 
 # --- Avaliação contra o Caminho D --------------------------------------------
 

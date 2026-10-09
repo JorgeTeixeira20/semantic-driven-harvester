@@ -322,16 +322,18 @@ Sem rede e sem alterar o grafo nem o raw: lê `output/corpus_articles.ttl` e os
 textos referenciados em `data/raw/texts/`.
 
 ```bash
-python -m semantic_harvester.corpus_redundancy               # limiar pendente de calibração
-python -m semantic_harvester.corpus_redundancy --limiar 0.9  # só depois da rotulagem manual
+python -m semantic_harvester.corpus_redundancy --limiar 0.90                    # resultado oficial (corpo, variante c′)
+python -m semantic_harvester.corpus_redundancy --limiar 0.80 --texto completo   # variante (a), histórica
 ```
 
 Escreve `output/corpus_redundancy.csv` (uma linha por captura: camada,
 representante, similaridade, rótulo), `output/corpus_redundancy_summary.md`
 (contagens por camada, distribuição e tabela de sensibilidade ao limiar) e
 `output/corpus_redundancy_label_sample.csv` (amostra de pares para rotulagem
-manual). Sem `--limiar`, a Camada 1 fica `pendente_limiar`. Desenho e decisões
-em `docs/experiments.md`.
+manual, nunca reescrita depois de rotulada). Por omissão a similaridade usa só
+o corpo do artigo (`--texto corpo`, variante c′, `article_body.py`); as
+capturas sem corpo ficam numa camada própria (`sem_corpo`). Sem `--limiar`, a
+Camada 1 fica `pendente_limiar`. Desenho e decisões em `docs/experiments.md`.
 
 ### Variante (b): remoção do chrome
 
@@ -349,13 +351,15 @@ rotulados. Escreve `output/corpus_chrome_summary.md` e
 ## Caminho B — temas e entidades mencionadas
 
 ```bash
-python -m semantic_harvester.corpus_entities --vocabulario CAMINHO.csv [--fracao-chrome 0.10 | --sem-remocao-chrome]
+python -m semantic_harvester.corpus_entities --vocabulario CAMINHO.csv [--texto corpo|sem-chrome|completo]
 ```
 
 Sem rede e sem alterar grafo nem raw. Temas a partir do `originalURL`
 (secção, modalidade, competição, clube) e entidades por correspondência exata
-de um vocabulário fechado (CSV `tipo,categoria,rotulo,variantes`) no texto sem o
-chrome persistente, com regra de persistência entre capturas. Escreve
+de um vocabulário fechado (CSV `tipo,categoria,rotulo,variantes`) só no corpo
+do artigo (`--texto corpo`, por omissão; `sem-chrome` é a configuração
+histórica com remoção de n-gramas frequentes), com regra de persistência
+entre capturas. Escreve
 `output/corpus_entities.csv` e `output/corpus_entities_summary.md`.
 
 O vocabulário de jogadores (plantéis da Primeira Liga 2015–2020, Wikidata) é
