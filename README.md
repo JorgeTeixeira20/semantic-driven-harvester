@@ -395,3 +395,19 @@ captura entre o título do artigo e o primeiro de 13 marcadores de bloco de
 chrome, e compara com os 60 pares rotulados (D) e, com `--vocabulario`, os
 pares artigo–jogador (B). Escreve `output/corpus_body_summary.md`,
 `output/corpus_body_label_eval.csv` e `output/corpus_body_entities.csv`.
+
+## RDF dos Caminhos D e B
+
+```bash
+python -m semantic_harvester.corpus_redundancy_rdf   # output/corpus_redundancy.ttl
+python -m semantic_harvester.corpus_entities_rdf     # output/corpus_entities.ttl
+```
+
+Sem rede. Leem os CSV oficiais (`output/corpus_redundancy.csv`,
+`output/corpus_entities.csv`) e o vocabulário da Wikidata, e escrevem Turtle
+separado de `output/corpus_articles.ttl` (não alterado; checksum verificado),
+com os mesmos URIs de `Artigo` e `CapturaArquivada`: carregar os três ficheiros
+juntos dá o grafo completo. Termos novos da ontologia: `sdh:versaoDe`,
+`sdh:similaridade`, `sdh:Mencao`, `sdh:temMencao`, `sdh:sobreEntidade`,
+`sdh:capturasComMencao`, `sdh:capturasComTexto`, `sdh:ocorrencias`,
+`sdh:persistente`, `sdh:clubeCoerente`, `sdh:categoriaTema`, `sdh:valorTema`.

@@ -123,3 +123,81 @@ sdh:filePath a owl:DatatypeProperty ;
     rdfs:label "caminho do ficheiro"@pt ;
     rdfs:domain sdh:TextoExtraido ;
     rdfs:range xsd:string .
+
+# --- Caminho D: redundância entre capturas (variante c′, limiar 0,900) ---
+
+sdh:versaoDe a owl:ObjectProperty ;
+    rdfs:label "versão de"@pt ;
+    rdfs:comment "Liga uma CapturaArquivada redundante à CapturaArquivada que a representa, dentro da Camada 1 (capturas com corpo delimitado e statusCode 200). A captura representante NÃO recebe este triplo — não há nada anterior para apontar. Capturas sem corpo (sem_corpo) e a Camada 2 (sem texto) também não recebem este triplo, por não terem comparação nem representante calculados."@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range sdh:CapturaArquivada .
+
+sdh:similaridade a owl:DatatypeProperty ;
+    rdfs:label "similaridade"@pt ;
+    rdfs:comment "Jaccard de palavras do corpo do artigo (variante c′, article_body.py) entre esta captura e a sua representante (sdh:versaoDe). Só existe nas capturas redundantes; a representante não tem este triplo, pela mesma razão que não tem sdh:versaoDe."@pt ;
+    rdfs:domain sdh:CapturaArquivada ;
+    rdfs:range xsd:float .
+    # xsd:float, não xsd:decimal: é um rácio de Jaccard calculado em vírgula
+    # flutuante (ex.: 0.715241), não um valor decimal exato como dinheiro.
+
+# --- Caminho B: nuance das menções de entidade ---
+
+sdh:Mencao a owl:Class ;
+    rdfs:label "Menção"@pt ;
+    rdfs:comment "Uma menção concreta de uma EntidadeMencionada num Artigo específico, com as métricas de confiança calculadas sobre as capturas desse artigo (variante c′: só capturas com corpo, Camada 1, contam para estas métricas)."@pt .
+
+sdh:temMencao a owl:ObjectProperty ;
+    rdfs:label "tem menção"@pt ;
+    rdfs:comment "Liga um Artigo a cada Menção que tem — uma Menção por cada EntidadeMencionada detetada no seu texto."@pt ;
+    rdfs:domain sdh:Artigo ;
+    rdfs:range sdh:Mencao .
+
+sdh:sobreEntidade a owl:ObjectProperty ;
+    rdfs:label "sobre entidade"@pt ;
+    rdfs:comment "Liga uma Menção à EntidadeMencionada de que trata."@pt ;
+    rdfs:domain sdh:Mencao ;
+    rdfs:range sdh:EntidadeMencionada .
+
+sdh:capturasComMencao a owl:DatatypeProperty ;
+    rdfs:label "capturas com menção"@pt ;
+    rdfs:comment "Nº de capturas do artigo (com corpo, Camada 1) em que esta entidade foi detetada no texto. Corresponde à coluna capturas_com_mencao de corpus_entities.csv."@pt ;
+    rdfs:domain sdh:Mencao ;
+    rdfs:range xsd:nonNegativeInteger .
+
+sdh:capturasComTexto a owl:DatatypeProperty ;
+    rdfs:label "capturas com texto"@pt ;
+    rdfs:comment "Nº total de capturas do artigo com corpo (Camada 1) sobre as quais esta deteção foi avaliada; denominador da regra de persistência. Corresponde à coluna capturas_com_texto de corpus_entities.csv (sob a variante c′, o denominador real é 'capturas com corpo', não só 'com texto' — o nome da propriedade mantém-se igual ao da coluna do CSV por continuidade)."@pt ;
+    rdfs:domain sdh:Mencao ;
+    rdfs:range xsd:nonNegativeInteger .
+
+sdh:ocorrencias a owl:DatatypeProperty ;
+    rdfs:label "ocorrências"@pt ;
+    rdfs:comment "Nº total de vezes que o termo foi encontrado no corpo, somado por todas as capturas do artigo (contagem de correspondências de texto, não de capturas). Corresponde à coluna ocorrencias de corpus_entities.csv."@pt ;
+    rdfs:domain sdh:Mencao ;
+    rdfs:range xsd:nonNegativeInteger .
+
+sdh:persistente a owl:DatatypeProperty ;
+    rdfs:label "persistente"@pt ;
+    rdfs:comment "true se capturasComMencao == capturasComTexto (a entidade aparece em todas as capturas com corpo do artigo — regra de persistência); false caso contrário (regra fraca, só ≥ 1 captura). Corresponde à coluna persistente de corpus_entities.csv."@pt ;
+    rdfs:domain sdh:Mencao ;
+    rdfs:range xsd:boolean .
+
+sdh:clubeCoerente a owl:DatatypeProperty ;
+    rdfs:label "clube coerente"@pt ;
+    rdfs:comment "Sinal, não filtro: 'sim' se um clube da entidade no vocabulário coincide com o tema clube do URL do artigo; 'nao' se não coincide (possível falso positivo); 'sem_tema' se o artigo não tem tema de clube no URL. Corresponde à coluna clube_coerente de corpus_entities.csv; valores possíveis são exatamente estes três literais."@pt ;
+    rdfs:domain sdh:Mencao ;
+    rdfs:range xsd:string .
+
+# --- Literais do nó Tema (para não ficar opaco) ---
+
+sdh:categoriaTema a owl:DatatypeProperty ;
+    rdfs:label "categoria do tema"@pt ;
+    rdfs:comment "A categoria do Tema: 'secao', 'modalidade', 'competicao' ou 'clube' — os mesmos valores já usados na coluna categoria de corpus_entities.csv para linhas tipo=tema."@pt ;
+    rdfs:domain sdh:Tema ;
+    rdfs:range xsd:string .
+
+sdh:valorTema a owl:DatatypeProperty ;
+    rdfs:label "valor do tema"@pt ;
+    rdfs:comment "O valor do Tema dentro da categoria, ex.: 'benfica' para categoria 'clube'. Corresponde à coluna rotulo de corpus_entities.csv para linhas tipo=tema."@pt ;
+    rdfs:domain sdh:Tema ;
+    rdfs:range xsd:string .

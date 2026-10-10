@@ -53,6 +53,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
 - `article_body.py`: corpo do artigo entre o título e 14 marcadores literais
   de chrome (variante c′, adotada em D e B); sem dependências.
 - `corpus_body.py`: avaliação da variante (c′) contra D e B, sem rede.
+- `corpus_redundancy_rdf.py`, `corpus_entities_rdf.py`: RDF dos Caminhos D e
+  B a partir dos CSV oficiais, em Turtle separado do grafo do corpus (que não
+  alteram); sem rede.
 - `navigation_prototype.py`: protótipo de navegação — corre `queries/*.rq`
   (SPARQL, `rdflib`) sobre o Turtle do corpus e gera HTML estático em
   `output/prototipo/`; sem rede nem servidor.
@@ -101,6 +104,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_entities --vocabulario CSV [--texto corpo\|sem-chrome\|completo]` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.wikidata_vocabulary` | Rede (28 pedidos SPARQL à Wikidata); grava raw em `data/raw/wikidata/` e `data/processed/caminho_b_vocabulario_wikidata.csv`. |
 | `python -m semantic_harvester.corpus_body [--vocabulario CSV]` | Sem rede; lê o Turtle, os textos e a amostra rotulada; grava `output/corpus_body_*`. |
+| `python -m semantic_harvester.corpus_redundancy_rdf` / `corpus_entities_rdf` | Sem rede; leem os CSV oficiais de D/B (e o vocabulário); gravam `output/corpus_redundancy.ttl` / `output/corpus_entities.ttl`; não alteram `corpus_articles.ttl`. |
 | `python -m semantic_harvester.navigation_prototype` | Sem rede; lê `output/corpus_articles.ttl` e `queries/`; regenera `output/prototipo/`. |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
