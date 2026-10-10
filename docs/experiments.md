@@ -2695,6 +2695,98 @@ a homonímia, adiada por decisão dos autores, continua.
   como histórico; `output/corpus_chrome_*` continua a descrever o corpus de
   127 artigos (variante b, não regenerada).
 
+## RDF dos Caminhos D e B (2026-10-10)
+
+**Objetivo.** Passar a RDF o que até aqui só existia em CSV: a anotação de
+redundância do Caminho D (`output/corpus_redundancy.csv`, variante c′,
+limiar 0,90) e os temas e entidades do Caminho B
+(`output/corpus_entities.csv`, variante c′). Desenho decidido pelo autor;
+implementado em `src/semantic_harvester/corpus_redundancy_rdf.py` e
+`corpus_entities_rdf.py`, sem pedidos à API.
+
+**Ontologia** (`ontology/semantic_harvester.ttl`, acrescentados sem remover
+nada, com `rdfs:label`/`rdfs:comment` em português):
+`sdh:versaoDe` (CapturaArquivada → CapturaArquivada) e `sdh:similaridade`
+(`xsd:float`, rácio de Jaccard calculado em vírgula flutuante) para o D;
+`sdh:Mencao`, `sdh:temMencao` (Artigo → Mencao), `sdh:sobreEntidade` (Mencao
+→ EntidadeMencionada), `sdh:capturasComMencao`, `sdh:capturasComTexto`,
+`sdh:ocorrencias` (`xsd:nonNegativeInteger`), `sdh:persistente`
+(`xsd:boolean`) e `sdh:clubeCoerente` (`xsd:string`: "sim", "nao",
+"sem_tema") para o B; `sdh:categoriaTema` e `sdh:valorTema` para o Tema.
+`sdh:mencionaEntidade` e `sdh:temTema` mantêm-se e são usados em paralelo com
+`Mencao` (relação n-ária: o triplo direto responde a perguntas de um salto;
+a `Mencao` guarda as métricas). Não há nó intermédio para o Tema (as linhas
+de tema não têm colunas quantitativas) nem propriedade `uma_so_captura`
+(derivável de `capturasComTexto = 1`). `capturasComTexto` mantém o nome da
+coluna do CSV, embora sob a variante c′ o denominador seja "capturas com
+corpo".
+
+**Identidade dos nós.**
+
+- `Artigo` e `CapturaArquivada`: os mesmos URIs de `corpus_articles.ttl`
+  (`rdf_mapper.article_uri`/`capture_uri`, chave `originalURL` e
+  `(originalURL, tstamp)`), por isso os três Turtle se combinam sem
+  conversão.
+- `EntidadeMencionada`: um nó por entidade, partilhado entre artigos. Rótulo
+  com um só QID no vocabulário (`homonimos == 1`) → **URI da Wikidata**
+  (`http://www.wikidata.org/entity/<QID>`), reutilizando a identidade
+  externa. Rótulo de homónimos (`homonimos > 1`) → `sdh:entity/<sha256(rotulo)>`:
+  a deteção por vocabulário fechado não distingue qual das pessoas é
+  mencionada, por isso não se atribui um QID sem fundamento. Também não se
+  desambigua por clube: a coluna `clubes` do vocabulário já vem fundida entre
+  as pessoas homónimas.
+- `Tema`: um nó por (categoria, valor), partilhado entre artigos
+  (`sdh:tema/<sha256(categoria|valor)>`), com `categoriaTema`, `valorTema` e
+  `rdfs:label` "categoria: valor". **Decisão tomada nesta implementação, não
+  discutida antes com o autor** (consistente com a das entidades: permite
+  perguntar "todos os artigos deste tema"); fica sinalizada para revisão.
+- `Mencao`: uma por par artigo–entidade (`sdh:mencao/<sha256(artigo|rotulo)>`).
+- Toda a `EntidadeMencionada` e todo o `Tema` têm `rdfs:label`.
+
+**Camada 2 e capturas sem corpo: sem triplos.** No D só as capturas
+redundantes da Camada 1 recebem triplos. As representantes não recebem
+nenhum (não há nada anterior para apontar); as capturas `sem_corpo` e as da
+Camada 2 também não, porque não têm comparação nem representante
+calculados. O critério da Camada 2 (`digest` + `contentLength`) continua
+reconstituível por SPARQL a partir de `sdh:digest`/`sdh:contentLength`, já
+no grafo desde o M2/M3; representá-lo ao lado da redundância confirmada
+esbateria a distinção entre "confirmado" e "nunca verificado".
+
+**Salvaguardas** (acrescentadas na implementação): cada execução verifica
+por checksum que `output/corpus_articles.ttl` não muda; artigos ou capturas
+referidos que não existam nesse grafo, linhas da Camada 1 com limiar
+diferente de 0,9 e entidades ausentes do vocabulário fazem a execução falhar
+em vez de gerar RDF inconsistente. Testes: `tests/test_corpus_annotations_rdf.py`
+(4), incluindo a verificação de que todos os predicados usados estão
+declarados na ontologia.
+
+**Resultado real** (`output/corpus_redundancy_rdf_summary.md`,
+`output/corpus_entities_rdf_summary.md`):
+
+| Ficheiro | Triplos | Conteúdo |
+| --- | ---: | --- |
+| `output/corpus_redundancy.ttl` | 1 284 | 642 capturas redundantes × (`versaoDe` + `similaridade`); 133 representantes, 18 `sem_corpo`, 144 da Camada 2 e 4 não avaliáveis sem triplos |
+| `output/corpus_entities.ttl` | 1 703 | 40 nós `Tema` (308 linhas de tema, nos 125 artigos); 82 nós `EntidadeMencionada` (81 com URI da Wikidata, 1 próprio); 119 nós `Mencao` em 60 artigos |
+
+`corpus_articles.ttl` ficou inalterado (13 482 triplos). Os três ficheiros
+combinados dão **16 469 triplos**; todos os sujeitos e objetos de `versaoDe`
+e todos os artigos com `temTema`/`temMencao` existem no grafo do corpus.
+Exemplo de consulta sobre o grafo combinado (entidades com menção
+persistente no maior número de artigos): João Félix 6, Bruno Fernandes 5,
+Pepe 5, Marvin Zeegelaar 4, Bas Dost 3.
+
+**Exceção dos homónimos, com a contagem real.** O vocabulário tem 3 rótulos
+homónimos ("André Silva", "Chico", "Pedro Mendes", 2 QIDs cada) — é uma
+propriedade do vocabulário, não do corpus. No `corpus_entities.csv` atual
+(c′) só "Pedro Mendes" ocorre, numa linha: o artigo
+`…/desporto-universitario/detalhe/AMP/universidade-do-porto-vence-no-xadrez.html`.
+Pelo tema (xadrez universitário), é plausível que não se trate de nenhum dos
+dois futebolistas do vocabulário — o tipo de caso em que o URI próprio, em
+vez de um QID, evita uma afirmação sem fundamento. Não foi verificado.
+"André Silva" e "Chico" deixaram de ocorrer quando a deteção passou a
+procurar só no corpo do artigo (na versão anterior, sem chrome persistente,
+os três somavam 19 linhas).
+
 ## Retentativa dos textos por timeout ou ligação cortada (script e proposta de integração)
 
 **Estado em 2026-09-20: script escrito e testado em 2026-09-19 e executado pelo

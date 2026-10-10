@@ -71,7 +71,7 @@ def run(project_root: Path | None = None) -> tuple[Graph, Counter]:
     with (output / "corpus_redundancy.csv").open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
     graph, stats = build_graph(rows, captures_in_graph)
-    graph.serialize(destination=output / "corpus_redundancy.ttl", format="turtle")
+    (output / "corpus_redundancy.ttl").write_text(graph.serialize(format="turtle").rstrip("\n") + "\n", encoding="utf-8")
     stats["triplos"] = len(graph)
 
     if file_sha256(articles_ttl) != before:

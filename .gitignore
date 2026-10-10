@@ -62,6 +62,10 @@ output/*
 !output/corpus_body_summary.md
 !output/corpus_body_label_eval.csv
 !output/corpus_body_entities.csv
+!output/corpus_redundancy.ttl
+!output/corpus_redundancy_rdf_summary.md
+!output/corpus_entities.ttl
+!output/corpus_entities_rdf_summary.md
 data/processed/corpus_articles_triples.nt.pre-rebuild
 
 # Metadados do Finder (macOS)

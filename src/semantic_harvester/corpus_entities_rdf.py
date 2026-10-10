@@ -126,7 +126,7 @@ def run(project_root: Path | None = None) -> tuple[Graph, Counter, list[str]]:
     with (output / "corpus_entities.csv").open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
     graph, stats, homonym_rows = build_graph(rows, vocabulary, articles_in_graph)
-    graph.serialize(destination=output / "corpus_entities.ttl", format="turtle")
+    (output / "corpus_entities.ttl").write_text(graph.serialize(format="turtle").rstrip("\n") + "\n", encoding="utf-8")
 
     if file_sha256(articles_ttl) != before:
         raise RuntimeError("output/corpus_articles.ttl foi alterado durante a execução")

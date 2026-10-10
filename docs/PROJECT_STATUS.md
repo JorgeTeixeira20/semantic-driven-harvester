@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-10-09** (adoção da variante c′ em D e B), a partir do código, testes,
+Atualizado em **2026-10-10** (RDF dos Caminhos D e B), a partir do código, testes,
 documentação e histórico; a última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
@@ -136,7 +136,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 174 testes em doze módulos de `tests/`.
+pacote conforme o README. Existem 178 testes em treze módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -163,7 +163,7 @@ em bruto, com sessão simulada) e o protótipo de navegação
 ordem e filtro do histórico, ligações entre páginas e escape de títulos).
 
 Última validação em **2026-10-02**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **174 testes, todos
+`.venv/bin/python -m unittest discover -s tests` — **178 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
 3.13.1 no Windows, 68 testes OK.)
 
@@ -411,8 +411,17 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    as frações (0,02–0,50) e n (3, 5, 8) testados: o que distingue capturas do
    mesmo artigo é chrome rotativo (manchetes do dia), raro entre artigos. A
    amostra rotulada cobre só 34 artigos (um vídeo com 11 dos 60 pares), o que
-   limita a generalização. Por implementar: a representação em RDF da
-   anotação. Detalhe em `experiments.md`.
+   limita a generalização. Detalhe em `experiments.md`.
+
+   **Representação em RDF, 2026-10-10** (`corpus_redundancy_rdf.py`,
+   `output/corpus_redundancy.ttl`, separado de `corpus_articles.ttl`, que não
+   muda): a partir do CSV oficial (c′, limiar 0,90), **642 capturas
+   redundantes** recebem `sdh:versaoDe` (para a representante) e
+   `sdh:similaridade` (`xsd:float`) — **1 284 triplos**. As 133
+   representantes, as 18 capturas `sem_corpo`, as 144 da Camada 2 e as 4 não
+   avaliáveis não recebem triplos (sem comparação nem representante
+   calculados; a Camada 2 é reconstituível por SPARQL a partir de
+   `sdh:digest`/`sdh:contentLength`, já no grafo).
 4. **B** — **O Caminho B foi concluído em 2026-10-03 e revisto em
    2026-10-09:** desde então o resultado reportado procura os jogadores só no
    corpo do artigo (variante c′): 113 pares artigo–jogador em 58 artigos pela
@@ -460,8 +469,20 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    pela regra fraca 189 `sim`, 333 `nao`, 902 `sem_tema`; pela persistência 82
    `sim`, 41 `nao`, 168 `sem_tema` (após a correção de 2026-10-04: fraca 189 /
    333 / 905, persistência 82 / 41 / 164). Só 50 artigos têm clube no URL, por isso os
-   dois casos investigados ficam `sem_tema`. Por fazer: representação em RDF
-   (`temTema`/`mencionaEntidade`).
+   dois casos investigados ficam `sem_tema`.
+
+   **Representação em RDF, 2026-10-10** (`corpus_entities_rdf.py`,
+   `output/corpus_entities.ttl`, separado de `corpus_articles.ttl`, que não
+   muda), a partir do CSV oficial (c′): **1 703 triplos**; **40 nós `Tema`**
+   partilhados por (categoria, valor), ligados por `sdh:temTema` aos 125
+   artigos (308 linhas de tema); **82 nós `EntidadeMencionada`** partilhados
+   por entidade, 81 com o URI da Wikidata e 1 com URI próprio (homónimo);
+   **119 nós `Mencao`** (`sdh:temMencao`/`sdh:sobreEntidade`, com as
+   métricas do CSV) em 60 artigos, em paralelo com `sdh:mencionaEntidade`.
+   Homónimos do vocabulário: 3 rótulos (André Silva, Chico, Pedro Mendes);
+   no corpus atual só "Pedro Mendes" ocorre, 1 linha. Os três Turtle (corpus,
+   D, B) combinados dão 16 469 triplos com URIs comuns. Detalhe em
+   `experiments.md` ("RDF dos Caminhos D e B").
 5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
    **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
    construída cedo (não deixada para o fim) para reduzir o risco de ficar sem

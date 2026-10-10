@@ -1,0 +1,2073 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdh: <urn:semantic-driven-harvester:prototype:> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:semantic-driven-harvester:prototype:article/0392f9aa444cbd33e0577ee31367c1139ee72053ca34af8eca3213a1d380db06> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/0b3e73421b36d86b168185dc5ea9c16c0606df17935364463e66ad2ade30b001> sdh:mencionaEntidade wd:Q376394 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/c86dcabf0dccd88647714e5a63c6f0c2dc1aed32764c277d11b2bfe5f00b9694> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/602c04a7b4447c2bf68c391c33b4f35fe16351cd4ceb85d68b9dbafd1a1599ba> .
+
+<urn:semantic-driven-harvester:prototype:article/106e4a38dd41578c9e34290816f7ac9a97e4cdb98108a7c7b172eaeec76549fd> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/11651355f01cab5a67304e82044905c70ec634ce38e7646a6994954e0c4c7b8f> sdh:mencionaEntidade wd:Q628601 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/ab0bca86a267083a0b7ce14b7216635ae95096bddd07ac9253da8f8750cec7fe> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/2ba7a8118ed4f82898bf7dda8acd5d49a4c539fd5b2404c255738569ddc6c20e> .
+
+<urn:semantic-driven-harvester:prototype:article/18f3959bbddd812641f21fe9ced0eb08f6dcc324af563dcfade76374592676d8> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/1b4bdc7521dfdbbecaeb882ce3576854700627033765de14b491cdab2a6f9c23> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/cb401b334b2b27903d90be77a754082b6ff79894339e120537a0d54633261ac1> .
+
+<urn:semantic-driven-harvester:prototype:article/1f1ff0b2b68d5a1ff7206fa8b33eceaf05044325f9888666a19acec4a2c109fd> sdh:mencionaEntidade wd:Q27049064 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/bb6c9da8c8a466328a7ba85eb83dfa89cd5d80979e20d6bb67b43f958418882e> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/20accedc7dd8ff70f8075ceabd243f4110c97af3f976e08e17e30d79583cc6ac> sdh:mencionaEntidade wd:Q10515115,
+        wd:Q10553667,
+        wd:Q16221981,
+        wd:Q18062120,
+        wd:Q20641302,
+        wd:Q273776,
+        wd:Q5448543,
+        wd:Q5511336,
+        wd:Q641425,
+        wd:Q7196514 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/05556f190c0f1edf29cf9b61831ac86d6753f55ad8c14199f92e4ae8a71f5a7b>,
+        <urn:semantic-driven-harvester:prototype:mencao/0e5e89f89f462b1a8abfa75f4fdc73c0aa6773738512e5a2cb664f1a6dec8eb0>,
+        <urn:semantic-driven-harvester:prototype:mencao/1a43a9d048afe1b48653824528af50289b30fe53c877f7535de55663cce6f602>,
+        <urn:semantic-driven-harvester:prototype:mencao/1b061048b6e6f52ae3c53da4d2c1b98f35ad9bc7c99eb39e2c6209aae1aa566a>,
+        <urn:semantic-driven-harvester:prototype:mencao/3579a032ddf9387ac360356c604aef52ad45a0f5686c2df63077095e1d523f49>,
+        <urn:semantic-driven-harvester:prototype:mencao/44304fb0125029d369af5b0957231e59cd7804d3e4c68ec7537a7c8a8b95d383>,
+        <urn:semantic-driven-harvester:prototype:mencao/6cb9ebddd3eeff869d1e656714863c2bda08621b3909d147c5f4b78bd12f43a4>,
+        <urn:semantic-driven-harvester:prototype:mencao/950039d7b79faf7f069c35dff82626ee7836cea7a87f84f6ddefc36ed267f132>,
+        <urn:semantic-driven-harvester:prototype:mencao/d5888ae662391f7cdfe384bc0919569f97093ea5c9a1344f006273c64e0b47c7>,
+        <urn:semantic-driven-harvester:prototype:mencao/e69a29a485496c40e7f728e0b74d3d6e37b90ce9c99006c79b4ec8d320264048> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/608d660bea3262a2456e9226d24e3364376696da26a53428d2542d9db71dd4ea>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/21266b924f9d8e25cade2ec5dbb0f17384e8b7dfdc7545bb80193d188d2d810f> sdh:mencionaEntidade wd:Q15831095,
+        wd:Q1988686,
+        wd:Q4760001,
+        wd:Q4979316 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/10a8f8a74fc3f5e80920eb90b103117b3f0ef4c52a01abe4a75c8c405d81a170>,
+        <urn:semantic-driven-harvester:prototype:mencao/23a44767596d81056784c450230cfb04ed70fd11d143020c493d8a14cdaf7d30>,
+        <urn:semantic-driven-harvester:prototype:mencao/3fb124046ea2deee75bf1cee55f86fa1f6a9b09a6389950c8d488d5d2dce14ee>,
+        <urn:semantic-driven-harvester:prototype:mencao/db2965c89971dfaddea2465a5d7b74717d728b18912f049bb9702bd73d246e84> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/23846c39748e2b0474c3673fa902f5751ba349e30271db2628edebcb5bee3d53> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/2445e8cdf2850c8812eeaedaca455d288853b488f520b3569bed7c169972b4c3> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/40cc4d15bc95e6ec2ec68e945fec7e7509c2054dedb366ab99977fdd4c0cef15> .
+
+<urn:semantic-driven-harvester:prototype:article/26c5060e438a1b196288a723bc0d312eb3b0f407c5761913e8dcee3d4b925da2> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/c1ba74bc9f46ff966c036ce70689213567e907135b1d2d0c9c2beb100b32a63b>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/292b1c0475a1f726bef6af245510eb0d6c7194cef0b22ae2f670541e55fc32ab> sdh:mencionaEntidade wd:Q15521306 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/6b65e58cb034b7ad745e2441a5c6d571848319de9e692d747042f28ce56628d0> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
+        <urn:semantic-driven-harvester:prototype:tema/9595d81dfca9a4a13822efd73208e1a7be55979bc10a536d898790f8ca1c94c2> .
+
+<urn:semantic-driven-harvester:prototype:article/2ee25eca7bf906469323ee092f0800b88d4eebb39a8c5875aeb0c5d865692c39> sdh:mencionaEntidade wd:Q616664,
+        wd:Q7155313 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/d49cf98ba43775f6bf0ea381e01e70007f12877519ebee5abab2305223668dd1>,
+        <urn:semantic-driven-harvester:prototype:mencao/fa2713e2a3d6e938521687362f2b4fccf936324a5f1e1b76122b9d89d08600a7> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/cb401b334b2b27903d90be77a754082b6ff79894339e120537a0d54633261ac1> .
+
+<urn:semantic-driven-harvester:prototype:article/300a30d37d99b6822c6917fd1d88ef073cfd9ff4857e32e0e29b6c8616038de3> sdh:mencionaEntidade wd:Q16729477 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/b7f53ee32e779e0f7aa3c90247a68ee26fe43d0063827143f17141c71674c53d> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/3059002c100a7bf4328bb75f0ae5642d347f6b9f6b93421b7d752fbcb670c596> sdh:mencionaEntidade wd:Q273776 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/5c35349729c8525e4addb4e8785eccd15f7560d6d4cafe858ff8ab281d7bbf69> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/3a1ec9cdfcb4efa849d2de83ab2f559c03cf413d3c00511ebf365946877bd0be>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/334c91e33971c03aa150744d08d270de72f601f357046021d07a36377ce24303> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/91c2157f4b4a7e6150d41b39a8e2ef291cfa66ce7333857aaa650c2db34d2081> .
+
+<urn:semantic-driven-harvester:prototype:article/3446ae82bf55c27e64ed37a7774d6582189783eb20fe91e65861be1cf31f51e7> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/34d1433953d8e63ad02950144671bec7823d59375b58bcd3a9de17d4a0ecc4f5> sdh:mencionaEntidade wd:Q922118 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/7d693af2d6a9b9eb1cf3e6af33e3e80a86ee76805ad6fa69acb16986ff2ecad8> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/3655fec2ab3ec344296d3bb5152ae9bb4cd8b61594866191ed50a8ba32c25e29> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/9a8c0c55dfd15b5151f5201d7f3a34e213f15f3da9c95bdad2f9d41c55f83f0a> .
+
+<urn:semantic-driven-harvester:prototype:article/3676d066e07de983f3e0261770e526abc6ff7aa8538cd3146417c9757ed4e9d0> sdh:mencionaEntidade wd:Q312507 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/3b25e3f30a0da649011a85a2eef8352c56332913febef5ffe3f7055190926bc4> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/fccf093940b90410b2a3615f4bac5827f5acd581dc18a58b65c0e1821d4e88e8> .
+
+<urn:semantic-driven-harvester:prototype:article/3b2487a4d3321dd4f35ee48fd26ab240d7915b0722c0e5596bf5bb2c66687b83> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/3cd6ff6fc752615ce96aeb3e134e996ab4f732b190691ea4f2dbba0066a95886> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/1f8ebece18af0e15515891a310997f72198497e7be1218f5a341a94e0dece743> .
+
+<urn:semantic-driven-harvester:prototype:article/3cfdcb99e43eebd7d8d2b4e4e91cff10ea3021d8da6edcf2cc1cb4e475f71000> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/3d7b3e75cc7ca19ef4f442985fa599765867cb6b3508ca656696a19386a6ea9d> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/3fb22968a78da9a62a95ef455c3e5554449aad199827d8402735fb4788619d50> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/3ff67cd7f3ca4887b1a246e83767b6c854ca630cd9453b5fae56791a7b35e0d2> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/1f8ebece18af0e15515891a310997f72198497e7be1218f5a341a94e0dece743> .
+
+<urn:semantic-driven-harvester:prototype:article/41f442036d4cffb670f394b8fe5e0603732410d583e2c8a6e1525e02641c043b> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/449702ff9b0b7578fbaefb64eb361c425c65c18a7cc0be9a77bf39df6aeeb8e9> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/c1ba74bc9f46ff966c036ce70689213567e907135b1d2d0c9c2beb100b32a63b>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/45d0400024e86952ee266049e920feeb5a2e2bf5c7e5479254621c519e607936> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/46e471efe497ee9340b87955a7e5612df0a39320af9b0391e104b54c1c732d8b> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/46ef93ba9168fde6ab7c0f349abbd89b4da9a1bdf1d7ca7894dc3c57d706170c> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/73729e0d10a92ccf677b9ccb5cfc2f9a79d8c18ec269907bf18e308ee3aff539> .
+
+<urn:semantic-driven-harvester:prototype:article/476503eb19ac7d2054e4cbe7c606ffd6ea9bf174c53ea3981c5d4069e5b5a55c> sdh:mencionaEntidade wd:Q1991022 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/87d0dcab5c6099d16b3f3c9fb5e4956d15ebd8f97c99e4fc5191560786b25a30> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/602c04a7b4447c2bf68c391c33b4f35fe16351cd4ceb85d68b9dbafd1a1599ba> .
+
+<urn:semantic-driven-harvester:prototype:article/48d2bef2ee2f7c24e0e9e67447f302ddf068d4a52eb13a0185ef1439e2b23e72> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
+        <urn:semantic-driven-harvester:prototype:tema/9595d81dfca9a4a13822efd73208e1a7be55979bc10a536d898790f8ca1c94c2> .
+
+<urn:semantic-driven-harvester:prototype:article/4a52e76d8d729af19f379177d1cd629f8202c886955856821e85f2d4be0b8498> sdh:mencionaEntidade wd:Q154390 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/9d2bdce751a4d0eb29c5c40792e06dd28c963f541cfbef8c611a388c840f646a> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/3aee6d1337a08b45d77060631a79680afa3806ed299e8c8782d79b03ba81ed46> .
+
+<urn:semantic-driven-harvester:prototype:article/4fb2b4babb5546e6da8043e4206ede8c250a7740c628db2491cbf26b46132a2b> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/4ff1fe1cda37e304f6a4ffef049417396c1a861a3a57d3fe477a772873ef2799> sdh:mencionaEntidade wd:Q922118 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/6656621ffeb79479ea3167e53f123c42fd9ee9e77e90e5dce0475cf9ffd590ab> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/4ffdfdd0b391a07ffd56254d538779ef3cd929aaa193fd41acf7ced571e9e325> sdh:mencionaEntidade wd:Q18394009,
+        wd:Q19282169,
+        wd:Q27049064,
+        wd:Q326476,
+        wd:Q485697,
+        wd:Q6292355,
+        wd:Q6321698,
+        wd:Q65956786,
+        wd:Q7069892 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/1a934920f309e82d4f122ff70efa86d9a30ed15de084bf29182a568273f5df62>,
+        <urn:semantic-driven-harvester:prototype:mencao/3a9695394584009494db9144369351958f3fdf4d2c07e5be1fcdbefc311432b5>,
+        <urn:semantic-driven-harvester:prototype:mencao/46b9551dd2e4156585afd5d20a3783c7c50c986e350cc41cdd56afd8ba9a5978>,
+        <urn:semantic-driven-harvester:prototype:mencao/5068cec67a7eae141069807ff01051a9b745df7b258311a04e7309b05253ed88>,
+        <urn:semantic-driven-harvester:prototype:mencao/675a76b9902ca7c60ab7ee9827ac5bb784434298bb8b58db3858f3b695a5791c>,
+        <urn:semantic-driven-harvester:prototype:mencao/81e9f8f0c17d93fb22a5a135d4342dee820e9dc9ae71cd31ff73053ae9d01a2d>,
+        <urn:semantic-driven-harvester:prototype:mencao/c26c4188c3cea9c415c9270ac989544e4a3e6bda035a8cb00ff0aa06c058d0ea>,
+        <urn:semantic-driven-harvester:prototype:mencao/d665d8847b23b8f9ad360ce1c2dae51506d1f0d3454231a3a927c0029e5ee424>,
+        <urn:semantic-driven-harvester:prototype:mencao/eb6c0967e6e351e49d6ae9e14a337c57c6cc6d526d8fecd7c6fbf68be6cb729a> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/5404e20088b99d2380ad1807456a1b25c9ca9eb28a731cc8298b5b3d1b3021e4> sdh:mencionaEntidade wd:Q7155313 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/d933d90ce3fd5447a54c358ed07fa588c96de7d1b819b298c16a77af969134e0> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/545ec15131084a6fe8032439a8db3f09cdfba6d4787874e8dc1cd35a99a9f075> sdh:mencionaEntidade wd:Q15214940 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/5830fd86e86f735456ecbcdea108ebda2ebe20469539169127467335bdda2641> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/24228a619992d4b9a8111f19050bf35a74d8d37329feadf6ca4f8f2e3fb3d787>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/54d54566984814b04c0f8741c8f2b67600bb23f603566cc601b01f7eb1ccd332> sdh:mencionaEntidade wd:Q1906140,
+        wd:Q5934066 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/1d768854bd1719d51bd511f6a1696680c1cf8b91b31e2fcc99936c2b9a7c379e>,
+        <urn:semantic-driven-harvester:prototype:mencao/f6794f95c188fd7e126bc76f7ab8653f9d929c2a12a36d3f6e20c738ca1249da> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/58084291167d56f6a66e4adce38a5b0fe69a5976973e941f2ee7511f99f5cffe> sdh:mencionaEntidade wd:Q16231680,
+        wd:Q17403192,
+        wd:Q4760071,
+        <urn:semantic-driven-harvester:prototype:entity/d0c9d5ec22565219419de1a1dd11b3ddeee8d99bb42db00282e0b590bc1e6496> ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/65045ce1de7595c6c74300f80126f1159e43a6cc0e71d24d9d367ff8efb4092d>,
+        <urn:semantic-driven-harvester:prototype:mencao/79b10fbc2ef7c1e53501a7704b5670103021be3ba2123ec554a12abf10de3629>,
+        <urn:semantic-driven-harvester:prototype:mencao/9777fa504141fb4322bdac2c0367c5b1b0a03ebca4f598302743b1e64c411ba3>,
+        <urn:semantic-driven-harvester:prototype:mencao/fa36aa8fbd2b61913fd5104a369b36211894b41c29e7424f781aa00ab5a9f4de> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/59f38b3d62dbf8da0dd0f554c31fb23d81340b6e4d9f689deff5799f28e9639d> .
+
+<urn:semantic-driven-harvester:prototype:article/590fdd8081927abdae74687b2d354ca5bf4ba8d81a365776d0f9a6a1b654c004> sdh:mencionaEntidade wd:Q1906140,
+        wd:Q1988686,
+        wd:Q318383 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/d15838d167b8a7f1edf3b3cd55237f1b8fcf2e2e289d4e017a96e4d5a0347342>,
+        <urn:semantic-driven-harvester:prototype:mencao/de14123e2d4fb464bd525ecc3d6e3da8046d45ea18d6b14b6664d99249fea27c>,
+        <urn:semantic-driven-harvester:prototype:mencao/f7f35fac2ce4fa77bfd026b0974d52d98f4b6a4503821b4ca404d59e693c8782> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/5cb278b12aa42ee63dc54b7c9200140ac3c80dbd140a8e6b8e60b1dd1c6576b8> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/5ff0ddd6eae1b6508ede14a843bdf3ebe962092a1dba62451dbad7f55af9d2b8> sdh:mencionaEntidade wd:Q1906140,
+        wd:Q510596 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/5c43f12a4d0571d1064b94c5d9b4b47d3997f8fc107fe4a86e30398f7775d2fb>,
+        <urn:semantic-driven-harvester:prototype:mencao/f062021a76d776313a97d5bc0e5f8363eddb0c45a6c0c89ade23686a4e4359ba> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/609b9be2404e331a8199406809974921663d9b1d658a6524beaffa0ed0e752f0> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/31395661c597434ef8a901ca224c3dcbc4f1064eb70b34f1a0f480a2fd5d0378>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/617469d0a0d12c4828d31bd06c2ad52b68fadaa98c108b6d7c4efe0d801a3ba2> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/40cc4d15bc95e6ec2ec68e945fec7e7509c2054dedb366ab99977fdd4c0cef15> .
+
+<urn:semantic-driven-harvester:prototype:article/61efc86cf09cbad607dad6aeac048460d5f6517b4007e8604c81b80e8d592917> sdh:mencionaEntidade wd:Q20641302 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/052595e8c39b2b9699adce0f7091689386d432faea59a509a1d7342b06e5c82d> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/62d720d9216fdd77e3d9b51726c3ace8daeba0470d428a3b905b9b6e562fc89d> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/64ba9625c82a63042dc8bbaccf23da5d950f8bce1d4822525eb8b2740092e25c> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/2ba7a8118ed4f82898bf7dda8acd5d49a4c539fd5b2404c255738569ddc6c20e> .
+
+<urn:semantic-driven-harvester:prototype:article/67f006bfab7b3b0de5afdf5ec4d83f6ac740fac385d3587106cf9b76aeeee341> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/67f338149ca47573e254d1e691d13306470e24b780268190dd98dde34a72e713> sdh:mencionaEntidade wd:Q17074511,
+        wd:Q210950 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/1daa5efd91baef8d48efc505512ca614595770fb0fca821c02c4c042a385077f>,
+        <urn:semantic-driven-harvester:prototype:mencao/7c9e5a183d11891a02a52366a50a8c950957a6b0c364be03acb0138be04e533d> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/6923eea0edd157a60c2f08774c04896c1806c2ddca09d4272aa58f6d4ef7fe09> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/6c64724045bb232cf5cb259f2a8d53370724e944ebee51de721f315ab64527cb> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/6c6473b54e5c600729c69afdcdd56e6992ee935ad841f139a1eb6abd2e0ffa96> sdh:mencionaEntidade wd:Q16235823,
+        wd:Q1925465,
+        wd:Q672388,
+        wd:Q922118 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/7cafce41950fcb348f9160e5e082a0e07ffe373af669f426c29cf783db69b88d>,
+        <urn:semantic-driven-harvester:prototype:mencao/b4c485f24db69630c97a5252f064128c40db39ed229505cbcee72503e863b436>,
+        <urn:semantic-driven-harvester:prototype:mencao/e2c78ee58ec4ca3cbcec922d41f9088c7ccafcbce2e6bc3b05fca4ba76db367c>,
+        <urn:semantic-driven-harvester:prototype:mencao/e362fe00f9266fe33c71dd791b87183d6bcece2a91a2acc48ef69e7e4d0aeec0> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/6ff3cda7aef750e94c58be6a36666a0d44f60480e7e370eb6c4429e1f4192520> sdh:mencionaEntidade wd:Q2074431 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/0b3cafc8dc51d2b1a3e59d733ef52392a31fbf51198e967ca8df6271cef7f5da> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/707011a9ba79e7d501451b332e33b2d193919dfc0a46450e853bf79dddb917ba> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/025435cf78f8a041b333e687f9daa81e3a0679d6a0d3eb9591fad244c82344d2> .
+
+<urn:semantic-driven-harvester:prototype:article/734f777e83d6429acee144f0616048efa79c9a5205e6b7c1a9a356807f951683> sdh:mencionaEntidade wd:Q12808967 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/1ed21bec756bc3c4eb6c956ca697681074b97baef614902a585967a20a4837e2> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/74b8d4ce02f57848ce9236484ced200bf3dd69a276537137b33e12324ae4ee07> sdh:mencionaEntidade wd:Q17403192 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/78049a31b698add22e02e8693eb5e324a479565643701ab0995ff4f25c2a4307> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/05a97665c7cc6b65725d7b2306f69d82efc84e03eabf22357cf65a38318ed004>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/7672db676a23c89ee203c5c16c1837376c7ada748708a04ae4d3f05c75f864c3> sdh:mencionaEntidade wd:Q5042329 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/4a094db18864b73bdcf9616b094f67476d8d10e3d84f2597b8e3a568e304a2d4> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/784bdb957e560569abd7a36a056dcd9c07e2e5dbf880907017e3e707d3652315> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/24228a619992d4b9a8111f19050bf35a74d8d37329feadf6ca4f8f2e3fb3d787>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/7cd086a1bf4eebbfcb691dcd796f127196b47e3d7a858c4232a99d451e486c5e> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/7dca6c5b40bdf9a38809fbcf378f18b334f3ee29250b6c83307ec1bec0c782bb> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/7f8a3485af6fc0127d80fa7d87c76c056c2d3ad3182ec2ef81057dd597512c75> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b0fbc5b12ffa966b4da4f3404c603fdcee0b668591989130d150d2f8a391d0>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/7feb8f0646dafd35dba6fd9880041bf7c7ad102c86d00daa6bef99b8f114b19c> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/9eedda80b396edb4c7e8530130219a283aa0523d69db1112368bb37c6ad45821> .
+
+<urn:semantic-driven-harvester:prototype:article/8526ad890688e8c37b4d6104fc145e16054bc286017a6586937d8a1d89188dda> sdh:mencionaEntidade wd:Q27049064 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/61aab60b3a9a0de681d9cefc3647f4fdf4c27b69861e5ab61236e1bb17026d58> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/90ab563b8faa328f14444f8760e07629a91d30c01a394db009dfca5e0a7b7a54> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/90b9306d3514c8796c8bfcd83629207605519b796ecc7f09764b2c68845d4104> sdh:mencionaEntidade wd:Q377544,
+        wd:Q4979316 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/113b4c4bcf3516952bbb1256b531288b0dedb5da7be6331238592a4c9e76f1c4>,
+        <urn:semantic-driven-harvester:prototype:mencao/d04202414a92669bbbd0b0d69985e8f37d84c14cc0aa1ca0f971deaebdd6a670> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/95c3c529a394313042c9eb4507a593e61146215fccd61ac3850f0aaf5078599a> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/977f3c8203d831c5231fdf377b1af84ab186c8a1540ede126153732e37b81e15> sdh:mencionaEntidade wd:Q20641302 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/19a6d127bb7a8115f7bcf6ba76c3eff9bca034057a4324283292904af3f991ff> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/98fc975e2f8bdcf26df4ae1f5ce171330794a53182db1fe10f6ce131204abe19> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
+        <urn:semantic-driven-harvester:prototype:tema/9595d81dfca9a4a13822efd73208e1a7be55979bc10a536d898790f8ca1c94c2> .
+
+<urn:semantic-driven-harvester:prototype:article/99f811299bc25610cb83273cd19078c55d04f1453f88a74d5403835cd51b3272> sdh:mencionaEntidade wd:Q18022223 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/d3f2512e8700cdfb9e11bb979119ba3d5037f70dccaccc81548cd59f9e4cd62a> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/9c8fe5c70c1eb6ba6e773fd2bd3469d26b5d03a2134bb3cdab07141e2cf7c919> sdh:mencionaEntidade wd:Q214117 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/d838b0bf074a53eab6790449a08f888fb97e1123be8723b4f51c971ae2ea2eb4> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/9d7c1afcf8e50cc4c43981b6b1aa488eada7c444997574257ae1c27df2bb0cb2> sdh:mencionaEntidade wd:Q6292355 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/737f6dcf394d5574421a64d3013f9fcfc6ee8f86aa9276587fdb077bb02369ea> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/d62bad3e16a44e067ed44adbc4f191b5a23f0069b0d20c86d60815a290a3120e>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/a264c52b820fecbb183a0a70d59d6d67563d115c27b043fdd1a272adf646167d> sdh:mencionaEntidade wd:Q326476 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/9aec79ac14e7233202f35fc2eea11921d248cdca927b255ed6df4f8c18ae288e> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/a64032dd245ef0298e4cfce534b4be6e4be67fa54f80fcab4b56cbd4d134158d> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/a814f4e9386e2ba9f607135a2ad1b205f59549489b860e5c5e08b5d2b2fd97e1> sdh:mencionaEntidade wd:Q19968627 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/f14853b026fe9d1f47f496f3c0248f1f0440784a6a406a01f9c75e46f415c5d1> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/a9335685f6ddd8bad1eab2acd39f9830afc98ccbe0b6a98deaaa08045b6fdf12> sdh:mencionaEntidade wd:Q15521306 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/047693f5259f1dfd7a48d7683501070363387cb7bd55951ae7ae47cbc69a74f6> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/a967b67f48a3556c3129e9f8d70e354cfa825882e1a2e6b2ab2926bbe4fd2ed1> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/a9fbdc1ac7d1bd7a62a9a65fc9bf4f3aa40e50fe0362f72d83ab34310731ece1> sdh:mencionaEntidade wd:Q10551729,
+        wd:Q16729477,
+        wd:Q17560726,
+        wd:Q19973677,
+        wd:Q7069892 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/0b40bf9a2a487f606ae7fb1b7edb9b8a94548265ae343b7ea13ce7225042de4b>,
+        <urn:semantic-driven-harvester:prototype:mencao/0e1c8ebd1400e538b26c3fd4031eca9daf7c5c8e54affec70f10eab614a57785>,
+        <urn:semantic-driven-harvester:prototype:mencao/5d0163cd614edec57fdb396a56ec9d2e59d646625ecf92946f413ed8c8eeee35>,
+        <urn:semantic-driven-harvester:prototype:mencao/71a28351af33808d97c93bec19e9fe5edebb926b8b42fe2c057bfbbe3b1a3f2a>,
+        <urn:semantic-driven-harvester:prototype:mencao/e5f6c0641aad6076c29c28748a3605a7adeadf383e97dd2b845a5438e4c6b463> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/ac8de95aa171b0e1ca2d84cfaf513b656e9971439b7853e9b6684cb18a8411cd> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/01173f2aeebe5251fd73950397523f3c31baccb03b6c450e0b8e3aee011145de> .
+
+<urn:semantic-driven-harvester:prototype:article/b613ca9087b54b89e437e2bb37134343dd3a68db2d1cb1064e3168f9652cbfa1> sdh:mencionaEntidade wd:Q1925465,
+        wd:Q611923 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/82462578aed7ef353f8a544edb869e9772e826c31b6dca6b7a2e5b9a9af4916e>,
+        <urn:semantic-driven-harvester:prototype:mencao/f6f7bbefff65fc3bfa4adc02e7acb3f410db162a4c6581f3266baae28ff22d33> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/b74c8c7ed751cdb0cdffd92fa642cf49dc29995342d33342ba4393b68b1f25c1> sdh:mencionaEntidade wd:Q2724855,
+        wd:Q437329,
+        wd:Q766289 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/0f14509d7bb414e52cbc63a1d5c085f1c2671a4c17ae358ec2c1e2df13840c34>,
+        <urn:semantic-driven-harvester:prototype:mencao/6ec5ef79d88979e695cc7f3ea49fb67487bf4eecc0a431e2db00ec602669ffa8>,
+        <urn:semantic-driven-harvester:prototype:mencao/f3bae964bb5840d6326daaf6ddae0c7b773d0e84a9f0c5f6a098cbc4de16bb8b> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
+        <urn:semantic-driven-harvester:prototype:tema/9ba5381b4ff184d17abc9935304220cf8e23b39b5712986e130e2ecfbd6afbd9> .
+
+<urn:semantic-driven-harvester:prototype:article/b7e361ee39237c55bf5a7b0c749d9b98d33e00390d9019eaab53ebe1898615ad> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/72a09064f39cbbb4f20eb35f1f8bfecd2205421089ae4f71a3df0fe3224a2428> .
+
+<urn:semantic-driven-harvester:prototype:article/b9d7de89a53e9899ccaa3496ee85aa3361adf60ad11ba75b6fe46c45f3b980e7> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/c1d001e32681221e1cf9d669432a5e81c6ceaab5a4181f61abf105274e57a236> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/c245522e168f32edcb787f295efbdbdbf788ff027a9f9aa024b2ba14d9475763> sdh:mencionaEntidade wd:Q1401111 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/754b5a485dcb189e79142edeefe2a4376228ffb74f45966210593827a6ac93af> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/c366085cd72fd8bcae97a09d115de7e39295c0830fc8664d9a91ba8211953e94> sdh:mencionaEntidade wd:Q4979316 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/057f1e5ae02be4f9458da9e86e9da34c6764a5638f2f0c35bb6d25e6ff78f61e> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
+        <urn:semantic-driven-harvester:prototype:tema/9595d81dfca9a4a13822efd73208e1a7be55979bc10a536d898790f8ca1c94c2> .
+
+<urn:semantic-driven-harvester:prototype:article/c389d5892a17b6c84df02b38c4a990ca73393911087a673aa08fb0ee0cbdddf4> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/c51b23a8a386de9a9ddd554b2fd012506c7e288abd734b5781816ef1a2e9d223> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/24228a619992d4b9a8111f19050bf35a74d8d37329feadf6ca4f8f2e3fb3d787>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/c5f561b836dd1261f67186c0171838ae26437073b462f303d262fb9f27ccb0b9> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/c96cbe49ccf9291b6ea89023e94ca895e2d863c6a179632c5576ac4bf1cca640> sdh:mencionaEntidade wd:Q27049064,
+        wd:Q485697 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/8e91a70541ae46a6151160b5f978e1b0f79d8bbbd2fe2bb137c3c706fd1d8fe5>,
+        <urn:semantic-driven-harvester:prototype:mencao/8f9970dbc093817d7c715d701b3788fffeb2fbda68c753fac743f940ddf2552a> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/cb23b39b789fe61de0fa777a654ee63b4784863c33f42e19576b03038d327441> sdh:mencionaEntidade wd:Q27049064,
+        wd:Q485697 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/81ce096723df9e74a890975e6d6fb173458ad7b84f724ab263459b96ee22e940>,
+        <urn:semantic-driven-harvester:prototype:mencao/cf08ca4fb373a96d3837aab451576cd26b42c2a7f284ce12b40948e7864becf5> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/cc3211ac9f89d1669efe192b359694601f25281030618577a0c57fbd324f92d2> sdh:mencionaEntidade wd:Q922118 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/e502d99c16c28e76c5a709d11f8659d9fa0a09d26de3c6c43f2e93238bc75422> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/ce7bf3ff10f4b13e0f9c13ee6dedc3d8a0b1ff24bdc5501aef81b4a21bc44180> sdh:mencionaEntidade wd:Q38217836,
+        wd:Q6298271,
+        wd:Q63032399,
+        wd:Q66738004,
+        wd:Q66818509 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/091e4c4c8f62b36f05716a87c6ccde9e081ef8812396c6fd1c9b95ec84e6e7c0>,
+        <urn:semantic-driven-harvester:prototype:mencao/6ddcc737a486aaaef3b1c2f30299a97b81ad081c02f7eb659831c4266bb4cda3>,
+        <urn:semantic-driven-harvester:prototype:mencao/7dd128b31259a8bc767af6e94f3b16cc4d98a9aaf4bda14d9ca1b19d2761b18e>,
+        <urn:semantic-driven-harvester:prototype:mencao/aa7c486b0dcf52453b51c61d05546a6b1e28f95ad263c2a83f6b632e71ff594a>,
+        <urn:semantic-driven-harvester:prototype:mencao/b35cae5698c9bd80c5d378823c6c5ca8511ca9a17806322d9575ec6efb163b8f> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
+        <urn:semantic-driven-harvester:prototype:tema/7497ef4bd73f266c80627e3fca063bd181451def04a9521156ea2519918631ce> .
+
+<urn:semantic-driven-harvester:prototype:article/cfae465bb145d0bf26f77d14e20a6bcad76955158094bb8f076030693b09e0ce> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/2d13b537409c753f297ba615c36ea396f6cb7f226687479b335f41b010eb4322>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9> sdh:mencionaEntidade wd:Q10298795,
+        wd:Q20047629,
+        wd:Q376394,
+        wd:Q7197539 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/160713eba9529929c9ba15d9622b06d886645c717787a7bbca7b35023f72ac2c>,
+        <urn:semantic-driven-harvester:prototype:mencao/8d8ef61e0a1a31b6a7386d13c79a32a7cf8b5286ae0e820ee4a7d6d331b8732d>,
+        <urn:semantic-driven-harvester:prototype:mencao/ea2f73947e546ba17ee127b319db2ee0d5ae69902b740a19b693a92cd4381850>,
+        <urn:semantic-driven-harvester:prototype:mencao/f35a96398e9139d3db4e71654f560e36bb50f196542634bd32620d73f5e14d6b> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/608d660bea3262a2456e9226d24e3364376696da26a53428d2542d9db71dd4ea>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/d1666ab61ba02d32a22081c3c06de57dcdf8524ae8eeeca6de20f306865e53a5> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/d348fcf2f3210d1eea7382cd66d4a21daa28dbdccd7f56ace37070fe09c262d8> sdh:mencionaEntidade wd:Q17429290 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/3d06629c9459b560883f467cb53aeb32cfed4f44a03da5590042cf0c0479969f> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/05a97665c7cc6b65725d7b2306f69d82efc84e03eabf22357cf65a38318ed004>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/d6837c81a3170629556fb5cc863e2e63f71b56d3ba743ce847cead6e581e2dfb> sdh:mencionaEntidade wd:Q485697 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/a6dc6d0aa1f284aec77f6dac9c1ea8275f2be463fb9b64a5088e71636bd4e790> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/da7ed7957702b0303fa705fd6d73b7a6a52b1fd311fad1727148164684093c0a> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0b538186ec54bd987eb1d080b085c8a77d9ad9c3009a43611b91b0f7f8bc2556>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/db9384c22b40db171fa5a443476e81263f79af98547ef1ca48f697faf78ab622> sdh:mencionaEntidade wd:Q28861547,
+        wd:Q3329570,
+        wd:Q377544,
+        wd:Q4979224,
+        wd:Q4979316,
+        wd:Q970801 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/0744a49ccd853bcc7e96d344db403940cf04bb5ad088de39c033616e32274fa5>,
+        <urn:semantic-driven-harvester:prototype:mencao/2576db7cbbfb1f7ac108de456d3c6d822fa11eed76401fedb1f8909cd7cc79ae>,
+        <urn:semantic-driven-harvester:prototype:mencao/2972de0b6563d15e8b97d5afdb8e97dc8cded7bf83e837f9cfd8a95631008c65>,
+        <urn:semantic-driven-harvester:prototype:mencao/31ed8851979c2048a24a480cfe23c2a6ff7b80c192989d6e47672c5b6cd7e60f>,
+        <urn:semantic-driven-harvester:prototype:mencao/4a82cbfd7cc27877addaddb05c654d5dfd220dc5156ae54197aa8482f94b0d9d>,
+        <urn:semantic-driven-harvester:prototype:mencao/daa0a4107b86ad1c425a658c22c3dc2f1943d29099c921e9753158d06445562d> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/dc33a56537aafaa0285bc5f9c76c3e1c8d8633ebdd53b3ce25bcdfb887ddee72> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/c1ba74bc9f46ff966c036ce70689213567e907135b1d2d0c9c2beb100b32a63b>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/dd58d601edf1203b365b43550cac45f10751fb7701d8d913fed84986d173d0bd> sdh:mencionaEntidade wd:Q3909869,
+        wd:Q921324 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/6297b30cadfd3b2347754a96ce56ffc0004cff85147c645ac82a420de3d8e576>,
+        <urn:semantic-driven-harvester:prototype:mencao/999619ba93e354878904f5a052c3f7b5cf2a0f3e144de4759d7c3a8938c7e400> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/de0365f42db3a08cd064472ba9ce964900afda1686b884fbbdbda1c9b7a9af46> sdh:mencionaEntidade wd:Q12808967 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/55f7cbfbc3f4b0cb8802ffe30b1b7453b700682d0e4eda6cf8f1ae03b438c04a> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/dfd2903ee9f4d62af2195d107612da34ab55bfb3bd001fa7f48eb61aaef1380a> sdh:mencionaEntidade wd:Q15521306,
+        wd:Q27049064 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/24a0c4f54426332c9d76dd1524c765afc91b304650e1d065b255539e7da36a39>,
+        <urn:semantic-driven-harvester:prototype:mencao/a1974d606f4357eeca01887d70d16e8c3dba1c4fcb192d8feab2e85973a681b2> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/e1447ab89e9d7b68fc6f7d77662beee7da6ae8f8411074ead30992dfee0d803d> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/490ada6687e1d39107155cda1b9f5343ad3c2e555ec461b07daa97b9ac2dc170> .
+
+<urn:semantic-driven-harvester:prototype:article/e162d51872a140a02739e844cbc541244ef4491e37dc68d48707ee4e45372f9e> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/628235906022836d21694a3347909ef1418dd3dcaf0f3683f323c210a32d1775> .
+
+<urn:semantic-driven-harvester:prototype:article/e1f7a426f22f3ac174a34bf90764e5bafd348f32dc0710af9f28abca24fe1867> sdh:mencionaEntidade wd:Q377544,
+        wd:Q4979316 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/6b002bb9fddb9bf4570aa2259663ac7263fa2ded3e420eae98384481f34659d1>,
+        <urn:semantic-driven-harvester:prototype:mencao/f4945e4f64d180fd46e779895dc5b7bb285766604c68273abb893572e0bc729d> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/e32a82ce770cd172d32d304383cc36b4612238fbd8db0460e231b7123529dd96> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/e4a66b7bbcda7f193eb3014c8e3dacf003341c17d0251be90bea181a3da9d8fa> sdh:mencionaEntidade wd:Q482947 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/21c5491b0f642bffd7b9e2f2302f0b199e19b0c67a46deafd72f7f4947731ed8> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/9eedda80b396edb4c7e8530130219a283aa0523d69db1112368bb37c6ad45821> .
+
+<urn:semantic-driven-harvester:prototype:article/e8372a1aebd25a06f529ecd6122c03639d13b8d33ad3662978f0a66b271ab0b6> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/e8a97a055a2241dd930fa1d28880ba17338d7ad4e0c82c9f2ecd4c3f17c8180b> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/e9e1bfcee8fd28620037fac7a08a2bafe05c58a4fba65768082a2362be430c42> sdh:mencionaEntidade wd:Q1906140 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/f8e97c8b360c06c7c013b310f091bd6d065d8c1b8c00145053264443d37d8730> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
+
+<urn:semantic-driven-harvester:prototype:article/ee062e351362e901e6d2326ec1f966bb5f36d18b90e5566617c4ab098c5d02ca> sdh:mencionaEntidade wd:Q188241,
+        wd:Q485697 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/5a0660d13496304d519f32bf118fc63027f48eed357fe3b813a1c56feea8dee7>,
+        <urn:semantic-driven-harvester:prototype:mencao/a53b86772355089b9b344afcf3374763d1cd66d53db9e094d6a703446a6fe9cf> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/24228a619992d4b9a8111f19050bf35a74d8d37329feadf6ca4f8f2e3fb3d787>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/ee20d50ac1e29071d8c67275e81ab7c7515de87f541999b6b1f7ce68fe853a6c> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/ef4c5e697b6a0ba4c9882372001bf1466b13a3eff1c023307ee167d6ee7af805> sdh:mencionaEntidade wd:Q5492446 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/7bd6b3e5c8850d92bcb010d485bd1c41130a3c029ccd8feb8504d4adbaade8d9> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/3a1ec9cdfcb4efa849d2de83ab2f559c03cf413d3c00511ebf365946877bd0be>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/f06208eb9d0a2e3497d18426c59b9fe5f36f514c6c2bfe46ecb35d173e403901> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
+        <urn:semantic-driven-harvester:prototype:tema/4c5fc1e46cdb931db2ce76db53255368b56bb5ad60cc2606add671f458ba8c0d> .
+
+<urn:semantic-driven-harvester:prototype:article/f23ac0b05555e526cb93f06e023d92fda157bab770ab3a54751365e467dc94ea> sdh:mencionaEntidade wd:Q312507 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/5c72c923de8cafda8ca3b374af406f75a7ae3d9430616c3f2fd4882dfd7dc4b0> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/fccf093940b90410b2a3615f4bac5827f5acd581dc18a58b65c0e1821d4e88e8> .
+
+<urn:semantic-driven-harvester:prototype:article/f5beedf55036e85a4c3ec20b0216228fae9acdd0522ba1d71bb5d0933b871980> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/24228a619992d4b9a8111f19050bf35a74d8d37329feadf6ca4f8f2e3fb3d787>,
+        <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/f6103d7444ab1c5b63ac4dbc65ade162746f86de45b657729d4f8d22377a8d0c> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:article/fa7a6e1a1ed87b7b0aac3401c8e97d36696a20f773f8de7fdba77885dc9bbe2c> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+        <urn:semantic-driven-harvester:prototype:tema/8d2d60384a89ec66a2e37a5a213d5997f2d19041ceb168ffc876ab3ad12084b0> .
+
+<urn:semantic-driven-harvester:prototype:article/fab5a0613d73cef6394b626524889e37e98ac54d32706e9ebb69c0746bf1acb4> sdh:mencionaEntidade wd:Q1188298,
+        wd:Q7944780 ;
+    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/b8a6d284c6e1b4886c8906a7e3939fff4b18d76515985acc3759358ede8981dc>,
+        <urn:semantic-driven-harvester:prototype:mencao/d844d81fc07eefd25da616282ca6105870bef26a917754824389700bb47450dc> ;
+    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b0fbc5b12ffa966b4da4f3404c603fdcee0b668591989130d150d2f8a391d0>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/fccf473109cd5027f7f9e03f1978b186733b1a9f70e4626d84598a886a382279> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e>,
+        <urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c>,
+        <urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665>,
+        <urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> .
+
+<urn:semantic-driven-harvester:prototype:article/fe697af1dc909ef4126e09c02ff13d704a2b24e5cfa07de9a04e63acb6d65e1a> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
+
+<urn:semantic-driven-harvester:prototype:mencao/047693f5259f1dfd7a48d7683501070363387cb7bd55951ae7ae47cbc69a74f6> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q15521306 .
+
+<urn:semantic-driven-harvester:prototype:mencao/052595e8c39b2b9699adce0f7091689386d432faea59a509a1d7342b06e5c82d> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "8"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q20641302 .
+
+<urn:semantic-driven-harvester:prototype:mencao/05556f190c0f1edf29cf9b61831ac86d6753f55ad8c14199f92e4ae8a71f5a7b> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "82"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q5448543 .
+
+<urn:semantic-driven-harvester:prototype:mencao/057f1e5ae02be4f9458da9e86e9da34c6764a5638f2f0c35bb6d25e6ff78f61e> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q4979316 .
+
+<urn:semantic-driven-harvester:prototype:mencao/0744a49ccd853bcc7e96d344db403940cf04bb5ad088de39c033616e32274fa5> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q377544 .
+
+<urn:semantic-driven-harvester:prototype:mencao/091e4c4c8f62b36f05716a87c6ccde9e081ef8812396c6fd1c9b95ec84e6e7c0> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "51"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q63032399 .
+
+<urn:semantic-driven-harvester:prototype:mencao/0b3cafc8dc51d2b1a3e59d733ef52392a31fbf51198e967ca8df6271cef7f5da> a sdh:Mencao ;
+    sdh:capturasComMencao "11"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "11"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "33"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q2074431 .
+
+<urn:semantic-driven-harvester:prototype:mencao/0b40bf9a2a487f606ae7fb1b7edb9b8a94548265ae343b7ea13ce7225042de4b> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q19973677 .
+
+<urn:semantic-driven-harvester:prototype:mencao/0e1c8ebd1400e538b26c3fd4031eca9daf7c5c8e54affec70f10eab614a57785> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q17560726 .
+
+<urn:semantic-driven-harvester:prototype:mencao/0e5e89f89f462b1a8abfa75f4fdc73c0aa6773738512e5a2cb664f1a6dec8eb0> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "41"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q18062120 .
+
+<urn:semantic-driven-harvester:prototype:mencao/0f14509d7bb414e52cbc63a1d5c085f1c2671a4c17ae358ec2c1e2df13840c34> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q766289 .
+
+<urn:semantic-driven-harvester:prototype:mencao/10a8f8a74fc3f5e80920eb90b103117b3f0ef4c52a01abe4a75c8c405d81a170> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q4760001 .
+
+<urn:semantic-driven-harvester:prototype:mencao/113b4c4bcf3516952bbb1256b531288b0dedb5da7be6331238592a4c9e76f1c4> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q377544 .
+
+<urn:semantic-driven-harvester:prototype:mencao/160713eba9529929c9ba15d9622b06d886645c717787a7bbca7b35023f72ac2c> a sdh:Mencao ;
+    sdh:capturasComMencao "44"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "44"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "308"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q20047629 .
+
+<urn:semantic-driven-harvester:prototype:mencao/19a6d127bb7a8115f7bcf6ba76c3eff9bca034057a4324283292904af3f991ff> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "5"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q20641302 .
+
+<urn:semantic-driven-harvester:prototype:mencao/1a43a9d048afe1b48653824528af50289b30fe53c877f7535de55663cce6f602> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "41"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q16221981 .
+
+<urn:semantic-driven-harvester:prototype:mencao/1a934920f309e82d4f122ff70efa86d9a30ed15de084bf29182a568273f5df62> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q326476 .
+
+<urn:semantic-driven-harvester:prototype:mencao/1b061048b6e6f52ae3c53da4d2c1b98f35ad9bc7c99eb39e2c6209aae1aa566a> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "41"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q7196514 .
+
+<urn:semantic-driven-harvester:prototype:mencao/1d768854bd1719d51bd511f6a1696680c1cf8b91b31e2fcc99936c2b9a7c379e> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q5934066 .
+
+<urn:semantic-driven-harvester:prototype:mencao/1daa5efd91baef8d48efc505512ca614595770fb0fca821c02c4c042a385077f> a sdh:Mencao ;
+    sdh:capturasComMencao "71"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "71"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "71"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q210950 .
+
+<urn:semantic-driven-harvester:prototype:mencao/1ed21bec756bc3c4eb6c956ca697681074b97baef614902a585967a20a4837e2> a sdh:Mencao ;
+    sdh:capturasComMencao "7"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "7"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "7"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q12808967 .
+
+<urn:semantic-driven-harvester:prototype:mencao/21c5491b0f642bffd7b9e2f2302f0b199e19b0c67a46deafd72f7f4947731ed8> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q482947 .
+
+<urn:semantic-driven-harvester:prototype:mencao/23a44767596d81056784c450230cfb04ed70fd11d143020c493d8a14cdaf7d30> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1988686 .
+
+<urn:semantic-driven-harvester:prototype:mencao/24a0c4f54426332c9d76dd1524c765afc91b304650e1d065b255539e7da36a39> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q15521306 .
+
+<urn:semantic-driven-harvester:prototype:mencao/2576db7cbbfb1f7ac108de456d3c6d822fa11eed76401fedb1f8909cd7cc79ae> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q4979224 .
+
+<urn:semantic-driven-harvester:prototype:mencao/2972de0b6563d15e8b97d5afdb8e97dc8cded7bf83e837f9cfd8a95631008c65> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q28861547 .
+
+<urn:semantic-driven-harvester:prototype:mencao/31ed8851979c2048a24a480cfe23c2a6ff7b80c192989d6e47672c5b6cd7e60f> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q3329570 .
+
+<urn:semantic-driven-harvester:prototype:mencao/3579a032ddf9387ac360356c604aef52ad45a0f5686c2df63077095e1d523f49> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "123"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q641425 .
+
+<urn:semantic-driven-harvester:prototype:mencao/3a9695394584009494db9144369351958f3fdf4d2c07e5be1fcdbefc311432b5> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q27049064 .
+
+<urn:semantic-driven-harvester:prototype:mencao/3b25e3f30a0da649011a85a2eef8352c56332913febef5ffe3f7055190926bc4> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q312507 .
+
+<urn:semantic-driven-harvester:prototype:mencao/3d06629c9459b560883f467cb53aeb32cfed4f44a03da5590042cf0c0479969f> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "9"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q17429290 .
+
+<urn:semantic-driven-harvester:prototype:mencao/3fb124046ea2deee75bf1cee55f86fa1f6a9b09a6389950c8d488d5d2dce14ee> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q15831095 .
+
+<urn:semantic-driven-harvester:prototype:mencao/44304fb0125029d369af5b0957231e59cd7804d3e4c68ec7537a7c8a8b95d383> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "41"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q10553667 .
+
+<urn:semantic-driven-harvester:prototype:mencao/46b9551dd2e4156585afd5d20a3783c7c50c986e350cc41cdd56afd8ba9a5978> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q6321698 .
+
+<urn:semantic-driven-harvester:prototype:mencao/4a094db18864b73bdcf9616b094f67476d8d10e3d84f2597b8e3a568e304a2d4> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q5042329 .
+
+<urn:semantic-driven-harvester:prototype:mencao/4a82cbfd7cc27877addaddb05c654d5dfd220dc5156ae54197aa8482f94b0d9d> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q970801 .
+
+<urn:semantic-driven-harvester:prototype:mencao/5068cec67a7eae141069807ff01051a9b745df7b258311a04e7309b05253ed88> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q7069892 .
+
+<urn:semantic-driven-harvester:prototype:mencao/55f7cbfbc3f4b0cb8802ffe30b1b7453b700682d0e4eda6cf8f1ae03b438c04a> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q12808967 .
+
+<urn:semantic-driven-harvester:prototype:mencao/5830fd86e86f735456ecbcdea108ebda2ebe20469539169127467335bdda2641> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "24"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q15214940 .
+
+<urn:semantic-driven-harvester:prototype:mencao/5a0660d13496304d519f32bf118fc63027f48eed357fe3b813a1c56feea8dee7> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "6"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q188241 .
+
+<urn:semantic-driven-harvester:prototype:mencao/5c35349729c8525e4addb4e8785eccd15f7560d6d4cafe858ff8ab281d7bbf69> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q273776 .
+
+<urn:semantic-driven-harvester:prototype:mencao/5c43f12a4d0571d1064b94c5d9b4b47d3997f8fc107fe4a86e30398f7775d2fb> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "5"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q510596 .
+
+<urn:semantic-driven-harvester:prototype:mencao/5c72c923de8cafda8ca3b374af406f75a7ae3d9430616c3f2fd4882dfd7dc4b0> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q312507 .
+
+<urn:semantic-driven-harvester:prototype:mencao/5d0163cd614edec57fdb396a56ec9d2e59d646625ecf92946f413ed8c8eeee35> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q7069892 .
+
+<urn:semantic-driven-harvester:prototype:mencao/61aab60b3a9a0de681d9cefc3647f4fdf4c27b69861e5ab61236e1bb17026d58> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q27049064 .
+
+<urn:semantic-driven-harvester:prototype:mencao/6297b30cadfd3b2347754a96ce56ffc0004cff85147c645ac82a420de3d8e576> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q921324 .
+
+<urn:semantic-driven-harvester:prototype:mencao/65045ce1de7595c6c74300f80126f1159e43a6cc0e71d24d9d367ff8efb4092d> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q4760071 .
+
+<urn:semantic-driven-harvester:prototype:mencao/6656621ffeb79479ea3167e53f123c42fd9ee9e77e90e5dce0475cf9ffd590ab> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q922118 .
+
+<urn:semantic-driven-harvester:prototype:mencao/675a76b9902ca7c60ab7ee9827ac5bb784434298bb8b58db3858f3b695a5791c> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q19282169 .
+
+<urn:semantic-driven-harvester:prototype:mencao/6b002bb9fddb9bf4570aa2259663ac7263fa2ded3e420eae98384481f34659d1> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q4979316 .
+
+<urn:semantic-driven-harvester:prototype:mencao/6b65e58cb034b7ad745e2441a5c6d571848319de9e692d747042f28ce56628d0> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q15521306 .
+
+<urn:semantic-driven-harvester:prototype:mencao/6cb9ebddd3eeff869d1e656714863c2bda08621b3909d147c5f4b78bd12f43a4> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "82"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q5511336 .
+
+<urn:semantic-driven-harvester:prototype:mencao/6ddcc737a486aaaef3b1c2f30299a97b81ad081c02f7eb659831c4266bb4cda3> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "29"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q38217836 .
+
+<urn:semantic-driven-harvester:prototype:mencao/6ec5ef79d88979e695cc7f3ea49fb67487bf4eecc0a431e2db00ec602669ffa8> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q437329 .
+
+<urn:semantic-driven-harvester:prototype:mencao/71a28351af33808d97c93bec19e9fe5edebb926b8b42fe2c057bfbbe3b1a3f2a> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q10551729 .
+
+<urn:semantic-driven-harvester:prototype:mencao/737f6dcf394d5574421a64d3013f9fcfc6ee8f86aa9276587fdb077bb02369ea> a sdh:Mencao ;
+    sdh:capturasComMencao "5"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "5"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "5"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q6292355 .
+
+<urn:semantic-driven-harvester:prototype:mencao/754b5a485dcb189e79142edeefe2a4376228ffb74f45966210593827a6ac93af> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "9"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1401111 .
+
+<urn:semantic-driven-harvester:prototype:mencao/78049a31b698add22e02e8693eb5e324a479565643701ab0995ff4f25c2a4307> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q17403192 .
+
+<urn:semantic-driven-harvester:prototype:mencao/79b10fbc2ef7c1e53501a7704b5670103021be3ba2123ec554a12abf10de3629> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q17403192 .
+
+<urn:semantic-driven-harvester:prototype:mencao/7bd6b3e5c8850d92bcb010d485bd1c41130a3c029ccd8feb8504d4adbaade8d9> a sdh:Mencao ;
+    sdh:capturasComMencao "7"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "7"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "7"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q5492446 .
+
+<urn:semantic-driven-harvester:prototype:mencao/7c9e5a183d11891a02a52366a50a8c950957a6b0c364be03acb0138be04e533d> a sdh:Mencao ;
+    sdh:capturasComMencao "71"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "71"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "71"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q17074511 .
+
+<urn:semantic-driven-harvester:prototype:mencao/7cafce41950fcb348f9160e5e082a0e07ffe373af669f426c29cf783db69b88d> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "5"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente false ;
+    sdh:sobreEntidade wd:Q1925465 .
+
+<urn:semantic-driven-harvester:prototype:mencao/7d693af2d6a9b9eb1cf3e6af33e3e80a86ee76805ad6fa69acb16986ff2ecad8> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q922118 .
+
+<urn:semantic-driven-harvester:prototype:mencao/7dd128b31259a8bc767af6e94f3b16cc4d98a9aaf4bda14d9ca1b19d2761b18e> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "10"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q66818509 .
+
+<urn:semantic-driven-harvester:prototype:mencao/81ce096723df9e74a890975e6d6fb173458ad7b84f724ab263459b96ee22e940> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "24"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q485697 .
+
+<urn:semantic-driven-harvester:prototype:mencao/81e9f8f0c17d93fb22a5a135d4342dee820e9dc9ae71cd31ff73053ae9d01a2d> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q65956786 .
+
+<urn:semantic-driven-harvester:prototype:mencao/82462578aed7ef353f8a544edb869e9772e826c31b6dca6b7a2e5b9a9af4916e> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "25"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente false ;
+    sdh:sobreEntidade wd:Q1925465 .
+
+<urn:semantic-driven-harvester:prototype:mencao/87d0dcab5c6099d16b3f3c9fb5e4956d15ebd8f97c99e4fc5191560786b25a30> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1991022 .
+
+<urn:semantic-driven-harvester:prototype:mencao/8d8ef61e0a1a31b6a7386d13c79a32a7cf8b5286ae0e820ee4a7d6d331b8732d> a sdh:Mencao ;
+    sdh:capturasComMencao "44"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "44"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "308"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q376394 .
+
+<urn:semantic-driven-harvester:prototype:mencao/8e91a70541ae46a6151160b5f978e1b0f79d8bbbd2fe2bb137c3c706fd1d8fe5> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "6"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q27049064 .
+
+<urn:semantic-driven-harvester:prototype:mencao/8f9970dbc093817d7c715d701b3788fffeb2fbda68c753fac743f940ddf2552a> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "6"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q485697 .
+
+<urn:semantic-driven-harvester:prototype:mencao/950039d7b79faf7f069c35dff82626ee7836cea7a87f84f6ddefc36ed267f132> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "82"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q10515115 .
+
+<urn:semantic-driven-harvester:prototype:mencao/9777fa504141fb4322bdac2c0367c5b1b0a03ebca4f598302743b1e64c411ba3> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q16231680 .
+
+<urn:semantic-driven-harvester:prototype:mencao/999619ba93e354878904f5a052c3f7b5cf2a0f3e144de4759d7c3a8938c7e400> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q3909869 .
+
+<urn:semantic-driven-harvester:prototype:mencao/9aec79ac14e7233202f35fc2eea11921d248cdca927b255ed6df4f8c18ae288e> a sdh:Mencao ;
+    sdh:capturasComMencao "39"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "39"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "78"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q326476 .
+
+<urn:semantic-driven-harvester:prototype:mencao/9d2bdce751a4d0eb29c5c40792e06dd28c963f541cfbef8c611a388c840f646a> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "8"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q154390 .
+
+<urn:semantic-driven-harvester:prototype:mencao/a1974d606f4357eeca01887d70d16e8c3dba1c4fcb192d8feab2e85973a681b2> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q27049064 .
+
+<urn:semantic-driven-harvester:prototype:mencao/a53b86772355089b9b344afcf3374763d1cd66d53db9e094d6a703446a6fe9cf> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q485697 .
+
+<urn:semantic-driven-harvester:prototype:mencao/a6dc6d0aa1f284aec77f6dac9c1ea8275f2be463fb9b64a5088e71636bd4e790> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q485697 .
+
+<urn:semantic-driven-harvester:prototype:mencao/aa7c486b0dcf52453b51c61d05546a6b1e28f95ad263c2a83f6b632e71ff594a> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "22"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q6298271 .
+
+<urn:semantic-driven-harvester:prototype:mencao/ab0bca86a267083a0b7ce14b7216635ae95096bddd07ac9253da8f8750cec7fe> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "14"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q628601 .
+
+<urn:semantic-driven-harvester:prototype:mencao/b35cae5698c9bd80c5d378823c6c5ca8511ca9a17806322d9575ec6efb163b8f> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "17"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q66738004 .
+
+<urn:semantic-driven-harvester:prototype:mencao/b4c485f24db69630c97a5252f064128c40db39ed229505cbcee72503e863b436> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "5"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente false ;
+    sdh:sobreEntidade wd:Q922118 .
+
+<urn:semantic-driven-harvester:prototype:mencao/b7f53ee32e779e0f7aa3c90247a68ee26fe43d0063827143f17141c71674c53d> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q16729477 .
+
+<urn:semantic-driven-harvester:prototype:mencao/b8a6d284c6e1b4886c8906a7e3939fff4b18d76515985acc3759358ede8981dc> a sdh:Mencao ;
+    sdh:capturasComMencao "13"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "13"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "13"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1188298 .
+
+<urn:semantic-driven-harvester:prototype:mencao/bb6c9da8c8a466328a7ba85eb83dfa89cd5d80979e20d6bb67b43f958418882e> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q27049064 .
+
+<urn:semantic-driven-harvester:prototype:mencao/c26c4188c3cea9c415c9270ac989544e4a3e6bda035a8cb00ff0aa06c058d0ea> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q485697 .
+
+<urn:semantic-driven-harvester:prototype:mencao/c86dcabf0dccd88647714e5a63c6f0c2dc1aed32764c277d11b2bfe5f00b9694> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q376394 .
+
+<urn:semantic-driven-harvester:prototype:mencao/cf08ca4fb373a96d3837aab451576cd26b42c2a7f284ce12b40948e7864becf5> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "24"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q27049064 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d04202414a92669bbbd0b0d69985e8f37d84c14cc0aa1ca0f971deaebdd6a670> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "10"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q4979316 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d15838d167b8a7f1edf3b3cd55237f1b8fcf2e2e289d4e017a96e4d5a0347342> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1906140 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d3f2512e8700cdfb9e11bb979119ba3d5037f70dccaccc81548cd59f9e4cd62a> a sdh:Mencao ;
+    sdh:capturasComMencao "28"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "28"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "28"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q18022223 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d49cf98ba43775f6bf0ea381e01e70007f12877519ebee5abab2305223668dd1> a sdh:Mencao ;
+    sdh:capturasComMencao "13"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "13"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "39"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q7155313 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d5888ae662391f7cdfe384bc0919569f97093ea5c9a1344f006273c64e0b47c7> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "41"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q273776 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d665d8847b23b8f9ad360ce1c2dae51506d1f0d3454231a3a927c0029e5ee424> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q6292355 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d838b0bf074a53eab6790449a08f888fb97e1123be8723b4f51c971ae2ea2eb4> a sdh:Mencao ;
+    sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q214117 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d844d81fc07eefd25da616282ca6105870bef26a917754824389700bb47450dc> a sdh:Mencao ;
+    sdh:capturasComMencao "13"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "13"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "13"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q7944780 .
+
+<urn:semantic-driven-harvester:prototype:mencao/d933d90ce3fd5447a54c358ed07fa588c96de7d1b819b298c16a77af969134e0> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q7155313 .
+
+<urn:semantic-driven-harvester:prototype:mencao/daa0a4107b86ad1c425a658c22c3dc2f1943d29099c921e9753158d06445562d> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q4979316 .
+
+<urn:semantic-driven-harvester:prototype:mencao/db2965c89971dfaddea2465a5d7b74717d728b18912f049bb9702bd73d246e84> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q4979316 .
+
+<urn:semantic-driven-harvester:prototype:mencao/de14123e2d4fb464bd525ecc3d6e3da8046d45ea18d6b14b6664d99249fea27c> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q318383 .
+
+<urn:semantic-driven-harvester:prototype:mencao/e2c78ee58ec4ca3cbcec922d41f9088c7ccafcbce2e6bc3b05fca4ba76db367c> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "5"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente false ;
+    sdh:sobreEntidade wd:Q672388 .
+
+<urn:semantic-driven-harvester:prototype:mencao/e362fe00f9266fe33c71dd791b87183d6bcece2a91a2acc48ef69e7e4d0aeec0> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "5"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente false ;
+    sdh:sobreEntidade wd:Q16235823 .
+
+<urn:semantic-driven-harvester:prototype:mencao/e502d99c16c28e76c5a709d11f8659d9fa0a09d26de3c6c43f2e93238bc75422> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q922118 .
+
+<urn:semantic-driven-harvester:prototype:mencao/e5f6c0641aad6076c29c28748a3605a7adeadf383e97dd2b845a5438e4c6b463> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q16729477 .
+
+<urn:semantic-driven-harvester:prototype:mencao/e69a29a485496c40e7f728e0b74d3d6e37b90ce9c99006c79b4ec8d320264048> a sdh:Mencao ;
+    sdh:capturasComMencao "41"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "41"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "41"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q20641302 .
+
+<urn:semantic-driven-harvester:prototype:mencao/ea2f73947e546ba17ee127b319db2ee0d5ae69902b740a19b693a92cd4381850> a sdh:Mencao ;
+    sdh:capturasComMencao "44"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "44"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "132"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q7197539 .
+
+<urn:semantic-driven-harvester:prototype:mencao/eb6c0967e6e351e49d6ae9e14a337c57c6cc6d526d8fecd7c6fbf68be6cb729a> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q18394009 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f062021a76d776313a97d5bc0e5f8363eddb0c45a6c0c89ade23686a4e4359ba> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1906140 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f14853b026fe9d1f47f496f3c0248f1f0440784a6a406a01f9c75e46f415c5d1> a sdh:Mencao ;
+    sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "2"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "10"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q19968627 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f35a96398e9139d3db4e71654f560e36bb50f196542634bd32620d73f5e14d6b> a sdh:Mencao ;
+    sdh:capturasComMencao "44"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "44"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "44"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q10298795 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f3bae964bb5840d6326daaf6ddae0c7b773d0e84a9f0c5f6a098cbc4de16bb8b> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q2724855 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f4945e4f64d180fd46e779895dc5b7bb285766604c68273abb893572e0bc729d> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q377544 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f6794f95c188fd7e126bc76f7ab8653f9d929c2a12a36d3f6e20c738ca1249da> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sim"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1906140 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f6f7bbefff65fc3bfa4adc02e7acb3f410db162a4c6581f3266baae28ff22d33> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "25"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente false ;
+    sdh:sobreEntidade wd:Q611923 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f7f35fac2ce4fa77bfd026b0974d52d98f4b6a4503821b4ca404d59e693c8782> a sdh:Mencao ;
+    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "nao"^^xsd:string ;
+    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1988686 .
+
+<urn:semantic-driven-harvester:prototype:mencao/f8e97c8b360c06c7c013b310f091bd6d065d8c1b8c00145053264443d37d8730> a sdh:Mencao ;
+    sdh:capturasComMencao "32"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "32"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "32"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q1906140 .
+
+<urn:semantic-driven-harvester:prototype:mencao/fa2713e2a3d6e938521687362f2b4fccf936324a5f1e1b76122b9d89d08600a7> a sdh:Mencao ;
+    sdh:capturasComMencao "13"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "13"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "13"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade wd:Q616664 .
+
+<urn:semantic-driven-harvester:prototype:mencao/fa36aa8fbd2b61913fd5104a369b36211894b41c29e7424f781aa00ab5a9f4de> a sdh:Mencao ;
+    sdh:capturasComMencao "3"^^xsd:nonNegativeInteger ;
+    sdh:capturasComTexto "3"^^xsd:nonNegativeInteger ;
+    sdh:clubeCoerente "sem_tema"^^xsd:string ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
+    sdh:persistente true ;
+    sdh:sobreEntidade <urn:semantic-driven-harvester:prototype:entity/d0c9d5ec22565219419de1a1dd11b3ddeee8d99bb42db00282e0b590bc1e6496> .
+
+<urn:semantic-driven-harvester:prototype:tema/01173f2aeebe5251fd73950397523f3c31baccb03b6c450e0b8e3aee011145de> a sdh:Tema ;
+    rdfs:label "secao: jogo-da-vida" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "jogo-da-vida"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/025435cf78f8a041b333e687f9daa81e3a0679d6a0d3eb9591fad244c82344d2> a sdh:Tema ;
+    rdfs:label "secao: jogos-em-direto" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "jogos-em-direto"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/0b538186ec54bd987eb1d080b085c8a77d9ad9c3009a43611b91b0f7f8bc2556> a sdh:Tema ;
+    rdfs:label "clube: maritimo" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "maritimo"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/2d13b537409c753f297ba615c36ea396f6cb7f226687479b335f41b010eb4322> a sdh:Tema ;
+    rdfs:label "competicao: taca-de-portugal" ;
+    sdh:categoriaTema "competicao"^^xsd:string ;
+    sdh:valorTema "taca-de-portugal"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/31395661c597434ef8a901ca224c3dcbc4f1064eb70b34f1a0f480a2fd5d0378> a sdh:Tema ;
+    rdfs:label "clube: aves" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "aves"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/3aee6d1337a08b45d77060631a79680afa3806ed299e8c8782d79b03ba81ed46> a sdh:Tema ;
+    rdfs:label "modalidade: andebol" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "andebol"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/490ada6687e1d39107155cda1b9f5343ad3c2e555ec461b07daa97b9ac2dc170> a sdh:Tema ;
+    rdfs:label "modalidade: natacao" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "natacao"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/4c5fc1e46cdb931db2ce76db53255368b56bb5ad60cc2606add671f458ba8c0d> a sdh:Tema ;
+    rdfs:label "competicao: can" ;
+    sdh:categoriaTema "competicao"^^xsd:string ;
+    sdh:valorTema "can"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/59f38b3d62dbf8da0dd0f554c31fb23d81340b6e4d9f689deff5799f28e9639d> a sdh:Tema ;
+    rdfs:label "modalidade: desporto-universitario" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "desporto-universitario"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/628235906022836d21694a3347909ef1418dd3dcaf0f3683f323c210a32d1775> a sdh:Tema ;
+    rdfs:label "secao: entrevistas" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "entrevistas"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/72a09064f39cbbb4f20eb35f1f8bfecd2205421089ae4f71a3df0fe3224a2428> a sdh:Tema ;
+    rdfs:label "secao: liga-record" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "liga-record"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/73729e0d10a92ccf677b9ccb5cfc2f9a79d8c18ec269907bf18e308ee3aff539> a sdh:Tema ;
+    rdfs:label "secao: record-gaming" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "record-gaming"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/7497ef4bd73f266c80627e3fca063bd181451def04a9521156ea2519918631ce> a sdh:Tema ;
+    rdfs:label "competicao: liga-jovem-da-uefa" ;
+    sdh:categoriaTema "competicao"^^xsd:string ;
+    sdh:valorTema "liga-jovem-da-uefa"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/8d2d60384a89ec66a2e37a5a213d5997f2d19041ceb168ffc876ab3ad12084b0> a sdh:Tema ;
+    rdfs:label "modalidade: jogos-europeus" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "jogos-europeus"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/91c2157f4b4a7e6150d41b39a8e2ef291cfa66ce7333857aaa650c2db34d2081> a sdh:Tema ;
+    rdfs:label "secao: liga-allianz-running-record" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "liga-allianz-running-record"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/9a8c0c55dfd15b5151f5201d7f3a34e213f15f3da9c95bdad2f9d41c55f83f0a> a sdh:Tema ;
+    rdfs:label "secao: record-mais" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "record-mais"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/9ba5381b4ff184d17abc9935304220cf8e23b39b5712986e130e2ecfbd6afbd9> a sdh:Tema ;
+    rdfs:label "competicao: taca-das-confederacoes" ;
+    sdh:categoriaTema "competicao"^^xsd:string ;
+    sdh:valorTema "taca-das-confederacoes"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/d62bad3e16a44e067ed44adbc4f191b5a23f0069b0d20c86d60815a290a3120e> a sdh:Tema ;
+    rdfs:label "clube: portimonense" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "portimonense"^^xsd:string .
+
+wd:Q10298795 a sdh:EntidadeMencionada ;
+    rdfs:label "Hugo Rogério Ferreira Monteiro" .
+
+wd:Q10515115 a sdh:EntidadeMencionada ;
+    rdfs:label "Gonçalo Abreu" .
+
+wd:Q10551729 a sdh:EntidadeMencionada ;
+    rdfs:label "Raphael Guzzo" .
+
+wd:Q10553667 a sdh:EntidadeMencionada ;
+    rdfs:label "Cristian Ponde" .
+
+wd:Q1188298 a sdh:EntidadeMencionada ;
+    rdfs:label "David Martins Simão" .
+
+wd:Q1401111 a sdh:EntidadeMencionada ;
+    rdfs:label "Paulo Jorge Pedro Lopes" .
+
+wd:Q15214940 a sdh:EntidadeMencionada ;
+    rdfs:label "Alex Telles" .
+
+wd:Q154390 a sdh:EntidadeMencionada ;
+    rdfs:label "Ricardo Costa" .
+
+wd:Q15831095 a sdh:EntidadeMencionada ;
+    rdfs:label "Luíz Carlos" .
+
+wd:Q16221981 a sdh:EntidadeMencionada ;
+    rdfs:label "Luís Pinto" .
+
+wd:Q16231680 a sdh:EntidadeMencionada ;
+    rdfs:label "Rui Daniel Morais Gomes" .
+
+wd:Q16235823 a sdh:EntidadeMencionada ;
+    rdfs:label "Nélson Semedo" .
+
+wd:Q17074511 a sdh:EntidadeMencionada ;
+    rdfs:label "Ederson Moraes" .
+
+wd:Q17429290 a sdh:EntidadeMencionada ;
+    rdfs:label "Ahmed Sayed" .
+
+wd:Q17560726 a sdh:EntidadeMencionada ;
+    rdfs:label "Romário Baldé" .
+
+wd:Q18022223 a sdh:EntidadeMencionada ;
+    rdfs:label "Carraça" .
+
+wd:Q18062120 a sdh:EntidadeMencionada ;
+    rdfs:label "André Fontes" .
+
+wd:Q18394009 a sdh:EntidadeMencionada ;
+    rdfs:label "Renato Sanches" .
+
+wd:Q188241 a sdh:EntidadeMencionada ;
+    rdfs:label "Ricardo Quaresma" .
+
+wd:Q19282169 a sdh:EntidadeMencionada ;
+    rdfs:label "Diogo Gonçalves" .
+
+wd:Q1991022 a sdh:EntidadeMencionada ;
+    rdfs:label "Judilson Mamadu Tuncará Gomes" .
+
+wd:Q19968627 a sdh:EntidadeMencionada ;
+    rdfs:label "Yony Andrés González Copete" .
+
+wd:Q19973677 a sdh:EntidadeMencionada ;
+    rdfs:label "Hildeberto Pereira" .
+
+wd:Q20047629 a sdh:EntidadeMencionada ;
+    rdfs:label "Rodrigo Pinho" .
+
+wd:Q2074431 a sdh:EntidadeMencionada ;
+    rdfs:label "Wilson Eduardo" .
+
+wd:Q210950 a sdh:EntidadeMencionada ;
+    rdfs:label "Luisão" .
+
+wd:Q214117 a sdh:EntidadeMencionada ;
+    rdfs:label "Hélder Postiga" .
+
+wd:Q2724855 a sdh:EntidadeMencionada ;
+    rdfs:label "Adrien Silva" .
+
+wd:Q28861547 a sdh:EntidadeMencionada ;
+    rdfs:label "Raphinha" .
+
+wd:Q318383 a sdh:EntidadeMencionada ;
+    rdfs:label "Bryan Ruiz" .
+
+wd:Q3329570 a sdh:EntidadeMencionada ;
+    rdfs:label "Alan Ruiz" .
+
+wd:Q38217836 a sdh:EntidadeMencionada ;
+    rdfs:label "Diogo Queirós" .
+
+wd:Q3909869 a sdh:EntidadeMencionada ;
+    rdfs:label "Edinaldo Gomes Pereira" .
+
+wd:Q437329 a sdh:EntidadeMencionada ;
+    rdfs:label "Danilo Luiz da Silva" .
+
+wd:Q4760001 a sdh:EntidadeMencionada ;
+    rdfs:label "André Micael" .
+
+wd:Q4760071 a sdh:EntidadeMencionada ;
+    rdfs:label "André Sousa" .
+
+wd:Q482947 a sdh:EntidadeMencionada ;
+    rdfs:label "Nani" .
+
+wd:Q4979224 a sdh:EntidadeMencionada ;
+    rdfs:label "Bruno Gaspar" .
+
+wd:Q5042329 a sdh:EntidadeMencionada ;
+    rdfs:label "Carlos Mané" .
+
+wd:Q510596 a sdh:EntidadeMencionada ;
+    rdfs:label "Ezequiel Schelotto" .
+
+wd:Q5448543 a sdh:EntidadeMencionada ;
+    rdfs:label "Filipe Chaby" .
+
+wd:Q5492446 a sdh:EntidadeMencionada ;
+    rdfs:label "Fransérgio" .
+
+wd:Q5511336 a sdh:EntidadeMencionada ;
+    rdfs:label "Fábio Fortes" .
+
+wd:Q5934066 a sdh:EntidadeMencionada ;
+    rdfs:label "Jonathan Silva" .
+
+wd:Q611923 a sdh:EntidadeMencionada ;
+    rdfs:label "Luís Miguel Afonso Fernandes" .
+
+wd:Q616664 a sdh:EntidadeMencionada ;
+    rdfs:label "Casemiro" .
+
+wd:Q628601 a sdh:EntidadeMencionada ;
+    rdfs:label "Miguel Oliveira" .
+
+wd:Q6298271 a sdh:EntidadeMencionada ;
+    rdfs:label "João Mário" .
+
+wd:Q63032399 a sdh:EntidadeMencionada ;
+    rdfs:label "Fábio Vieira" .
+
+wd:Q6321698 a sdh:EntidadeMencionada ;
+    rdfs:label "Júlio César Oliveira Martins" .
+
+wd:Q641425 a sdh:EntidadeMencionada ;
+    rdfs:label "Fabinho" .
+
+wd:Q65956786 a sdh:EntidadeMencionada ;
+    rdfs:label "Tomás Tavares" .
+
+wd:Q66738004 a sdh:EntidadeMencionada ;
+    rdfs:label "Fábio Daniel Soares Silva" .
+
+wd:Q66818509 a sdh:EntidadeMencionada ;
+    rdfs:label "Vítor Ferreira" .
+
+wd:Q672388 a sdh:EntidadeMencionada ;
+    rdfs:label "Diego Reyes" .
+
+wd:Q7196514 a sdh:EntidadeMencionada ;
+    rdfs:label "Pintassilgo" .
+
+wd:Q7197539 a sdh:EntidadeMencionada ;
+    rdfs:label "Piqueti" .
+
+wd:Q766289 a sdh:EntidadeMencionada ;
+    rdfs:label "Danilo Luís Hélio Pereira" .
+
+wd:Q7944780 a sdh:EntidadeMencionada ;
+    rdfs:label "Vítor Bruno" .
+
+wd:Q921324 a sdh:EntidadeMencionada ;
+    rdfs:label "Alejandro Grimaldo" .
+
+wd:Q970801 a sdh:EntidadeMencionada ;
+    rdfs:label "Fredy Montero" .
+
+<urn:semantic-driven-harvester:prototype:entity/d0c9d5ec22565219419de1a1dd11b3ddeee8d99bb42db00282e0b590bc1e6496> a sdh:EntidadeMencionada ;
+    rdfs:label "Pedro Mendes" .
+
+<urn:semantic-driven-harvester:prototype:tema/05a97665c7cc6b65725d7b2306f69d82efc84e03eabf22357cf65a38318ed004> a sdh:Tema ;
+    rdfs:label "clube: moreirense" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "moreirense"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/1f8ebece18af0e15515891a310997f72198497e7be1218f5a341a94e0dece743> a sdh:Tema ;
+    rdfs:label "secao: fora-de-campo" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "fora-de-campo"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/2ba7a8118ed4f82898bf7dda8acd5d49a4c539fd5b2404c255738569ddc6c20e> a sdh:Tema ;
+    rdfs:label "modalidade: motores" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "motores"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/3a1ec9cdfcb4efa849d2de83ab2f559c03cf413d3c00511ebf365946877bd0be> a sdh:Tema ;
+    rdfs:label "clube: sp--braga" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "sp--braga"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/40cc4d15bc95e6ec2ec68e945fec7e7509c2054dedb366ab99977fdd4c0cef15> a sdh:Tema ;
+    rdfs:label "secao: o-diario-de-cr7-by-meo" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "o-diario-de-cr7-by-meo"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/602c04a7b4447c2bf68c391c33b4f35fe16351cd4ceb85d68b9dbafd1a1599ba> a sdh:Tema ;
+    rdfs:label "modalidade: judo" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "judo"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/608d660bea3262a2456e9226d24e3364376696da26a53428d2542d9db71dd4ea> a sdh:Tema ;
+    rdfs:label "competicao: 2--liga" ;
+    sdh:categoriaTema "competicao"^^xsd:string ;
+    sdh:valorTema "2--liga"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/9eedda80b396edb4c7e8530130219a283aa0523d69db1112368bb37c6ad45821> a sdh:Tema ;
+    rdfs:label "modalidade: atletismo" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "atletismo"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/cb401b334b2b27903d90be77a754082b6ff79894339e120537a0d54633261ac1> a sdh:Tema ;
+    rdfs:label "secao: opiniao" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "opiniao"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/e3b0fbc5b12ffa966b4da4f3404c603fdcee0b668591989130d150d2f8a391d0> a sdh:Tema ;
+    rdfs:label "clube: boavista" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "boavista"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/fccf093940b90410b2a3615f4bac5827f5acd581dc18a58b65c0e1821d4e88e8> a sdh:Tema ;
+    rdfs:label "modalidade: ciclismo" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "ciclismo"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/c1ba74bc9f46ff966c036ce70689213567e907135b1d2d0c9c2beb100b32a63b> a sdh:Tema ;
+    rdfs:label "clube: v--guimaraes" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "v--guimaraes"^^xsd:string .
+
+wd:Q12808967 a sdh:EntidadeMencionada ;
+    rdfs:label "Andrija Živković" .
+
+wd:Q16729477 a sdh:EntidadeMencionada ;
+    rdfs:label "Gonçalo Guedes" .
+
+wd:Q17403192 a sdh:EntidadeMencionada ;
+    rdfs:label "Moreira" .
+
+wd:Q1925465 a sdh:EntidadeMencionada ;
+    rdfs:label "Raúl Jiménez" .
+
+wd:Q1988686 a sdh:EntidadeMencionada ;
+    rdfs:label "Douglas Pereira dos Santos" .
+
+wd:Q273776 a sdh:EntidadeMencionada ;
+    rdfs:label "Éderzito António Macedo Lopes" .
+
+wd:Q312507 a sdh:EntidadeMencionada ;
+    rdfs:label "Nélson Oliveira" .
+
+wd:Q326476 a sdh:EntidadeMencionada ;
+    rdfs:label "Jonas" .
+
+wd:Q376394 a sdh:EntidadeMencionada ;
+    rdfs:label "Rodrigo Moreno Machado" .
+
+wd:Q6292355 a sdh:EntidadeMencionada ;
+    rdfs:label "José Gomes da Silva" .
+
+wd:Q7069892 a sdh:EntidadeMencionada ;
+    rdfs:label "Nuno Santos" .
+
+wd:Q7155313 a sdh:EntidadeMencionada ;
+    rdfs:label "Paulo Sérgio Mota" .
+
+<urn:semantic-driven-harvester:prototype:tema/9595d81dfca9a4a13822efd73208e1a7be55979bc10a536d898790f8ca1c94c2> a sdh:Tema ;
+    rdfs:label "competicao: europeu" ;
+    sdh:categoriaTema "competicao"^^xsd:string ;
+    sdh:valorTema "europeu"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/24228a619992d4b9a8111f19050bf35a74d8d37329feadf6ca4f8f2e3fb3d787> a sdh:Tema ;
+    rdfs:label "clube: fc-porto" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "fc-porto"^^xsd:string .
+
+wd:Q15521306 a sdh:EntidadeMencionada ;
+    rdfs:label "Bernardo Silva" .
+
+wd:Q20641302 a sdh:EntidadeMencionada ;
+    rdfs:label "José Pedro Costa Amorim Cerqueira" .
+
+wd:Q377544 a sdh:EntidadeMencionada ;
+    rdfs:label "Bas Dost" .
+
+wd:Q1906140 a sdh:EntidadeMencionada ;
+    rdfs:label "Marvin Zeegelaar" .
+
+wd:Q922118 a sdh:EntidadeMencionada ;
+    rdfs:label "Rodrigo José Lima dos Santos" .
+
+wd:Q485697 a sdh:EntidadeMencionada ;
+    rdfs:label "Pepe" .
+
+wd:Q4979316 a sdh:EntidadeMencionada ;
+    rdfs:label "Bruno Fernandes" .
+
+wd:Q27049064 a sdh:EntidadeMencionada ;
+    rdfs:label "João Félix" .
+
+<urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a> a sdh:Tema ;
+    rdfs:label "secao: modalidades" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "modalidades"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7> a sdh:Tema ;
+    rdfs:label "clube: benfica" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "benfica"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665> a sdh:Tema ;
+    rdfs:label "clube: sporting" ;
+    sdh:categoriaTema "clube"^^xsd:string ;
+    sdh:valorTema "sporting"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> a sdh:Tema ;
+    rdfs:label "secao: multimedia" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "multimedia"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> a sdh:Tema ;
+    rdfs:label "secao: internacional" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "internacional"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e> a sdh:Tema ;
+    rdfs:label "competicao: liga-nos" ;
+    sdh:categoriaTema "competicao"^^xsd:string ;
+    sdh:valorTema "liga-nos"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c> a sdh:Tema ;
+    rdfs:label "modalidade: futebol" ;
+    sdh:categoriaTema "modalidade"^^xsd:string ;
+    sdh:valorTema "futebol"^^xsd:string .
+
+<urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> a sdh:Tema ;
+    rdfs:label "secao: futebol" ;
+    sdh:categoriaTema "secao"^^xsd:string ;
+    sdh:valorTema "futebol"^^xsd:string .
