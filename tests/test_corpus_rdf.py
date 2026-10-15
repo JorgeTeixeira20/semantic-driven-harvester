@@ -13,7 +13,7 @@ from semantic_harvester.corpus_rdf import (
     CacheOnlyClient, build_corpus_graph, build_one_article_graph,
     load_captures_from_raw, load_retained_articles, main as corpus_rdf_main,
     normalize_captures_to_canonical_url, normalize_for_grouping,
-    rebuild_graph_offline, rebuild_offline, url_hash16,
+    rebuild_graph_offline, rebuild_offline, url_hash16, write_summary_markdown,
 )
 from semantic_harvester.rdf_mapper import (
     SDH, article_uri, capture_uri, extracted_text_uri,
@@ -419,6 +419,70 @@ class BuildCorpusGraphTests(OfflineTestCase):
         self.assertIn((article_uri(url_b), RDF.type, SDH.Artigo), second_graph)
 
 
+class FirstCaptureTextPolicyCorpusTests(OfflineTestCase):
+    """Recolha online de artigos novos: só o texto da captura mais antiga."""
+
+    def test_new_article_requests_only_oldest_text_and_historical_is_skipped(self) -> None:
+        raw_dir = self.root / "data" / "raw"
+        version_history_dir = raw_dir / "version_history"
+        output_dir = self.root / "output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        historical = "https://news.example.test/articles/historico"
+        new = "https://news.example.test/articles/novo"
+
+        def item(tstamp: str) -> dict:
+            return {
+                "originalURL": new, "tstamp": tstamp, "title": "Artigo novo",
+                "linkToArchive": f"https://archive.example.test/{tstamp}",
+                "linkToExtractedText": f"https://archive.example.test/text/{tstamp}",
+                "mimeType": "text/html", "contentLength": 100, "digest": f"D{tstamp}",
+                "encoding": "UTF-8", "collection": "SYNTHETIC", "statusCode": 200,
+            }
+
+        write_version_history_raw(version_history_dir, new, offset=0, response_items=[
+            item("20200301000000"), item("20200101000000"), item("20200201000000"),
+        ])
+        with (output_dir / "corpus_classification.csv").open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(
+                handle, fieldnames=["original_url", "title", "captures", "is_artigo", "reason"],
+            )
+            writer.writeheader()
+            for url in (historical, new):
+                writer.writerow({"original_url": url, "title": url, "captures": "1",
+                                 "is_artigo": "True", "reason": "artigo"})
+        # Relatório pré-existente com o esquema atual: o artigo histórico já
+        # foi processado e não é tocado (nem o seu raw é preciso).
+        header = ("original_url,captures_used,captures_url_variants_normalized,"
+                  "captures_dropped_mismatched_url,texts_downloaded_now,texts_reused,"
+                  "texts_failed,error\n")
+        report = output_dir / "corpus_rdf_report.csv"
+        report.write_text(header + f"{historical},2,0,0,1,0,1,\n", encoding="utf-8")
+
+        session = self.fixture_session(
+            ("https://archive.example.test/text/20200101000000", b"texto sintetico"),
+        )
+        graph, results = build_corpus_graph(self.root, client=ArquivoClient(data_dir=raw_dir, session=session))
+
+        by_url = {r.original_url: r for r in results}
+        self.assertEqual(
+            (by_url[new].captures_used, by_url[new].texts_downloaded_now,
+             by_url[new].texts_failed, by_url[new].texts_not_requested),
+            (3, 1, 0, 2),
+        )
+        # Histórico: a falha registada continua falha; nada "não pedido".
+        self.assertEqual((by_url[historical].texts_failed, by_url[historical].texts_not_requested), (1, 0))
+        self.assertEqual(len(set(graph.subjects(RDF.type, SDH.CapturaArquivada))), 3)
+        self.assertEqual(len(set(graph.subjects(RDF.type, SDH.TextoExtraido))), 1)
+        # O esquema do relatório retomável não muda.
+        lines = report.read_text("utf-8").splitlines()
+        self.assertEqual(lines[0] + "\n", header)
+        self.assertEqual(lines[2], f"{new},3,0,0,1,0,0,")
+        write_summary_markdown(results, len(graph), output_dir / "corpus_rdf_summary.md")
+        summary = (output_dir / "corpus_rdf_summary.md").read_text("utf-8")
+        self.assertIn("- Textos indisponíveis (falha ou 404): 1", summary)
+        self.assertIn("não são falhas): 2", summary)
+
+
 REBUILD_URL = "https://news.example.test/articles/reconstrucao"
 REBUILD_TSTAMPS = ("20200101000000", "20200202000000")
 
@@ -539,6 +603,21 @@ class RebuildGraphOfflineTests(OfflineRebuildTestCase):
         self.assertEqual(second_results[0].texts_failed, 0)
         self.assertEqual(second_results[0].texts_downloaded_now, 0)
         self.assertEqual(second_results[0].texts_reused, 2)
+
+    def test_offline_rebuild_still_uses_every_capture(self) -> None:
+        # Só a captura mais recente tem texto na cache: com a política
+        # "primeira" seria ignorada; a reconstrução histórica tem de a usar.
+        self.cache_text(REBUILD_TSTAMPS[1])
+        graph, results = rebuild_graph_offline(self.root)
+        self.assertEqual(
+            (results[0].texts_reused, results[0].texts_failed, results[0].texts_not_requested),
+            (1, 1, 0),
+        )
+        self.assertIn(
+            (capture_uri(REBUILD_URL, REBUILD_TSTAMPS[1]), SDH.temTextoExtraido,
+             extracted_text_uri(REBUILD_URL, REBUILD_TSTAMPS[1])),
+            graph,
+        )
 
 
 class RebuildOfflineTests(OfflineRebuildTestCase):

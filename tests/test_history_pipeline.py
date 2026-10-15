@@ -3,18 +3,21 @@ from __future__ import annotations
 import json
 import unittest
 
+import requests
+
 from rdflib import Graph, Literal, RDF, XSD
 from rdflib.compare import isomorphic
 
 from semantic_harvester.arquivo_client import ArquivoClient
 from semantic_harvester.history_pipeline import (
-    build_manifest_records, collect_all_captures, write_manifest,
+    TEXT_POLICY_ALL, TEXT_POLICY_FIRST, build_manifest_records, calculate_metrics,
+    collect_all_captures, write_manifest,
 )
 from semantic_harvester.rdf_mapper import (
     SDH, article_uri, build_article_history_graph, capture_uri,
     extracted_text_uri, load_manifest, resource_uri,
 )
-from tests.support import FIXTURES, ORIGINAL_URL, OfflineTestCase
+from tests.support import FIXTURES, ORIGINAL_URL, FixtureSession, OfflineTestCase
 
 
 class HistoryPipelineTests(OfflineTestCase):
@@ -32,7 +35,9 @@ class HistoryPipelineTests(OfflineTestCase):
         self.captures, self.raw_paths, self.estimated = collect_all_captures(
             self.client, original_url=ORIGINAL_URL,
         )
-        self.records = build_manifest_records(self.client, self.captures, self.root)
+        self.records = build_manifest_records(
+            self.client, self.captures, self.root, text_policy=TEXT_POLICY_ALL
+        )
         self.manifest_path = self.root / "captures.jsonl"
         write_manifest(self.records, self.manifest_path)
         self.graph = build_article_history_graph(
@@ -203,7 +208,9 @@ class HistoryPipelineTests(OfflineTestCase):
 
     def test_existing_text_is_reused_without_request_or_byte_changes(self) -> None:
         request_count = len(self.session.calls)
-        records = build_manifest_records(self.client, self.captures, self.root)
+        records = build_manifest_records(
+            self.client, self.captures, self.root, text_policy=TEXT_POLICY_ALL
+        )
         self.assertEqual(len(self.session.calls), request_count)
         for original, reused in zip(self.records, records, strict=True):
             self.assertEqual(reused, {**original, "text_downloaded_now": False})
@@ -215,6 +222,112 @@ class HistoryPipelineTests(OfflineTestCase):
         path = self.root / "history.ttl"
         self.graph.serialize(destination=path, format="turtle")
         self.assertTrue(isomorphic(Graph().parse(path, format="turtle"), self.graph))
+
+
+OTHER_URL = "https://news.example.test/articles/outro"
+
+
+def policy_capture(url: str, tstamp: str) -> dict:
+    return {
+        "originalURL": url, "tstamp": tstamp, "title": url, "statusCode": 200,
+        "digest": f"D{tstamp}", "linkToArchive": f"https://archive.example.test/{tstamp}",
+        "linkToExtractedText": f"https://archive.example.test/text/{tstamp}",
+    }
+
+
+class NotFoundSession(FixtureSession):
+    """Como a FixtureSession, mas o texto da URL indicada responde 404."""
+
+    def __init__(self, missing_url: str) -> None:
+        super().__init__()
+        self.missing_url = missing_url
+
+    def get(self, url: str, **kwargs):
+        self.calls.append((url, kwargs))
+        if url != self.missing_url:
+            raise AssertionError(f"Unexpected fixture request: {url}")
+        raise requests.HTTPError("404 Client Error: Not Found")
+
+
+class FirstCaptureTextPolicyTests(OfflineTestCase):
+    """Política para artigos novos: só o texto da captura mais antiga é pedido."""
+
+    def test_only_oldest_capture_of_each_article_is_requested(self) -> None:
+        # Ordem do version_history não cronológica, de propósito.
+        captures = [
+            policy_capture(ORIGINAL_URL, "20200301000000"),
+            policy_capture(ORIGINAL_URL, "20200101000000"),
+            policy_capture(OTHER_URL, "20210505000000"),
+            policy_capture(ORIGINAL_URL, "20200201000000"),
+        ]
+        # A FixtureSession falha perante qualquer pedido fora destes dois.
+        session = self.fixture_session(
+            ("https://archive.example.test/text/20200101000000", b"texto A"),
+            ("https://archive.example.test/text/20210505000000", b"texto B"),
+        )
+        client = ArquivoClient(data_dir=self.root / "raw", session=session)
+
+        records = build_manifest_records(
+            client, captures, self.root, text_policy=TEXT_POLICY_FIRST
+        )
+
+        self.assertEqual(len(records), 4)  # todas as capturas ficam no manifesto
+        requested = {r["tstamp"]: r["text_requested"] for r in records}
+        self.assertEqual(requested, {
+            "20200101000000": True, "20210505000000": True,
+            "20200201000000": False, "20200301000000": False,
+        })
+        for record in records:
+            if record["text_requested"]:
+                self.assertTrue(record["text_download_success"])
+                continue
+            self.assertEqual(
+                (record["text_download_success"], record["text_downloaded_now"],
+                 record["text_size_bytes"], record["text_error"],
+                 record["extracted_text_path"]),
+                (False, False, 0, None, None),
+            )
+        self.assertEqual(len(list(client.texts_dir.iterdir())), 2)
+
+        metrics = calculate_metrics(records, estimated_total=None)
+        self.assertEqual(
+            (metrics.texts_obtained, metrics.text_failures, metrics.texts_not_requested),
+            (2, 0, 2),
+        )
+
+    def test_failed_oldest_text_is_a_failure_without_fallback(self) -> None:
+        captures = [
+            policy_capture(ORIGINAL_URL, "20200101000000"),
+            policy_capture(ORIGINAL_URL, "20200201000000"),
+        ]
+        session = NotFoundSession("https://archive.example.test/text/20200101000000")
+        client = ArquivoClient(data_dir=self.root / "raw", session=session)
+
+        records = build_manifest_records(
+            client, captures, self.root, text_policy=TEXT_POLICY_FIRST
+        )
+
+        # Um só pedido: a segunda captura não é tentada como alternativa.
+        self.assertEqual([url for url, _ in session.calls],
+                         ["https://archive.example.test/text/20200101000000"])
+        self.assertIsNotNone(records[0]["text_error"])
+        self.assertIsNone(records[1]["text_error"])
+        metrics = calculate_metrics(records, estimated_total=None)
+        self.assertEqual((metrics.text_failures, metrics.texts_not_requested), (1, 1))
+
+    def test_unknown_policy_is_rejected(self) -> None:
+        client = ArquivoClient(data_dir=self.root / "raw", session=self.fixture_session())
+        with self.assertRaises(ValueError):
+            build_manifest_records(client, [], self.root, text_policy="nenhuma")
+
+    def test_all_policy_marks_every_capture_as_requested(self) -> None:
+        captures = [policy_capture(ORIGINAL_URL, t) for t in ("20200101000000", "20200201000000")]
+        session = self.fixture_session(
+            *((c["linkToExtractedText"], b"texto") for c in captures),
+        )
+        client = ArquivoClient(data_dir=self.root / "raw", session=session)
+        records = build_manifest_records(client, captures, self.root, text_policy=TEXT_POLICY_ALL)
+        self.assertEqual([r["text_requested"] for r in records], [True, True])
 
 
 if __name__ == "__main__":

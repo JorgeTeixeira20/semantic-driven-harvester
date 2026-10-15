@@ -13,7 +13,7 @@ from typing import Any
 
 import requests
 
-from .arquivo_client import ArquivoClient
+from .arquivo_client import ArquivoClient, TextDownloadResult
 from .rdf_mapper import SAMPLE_ORIGINAL_URL, generate_article_history, stable_hash
 
 LOGGER = logging.getLogger(__name__)
@@ -32,6 +32,7 @@ class HistoryMetrics:
     text_size_min: int | None
     text_size_mean: float | None
     text_size_max: int | None
+    texts_not_requested: int = 0
 
 
 @dataclass(frozen=True)
@@ -97,22 +98,59 @@ def collect_all_captures(
     return captures, raw_paths, estimated_total
 
 
+TEXT_POLICY_FIRST = "primeira"
+TEXT_POLICY_ALL = "todas"
+
+
+def oldest_capture_keys(captures: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    """(originalURL, tstamp) da captura mais antiga de cada artigo (por `tstamp`)."""
+
+    oldest: dict[str, str] = {}
+    for capture in captures:
+        url, tstamp = str(capture["originalURL"]), str(capture["tstamp"])
+        if url not in oldest or tstamp < oldest[url]:
+            oldest[url] = tstamp
+    return set(oldest.items())
+
+
 def build_manifest_records(
     client: ArquivoClient,
     captures: list[dict[str, Any]],
     project_root: Path,
+    *,
+    text_policy: str,
 ) -> list[dict[str, Any]]:
-    """Descarrega/reutiliza textos e cria um registo por captura, sem deduplicar."""
+    """Cria um registo por captura, sem deduplicar; o texto depende de `text_policy`.
+
+    - `TEXT_POLICY_FIRST` ("primeira", política para artigos novos desde
+      2026-10-15, `docs/experiments.md`): só se pede o texto da captura mais
+      antiga de cada artigo; as restantes ficam no manifesto como "não pedido"
+      (`text_requested=False`), nunca como falha.
+    - `TEXT_POLICY_ALL` ("todas"): pede/reutiliza o texto de todas as capturas
+      (corpus histórico de 125 artigos e M3).
+    """
+
+    if text_policy not in (TEXT_POLICY_FIRST, TEXT_POLICY_ALL):
+        raise ValueError(f"Política de texto desconhecida: {text_policy!r}")
+    requested = (
+        oldest_capture_keys(captures) if text_policy == TEXT_POLICY_FIRST else None
+    )
 
     records: list[dict[str, Any]] = []
     for capture in captures:
         original_url = str(capture["originalURL"])
         tstamp = str(capture["tstamp"])
-        download = client.download_extracted_text(
-            capture,
-            skip_existing=True,
-            derive_url_when_missing=True,
-        )
+        text_requested = requested is None or (original_url, tstamp) in requested
+        if text_requested:
+            download = client.download_extracted_text(
+                capture,
+                skip_existing=True,
+                derive_url_when_missing=True,
+            )
+        else:
+            download = TextDownloadResult(
+                success=False, path=None, size_bytes=0, downloaded=False, text_url=None,
+            )
 
         relative_path = None
         if download.path is not None:
@@ -137,6 +175,7 @@ def build_manifest_records(
                 "text_downloaded_now": download.downloaded,
                 "text_size_bytes": download.size_bytes,
                 "text_error": download.error,
+                "text_requested": text_requested,
             }
         )
     return records
@@ -171,13 +210,15 @@ def calculate_metrics(
         newest=tstamps[-1] if tstamps else None,
         texts_obtained=len(successful_sizes),
         text_failures=sum(
-            not bool(record["text_download_success"]) for record in records
+            record.get("text_requested", True) and not bool(record["text_download_success"])
+            for record in records
         ),
         distinct_digests=len(digest_counts),
         repeated_digests=sum(count - 1 for count in digest_counts.values()),
         text_size_min=min(successful_sizes) if successful_sizes else None,
         text_size_mean=mean(successful_sizes) if successful_sizes else None,
         text_size_max=max(successful_sizes) if successful_sizes else None,
+        texts_not_requested=sum(not record.get("text_requested", True) for record in records),
     )
 
 
@@ -194,7 +235,8 @@ def run_history_pipeline(
         original_url=original_url,
         page_size=page_size,
     )
-    records = build_manifest_records(client, captures, root)
+    # M3 (artigo único histórico): mantém o texto de todas as capturas.
+    records = build_manifest_records(client, captures, root, text_policy=TEXT_POLICY_ALL)
     manifest_path = root / "data" / "processed" / "captures_manifest.jsonl"
     write_manifest(records, manifest_path)
     metrics = calculate_metrics(records, estimated_total)
@@ -209,6 +251,7 @@ def print_metrics(metrics: HistoryMetrics) -> None:
     print(f"Captura mais recente: {metrics.newest}")
     print(f"Textos obtidos: {metrics.texts_obtained}")
     print(f"Falhas de texto: {metrics.text_failures}")
+    print(f"Textos não pedidos (só a 1.ª captura): {metrics.texts_not_requested}")
     print(f"Digests distintos: {metrics.distinct_digests}")
     print(f"Digests repetidos: {metrics.repeated_digests}")
     if metrics.text_size_mean is None:

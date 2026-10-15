@@ -64,7 +64,7 @@ from typing import Any
 from rdflib import RDF, RDFS, Graph, XSD
 
 from .arquivo_client import ArquivoClient, TextDownloadResult
-from .history_pipeline import build_manifest_records
+from .history_pipeline import TEXT_POLICY_ALL, TEXT_POLICY_FIRST, build_manifest_records
 from .rdf_mapper import SDH, build_article_history_graph, stable_hash
 from .url_identity import strip_scheme, strip_tracking_params
 
@@ -192,6 +192,18 @@ class ArticleGraphResult:
     texts_failed: int
     error: str | None
 
+    @property
+    def texts_not_requested(self) -> int:
+        """Capturas sem pedido de texto (política "primeira"); não são falhas.
+
+        Derivado, para não mudar o esquema de `corpus_rdf_report.csv`, que é
+        retomável e acrescentado em modo append.
+        """
+
+        if self.error is not None:
+            return 0
+        return self.captures_used - self.texts_downloaded_now - self.texts_reused - self.texts_failed
+
 
 RESULT_FIELDS = tuple(f.name for f in fields(ArticleGraphResult))
 
@@ -234,6 +246,7 @@ def build_one_article_graph(
     version_history_dir: Path,
     project_root: Path,
     variants: list[str] | None = None,
+    text_policy: str = TEXT_POLICY_ALL,
 ) -> tuple[Graph | None, ArticleGraphResult]:
     try:
         raw_captures, repeated = load_article_captures(
@@ -257,7 +270,7 @@ def build_one_article_graph(
             dropped,
         )
 
-    records = build_manifest_records(client, captures, project_root)
+    records = build_manifest_records(client, captures, project_root, text_policy=text_policy)
     try:
         graph = build_article_history_graph(records, title, project_root)
     except ValueError as exc:
@@ -270,7 +283,9 @@ def build_one_article_graph(
     reused = sum(
         1 for r in records if r["text_download_success"] and not r["text_downloaded_now"]
     )
-    failed = sum(1 for r in records if not r["text_download_success"])
+    failed = sum(
+        1 for r in records if r["text_requested"] and not r["text_download_success"]
+    )
 
     return graph, ArticleGraphResult(
         original_url=original_url,
@@ -307,7 +322,7 @@ def _summary_intro(n_articles: int, rebuilt_offline: bool) -> list[str]:
 
 
 def _summary_text_lines(
-    downloaded: int, reused: int, failed: int, rebuilt_offline: bool
+    downloaded: int, reused: int, failed: int, not_requested: int, rebuilt_offline: bool
 ) -> list[str]:
     if rebuilt_offline:
         return [
@@ -321,6 +336,8 @@ def _summary_text_lines(
         f"- Textos descarregados (soma de todas as sessões): {downloaded}",
         f"- Textos reutilizados (já existentes em `data/raw/texts/`): {reused}",
         f"- Textos indisponíveis (falha ou 404): {failed}",
+        f"- Textos não pedidos (só a captura mais antiga de cada artigo novo; "
+        f"não são falhas): {not_requested}",
     ]
 
 
@@ -336,6 +353,7 @@ def write_summary_markdown(
     total_downloaded = sum(r.texts_downloaded_now for r in successes)
     total_reused = sum(r.texts_reused for r in successes)
     total_failed = sum(r.texts_failed for r in successes)
+    total_not_requested = sum(r.texts_not_requested for r in successes)
     total_variants = sum(r.captures_url_variants_normalized for r in successes)
     total_dropped = sum(r.captures_dropped_mismatched_url for r in results)
     articles_with_variants = sum(
@@ -350,7 +368,8 @@ def write_summary_markdown(
         f"- Artigos com falha (raw em falta ou manifesto inválido): {len(failures)}",
         f"- Total de capturas incluídas no grafo: {total_captures}",
         *_summary_text_lines(
-            total_downloaded, total_reused, total_failed, rebuilt_offline
+            total_downloaded, total_reused, total_failed, total_not_requested,
+            rebuilt_offline,
         ),
         f"- Triplos no grafo final (`output/corpus_articles.ttl`): {graph_size}",
         f"- Capturas com `originalURL` normalizado (variante de esquema ou "
@@ -434,8 +453,11 @@ def build_corpus_graph(
                 for index, row in enumerate(pending, start=1):
                     url = row["original_url"]
                     title = row["title"]
+                    # Artigos novos (os já no relatório são saltados): só o
+                    # texto da captura mais antiga (docs/experiments.md).
                     graph, result = build_one_article_graph(
-                        client, url, title, version_history_dir, root, variants_of(row)
+                        client, url, title, version_history_dir, root, variants_of(row),
+                        text_policy=TEXT_POLICY_FIRST,
                     )
                     if graph is not None:
                         triples_handle.write(graph.serialize(format="nt"))
@@ -561,7 +583,7 @@ def rebuild_graph_offline(
     for row in articles:
         graph, result = build_one_article_graph(
             client, row["original_url"], row["title"], version_history_dir, root,
-            variants_of(row),
+            variants_of(row), text_policy=TEXT_POLICY_ALL,
         )
         if graph is not None:
             combined += graph
