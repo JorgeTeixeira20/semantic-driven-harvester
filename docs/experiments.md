@@ -3183,4 +3183,59 @@ Bas Dost 3), confirmando que a ligação lê os dados certos.
 
 Testes: 5 novos em `tests/test_navigation_prototype.py` (as três queries
 novas com um grafo sintético D+B; geração completa com e sem os ficheiros de
-D/B). Suite completa: **184 testes, todos a passar**.
+D/B). Suite completa: **190 testes, todos a passar**.
+
+## Política de texto para artigos novos: só a captura mais antiga (implementada, não executada; 2026-10-15)
+
+### Decisão
+
+Para alargar o corpus sem descarregar o texto de todas as capturas de cada
+artigo novo:
+
+- O `version_history` continua a ser paginado até ao fim;
+  `estimated_nr_results` não é usado para nada.
+- `download_extracted_text` só é chamado para a captura **mais antiga** de
+  cada artigo (menor `tstamp` por `originalURL`, depois da normalização das
+  variantes cosméticas de URL).
+- As outras capturas entram no manifesto e no grafo (`CapturaArquivada`, sem
+  `TextoExtraido`) com `text_requested = False`: **"não pedido"**, que não se
+  confunde com um 404 nem com um timeout.
+- Se o texto da captura mais antiga falhar, conta como falha e **não** se
+  tenta a seguinte (decisão do Jorge: só a primeira).
+- A descoberta continua a ser a pesquisa por palavra-chave com
+  `siteSearch=record.pt`; o RSS não é usado (ver a secção anterior).
+
+### Implementação
+
+- `history_pipeline.build_manifest_records(..., text_policy=...)` passa a
+  exigir a política explicitamente: `TEXT_POLICY_FIRST` (`"primeira"`) ou
+  `TEXT_POLICY_ALL` (`"todas"`); não há valor por omissão silencioso.
+- `corpus_rdf.build_corpus_graph` (recolha online, retomável) usa
+  `"primeira"`. Como salta os artigos já em `output/corpus_rdf_report.csv`, a
+  política só se aplica a artigos **novos**; os 125 do corpus atual não são
+  reprocessados.
+- `corpus_rdf.rebuild_graph_offline` (`--rebuild-offline`) e o M3
+  (`run_history_pipeline`) usam `"todas"`: a reconstrução do corpus histórico
+  continua a usar o texto de todas as capturas em cache.
+- As falhas de texto (`texts_failed` no relatório, `text_failures` nas
+  métricas do M3) passam a contar só capturas **com pedido**. O número de
+  "não pedidos" é derivado (`captures_used − descarregados − reutilizados −
+  falhados`) em vez de ser uma coluna nova, para não mudar o esquema do
+  relatório retomável, que é escrito em modo append; o resumo
+  (`corpus_rdf_summary.md`) ganha uma linha para ele.
+
+### Testes (offline, fixtures sintéticas)
+
+Só a mais antiga é pedida, mesmo com o `version_history` fora de ordem
+cronológica; as outras ficam "não pedido" e não contam como falha; 404 na
+mais antiga conta como falha, sem tentar a seguinte; política desconhecida
+é rejeitada; a recolha online de um artigo novo pede um só texto e não toca
+no artigo histórico já no relatório, com o esquema do relatório inalterado;
+a reconstrução offline continua a usar o texto de uma captura que não é a
+mais antiga. Suite completa: 190 testes OK.
+
+### O que não foi feito
+
+Nada foi corrido contra a API real e o corpus de 125 artigos não foi
+regenerado. Correr a política sobre dados reais, ou alargar o corpus com ela,
+é uma decisão à parte.

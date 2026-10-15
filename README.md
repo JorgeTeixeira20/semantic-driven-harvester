@@ -278,6 +278,19 @@ os textos extraídos de cada captura, reutilizando os que já existirem em
 nem `output/article_history.ttl`, do M2/M3) e relatórios em
 `output/corpus_rdf_report.csv`/`output/corpus_rdf_summary.md`.
 
+**Política de texto para artigos novos** (desde 2026-10-15; ver
+`docs/experiments.md`): para os artigos ainda não presentes em
+`output/corpus_rdf_report.csv`, o `version_history` continua a ser lido até
+ao fim (sem usar `estimated_nr_results`), mas só se pede o texto extraído da
+captura **mais antiga** (menor `tstamp`) de cada artigo. As restantes
+capturas entram no grafo sem texto e contam como "não pedido", não como
+falha (sem tentativa alternativa noutra captura se o texto da mais antiga
+falhar). Os 125 artigos já processados são saltados e não mudam; a
+reconstrução offline (`--rebuild-offline`) e o M3 continuam a usar o texto de
+todas as capturas. A descoberta de artigos continua a ser a pesquisa por
+palavra-chave com `siteSearch=record.pt` (sem RSS). Esta política **não foi
+ainda corrida contra a API real**.
+
 ## Retentar os textos que falharam por timeout (antes do Caminho D)
 
 Para retentar as 324 capturas cuja última falha foi timeout ou ligação
