@@ -335,6 +335,22 @@ o corpo do artigo (`--texto corpo`, variante c′, `article_body.py`); as
 capturas sem corpo ficam numa camada própria (`sem_corpo`). Sem `--limiar`, a
 Camada 1 fica `pendente_limiar`. Desenho e decisões em `docs/experiments.md`.
 
+### Título exato vs. digest: estratégia de deduplicação antes do download
+
+```bash
+python -m semantic_harvester.dedup_strategy_check
+```
+
+Sem rede: lê `output/corpus_classification.csv`, `output/corpus_redundancy.csv`
+e o raw de `version_history` já em cache (`data/raw/version_history/`).
+Mede, contra os rótulos reais já calculados por Jaccard (Camada 1), se
+dedupicar por título exato (como o "Major Minors", Martins & Costa, Prémio
+Arquivo.pt 2021) ou por `digest` apanharia os mesmos duplicados sem
+descarregar o texto. Escreve `output/corpus_dedup_strategy_check.md`.
+Requer o raw e as saídas de classificação/redundância já presentes — não
+corre nesta sandbox (sem `data/raw/version_history/`), só numa sessão local
+com o corpus real.
+
 ### Variante (b): remoção do chrome
 
 ```bash
