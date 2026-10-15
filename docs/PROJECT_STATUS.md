@@ -500,8 +500,15 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    Caminho A; tornou visível que as capturas vão de 2017 a 2023 (nenhuma de
    2015–2016) e que as 24 de 2020–2023 não têm texto. A lista de artigos tem
    pesquisa por título/URL e filtro por secção (JavaScript embutido, sem
-   dependências). Fora desta versão: dados de D e B (sem RDF ainda) e
-   consultas novas sem regenerar.
+   dependências).
+
+   **Ligado a D e B em 2026-10-15** (`docs/experiments.md`, "Protótipo
+   ligado aos Caminhos D e B"): quando `output/corpus_redundancy.ttl` e
+   `output/corpus_entities.ttl` existem, juntam-se ao mesmo grafo; o
+   histórico de cada artigo assinala capturas redundantes, a página do
+   artigo mostra Temas/Entidades, e há páginas novas `temas.html`/
+   `entidades.html`. Sem esses ficheiros, gera-se só com o Caminho A, como
+   antes.
 
 **Trabalho relacionado consultado:** *Major Minors* (Martins & Costa, Prémio
 Arquivo.pt 2021, também referido no RPD) deduplica apenas por título exato

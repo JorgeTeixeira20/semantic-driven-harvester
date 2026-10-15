@@ -3146,3 +3146,41 @@ longo), o que permitiu apertar a janela até ao mês.
 - O feed RSS (ponto 2) só vale a pena como fonte de descoberta adicional
   para 2020–2026; para 1999–2015 a via é a pesquisa por palavra-chave já
   usada no Caminho A, com as duas ressalvas dos pontos 1 e 4 em conta.
+
+## Protótipo ligado aos Caminhos D e B (2026-10-15)
+
+**Objetivo.** `navigation_prototype.py` só lia `output/corpus_articles.ttl`
+(Caminho A); os dados de D (redundância) e B (temas/entidades), já em RDF
+desde 2026-10-10 ("RDF dos Caminhos D e B"), não entravam no protótipo.
+Implementado: quando `output/corpus_redundancy.ttl` e
+`output/corpus_entities.ttl` existem, juntam-se ao mesmo grafo em memória
+(os URIs de `Artigo`/`CapturaArquivada` já são partilhados, sem conversão,
+tal como documentado nessa secção). Sem esses dois ficheiros, o protótipo
+continua a gerar-se só com o Caminho A — testado explicitamente
+(`test_generate_without_db_files_skips_extra_pages`).
+
+**O que mudou:**
+
+- `historico_artigo.rq` passa a devolver, por captura, `representanteTstamp`
+  e `similaridade` quando essa captura está marcada `sdh:versaoDe` de outra
+  (Caminho D); a tabela de histórico de cada artigo ganha uma coluna
+  "Redundância (Caminho D)". Nota: uma captura sem essas colunas pode ser
+  representante **ou** não ter sido avaliada por D (`sem_corpo`, Camada 2) —
+  o grafo não distingue os dois casos, só o `corpus_redundancy.csv` o faz.
+- Duas queries novas por artigo (`temas_artigo.rq`, `mencoes_artigo.rq`) e
+  duas secções novas na página do artigo ("Temas", "Entidades mencionadas",
+  só aparecem quando há dados).
+- Duas queries globais (`temas_resumo.rq`, `entidades_resumo.rq`,
+  `redundancia_resumo.rq`) e duas páginas novas, `temas.html` e
+  `entidades.html`, ligadas do índice quando não vazias.
+
+**Resultado real, correndo contra o corpus atual** (125 artigos):
+`temas: 40; entidades: 82; capturas redundantes: 642` — os mesmos números já
+publicados em "RDF dos Caminhos D e B" (40 nós `Tema`, 82 `EntidadeMencionada`,
+642 capturas redundantes) e a mesma ordenação de entidades por persistência
+já ali reportada (João Félix 6, Bruno Fernandes 5, Pepe 5, Marvin Zeegelaar 4,
+Bas Dost 3), confirmando que a ligação lê os dados certos.
+
+Testes: 5 novos em `tests/test_navigation_prototype.py` (as três queries
+novas com um grafo sintético D+B; geração completa com e sem os ficheiros de
+D/B). Suite completa: **184 testes, todos a passar**.

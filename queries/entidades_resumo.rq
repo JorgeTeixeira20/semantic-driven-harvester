@@ -1,0 +1,23 @@
+# Caminho B (corpus_entities.ttl, opcional): resumo global de entidades
+# mencionadas, ordenado por persistência (nº de artigos com menção
+# persistente), tal como reportado em docs/experiments.md ("João Félix 6,
+# Bruno Fernandes 5, Pepe 5, ...").
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?entidade ?rotulo
+       (COUNT(DISTINCT ?artigo) AS ?artigos)
+       (SUM(?ocorrencias) AS ?ocorrenciasTotal)
+       (COUNT(DISTINCT ?mencaoPersistente) AS ?artigosPersistentes)
+WHERE {
+  ?artigo sdh:temMencao ?mencao .
+  ?mencao sdh:sobreEntidade ?entidade ;
+          sdh:ocorrencias ?ocorrencias .
+  OPTIONAL {
+    ?mencao sdh:persistente true .
+    BIND(?mencao AS ?mencaoPersistente)
+  }
+  ?entidade rdfs:label ?rotulo .
+}
+GROUP BY ?entidade ?rotulo
+ORDER BY DESC(?artigosPersistentes) DESC(?artigos) ?rotulo

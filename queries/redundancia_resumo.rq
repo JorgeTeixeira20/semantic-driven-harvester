@@ -1,0 +1,8 @@
+# Caminho D (corpus_redundancy.ttl, opcional): nº total de capturas
+# marcadas como redundantes (uma cópia de outra), em todo o grafo.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+
+SELECT (COUNT(?captura) AS ?capturasRedundantes)
+WHERE {
+  ?captura sdh:versaoDe ?representante .
+}

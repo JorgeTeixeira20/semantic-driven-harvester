@@ -400,6 +400,14 @@ sobre `output/corpus_articles.ttl` e gera páginas HTML estáticas em
 por ano e por `statusCode`, artigos mais capturados, lista de artigos e o
 histórico cronológico de capturas de cada artigo, com ligação ao Arquivo.pt.
 
+Se `output/corpus_redundancy.ttl` (Caminho D) e `output/corpus_entities.ttl`
+(Caminho B) existirem, juntam-se ao mesmo grafo (os URIs já são partilhados,
+sem conversão): o histórico de cada artigo passa a assinalar as capturas
+redundantes (`sdh:versaoDe`, com a similaridade), a página do artigo mostra os
+seus Temas e Entidades mencionadas, e o índice e as páginas `temas.html`/
+`entidades.html` resumem isso para o corpus todo. Sem esses dois ficheiros, o
+protótipo gera-se só com o Caminho A, como antes.
+
 ### Variante (c′): corpo do artigo por âncoras literais
 
 ```bash

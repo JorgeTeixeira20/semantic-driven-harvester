@@ -2,15 +2,26 @@
 
 Implementa a proposta de `docs/experiments.md` ("Protótipo de navegação").
 Corre as queries versionadas em `queries/*.rq` com `rdflib` (SPARQL em
-memória) sobre `output/corpus_articles.ttl` e gera `output/prototipo/`:
+memória) sobre `output/corpus_articles.ttl`, opcionalmente juntando
+`output/corpus_redundancy.ttl` (Caminho D) e `output/corpus_entities.ttl`
+(Caminho B) ao mesmo grafo — os três combinam-se sem conversão, por partilharem
+os URIs de `Artigo`/`CapturaArquivada` (`docs/experiments.md`, "RDF dos
+Caminhos D e B"). Gera `output/prototipo/`:
 
 - `index.html`: capturas por ano, textos por `statusCode`, os 10 artigos com
-  mais capturas e a lista de todos os artigos (estrutura);
-- `artigos/<id>.html`: o histórico de capturas de cada artigo, por ordem
-  cronológica, com ligação para cada captura no Arquivo.pt.
+  mais capturas e a lista de todos os artigos (estrutura); se D/B estiverem
+  presentes, também o nº de capturas redundantes e os temas/entidades mais
+  frequentes, com ligação para `temas.html`/`entidades.html`;
+- `artigos/<id>.html`: o histórico de capturas de cada artigo (cronológico,
+  com a redundância do Caminho D quando existe) e, se existirem, os seus
+  temas e entidades mencionadas (Caminho B);
+- `temas.html`, `entidades.html`: resumo global, só gerados quando há dados
+  de B no grafo.
 
 Sem servidor nem dependências novas: abre-se `index.html` no browser. Não
-faz pedidos à rede nem altera o grafo. Os dados de D e B (só CSV) não entram.
+faz pedidos à rede nem altera nenhum grafo. Se `corpus_redundancy.ttl`/
+`corpus_entities.ttl` não existirem, o protótipo gera-se só com o Caminho A,
+como antes.
 """
 
 from __future__ import annotations
@@ -29,6 +40,9 @@ from rdflib import Graph, URIRef
 
 INDEX = "index.html"
 ARTICLES_DIR = "artigos"
+TEMAS_PAGE = "temas.html"
+ENTIDADES_PAGE = "entidades.html"
+WIKIDATA_ENTITY = "http://www.wikidata.org/entity/"
 
 STYLE = """
 :root {
@@ -263,6 +277,25 @@ def badge_text(available: bool) -> str:
             else '<span class="badge muted">não</span>')
 
 
+def redundancy_badge(row: dict[str, Any]) -> str:
+    """Caminho D, opcional: só preenchido numa captura marcada `sdh:versaoDe`."""
+
+    representative = row.get("representanteTstamp")
+    if representative is None:
+        return '<span class="badge muted">—</span>'
+    similarity = row.get("similaridade")
+    sim_text = f"{float(similarity):.2f}" if similarity is not None else "?"
+    return f'<span class="badge warn">cópia de {esc(representative)} (sim. {sim_text})</span>'
+
+
+def entity_link(uri: str, rotulo: str) -> str:
+    """Rótulo com ligação à Wikidata quando o URI da entidade é um QID; texto simples no fallback."""
+
+    if uri.startswith(WIKIDATA_ENTITY):
+        return link(uri, f"{rotulo} ↗")
+    return esc(rotulo)
+
+
 def short_url(url: str) -> str:
     parts = urlsplit(url)
     return (parts.path + (f"?{parts.query}" if parts.query else "")) or url
@@ -303,7 +336,11 @@ def page(title: str, hero: str, body: str, script: str = "") -> str:
 
 def index_page(
     articles: list[dict], top: list[dict], per_year: list[dict], per_status: list[dict],
+    temas: list[dict] | None = None, entidades: list[dict] | None = None,
+    redundant_captures: int = 0,
 ) -> str:
+    temas = temas or []
+    entidades = entidades or []
     total_captures = sum(a["capturas"] for a in articles)
     total_texts = sum(a["textos"] for a in articles)
     share = f"{100 * total_texts / total_captures:.1f}% das capturas".replace(".", ",") if total_captures else ""
@@ -317,12 +354,21 @@ def index_page(
         "Cada artigo leva ao seu histórico de capturas, por ordem cronológica.</p>"
     )
     sections = Counter(section_of(r["url"]) for r in articles)
+    extra_stats = []
+    if total_captures:
+        redundant_share = f"{100 * redundant_captures / total_captures:.1f}% das capturas".replace(".", ",")
+        extra_stats.append(stat("Redundantes (Caminho D)", redundant_captures, redundant_share))
+    if temas:
+        extra_stats.append(stat("Temas", len(temas), "Caminho B"))
+    if entidades:
+        extra_stats.append(stat("Entidades mencionadas", len(entidades), "Caminho B"))
     body = [
         '<div class="stats">',
         stat("Artigos", len(articles), "jornal Record"),
         stat("Capturas arquivadas", total_captures),
         stat("Com texto extraído", total_texts, share),
         stat("Período das capturas", period, small=True),
+        *extra_stats,
         "</div>",
         '<div class="grid-2">',
         card("Capturas por ano", '<div class="table-wrap">' + table(
@@ -363,15 +409,71 @@ def index_page(
                  cell_classes={0: "title", 1: "url", 4: "date", 5: "date"}) + "</div>",
              f"{len(sections)} secções do site. Pesquisa sem distinguir maiúsculas nem acentos."),
     ]
+    if temas or entidades:
+        body.append('<div class="grid-2">')
+        if temas:
+            body.append(card(
+                "Temas mais frequentes", '<div class="table-wrap">' + table(
+                    ["Tema", "Artigos"],
+                    [[esc(r["rotulo"]), esc(r["artigos"])] for r in temas[:10]],
+                    numeric={1}) + "</div>"
+                + f'<p class="sub"><a href="{TEMAS_PAGE}">Ver todos os {len(temas)} temas →</a></p>',
+                "Classificação editorial pelo URL (Caminho B)."))
+        if entidades:
+            body.append(card(
+                "Entidades mais persistentes", '<div class="table-wrap">' + table(
+                    ["Entidade", "Artigos com menção persistente"],
+                    [[entity_link(r["entidade"], r["rotulo"]), esc(r["artigosPersistentes"])]
+                     for r in entidades[:10]],
+                    numeric={1}) + "</div>"
+                + f'<p class="sub"><a href="{ENTIDADES_PAGE}">Ver todas as {len(entidades)} entidades →</a></p>',
+                "Vocabulário fechado da Wikidata (Caminho B)."))
+        body.append("</div>")
     return page("Protótipo de navegação", hero, "".join(body), FILTER_SCRIPT)
 
 
-def article_page(article: dict, history: list[dict]) -> str:
+def temas_page(temas: list[dict]) -> str:
+    hero = (
+        f'<p class="crumb"><a href="{INDEX}">← Protótipo de navegação</a></p>'
+        "<h1>Temas</h1>"
+        "<p>Classificação editorial dos artigos pelo próprio <code>originalURL</code> "
+        "(Caminho B) — modalidade, competição ou clube-secção. Não exige que a "
+        "palavra apareça no texto.</p>"
+    )
+    body = card("Todos os temas", '<div class="table-wrap tall">' + table(
+        ["Tema", "Artigos"],
+        [[esc(r["rotulo"]), esc(r["artigos"])] for r in temas],
+        numeric={1}) + "</div>")
+    return page("Temas", hero, body)
+
+
+def entidades_page(entidades: list[dict]) -> str:
+    hero = (
+        f'<p class="crumb"><a href="{INDEX}">← Protótipo de navegação</a></p>'
+        "<h1>Entidades mencionadas</h1>"
+        "<p>Vocabulário fechado de jogadores da Wikidata (Caminho B); "
+        "ordenadas pelo nº de artigos em que a menção é persistente.</p>"
+    )
+    body = card("Todas as entidades", '<div class="table-wrap tall">' + table(
+        ["Entidade", "Artigos", "Artigos com menção persistente", "Ocorrências"],
+        [[entity_link(r["entidade"], r["rotulo"]), esc(r["artigos"]),
+          esc(r["artigosPersistentes"]), esc(r["ocorrenciasTotal"])] for r in entidades],
+        numeric={1, 2, 3}) + "</div>")
+    return page("Entidades mencionadas", hero, body)
+
+
+def article_page(
+    article: dict, history: list[dict],
+    temas: list[dict] | None = None, mencoes: list[dict] | None = None,
+) -> str:
+    temas = temas or []
+    mencoes = mencoes or []
     rows = [
         [esc(r["data"]), f'<span class="mono">{esc(r["tstamp"])}</span>', badge_status(r["status"]),
          f'<span class="mono">{esc(r["digest"])}</span>', esc(r["tamanho"]),
          badge_text(bool(r["ficheiro"])),
-         link(r["arquivo"], "Abrir ↗") if r["arquivo"] else "—"]
+         link(r["arquivo"], "Abrir ↗") if r["arquivo"] else "—",
+         redundancy_badge(r)]
         for r in history
     ]
     hero = (
@@ -388,10 +490,25 @@ def article_page(article: dict, history: list[dict]) -> str:
         stat("Última captura", article["ultima"], small=True),
         "</div>",
         card("Histórico de capturas", '<div class="table-wrap">' + table(
-            ["Data", "tstamp", "statusCode", "digest", "Tamanho (bytes)", "Texto", "Arquivo.pt"],
+            ["Data", "tstamp", "statusCode", "digest", "Tamanho (bytes)", "Texto", "Arquivo.pt",
+             "Redundância (Caminho D)"],
             rows, numeric={2, 4, 5}, cell_classes={0: "date"}) + "</div>",
-            "Por ordem cronológica, uma linha por captura."),
+            "Por ordem cronológica, uma linha por captura. \"—\" na redundância "
+            "significa representante ou não avaliado pelo Caminho D, não necessariamente distinto."),
     ]
+    if temas:
+        chips = " ".join(f'<span class="badge muted">{esc(t["rotulo"])}</span>' for t in temas)
+        body.append(card("Temas", chips, "Classificação editorial pelo URL (Caminho B)."))
+    if mencoes:
+        mencao_rows = [
+            [entity_link(m["entidade"], m["rotulo"]), esc(m["ocorrencias"]),
+             badge_text(bool(m["persistente"])), esc(m["clubeCoerente"])]
+            for m in mencoes
+        ]
+        body.append(card("Entidades mencionadas", '<div class="table-wrap">' + table(
+            ["Entidade", "Ocorrências", "Persistente", "Clube coerente"],
+            mencao_rows, numeric={1}) + "</div>",
+            "Vocabulário fechado de jogadores da Wikidata (Caminho B)."))
     return page(fmt(article["titulo"]), hero, "".join(body))
 
 
@@ -399,30 +516,50 @@ def article_page(article: dict, history: list[dict]) -> str:
 
 
 def generate(
-    ttl_path: Path, queries_dir: Path, out_dir: Path
+    ttl_path: Path, queries_dir: Path, out_dir: Path,
+    redundancy_ttl: Path | None = None, entities_ttl: Path | None = None,
 ) -> dict[str, Any]:
     graph = Graph().parse(ttl_path, format="turtle")
+    for extra_ttl in (redundancy_ttl, entities_ttl):
+        if extra_ttl is not None and extra_ttl.is_file():
+            graph.parse(extra_ttl, format="turtle")
+
     articles = run_query(graph, queries_dir, "artigos")
     top = run_query(graph, queries_dir, "mais_capturados")
     per_year = run_query(graph, queries_dir, "capturas_por_ano")
     per_status = run_query(graph, queries_dir, "textos_por_status")
+    temas = run_query(graph, queries_dir, "temas_resumo")
+    entidades = run_query(graph, queries_dir, "entidades_resumo")
+    redundancia = run_query(graph, queries_dir, "redundancia_resumo")
+    redundant_captures = redundancia[0]["capturasRedundantes"] if redundancia else 0
 
     if out_dir.exists():
         shutil.rmtree(out_dir)
     (out_dir / ARTICLES_DIR).mkdir(parents=True)
     (out_dir / INDEX).write_text(
-        index_page(articles, top, per_year, per_status), encoding="utf-8"
+        index_page(articles, top, per_year, per_status, temas, entidades, redundant_captures),
+        encoding="utf-8",
     )
+    if temas:
+        (out_dir / TEMAS_PAGE).write_text(temas_page(temas), encoding="utf-8")
+    if entidades:
+        (out_dir / ENTIDADES_PAGE).write_text(entidades_page(entidades), encoding="utf-8")
+
     history_rows = 0
     for article in articles:
-        history = run_query(graph, queries_dir, "historico_artigo",
-                            {"artigo": URIRef(article["artigo"])})
+        bindings = {"artigo": URIRef(article["artigo"])}
+        history = run_query(graph, queries_dir, "historico_artigo", bindings)
+        article_temas = run_query(graph, queries_dir, "temas_artigo", bindings)
+        article_mencoes = run_query(graph, queries_dir, "mencoes_artigo", bindings)
         history_rows += len(history)
         path = out_dir / ARTICLES_DIR / f"{article_id(article['artigo'])}.html"
-        path.write_text(article_page(article, history), encoding="utf-8")
+        path.write_text(
+            article_page(article, history, article_temas, article_mencoes), encoding="utf-8"
+        )
     return {
         "artigos": articles, "mais_capturados": top, "capturas_por_ano": per_year,
         "textos_por_status": per_status, "linhas_de_historico": history_rows,
+        "temas": temas, "entidades": entidades, "capturas_redundantes": redundant_captures,
     }
 
 
@@ -434,9 +571,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.parse_args(argv)
     root = Path(__file__).resolve().parents[2]
     out_dir = root / "output" / "prototipo"
-    result = generate(root / "output" / "corpus_articles.ttl", root / "queries", out_dir)
+    result = generate(
+        root / "output" / "corpus_articles.ttl", root / "queries", out_dir,
+        redundancy_ttl=root / "output" / "corpus_redundancy.ttl",
+        entities_ttl=root / "output" / "corpus_entities.ttl",
+    )
     print(f"Artigos: {len(result['artigos'])}; linhas de histórico: "
-          f"{result['linhas_de_historico']}")
+          f"{result['linhas_de_historico']}; temas: {len(result['temas'])}; "
+          f"entidades: {len(result['entidades'])}; capturas redundantes: "
+          f"{result['capturas_redundantes']}")
     print(f"Abrir no browser: {out_dir / INDEX}")
     return 0
 

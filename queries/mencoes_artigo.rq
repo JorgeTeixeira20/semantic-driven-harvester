@@ -1,0 +1,19 @@
+# Caminho B (corpus_entities.ttl, opcional): entidades mencionadas no texto
+# de um artigo, com as métricas da Mencao. ?artigo é ligado na execução
+# (initBindings).
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?entidade ?rotulo ?ocorrencias ?persistente ?clubeCoerente
+       ?capturasComMencao ?capturasComTexto
+WHERE {
+  ?artigo sdh:temMencao ?mencao .
+  ?mencao sdh:sobreEntidade ?entidade ;
+          sdh:ocorrencias ?ocorrencias ;
+          sdh:persistente ?persistente ;
+          sdh:clubeCoerente ?clubeCoerente ;
+          sdh:capturasComMencao ?capturasComMencao ;
+          sdh:capturasComTexto ?capturasComTexto .
+  ?entidade rdfs:label ?rotulo .
+}
+ORDER BY DESC(?ocorrencias) ?rotulo

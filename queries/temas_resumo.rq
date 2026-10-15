@@ -1,0 +1,14 @@
+# Caminho B (corpus_entities.ttl, opcional): resumo global de temas, com o
+# nº de artigos distintos em cada um.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?categoria ?valor ?rotulo (COUNT(DISTINCT ?artigo) AS ?artigos)
+WHERE {
+  ?artigo sdh:temTema ?tema .
+  ?tema sdh:categoriaTema ?categoria ;
+        sdh:valorTema ?valor ;
+        rdfs:label ?rotulo .
+}
+GROUP BY ?categoria ?valor ?rotulo
+ORDER BY DESC(?artigos) ?rotulo

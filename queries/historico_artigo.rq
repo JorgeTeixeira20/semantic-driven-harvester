@@ -1,8 +1,10 @@
 # (ii) Temporal: histórico completo de capturas de um artigo, por ordem
 # cronológica. ?artigo é ligado na execução (initBindings).
+# `representanteTstamp`/`similaridade` vêm do Caminho D (corpus_redundancy.ttl,
+# opcional): presentes só numa captura marcada `sdh:versaoDe` de outra.
 PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
 
-SELECT ?tstamp ?data ?status ?digest ?tamanho ?arquivo ?ficheiro
+SELECT ?tstamp ?data ?status ?digest ?tamanho ?arquivo ?ficheiro ?representanteTstamp ?similaridade
 WHERE {
   ?artigo sdh:temRecursoWeb ?recurso .
   ?recurso sdh:temCaptura ?captura .
@@ -13,5 +15,7 @@ WHERE {
   OPTIONAL { ?captura sdh:contentLength ?tamanho }
   OPTIONAL { ?captura sdh:archiveURL ?arquivo }
   OPTIONAL { ?captura sdh:temTextoExtraido ?texto . ?texto sdh:filePath ?ficheiro }
+  OPTIONAL { ?captura sdh:versaoDe ?representante . ?representante sdh:tstamp ?representanteTstamp }
+  OPTIONAL { ?captura sdh:similaridade ?similaridade }
 }
 ORDER BY ?tstamp

@@ -1,0 +1,13 @@
+# Caminho B (corpus_entities.ttl, opcional): temas de um artigo (editorial,
+# pelo originalURL). ?artigo é ligado na execução (initBindings).
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?categoria ?valor ?rotulo
+WHERE {
+  ?artigo sdh:temTema ?tema .
+  ?tema sdh:categoriaTema ?categoria ;
+        sdh:valorTema ?valor ;
+        rdfs:label ?rotulo .
+}
+ORDER BY ?categoria ?valor
