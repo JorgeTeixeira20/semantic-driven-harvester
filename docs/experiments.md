@@ -3044,3 +3044,105 @@ texto, 117 são 200, 32 são 302, 2 são 404 e 1 é 301 — **as 35 capturas com
   silêncio).
 - A retentativa foi corrida pelo autor; os números foram verificados a partir
   dos ficheiros produzidos, não observados em direto.
+
+## Alcance temporal do `record.pt` no Arquivo.pt: RSS, homepage e pesquisa por palavra-chave (2026-10-15)
+
+### Motivação
+
+Depois de confirmado o limite 2015–2020 do corpus atual (Caminho A), o autor
+pediu para explorar duas vias de alargar a cobertura temporal: (1) o feed RSS
+do site, como fonte de descoberta adicional; (2) até onde o `record.pt`
+recua no Arquivo.pt, com a esperança inicial de 20–30 anos. Todos os testes
+desta secção foram corridos manualmente pelo autor no browser, colando os
+URLs pedidos e reportando o JSON devolvido; nada foi integrado no corpus.
+
+### 1. `version_history` do feed RSS: `/rss` e `/rss/` não são pesquisas distintas
+
+Pedir `version_history` para `www.record.pt/rss` e, em separado, para
+`www.record.pt/rss/` devolveu as duas vezes o mesmo `estimated_nr_results`
+(889) e o mesmo ponto de corte real (`offset=850` com dados, `offset=900`
+vazio), com o mesmo `tstamp` mais antigo. Confirmado por inspeção direta:
+os `originalURL` devolvidos por uma única pesquisa já vêm misturados, com e
+sem barra final — o Arquivo.pt normaliza a barra internamente antes de
+calcular o histórico, tal como o achado já documentado em `corpus_rdf.py`
+sobre variantes cosméticas de `originalURL` num único `version_history`.
+**Correção a uma recomendação anterior:** não é preciso pesquisar as duas
+formas em separado e juntar os resultados à mão; uma só pesquisa já basta.
+
+### 2. Alcance do feed RSS: só a partir de 2018-08-06
+
+Com `from=2015&to=2020`, a última página com dados (`offset=850`) tem como
+último item `tstamp=20180806190610`; `offset=900` vem vazio, confirmando o
+fim real da paginação (não só o `next_page`, que nesta API nem sempre é de
+confiar — ver Experiência 1). **O feed RSS não tem nenhuma captura antes de
+6 de agosto de 2018.** Não serve para cobrir 2015–2017; o único ganho real
+seria 2020–2026, período ainda não coberto pela descoberta atual.
+
+### 3. A homepage está arquivada desde 1998 — mas essa captura não é o jornal
+
+`version_history` de `www.record.pt` (sem `from`/`to`) alcança `offset=4900`
+como última página com dados, com `tstamp` mais antigo `19981202152653`
+(2 de dezembro de 1998). Testado o conteúdo dessa captura via pesquisa por
+palavra-chave (`q=record&siteSearch=record.pt&from=1998&to=1999`): o único
+resultado tem título **"Servidor WWW Virtual da Esoterica"**, snippet
+"Esoterica's virtual web server directory... webmaster@esoterica.pt", e
+`collection: "IA"` (não as coleções próprias do Arquivo.pt vistas noutras
+experiências). **Não é o jornal — é a página de um domínio estacionado num
+serviço de alojamento genérico.** A data de 1998 não conta como início do
+Record Online.
+
+### 4. A pesquisa por palavra-chave não vem ordenada por data
+
+Achado metodológico, confirmado por contradição direta: com
+`q=futebol&siteSearch=record.pt&from=1998&to=2005`, a página 1 tinha como
+último item `tstamp=20010914172917` (set. 2001); a última página real da
+mesma pesquisa (`offset=40480`) devolveu `tstamp=20020125061748` (jan.
+2002) — **mais recente**, não mais antigo. Se a ordenação fosse
+cronológica descendente, como no `version_history`, isto seria impossível.
+**Consequência prática:** para encontrar o extremo temporal de uma
+pesquisa por palavra-chave, não se pode confiar na última página de uma
+janela larga — é preciso estreitar `from`/`to` diretamente e repetir.
+
+### 5. Origem real do Record Online: 1999
+
+Sequência de pesquisas por palavra-chave, estreitando `from`/`to` a cada
+passo (todas com `siteSearch=record.pt`):
+
+| Janela | Palavra | Resultado |
+| --- | --- | --- |
+| 1998–1999 | `futebol`, `jogo`, `notícia` | 0 resultados |
+| 1998–1999 | `record` | 1 resultado: placeholder Esoterica (`tstamp=19990125091626`) |
+| 1998–2001 | `futebol` | "Record On-Line" genuíno, `tstamp=20000707011057`, `record.pt/tn1cs.asp?nid=133349` |
+| 1999–2000 | `record` | "Record On-Line" genuíno em `tstamp=19991128140726`; Esoterica ainda em `19990125091626` |
+| 1999-02 a 1999-11 | `record` | "Record On-Line" genuíno desde `tstamp=19990829110932` (29 ago.); Esoterica ainda em `tstamp=19990208010000` (8 fev.) |
+
+Os itens genuínos têm título "Record On-Line", um menu de modalidades no
+`snippet` (Futebol, Andebol, Atletismo, ...) e URLs no formato
+`record.pt/tn0cs.asp?nid=<id>` ou `record.pt/tn1cs.asp?nid=<id>`.
+**Conclusão:** a transição de domínio estacionado para jornal real
+aconteceu entre 8 de fevereiro e 29 de agosto de 1999. Decisão do autor:
+não apertar mais a data exata (retornos cada vez menores); fica registado
+**1999** como o ano real de nascimento do Record Online no Arquivo.pt, não
+1998 (artefacto do domínio estacionado) nem a janela 2015–2020 do corpus
+atual.
+
+Nota técnica: a API aceita `from`/`to` com mais precisão que o ano —
+`request_parameters` devolveu `"from": "19990000000000"` para um `from=1999`
+pedido, e aceitou sem erro `from=19990200` (um prefixo de timestamp mais
+longo), o que permitiu apertar a janela até ao mês.
+
+### 6. Consequências para trabalho futuro (nada implementado nesta sessão)
+
+- **Novo critério de exclusão necessário**, análogo ao `"Object moved"` já
+  usado em `corpus_classification.py`: título exato
+  `"Servidor WWW Virtual da Esoterica"` identifica uma página de domínio
+  estacionado, não conteúdo editorial.
+- **Terceiro esquema de URL legado a reconhecer**: `tn0cs.asp?nid=<id>` /
+  `tn1cs.asp?nid=<id>` (visto em 1999–2000), distinto do `interior.aspx?
+  content_id=...` do "site antigo" já tratado em `url_identity.py` e do
+  `/detalhe/<slug>` do site atual. Se o corpus for alargado a 1999–2015, a
+  identidade do artigo e a classificação têm de reconhecer também este
+  padrão.
+- O feed RSS (ponto 2) só vale a pena como fonte de descoberta adicional
+  para 2020–2026; para 1999–2015 a via é a pesquisa por palavra-chave já
+  usada no Caminho A, com as duas ressalvas dos pontos 1 e 4 em conta.
