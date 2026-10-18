@@ -34,6 +34,15 @@ from .rdf_mapper import SDH, article_uri, stable_hash
 
 WIKIDATA_ENTITY = "http://www.wikidata.org/entity/"
 
+# Subclasses de sdh:Tema (ontology/semantic_harvester.ttl, 2026-10-18): uma
+# por valor de categoriaTema já em uso em corpus_entities.csv.
+TEMA_SUBCLASS_BY_CATEGORY = {
+    "secao": SDH.Secao,
+    "modalidade": SDH.Modalidade,
+    "competicao": SDH.Competicao,
+    "clube": SDH.Clube,
+}
+
 
 def load_vocabulary_identity(path: Path) -> dict[str, tuple[str, int]]:
     """rotulo → (QIDs separados por `|`, nº de homónimos)."""
@@ -75,8 +84,14 @@ def build_graph(
         if article not in articles_in_graph:
             raise ValueError(f"Artigo ausente de corpus_articles.ttl: {row['artigo']}")
         if row["origem"] == "url":
+            if row["categoria"] not in TEMA_SUBCLASS_BY_CATEGORY:
+                raise ValueError(
+                    f"categoria de Tema desconhecida, sem subclasse na ontologia: "
+                    f"{row['categoria']!r} (artigo {row['artigo']})"
+                )
             tema = tema_uri(row["categoria"], row["rotulo"])
             graph.add((tema, RDF.type, SDH.Tema))
+            graph.add((tema, RDF.type, TEMA_SUBCLASS_BY_CATEGORY[row["categoria"]]))
             graph.add((tema, SDH.categoriaTema, Literal(row["categoria"], datatype=XSD.string)))
             graph.add((tema, SDH.valorTema, Literal(row["rotulo"], datatype=XSD.string)))
             graph.add((tema, RDFS.label, Literal(f"{row['categoria']}: {row['rotulo']}")))

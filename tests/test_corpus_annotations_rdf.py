@@ -119,6 +119,8 @@ class EntitiesRdfTests(AnnotationsTestCase):
         tema = SDH[f"tema/{stable_hash('clube|benfica')}"]
         # Nós partilhados: um Tema e uma entidade por rótulo, para os dois artigos.
         self.assertEqual(set(graph.subjects(RDF.type, SDH.Tema)), {tema})
+        # Subclasse específica (ontology/semantic_harvester.ttl, 2026-10-18).
+        self.assertIn((tema, RDF.type, SDH.Clube), graph)
         self.assertEqual(set(graph.subjects(RDF.type, SDH.EntidadeMencionada)), {jonas, pedro})
         self.assertEqual(set(graph.subjects(SDH.temTema, tema)), {article_uri(A), article_uri(B)})
         self.assertEqual(graph.value(tema, RDFS.label), Literal("clube: benfica"))
@@ -148,5 +150,11 @@ class EntitiesRdfTests(AnnotationsTestCase):
     def test_entity_missing_from_vocabulary_fails(self) -> None:
         self.write_csv("corpus_entities.csv", [
             entity_row(A, "entidade", "jogador", "Desconhecido", "texto", "1", "1", "1", "True", "sim")])
+        with self.assertRaises(ValueError):
+            corpus_entities_rdf.run(self.root)
+
+    def test_unknown_tema_category_fails(self) -> None:
+        self.write_csv("corpus_entities.csv", [
+            entity_row(A, "tema", "modalidade_nova", "surf", "url")])
         with self.assertRaises(ValueError):
             corpus_entities_rdf.run(self.root)

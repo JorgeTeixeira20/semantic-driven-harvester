@@ -201,3 +201,40 @@ sdh:valorTema a owl:DatatypeProperty ;
     rdfs:comment "O valor do Tema dentro da categoria, ex.: 'benfica' para categoria 'clube'. Corresponde à coluna rotulo de corpus_entities.csv para linhas tipo=tema."@pt ;
     rdfs:domain sdh:Tema ;
     rdfs:range xsd:string .
+
+# --- Subclasses de Tema (2026-10-18): formalizam os 4 valores de
+# categoriaTema já em uso, em vez de os deixar só numa string literal. Cada
+# nó Tema passa a ter, além de `a sdh:Tema`, também `a` a sua subclasse
+# específica (corpus_entities_rdf.py); categoriaTema/valorTema mantêm-se,
+# por continuidade com corpus_entities.csv. Disjuntas: um Tema nunca é, ao
+# mesmo tempo, duas destas categorias.
+
+sdh:Secao a owl:Class ;
+    rdfs:label "Secção"@pt ;
+    rdfs:subClassOf sdh:Tema ;
+    rdfs:comment "Tema cuja categoriaTema é 'secao' — a secção do site onde o artigo está publicado (ex.: 'futebol', 'multimedia')."@pt .
+
+sdh:Modalidade a owl:Class ;
+    rdfs:label "Modalidade"@pt ;
+    rdfs:subClassOf sdh:Tema ;
+    rdfs:comment "Tema cuja categoriaTema é 'modalidade' — o desporto de que o artigo trata (ex.: 'andebol', 'natacao')."@pt .
+
+sdh:Competicao a owl:Class ;
+    rdfs:label "Competição"@pt ;
+    rdfs:subClassOf sdh:Tema ;
+    rdfs:comment "Tema cuja categoriaTema é 'competicao' (ex.: 'liga-nos', 'europeu')."@pt .
+
+sdh:Clube a owl:Class ;
+    rdfs:label "Clube"@pt ;
+    rdfs:subClassOf sdh:Tema ;
+    rdfs:comment "Tema cuja categoriaTema é 'clube' (ex.: 'benfica', 'fc-porto'). Não confundir com uma EntidadeMencionada clube no texto: este é o clube-secção editorial do URL."@pt .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( sdh:Secao sdh:Modalidade sdh:Competicao sdh:Clube ) .
+
+# --- Propriedades funcionais (2026-10-18): já eram verdade na construção
+# do grafo, agora declaradas para que um reasoner as possa verificar.
+
+sdh:originalURL a owl:FunctionalProperty .
+
+sdh:temTextoExtraido a owl:FunctionalProperty .

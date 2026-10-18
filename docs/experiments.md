@@ -3239,3 +3239,31 @@ mais antiga. Suite completa: 190 testes OK.
 Nada foi corrido contra a API real e o corpus de 125 artigos não foi
 regenerado. Correr a política sobre dados reais, ou alargar o corpus com ela,
 é uma decisão à parte.
+
+## Âmbito da ontologia OWL: subclasses de Tema (2026-10-18)
+
+**Decisão (reunião com o orientador):** a ontologia fica mesmo em RDF/OWL,
+não uma hierarquia de pastas — resolve a tensão já identificada entre as
+duas abordagens.
+
+**Âmbito definido e implementado**: os 4 valores de `categoriaTema` já em
+uso em `corpus_entities.csv` (`secao`, `modalidade`, `competicao`, `clube`)
+passam a ser subclasses formais de `sdh:Tema` — `sdh:Secao`, `sdh:Modalidade`,
+`sdh:Competicao`, `sdh:Clube` — declaradas `owl:AllDisjointClasses` (um Tema
+nunca é duas categorias ao mesmo tempo, já verdade nos dados). Cada nó `Tema`
+passa a ter, além de `a sdh:Tema`, também `a` a subclasse específica
+(`corpus_entities_rdf.py`); `categoriaTema`/`valorTema` mantêm-se, por
+continuidade com o CSV. Uma categoria fora destas 4 falha a execução em vez
+de gerar um Tema sem subclasse. Também declaradas `owl:FunctionalProperty`
+em `sdh:originalURL` e `sdh:temTextoExtraido` — já eram verdade na
+construção do grafo, agora formalizadas para um reasoner poder verificar.
+
+**O que ficou fora deste âmbito, por decisão consciente**: restrições de
+cardinalidade (`owl:Restriction`) além das duas propriedades funcionais, e
+qualquer subclasse de `EntidadeMencionada` (ex.: por modalidade) — fica para
+quando o vocabulário de entidades for alargado a outras modalidades, que
+ainda não está feito.
+
+Testes: 2 novos em `tests/test_corpus_annotations_rdf.py` (a subclasse
+específica aparece no grafo; uma categoria desconhecida falha). Suite
+completa: **191 testes, todos a passar**. Nada foi corrido contra a API.
