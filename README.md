@@ -199,26 +199,29 @@ execução.
 
 ## Fase 1 do corpus do Caminho A (descoberta via TextSearch)
 
-Para correr a Fase 1 alargada (decisão de âmbito de 2026-10-19 em
+Para correr a Fase 1 ano a ano (decisões de âmbito de 2026-10-19 em
 `docs/experiments.md`: 108 termos — 39 modalidades, 57 clubes, 5 atletas,
-7 competições —, `from=1999`/`to=2026`, 2 repetições por termo):
+7 competições —, um intervalo por ano de 1999 a 2026 com datas de 14
+dígitos, 1 repetição, paragem só em página vazia):
 
 ```bash
 python -m semantic_harvester.corpus_phase1
 ```
 
-Os JSON raw são guardados em `data/raw/corpus_queries/alargada/`; os
-resultados (estatísticas por termo, capturas agregadas/deduplicadas por
-`(originalURL, tstamp)` e o resumo com `N`) ficam em
-`output/corpus_phase1_alargada_per_term.csv`,
-`output/corpus_phase1_alargada_captures.csv` e
-`output/corpus_phase1_alargada_aggregation.md`. A Fase 1 original (Opção 2 —
-Moderada, 13 termos, 2015–2020), que deu o corpus atual de 125 artigos, fica
-preservada em `data/raw/corpus_queries/` e `output/corpus_phase1_*` e não é
-reescrita; a Fase 2 e a classificação continuam a ler essa por omissão.
-O comando faz até 1 296 pedidos reais (108 termos × 2 repetições × até 6
-páginas) e tem novas tentativas automáticas para timeouts/erros 500 pontuais
-da API. **Não avança para a Fase 2 (`version_history`)** — essa etapa exige
+Os JSON raw são guardados em `data/raw/corpus_queries/por_ano/` (o ano
+entra no nome de cada ficheiro); os resultados (estatísticas por termo e ano,
+capturas agregadas/deduplicadas por `(originalURL, tstamp)` e o resumo com
+`N` e a distribuição por ano) ficam em
+`output/corpus_phase1_por_ano_per_term.csv`,
+`output/corpus_phase1_por_ano_captures.csv` e
+`output/corpus_phase1_por_ano_aggregation.md`. As execuções anteriores — a
+original (13 termos, 2015–2020, que deu o corpus atual de 125 artigos, em
+`data/raw/corpus_queries/` e `output/corpus_phase1_*`) e a alargada (108
+termos num só intervalo, `.../alargada/` e `output/corpus_phase1_alargada_*`)
+— não são reescritas; a Fase 2 e a classificação continuam a ler a original
+por omissão. O comando faz no máximo 18 144 pedidos (108 termos × 28 anos ×
+até 6 páginas) e retoma a partir do raw já gravado se for interrompido.
+**Não avança para a Fase 2 (`version_history`)** — essa etapa exige
 confirmação explícita do valor de `N` (ver `docs/experiments.md`).
 
 ## Fase 2 do corpus do Caminho A (profundidade temporal via version_history)

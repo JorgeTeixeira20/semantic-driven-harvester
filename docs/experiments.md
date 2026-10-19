@@ -3861,3 +3861,67 @@ raw e 3 relatórios igual antes e depois).
 - O `N` conta `originalURL` distintos: variantes do mesmo artigo (esquema,
   `?ref=`) ainda não estão juntas, e páginas que não são artigos ainda não
   foram filtradas (isso é a classificação, depois da Fase 2).
+
+## Teste de blocos de data e recolha ano a ano na Fase 1 (2026-10-19)
+
+### Teste controlado: 2 termos × 3 blocos
+
+Motivação: na Fase 1 alargada (`from=1999`/`to=2026` num só intervalo), as
+capturas concentraram-se em 2017–2020, com 0 em 2011–2015. Teste com
+"Benfica" e "Vitória de Guimarães" (clubes; o segundo tinha batido no
+teto), mesmos parâmetros da Fase 1 (`maxItems=50`, `dedupValue=1`, até 6
+páginas), paragem só em página vazia, 1 repetição, em três blocos pedidos
+com o ano sozinho: 1999–2016, 2017–2020, 2021–2026. Raw, sondas e script em
+`data/raw/corpus_queries/teste_blocos_2026-10-19/` (não versionados).
+
+| Termo | Bloco | Páginas | Paragem | Resultados | Por ano |
+| --- | --- | ---: | --- | ---: | --- |
+| Benfica | 1999–2016 | 6 | teto | 300 | 2001: 1 · 2006: 2 · 2007: 144 · 2008: 146 · 2009: 7 |
+| Benfica | 2017–2020 | 6 | teto | 300 | 2017: 86 · 2018: 106 · 2019: 108 |
+| Benfica | 2021–2026 | 6 | teto | 300 | 2021: 58 · 2022: 86 · 2023: 106 · 2024: 50 |
+| V. Guimarães | 1999–2016 | 6 | teto | 300 | 1999: 1 · 2000: 4 · 2001: 45 · 2002: 18 · 2003: 1 · 2004: 13 · 2006: 27 · 2007: 88 · 2008: 65 · 2009: 37 · 2010: 1 |
+| V. Guimarães | 2017–2020 | 6 | teto | 300 | 2017: 95 · 2018: 54 · 2019: 151 |
+| V. Guimarães | 2021–2026 | 6 | teto | 300 | 2021: 87 · 2022: 88 · 2023: 70 · 2024: 55 |
+
+Na corrida sem blocos, os mesmos termos tinham 300 capturas cada:
+Benfica 2007–2009: 17, 2017–2019: 271, 2020: 12; V. Guimarães 2001: 1,
+2007: 3, 2017–2020: 213, 2021–2024: 83. Os blocos triplicam os resultados
+por termo e repartem-nos melhor, mas cada bloco bate no teto e, dentro de um
+bloco largo, os 300 resultados concentram-se em 2–3 anos (1999–2016:
+2007–2008 para Benfica).
+
+Sondas de uma página, com datas de 14 dígitos: 2011-01-01 a 2016-12-31 e
+2025-01-01 a 2026-12-31 deram **0 resultados** para os dois termos; 2020
+inteiro deu 50 (página cheia) para cada um. A Fase 1 original
+(`from=2015`/`to=2020`) também só tem capturas de 2017–2019. A lacuna de
+2011–2016 é, para estes termos, do índice da TextSearch para o `record.pt`,
+não do teto nem da divisão em blocos.
+
+### Erro de datas: um ano sozinho é o início desse ano
+
+A API lê `to=2020` como `20200000000000` (confirmado no
+`request_parameters` devolvido: `from=2017&to=2020` →
+`from=20170000000000`, `to=20200000000000`), excluindo o ano de 2020
+inteiro. Afetou a Fase 1 original (`to=2020`, por isso nunca teve 2020), a
+Fase 1 alargada (`to=2026`) e o bloco "2017–2020" do teste acima. Correção:
+todo o `from`/`to` passa a ser construído com 14 dígitos, `AAAA0101000000`
+a `AAAA1231235959` (`corpus_phase1.year_bounds`), o mesmo formato do
+`tstamp`. O `ArquivoClient` não muda: só serializa o que recebe.
+
+### Decisão: recolha ano a ano
+
+Como um bloco largo (18 anos) ainda concentra quase tudo em 2–3 anos, a
+Fase 1 passa a pedir cada termo **um ano de cada vez**, de 1999 a 2026 (28
+intervalos), com a paginação corrigida: paragem só na primeira página vazia
+(uma página com menos de 50 resultados não é o fim) ou no teto de 6
+páginas, agora por ano. `REPETITIONS` passa de 2 para 1 (decisão de âmbito
+do autor, pelo prazo; na corrida alargada as duas repetições deram sempre o
+mesmo número de resultados). Implementado em `corpus_phase1.py`:
+`collect_term_year()` substitui `collect_term_repetition()`; o ano entra no
+nome do raw (`<faceta>_<termo>_<ano>_rep1_offset-NNNN.json`), para não
+colidir entre anos; a execução retoma a partir do raw já gravado. Escreve
+em `data/raw/corpus_queries/por_ano/` e `output/corpus_phase1_por_ano_*`,
+sem tocar nas execuções original e alargada. Testes offline: datas de 14
+dígitos enviadas, página incompleta não pára e página vazia pára, teto de
+páginas, ano no nome do raw, retoma sem pedido; suite completa 211 testes
+OK.

@@ -21,12 +21,21 @@ faceta de descoberta, não vocabulário de entidades (decisão do Caminho B
 sobre circularidade). Total: 108 termos, `from=1999`/`to=2026` (não há
 limite de 2000 resultados que justifique dividir por datas).
 
-Parâmetros mantidos: `siteSearch=record.pt`, `maxItems=50`,
-`dedupField=url`/`dedupValue=1` explícitos, 2 repetições por termo, no
-máximo 6 páginas por termo/repetição, `offset` só quando a página vier
-cheia; a paragem não depende de `next_page` (não fiável mesmo a grande
-escala). Esta execução escreve o raw em `data/raw/corpus_queries/alargada/`
-e os relatórios em `output/corpus_phase1_alargada_*`.
+**Recolha ano a ano (2026-10-19, `docs/experiments.md`, teste de blocos de
+data).** Cada termo é pedido um ano de cada vez, de 1999 a 2026 (28
+intervalos), com datas de 14 dígitos (`AAAA0101000000`–`AAAA1231235959`): a
+API lê um ano sozinho como o início desse ano, pelo que `to=2020` excluía o
+ano de 2020 inteiro. Um intervalo largo concentrava os 300 resultados
+alcançáveis em 2–3 anos; o intervalo de um ano reparte-os. Em cada ano
+pagina-se por `offset` até à primeira página vazia (uma página com menos de
+`maxItems` resultados não é o fim) ou até 6 páginas. 1 repetição por termo
+(decisão de âmbito do autor). Parâmetros mantidos: `siteSearch=record.pt`,
+`maxItems=50`, `dedupField=url`/`dedupValue=1` explícitos; a paragem não
+depende de `next_page`. Esta execução escreve o raw em
+`data/raw/corpus_queries/por_ano/` e os relatórios em
+`output/corpus_phase1_por_ano_*`; as execuções anteriores (original e
+`alargada`) ficam intactas. Se for interrompida, retoma a partir do raw já
+gravado, sem repetir pedidos.
 
 Preserva o raw de cada pedido, depois agrega/deduplica os `response_items`
 de todos os pedidos por `(originalURL, tstamp)` (captura) e por
@@ -38,6 +47,7 @@ um passo manual seguinte, condicional à confirmação do valor de `N`.
 from __future__ import annotations
 
 import csv
+import json
 import logging
 import re
 import time
@@ -54,15 +64,16 @@ from .arquivo_client import ArquivoClient, SearchResponse
 LOGGER = logging.getLogger(__name__)
 
 SITE_SEARCH = "record.pt"
-FROM_DATE = "1999"
-TO_DATE = "2026"
+FIRST_YEAR = 1999
+LAST_YEAR = 2026
+YEARS = tuple(range(FIRST_YEAR, LAST_YEAR + 1))
 MAX_ITEMS = 50
-REPETITIONS = 2
+REPETITIONS = 1
 MAX_PAGES_PER_TERM = 6
 RETRY_ATTEMPTS = 3
 RETRY_SLEEP_SECONDS = 10.0
 
-RUN_LABEL = "alargada"
+RUN_LABEL = "por_ano"
 
 # Valores reais da enumeração de 2026-10-19 (docs/experiments.md), com as
 # decisões do autor sobre os casos ambíguos.
@@ -112,6 +123,16 @@ TERMS: tuple[tuple[str, str], ...] = (
 )
 
 
+def year_bounds(year: int) -> tuple[str, str]:
+    """`from`/`to` de um ano inteiro, em 14 dígitos (formato do `tstamp`).
+
+    Um ano sozinho é lido pela API como o início desse ano (`to=2020` →
+    `20200000000000`), excluindo-o; por isso nunca se envia só o ano.
+    """
+
+    return f"{year}0101000000", f"{year}1231235959"
+
+
 def slugify(text: str) -> str:
     normalized = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
     return re.sub(r"[^a-zA-Z0-9]+", "-", normalized).strip("-").lower()
@@ -121,6 +142,7 @@ def slugify(text: str) -> str:
 class TermRunStats:
     facet: str
     query: str
+    year: int
     repetition: int
     requests_made: int
     results_received: int
@@ -142,56 +164,60 @@ def _search_with_retries(client: ArquivoClient, **kwargs: Any) -> SearchResponse
     raise last_exc
 
 
-def collect_term_repetition(
+def collect_term_year(
     client: ArquivoClient,
     facet: str,
     query: str,
-    repetition: int,
+    year: int,
     raw_dir: Path,
+    repetition: int = 1,
 ) -> tuple[list[dict[str, Any]], list[Path]]:
-    """Pede páginas para um termo/repetição, só avançando offset se a página vier cheia.
+    """Pede as páginas de um termo num único ano, até à primeira página vazia.
 
-    Pára só quando a página vem incompleta (ou vazia); não depende de
-    `next_page`, que a investigação de 2026-10-19 (`docs/experiments.md`)
-    mostrou não ser um sinal fiável de fim mesmo a grande escala (continua
-    presente em páginas já vazias).
+    Uma página com menos de `MAX_ITEMS` resultados não pára a recolha: na
+    enumeração de 2026-10-19 houve páginas assim a meio da paginação,
+    seguidas de páginas cheias. Também não depende de `next_page`. O raw de
+    cada página inclui o ano no nome; se já existir, é lido em vez de pedido
+    de novo (retoma de uma execução interrompida).
     """
 
     items: list[dict[str, Any]] = []
     raw_paths: list[Path] = []
     offset = 0
     slug = slugify(query)
+    from_date, to_date = year_bounds(year)
 
-    for page_num in range(1, MAX_PAGES_PER_TERM + 1):
+    for _ in range(MAX_PAGES_PER_TERM):
         raw_path = raw_dir / (
-            f"{facet}_{slug}_rep{repetition}_offset-{offset:04d}.json"
+            f"{facet}_{slug}_{year}_rep{repetition}_offset-{offset:04d}.json"
         )
-        response = _search_with_retries(
-            client,
-            query=query,
-            site_search=SITE_SEARCH,
-            from_date=FROM_DATE,
-            to_date=TO_DATE,
-            max_items=MAX_ITEMS,
-            offset=offset,
-            dedup_field="url",
-            dedup_value=1,
-            raw_path=raw_path,
-        )
+        if raw_path.is_file():
+            results = json.loads(raw_path.read_bytes()).get("response_items") or []
+        else:
+            results = _search_with_retries(
+                client,
+                query=query,
+                site_search=SITE_SEARCH,
+                from_date=from_date,
+                to_date=to_date,
+                max_items=MAX_ITEMS,
+                offset=offset,
+                dedup_field="url",
+                dedup_value=1,
+                raw_path=raw_path,
+            ).results
         raw_paths.append(raw_path)
-        items.extend(response.results)
-
-        page_full = len(response.results) == MAX_ITEMS
-        if not page_full:
+        if not results:
             break
-        offset += len(response.results)
+        items.extend(results)
+        offset += MAX_ITEMS
     else:
         LOGGER.warning(
-            "Atingido o limite de %d páginas para %s/%s (rep %d); a parar.",
+            "Atingido o limite de %d páginas para %s/%s em %d; a parar.",
             MAX_PAGES_PER_TERM,
             facet,
             query,
-            repetition,
+            year,
         )
 
     return items, raw_paths
@@ -301,14 +327,15 @@ def write_aggregation_markdown(
     )
 
     lines = [
-        "# Fase 1 alargada — descoberta via TextSearch (corpus do Caminho A)\n",
+        "# Fase 1 ano a ano — descoberta via TextSearch (corpus do Caminho A)\n",
         f"Execução real. Parâmetros comuns: `siteSearch=record.pt`, "
-        f"`from={FROM_DATE}`, `to={TO_DATE}`, `maxItems={MAX_ITEMS}`, "
-        f"`dedupField=url`/`dedupValue=1` explícitos. {len(TERMS)} termos "
-        f"({len(MODALIDADES)} modalidades, {len(CLUBES)} clubes, "
-        f"{len(ATLETAS)} atletas, {len(COMPETICOES)} competições), "
-        f"{REPETITIONS} repetições por termo, offset só quando a página "
-        "anterior veio cheia.\n",
+        f"`maxItems={MAX_ITEMS}`, `dedupField=url`/`dedupValue=1` explícitos. "
+        f"{len(TERMS)} termos ({len(MODALIDADES)} modalidades, "
+        f"{len(CLUBES)} clubes, {len(ATLETAS)} atletas, "
+        f"{len(COMPETICOES)} competições), um intervalo por ano de "
+        f"{FIRST_YEAR} a {LAST_YEAR} (`AAAA0101000000`–`AAAA1231235959`), "
+        f"{REPETITIONS} repetição por termo, até {MAX_PAGES_PER_TERM} páginas "
+        "por ano, paragem na primeira página vazia.\n",
         "## Resumo\n",
         f"- Pedidos reais efetuados: {total_requests}",
         f"- Itens brutos recebidos (antes de deduplicar): {total_raw_items}",
@@ -317,14 +344,39 @@ def write_aggregation_markdown(
         f"- Capturas encontradas por mais do que uma query: {multi_query_articles}",
         f"- Divergências de metadados para a mesma `(originalURL, tstamp)`: "
         f"{len(divergent_keys)}",
-        "\n## Pedidos e resultados por termo\n",
-        "| Faceta | Termo | Repetição | Pedidos | Resultados |",
-        "| --- | --- | ---: | ---: | ---: |",
+        "\n## Por ano\n",
+        "Pedidos e resultados por intervalo pedido; capturas únicas pelo ano "
+        "do seu `tstamp`.\n",
+        "| Ano | Pedidos | Resultados | Termos no teto de páginas | Capturas únicas |",
+        "| ---: | ---: | ---: | ---: | ---: |",
     ]
-    for row in stats:
+    captures_per_year: dict[str, int] = defaultdict(int)
+    for record in captures.values():
+        captures_per_year[record.tstamp[:4]] += 1
+    for year in YEARS:
+        rows = [row for row in stats if row.year == year]
+        capped = sum(1 for row in rows if row.results_received == MAX_ITEMS * MAX_PAGES_PER_TERM)
         lines.append(
-            f"| {row.facet} | {row.query} | {row.repetition} | "
-            f"{row.requests_made} | {row.results_received} |"
+            f"| {year} | {sum(row.requests_made for row in rows)} | "
+            f"{sum(row.results_received for row in rows)} | {capped} | "
+            f"{captures_per_year.get(str(year), 0)} |"
+        )
+    outside = sum(n for y, n in captures_per_year.items() if not y.isdigit() or int(y) not in YEARS)
+    if outside:
+        lines.append(f"\nCapturas com `tstamp` fora de {FIRST_YEAR}–{LAST_YEAR}: {outside}")
+
+    lines.extend([
+        "\n## Pedidos e resultados por termo (soma dos anos)\n",
+        "| Faceta | Termo | Pedidos | Resultados | Anos com resultados | Anos no teto |",
+        "| --- | --- | ---: | ---: | ---: | ---: |",
+    ])
+    for facet, query in dict.fromkeys((row.facet, row.query) for row in stats):
+        rows = [row for row in stats if (row.facet, row.query) == (facet, query)]
+        lines.append(
+            f"| {facet} | {query} | {sum(row.requests_made for row in rows)} | "
+            f"{sum(row.results_received for row in rows)} | "
+            f"{sum(1 for row in rows if row.results_received)} | "
+            f"{sum(1 for row in rows if row.results_received == MAX_ITEMS * MAX_PAGES_PER_TERM)} |"
         )
 
     if divergent_keys:
@@ -361,22 +413,25 @@ def run_phase1(project_root: Path | None = None) -> tuple[
     stats: list[TermRunStats] = []
     records: list[tuple[str, str, dict[str, Any]]] = []
 
-    for facet, query in TERMS:
-        for repetition in range(1, REPETITIONS + 1):
-            items, raw_paths = collect_term_repetition(
-                client, facet, query, repetition, raw_dir
-            )
-            stats.append(
-                TermRunStats(
-                    facet=facet,
-                    query=query,
-                    repetition=repetition,
-                    requests_made=len(raw_paths),
-                    results_received=len(items),
+    for index, (facet, query) in enumerate(TERMS, start=1):
+        for year in YEARS:
+            for repetition in range(1, REPETITIONS + 1):
+                items, raw_paths = collect_term_year(
+                    client, facet, query, year, raw_dir, repetition
                 )
-            )
-            for item in items:
-                records.append((facet, query, item))
+                stats.append(
+                    TermRunStats(
+                        facet=facet,
+                        query=query,
+                        year=year,
+                        repetition=repetition,
+                        requests_made=len(raw_paths),
+                        results_received=len(items),
+                    )
+                )
+                for item in items:
+                    records.append((facet, query, item))
+        LOGGER.info("Termo %d/%d concluído: %s/%s", index, len(TERMS), facet, query)
 
     captures, divergent_keys = aggregate(records)
 

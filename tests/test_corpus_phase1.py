@@ -7,8 +7,8 @@ import unittest
 
 from semantic_harvester.arquivo_client import ArquivoClient
 from semantic_harvester.corpus_phase1 import (
-    ATLETAS, CLUBES, COMPETICOES, MODALIDADES, RUN_LABEL, TERMS, collect_term_repetition,
-    slugify,
+    ATLETAS, CLUBES, COMPETICOES, MAX_PAGES_PER_TERM, MODALIDADES, REPETITIONS, RUN_LABEL,
+    TERMS, YEARS, collect_term_year, slugify, year_bounds,
 )
 from tests.support import OfflineTestCase
 
@@ -26,44 +26,69 @@ def fake_item(n: int) -> dict:
     return {"originalURL": f"https://www.record.pt/artigo-{n}", "tstamp": f"2020010100{n:04d}"}
 
 
-class PaginationIgnoresNextPageTests(OfflineTestCase):
-    """Regressão (`docs/experiments.md`, 2026-10-19): `next_page` não é um
-    sinal fiável de fim mesmo a grande escala; só página incompleta/vazia
-    deve parar a recolha da Fase 1."""
+def sent_params(call: tuple[str, dict]) -> dict[str, list]:
+    params: dict[str, list] = {}
+    for key, value in call[1]["params"]:
+        params.setdefault(key, []).append(value)
+    return params
 
-    def test_full_page_without_next_page_still_continues(self) -> None:
-        full_page_without_next = page([fake_item(i) for i in range(50)], next_page=None)
-        incomplete_page = page([fake_item(50)], next_page="https://arquivo.pt/textsearch?offset=100")
-        session = self.fixture_session(
-            (ArquivoClient.SEARCH_URL, full_page_without_next),
-            (ArquivoClient.SEARCH_URL, incomplete_page),
-        )
+
+class CollectTermYearTests(OfflineTestCase):
+    """Recolha ano a ano (`docs/experiments.md`, 2026-10-19): datas de 14
+    dígitos, paragem só na primeira página vazia, ano no nome do raw."""
+
+    def collect(self, *pages: bytes, year: int = 2020):
+        session = self.fixture_session(*((ArquivoClient.SEARCH_URL, body) for body in pages))
         client = ArquivoClient(data_dir=self.root / "raw", session=session)
-
-        items, raw_paths = collect_term_repetition(
-            client, "modalidade", "futebol", 1, self.root / "raw" / "corpus_queries"
+        items, raw_paths = collect_term_year(
+            client, "modalidade", "futebol", year, self.root / "raw" / "corpus_queries"
         )
+        return items, raw_paths, session
 
-        self.assertEqual(len(items), 51)
+    def test_year_bounds_use_full_14_digit_timestamps(self) -> None:
+        self.assertEqual(year_bounds(2020), ("20200101000000", "20201231235959"))
+
+    def test_sends_the_whole_year_and_not_the_bare_year(self) -> None:
+        _, _, session = self.collect(page([], next_page=None))
+        params = sent_params(session.calls[0])
+        self.assertEqual(params["from"], ["20200101000000"])
+        self.assertEqual(params["to"], ["20201231235959"])
+
+    def test_incomplete_page_does_not_stop_only_an_empty_page_does(self) -> None:
+        items, raw_paths, session = self.collect(
+            page([fake_item(i) for i in range(50)], next_page=None),
+            page([fake_item(i) for i in range(50, 98)], next_page=None),
+            page([fake_item(i) for i in range(98, 148)], next_page=None),
+            page([], next_page="https://arquivo.pt/textsearch?offset=150"),
+        )
+        self.assertEqual(len(items), 148)
+        self.assertEqual(len(raw_paths), 4)
+        self.assertEqual([sent_params(call)["offset"] for call in session.calls],
+                         [[0], [50], [100], [150]])
+
+    def test_stops_at_the_page_cap(self) -> None:
+        pages = [page([fake_item(50 * n + i) for i in range(50)], next_page=None)
+                 for n in range(MAX_PAGES_PER_TERM)]
+        items, raw_paths, _ = self.collect(*pages)
+        self.assertEqual(len(items), 50 * MAX_PAGES_PER_TERM)
+        self.assertEqual(len(raw_paths), MAX_PAGES_PER_TERM)
+
+    def test_raw_file_names_include_the_year(self) -> None:
+        _, paths_2007, _ = self.collect(page([], next_page=None), year=2007)
+        _, paths_2008, _ = self.collect(page([], next_page=None), year=2008)
+        self.assertEqual(paths_2007[0].name, "modalidade_futebol_2007_rep1_offset-0000.json")
+        self.assertNotEqual(paths_2007[0], paths_2008[0])
+
+    def test_existing_raw_is_reused_without_a_request(self) -> None:
+        raw_dir = self.root / "raw" / "corpus_queries"
+        raw_dir.mkdir(parents=True)
+        (raw_dir / "modalidade_futebol_2020_rep1_offset-0000.json").write_bytes(
+            page([fake_item(1)], next_page=None)
+        )
+        items, raw_paths, session = self.collect(page([], next_page=None))
+        self.assertEqual(len(items), 1)
         self.assertEqual(len(raw_paths), 2)
-
-    def test_empty_page_stops_even_with_next_page_present(self) -> None:
-        full_page = page(
-            [fake_item(i) for i in range(50)], next_page="https://arquivo.pt/textsearch?offset=50",
-        )
-        empty_page_with_next = page([], next_page="https://arquivo.pt/textsearch?offset=100")
-        session = self.fixture_session(
-            (ArquivoClient.SEARCH_URL, full_page),
-            (ArquivoClient.SEARCH_URL, empty_page_with_next),
-        )
-        client = ArquivoClient(data_dir=self.root / "raw", session=session)
-
-        items, raw_paths = collect_term_repetition(
-            client, "modalidade", "futebol", 1, self.root / "raw" / "corpus_queries"
-        )
-
-        self.assertEqual(len(items), 50)
-        self.assertEqual(len(raw_paths), 2)
+        self.assertEqual([sent_params(call)["offset"] for call in session.calls], [[50]])
 
 
 class FinalTermsTests(unittest.TestCase):
@@ -95,11 +120,14 @@ class FinalTermsTests(unittest.TestCase):
              "Nelson Évora"),
         )
 
-    def test_run_does_not_overwrite_the_original_phase1(self) -> None:
-        # A Fase 1 original (corpus de 125 artigos) está em
-        # data/raw/corpus_queries/ e output/corpus_phase1_*.{csv,md}.
-        self.assertTrue(RUN_LABEL)
-        self.assertNotIn(RUN_LABEL, ("per_term", "captures", "aggregation"))
+    def test_run_does_not_overwrite_previous_phase1_runs(self) -> None:
+        # Original (corpus de 125 artigos): data/raw/corpus_queries/ e
+        # output/corpus_phase1_*; alargada: .../alargada/ e *_alargada_*.
+        self.assertNotIn(RUN_LABEL, ("", "alargada", "per_term", "captures", "aggregation"))
+
+    def test_one_repetition_per_year_from_1999_to_2026(self) -> None:
+        self.assertEqual(REPETITIONS, 1)
+        self.assertEqual((YEARS[0], YEARS[-1], len(YEARS)), (1999, 2026, 28))
 
 
 if __name__ == "__main__":
