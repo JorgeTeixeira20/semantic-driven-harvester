@@ -57,6 +57,18 @@ class TextDownloadResult:
     error: str | None = None
 
 
+@dataclass(frozen=True)
+class HtmlDownloadResult:
+    """Resultado do acesso ao HTML em bruto (`linkToOriginalFile`) de uma captura."""
+
+    success: bool
+    path: Path | None
+    size_bytes: int
+    downloaded: bool
+    html_url: str | None
+    error: str | None = None
+
+
 class ArquivoClient:
     """Pesquisa capturas e descarrega o respetivo texto extraído."""
 
@@ -71,6 +83,7 @@ class ArquivoClient:
         self.data_dir = Path(data_dir)
         self.searches_dir = self.data_dir / "searches"
         self.texts_dir = self.data_dir / "texts"
+        self.html_dir = self.data_dir / "original_html"
         self.timeout = timeout
         self.session = session or requests.Session()
         self.session.headers.setdefault(
@@ -79,6 +92,7 @@ class ArquivoClient:
 
         self.searches_dir.mkdir(parents=True, exist_ok=True)
         self.texts_dir.mkdir(parents=True, exist_ok=True)
+        self.html_dir.mkdir(parents=True, exist_ok=True)
 
     def search(
         self,
@@ -262,6 +276,64 @@ class ArquivoClient:
             text_url=str(text_url),
         )
 
+    def download_original_html(
+        self,
+        result: dict[str, Any],
+        *,
+        skip_existing: bool = True,
+    ) -> HtmlDownloadResult:
+        """Espelho de `download_extracted_text`, para `linkToOriginalFile`.
+
+        Sem derivação de URL quando o campo falta: ao contrário de
+        `linkToExtractedText`, não há (ainda) fórmula confirmada equivalente
+        à de `_derived_extracted_text_url` para o HTML em bruto.
+        """
+
+        destination = self.html_dir / self._capture_filename(result, "html")
+        html_url = result.get("linkToOriginalFile")
+
+        if skip_existing and destination.is_file():
+            return HtmlDownloadResult(
+                success=True,
+                path=destination,
+                size_bytes=destination.stat().st_size,
+                downloaded=False,
+                html_url=str(html_url) if html_url else None,
+            )
+
+        if not html_url:
+            return HtmlDownloadResult(
+                success=False,
+                path=None,
+                size_bytes=0,
+                downloaded=False,
+                html_url=None,
+                error="linkToOriginalFile ausente",
+            )
+
+        try:
+            response = self.session.get(str(html_url), timeout=self.timeout)
+            response.raise_for_status()
+            destination.write_bytes(response.content)
+        except (requests.RequestException, OSError) as exc:
+            LOGGER.warning("Falha ao obter %s: %s", html_url, exc)
+            return HtmlDownloadResult(
+                success=False,
+                path=None,
+                size_bytes=0,
+                downloaded=False,
+                html_url=str(html_url),
+                error=str(exc),
+            )
+
+        return HtmlDownloadResult(
+            success=True,
+            path=destination,
+            size_bytes=destination.stat().st_size,
+            downloaded=True,
+            html_url=str(html_url),
+        )
+
     def download_extracted_texts(
         self, results: Iterable[dict[str, Any]]
     ) -> DownloadSummary:
@@ -360,10 +432,14 @@ class ArquivoClient:
         return f"https://arquivo.pt/textextracted?{query}"
 
     @staticmethod
-    def _text_filename(result: dict[str, Any]) -> str:
+    def _capture_filename(result: dict[str, Any], suffix: str) -> str:
         raw_tstamp = str(result.get("tstamp") or "unknown")
         tstamp = "".join(character for character in raw_tstamp if character.isdigit())
         tstamp = tstamp or "unknown"
         url = str(result.get("originalURL") or result.get("linkToArchive") or "")
         url_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:16]
-        return f"{tstamp}_{url_hash}.txt"
+        return f"{tstamp}_{url_hash}.{suffix}"
+
+    @classmethod
+    def _text_filename(cls, result: dict[str, Any]) -> str:
+        return cls._capture_filename(result, "txt")

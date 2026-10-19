@@ -3,9 +3,17 @@
 Implementa a Opção 2 (Moderada) decidida em `docs/experiments.md`
 ("Protocolo de queries para o corpus do Caminho A"): 13 termos de pesquisa
 (4 modalidades, 4 clubes, 5 atletas conhecidos), `siteSearch=record.pt`,
-`from=2015`/`to=2020`, `maxItems=50`, `dedupField=url`/`dedupValue=1`
-explícitos, 2 repetições por termo, com paginação por `offset` só quando uma
-página vier cheia (decisão da Experiência 2).
+`maxItems=50`, `dedupField=url`/`dedupValue=1` explícitos, 2 repetições por
+termo, com paginação por `offset` só quando uma página vier cheia (decisão
+da Experiência 2).
+
+Alargado em `docs/experiments.md` ("Download do HTML em bruto da captura
+mais antiga e lista alargada de termos", 2026-10-19): mais 11 termos (5
+modalidades, 6 competições), com `from=1999`/`to=2026` em vez de
+`2015`/`2020` — a investigação do limite de 2000 resultados mostrou que não
+há parede que justifique dividir por datas. A paragem por página deixou de
+depender de `next_page` (não fiável mesmo a grande escala), só de página
+incompleta/vazia.
 
 Preserva o raw de cada pedido, depois agrega/deduplica os `response_items`
 de todos os pedidos por `(originalURL, tstamp)` (captura) e por
@@ -33,15 +41,20 @@ from .arquivo_client import ArquivoClient, SearchResponse
 LOGGER = logging.getLogger(__name__)
 
 SITE_SEARCH = "record.pt"
-FROM_DATE = "2015"
-TO_DATE = "2020"
+FROM_DATE = "1999"
+TO_DATE = "2026"
 MAX_ITEMS = 50
 REPETITIONS = 2
 MAX_PAGES_PER_TERM = 6
 RETRY_ATTEMPTS = 3
 RETRY_SLEEP_SECONDS = 10.0
 
-MODALIDADES = ("futebol", "basquetebol", "andebol", "voleibol")
+MODALIDADES = (
+    "futebol", "basquetebol", "andebol", "voleibol",
+    # Alargamento de 2026-10-19 (docs/experiments.md): valores reais já no
+    # vocabulário do Caminho B (sdh:Tema, categoria "modalidade").
+    "atletismo", "ciclismo", "judo", "motores", "natação",
+)
 CLUBES = ("Benfica", "Sporting", "Porto", "SC Braga")
 ATLETAS = (
     "Cristiano Ronaldo",
@@ -50,11 +63,18 @@ ATLETAS = (
     "João Félix",
     "Nelson Évora",
 )
+# Faceta nova de 2026-10-19 (docs/experiments.md): valores reais já no
+# vocabulário do Caminho B (sdh:Tema, categoria "competicao").
+COMPETICOES = (
+    "2.ª Liga", "CAN", "Europeu", "Liga Jovem da UEFA",
+    "Taça das Confederações", "Taça de Portugal",
+)
 
 TERMS: tuple[tuple[str, str], ...] = (
     tuple(("modalidade", termo) for termo in MODALIDADES)
     + tuple(("clube", termo) for termo in CLUBES)
     + tuple(("atleta", termo) for termo in ATLETAS)
+    + tuple(("competicao", termo) for termo in COMPETICOES)
 )
 
 
@@ -95,7 +115,13 @@ def collect_term_repetition(
     repetition: int,
     raw_dir: Path,
 ) -> tuple[list[dict[str, Any]], list[Path]]:
-    """Pede páginas para um termo/repetição, só avançando offset se a página vier cheia."""
+    """Pede páginas para um termo/repetição, só avançando offset se a página vier cheia.
+
+    Pára só quando a página vem incompleta (ou vazia); não depende de
+    `next_page`, que a investigação de 2026-10-19 (`docs/experiments.md`)
+    mostrou não ser um sinal fiável de fim mesmo a grande escala (continua
+    presente em páginas já vazias).
+    """
 
     items: list[dict[str, Any]] = []
     raw_paths: list[Path] = []
@@ -122,8 +148,7 @@ def collect_term_repetition(
         items.extend(response.results)
 
         page_full = len(response.results) == MAX_ITEMS
-        next_page = bool(response.raw_response.get("next_page"))
-        if not page_full or not next_page:
+        if not page_full:
             break
         offset += len(response.results)
     else:
@@ -245,9 +270,11 @@ def write_aggregation_markdown(
         "# Fase 1 — descoberta via TextSearch (Opção 2, corpus do Caminho A)\n",
         f"Execução real. Parâmetros comuns: `siteSearch=record.pt`, "
         f"`from={FROM_DATE}`, `to={TO_DATE}`, `maxItems={MAX_ITEMS}`, "
-        "`dedupField=url`/`dedupValue=1` explícitos. 13 termos "
-        f"(4 modalidades, 4 clubes, 5 atletas), {REPETITIONS} repetições "
-        "por termo, offset só quando a página anterior veio cheia.\n",
+        f"`dedupField=url`/`dedupValue=1` explícitos. {len(TERMS)} termos "
+        f"({len(MODALIDADES)} modalidades, {len(CLUBES)} clubes, "
+        f"{len(ATLETAS)} atletas, {len(COMPETICOES)} competições), "
+        f"{REPETITIONS} repetições por termo, offset só quando a página "
+        "anterior veio cheia.\n",
         "## Resumo\n",
         f"- Pedidos reais efetuados: {total_requests}",
         f"- Itens brutos recebidos (antes de deduplicar): {total_raw_items}",

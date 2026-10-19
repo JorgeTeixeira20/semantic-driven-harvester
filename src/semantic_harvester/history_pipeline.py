@@ -13,7 +13,7 @@ from typing import Any
 
 import requests
 
-from .arquivo_client import ArquivoClient, TextDownloadResult
+from .arquivo_client import ArquivoClient, HtmlDownloadResult, TextDownloadResult
 from .rdf_mapper import SAMPLE_ORIGINAL_URL, generate_article_history, stable_hash
 
 LOGGER = logging.getLogger(__name__)
@@ -128,6 +128,13 @@ def build_manifest_records(
       (`text_requested=False`), nunca como falha.
     - `TEXT_POLICY_ALL` ("todas"): pede/reutiliza o texto de todas as capturas
       (corpus histórico de 125 artigos e M3).
+
+    Quando `text_policy == TEXT_POLICY_FIRST` e o texto de uma captura é
+    pedido, pede-se também o HTML em bruto dessa mesma captura
+    (`ArquivoClient.download_original_html`), na mesma passagem
+    (`docs/experiments.md`, "Download do HTML em bruto da captura mais
+    antiga"). `TEXT_POLICY_ALL` nunca pede HTML, para não introduzir pedidos
+    de rede no caminho offline já testado (`CacheOnlyClient`, M3).
     """
 
     if text_policy not in (TEXT_POLICY_FIRST, TEXT_POLICY_ALL):
@@ -152,9 +159,21 @@ def build_manifest_records(
                 success=False, path=None, size_bytes=0, downloaded=False, text_url=None,
             )
 
+        html_requested = text_policy == TEXT_POLICY_FIRST and text_requested
+        if html_requested:
+            html_download = client.download_original_html(capture, skip_existing=True)
+        else:
+            html_download = HtmlDownloadResult(
+                success=False, path=None, size_bytes=0, downloaded=False, html_url=None,
+            )
+
         relative_path = None
         if download.path is not None:
             relative_path = download.path.relative_to(project_root).as_posix()
+
+        relative_html_path = None
+        if html_download.path is not None:
+            relative_html_path = html_download.path.relative_to(project_root).as_posix()
 
         records.append(
             {
@@ -176,6 +195,12 @@ def build_manifest_records(
                 "text_size_bytes": download.size_bytes,
                 "text_error": download.error,
                 "text_requested": text_requested,
+                "original_html_path": relative_html_path,
+                "html_download_success": html_download.success,
+                "html_downloaded_now": html_download.downloaded,
+                "html_size_bytes": html_download.size_bytes,
+                "html_error": html_download.error,
+                "html_requested": html_requested,
             }
         )
     return records
