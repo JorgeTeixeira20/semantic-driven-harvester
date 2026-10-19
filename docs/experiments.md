@@ -3528,3 +3528,246 @@ artigo listado cerca de 12 dias, as capturas de uma secção cobrem
 praticamente tudo o que ela publicou; fora dessa janela (1–7 capturas por
 ano) quase tudo escapa. A TextSearch, por seu lado, não trava em 2000: o
 alcance é da ordem de centenas de milhares de URLs por termo genérico.
+
+## Alcance real da pesquisa por palavra-chave e das páginas de secção (2026-10-19)
+
+**Execução real, numa sessão local com acesso à API** (este ambiente remoto
+tem `arquivo.pt` bloqueado pela política de rede do sandbox — ver
+`docs/PROJECT_STATUS.md`, "Nota operacional"). Motivação: saber se existe um
+limite de 2000 resultados por pesquisa e se as páginas de secção por
+modalidade (`record.pt/modalidades/<nome>`) servem como fonte de descoberta
+alternativa à pesquisa por palavra-chave, para alargar o corpus do Caminho A
+além da janela 2015–2020.
+
+### 1. Não há limite de 2000 resultados
+
+Pesquisas com os termos de alto volume `futebol` e `Benfica`,
+`siteSearch=record.pt`, `maxItems=500`, testadas sem restrição de datas e
+com `from=1999&to=2026` (as duas variantes dão a mesma fronteira). Paginação
+contínua por `offset` até 20 000 devolveu 20 324 URLs únicos para `futebol`
+e 20 461 para `Benfica`, sem nenhum URL repetido — já overdetermina que não
+há parede a 2000. A partir daí, sondagem por bisseção encontrou o fim real
+de cada pesquisa:
+
+| Termo | Última página com dados | Primeira página vazia | URLs alcançáveis (aprox.) | `estimated_nr_results` |
+| --- | --- | --- | ---: | ---: |
+| `futebol` | `offset=826000` (436 URLs) | `offset=826500` | ~826 400 | 2 613 366 |
+| `Benfica` | `offset=810000` (143 URLs) | `offset=810500` | ~810 100 | 2 460 613 |
+
+**~826 mil URLs alcançáveis para "futebol", ~810 mil para "Benfica" — não há
+parede nenhuma a 2000.** Ressalva do autor da investigação: fora do
+intervalo 0–20 000 só se verificaram os pontos da bisseção, não cada offset;
+o total aproximado assume que não há páginas vazias isoladas entre esses
+pontos.
+
+**Confirmação de que `next_page` e `estimated_nr_results` continuam a não
+ser sinais fiáveis**, agora também a esta escala: `next_page` continua
+presente mesmo em páginas já vazias (verificado até `offset=2600000`) — não
+serve para detetar o fim; o sinal fiável é uma página incompleta seguida de
+uma vazia. `estimated_nr_results` também não serve como contagem: é
+consistentemente **cerca de 3× o valor real** (2 613 366 vs. ~826 400 para
+`futebol`; 2 460 613 vs. ~810 100 para `Benfica`), não apenas "pouco
+fiável" como já registado nas Experiências 1–3. Achado adicional sobre
+deduplicação: sem `dedupField`/`dedupValue` explícitos a API aplica por
+omissão `dedupValue=2` (até 2 capturas por URL), por isso `maxItems=500`
+devolve ~500 URLs únicos mas 550–800 itens brutos.
+
+### 2. Páginas de secção: só cobrem bem 2018–meados de 2020
+
+Teste concreto sobre três secções de modalidade (`record.pt/modalidades/
+{andebol,judo,natacao}`), pedindo o `version_history` completo de cada URL,
+paginado até ao fim:
+
+| Secção | Capturas | Mais antiga | Mais recente | Intervalo mediano |
+| --- | ---: | --- | --- | --- |
+| andebol | 919 | 2018-08-06 | 2025-12-23 | 0,98 dias |
+| judo | 919 | 2018-08-06 | 2025-12-19 | 0,98 dias |
+| natação | 918 | 2018-08-06 | 2025-12-19 | 0,98 dias |
+
+As três secções coincidem em 650 dos 651 dias cobertos, com minutos de
+diferença entre si — não é uma recolha dedicada à secção, é o crawl do site
+inteiro do Arquivo.pt nessa janela, visível em qualquer URL de secção. Um
+teste de 22 dias consecutivos (15 de março a 5 de abril de 2019) sobre as
+capturas de `andebol` confirma a granularidade real nessa janela: 67
+artigos distintos, com uma média de 1,9 novos artigos por dia (máximo 5) —
+praticamente diário. Fora dessa janela a cobertura cai para 1 a 7 capturas
+por ano, com lacunas de até 582 dias (ex.: 2024-01 a 2025-09).
+
+**Conclusão: as páginas de secção só servem bem para 2018–meados de 2020
+(crawl diário do site inteiro nessa janela); fora disso ficam dispersas —
+não chegam para cobrir 1999–2026.**
+
+### Decisão
+
+- Abandonar a divisão recursiva de pesquisas por data — não há parede de
+  2000 resultados que a justifique.
+- Abandonar as páginas de secção como método principal de descoberta — só
+  cobrem bem uma janela de ~2 anos já parcialmente coberta pela amostra
+  atual.
+- Alargar a lista de termos da Fase 1 (`corpus_phase1.py`) com nomes de
+  modalidade e competição diretamente, mantendo o mesmo método já validado
+  (pesquisa por palavra-chave, `siteSearch=record.pt`), com `from=1999` e
+  `to=2026` em vez de `2015`/`2020`. Ver "Download do HTML em bruto da
+  captura mais antiga e lista alargada de termos" abaixo para a lista exata
+  e o que ficou implementado.
+
+## HTML em bruto como alternativa à heurística do corpo do artigo (2026-10-19)
+
+**Investigação, numa sessão local com acesso à API; só decisão de design,
+nada disto está implementado.** Motivação: saber se o Record marca o corpo
+do artigo de forma fiável no HTML em bruto (`linkToOriginalFile`, distinto
+de `linkToExtractedText`, já usado), como alternativa ou complemento à
+heurística de âncoras literais (variante c′, `article_body.py`) usada em D
+e B.
+
+### Prova de conceito (7 capturas)
+
+Amostra deliberada: a crónica Premium (Boavista–Moreirense), as duas
+páginas do "par 29" (FC Porto–Chelsea, direto), 2 páginas AMP (Jorge
+Jesus/Pini Zahavi e Nike Pegasus) e 2 artigos normais (2017 e 2019); os 7 pedidos devolveram 200.
+
+- Nenhuma tem `itemprop="articleBody"`; há JSON-LD em todas, mas sem a
+  propriedade `articleBody` (só `headline`, `datePublished`, `keywords`).
+- Contentores do corpo variam por geração do site: `article-body`/
+  `noticia-content` (2017), `text_container`/`mainTexto` (2019),
+  `bodybox` (AMP).
+- No artigo Premium, `.article-body` é substituído por
+  `.article-premium` (aviso de paywall) — a heurística atual dá **falso
+  positivo**: encontra corpo (113 palavras), tratando o aviso como o texto
+  do artigo.
+- Na página AMP, o Jaccard entre os dois métodos (heurística vs.
+  contentor HTML) é 1,00.
+
+### Amostra maior (251 capturas: 1 por artigo nos 125 artigos, mais Camada 2 e `sem_corpo`)
+
+- **Templates**: 109 dos 125 artigos têm um dos três contentores já vistos
+  (`article-body` em 42, `text_container` em 39, `bodybox`/AMP em 28). Os 16
+  restantes: 5 Premium, 8 páginas multimédia, 1 crónica de opinião
+  (`article-opiniao-content`), 1 AMP antiga de 2017 (`mainBox`) e 1 página
+  `jogos-em-direto`/direto.
+- **Concordância** (98 capturas comparáveis, sem Premium): Jaccard mediano
+  0,893; 37 capturas abaixo de 0,8 — em 25 delas o HTML é mais limpo (a
+  heurística inclui chrome do layout de 2018–19), nas outras 12 o HTML é
+  pior (todas AMP: `bodybox` inclui blocos como "O Record recomenda para
+  si"/"Últimas Notícias").
+- **Deteção de Premium generaliza**: um sinal estrutural no HTML
+  (`article-premium` desde 2017–18, `container_assinatura` desde 2018–20)
+  acerta em 26 de 26 capturas Premium testadas; `isAccessibleForFree` do
+  JSON-LD só existe desde 2019 e só identifica 5 das 26. A heurística atual
+  (âncoras de texto) erra 11 de 13 capturas Premium que têm texto em cache.
+- **Recuperação na Camada 2** (capturas sem texto em cache: 113 capturas,
+  46 artigos): o HTML em bruto recupera corpo em 55 capturas de 33 artigos
+  (mediana 222 palavras, mínimo 43); em 2 desses artigos é a única captura
+  com corpo disponível.
+- **Achado lateral**: em 2 das 136 capturas com texto em cache e HTML
+  disponíveis, o texto em cache não corresponde ao HTML da mesma captura.
+  Um caso confirmado (Yuri Ribeiro, `tstamp=20180717172856`): o ficheiro em
+  cache é igual, byte a byte, ao da captura seguinte, mas com `digest`
+  diferente; pedir o texto outra vez hoje já devolve a versão correta.
+  Causa não apurada — fica registado como anomalia pontual, não como padrão.
+
+### Decisão de design (híbrido, não substituição da heurística)
+
+Usar o contentor HTML por template para duas coisas específicas, sem
+substituir a heurística de âncoras (variante c′) como método principal:
+
+1. **Detetar Premium sem ambiguidade** (sinal estrutural, não
+   `isAccessibleForFree`) e marcar essas capturas como "sem corpo,
+   paywall", em vez de arriscar o falso positivo já documentado.
+2. **Recuperar corpo na Camada 2** (capturas sem texto extraído em cache)
+   a partir do contentor HTML, quando a heurística de texto não tem nada
+   para processar.
+
+Em ambos os casos, reaplicar os mesmos 14 marcadores de chrome da
+heurística por cima do texto do contentor extraído do HTML — resolve o
+caso AMP, em que o contentor `bodybox` por si só vem "sujo" (inclui blocos
+de chrome que os outros contentores não têm).
+
+**Estado: decisão de design registada, nada disto implementado.** A
+`article_body.py` e a lógica de Camada 2 de `corpus_redundancy.py` não
+foram alteradas. O único passo desta investigação que foi implementado é o
+download e a preservação do HTML em bruto em si — ver a secção seguinte.
+
+## Download do HTML em bruto da captura mais antiga e lista alargada de termos (implementado, não corrido; 2026-10-19)
+
+### Decisão
+
+Consequência das duas investigações anteriores:
+
+- Ao pedir o texto da captura mais antiga de um artigo novo
+  (`TEXT_POLICY_FIRST`, "Política de texto para artigos novos" acima),
+  pedir também o HTML em bruto dessa mesma captura, no mesmo passo, para
+  não ter de voltar a pedir à API mais tarde caso a heurística do corpo
+  venha a mudar (secção anterior).
+- Alargar a Fase 1 (`corpus_phase1.py`) com mais 11 termos de pesquisa, a
+  somar aos 13 já usados, com `from=1999`/`to=2026` em vez de
+  `2015`/`2020` — mesmo método (pesquisa por palavra-chave,
+  `siteSearch=record.pt`), sem dividir por datas nem usar páginas de
+  secção (secção anterior).
+- Corrigir a paragem da paginação da Fase 1 para não depender de
+  `next_page`, só de página incompleta/vazia (achado da secção "Alcance
+  real da pesquisa por palavra-chave" acima).
+
+### Implementação
+
+- **`ArquivoClient.download_original_html()`** (`arquivo_client.py`),
+  espelho de `download_extracted_text()`: lê `linkToOriginalFile` (em vez
+  de `linkToExtractedText`) e grava em `data/raw/original_html/<tstamp>_
+  <hash-do-url>.html`, com o mesmo comportamento de reutilização
+  (`skip_existing`) e o mesmo tratamento de falhas (campo ausente, erro de
+  rede). Ao contrário do texto extraído, não há derivação de URL quando o
+  campo falta — não existe (ainda) uma fórmula confirmada para
+  `linkToOriginalFile` equivalente à de `linkToExtractedText`.
+- **`history_pipeline.build_manifest_records()`** passa a chamar
+  `download_original_html()` quando `text_policy == TEXT_POLICY_FIRST` e o
+  texto dessa captura é pedido (mesma condição que já pede o texto). Cada
+  registo do manifesto ganha `original_html_path`, `html_download_success`,
+  `html_downloaded_now`, `html_size_bytes`, `html_error` e `html_requested`;
+  fora dessa condição estes campos ficam no valor "não pedido" (mesma lógica
+  já usada para o texto). `TEXT_POLICY_ALL` (M3, reconstrução offline do
+  corpus histórico via `CacheOnlyClient`) não é afetado — continua sem
+  pedir HTML, evitando qualquer pedido de rede no caminho offline já testado.
+- **`corpus_phase1.py`**: `MODALIDADES` ganha `atletismo`, `ciclismo`,
+  `judo`, `motores`, `natação` (5 novas; `andebol` já estava nos 4 termos
+  originais); nova faceta `COMPETICOES` com `2.ª Liga`, `CAN`, `Europeu`,
+  `Liga Jovem da UEFA`, `Taça das Confederações`, `Taça de Portugal` (6).
+  Total: **24 termos** (13 já usados + 11 novos). `FROM_DATE`/`TO_DATE`
+  passam de `2015`/`2020` para `1999`/`2026`. A origem dos valores novos é
+  uma query SPARQL sobre `output/corpus_entities.ttl` (instâncias
+  `sdh:Tema` por `categoriaTema`/`valorTema`), já usado no corpus atual —
+  não são termos inventados para esta expansão.
+- **Ressalva não resolvida**: a mesma consulta devolve ainda 3 valores
+  reais não incluídos nesta lista, sem justificação registada para a
+  exclusão — modalidade `desporto-universitario` e `jogos-europeus`,
+  competição `liga-nos` (distinta dos 4 clubes já pesquisados). Fica para o
+  autor e o Jorge decidirem se entram também, antes ou depois da primeira
+  corrida da descoberta alargada.
+- **`collect_term_repetition()`** (Fase 1, paginação por `offset`) deixa de
+  parar por ausência de `next_page`; passa a parar só quando a página vem
+  incompleta (`len(resultados) < maxItems`), consistente com o achado desta
+  semana de que `next_page` não é um sinal fiável de fim mesmo a esta
+  escala. `collect_all_captures()` (Fase 2, `version_history`) **não foi
+  alterado** — esta investigação testou especificamente a paginação do
+  TextSearch em pesquisas de grande volume, não o `version_history`; não se
+  generaliza uma conclusão de um endpoint para o outro sem evidência própria.
+
+### Testes
+
+Novos testes offline (fixtures sintéticas, sem rede) para
+`download_original_html()` (reutilização de ficheiro existente, campo
+ausente, falha de rede) e para a ligação ao `history_pipeline` (HTML pedido
+só quando `TEXT_POLICY_FIRST` e o texto é pedido; `TEXT_POLICY_ALL` nunca
+pede HTML, preservando o caminho offline do `CacheOnlyClient`). Suite
+completa a confirmar depois da implementação.
+
+### O que não foi feito
+
+- A extração do corpo a partir do HTML (decisão da secção anterior,
+  deteção de Premium e recuperação na Camada 2) continua por implementar;
+  isto cobre só o download e a preservação do raw.
+- **Nada foi corrido contra a API real**: este ambiente remoto não tem
+  acesso a `arquivo.pt` (ver `docs/PROJECT_STATUS.md`). A descoberta
+  alargada (24 termos, 1999–2026) tem de ser executada numa sessão local
+  ou no terminal, nunca aqui.
+- A ressalva dos 3 valores de vocabulário não incluídos (acima) fica em
+  aberto.

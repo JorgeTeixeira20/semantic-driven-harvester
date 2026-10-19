@@ -330,5 +330,90 @@ class FirstCaptureTextPolicyTests(OfflineTestCase):
         self.assertEqual([r["text_requested"] for r in records], [True, True])
 
 
+def policy_capture_with_html(url: str, tstamp: str) -> dict:
+    return {**policy_capture(url, tstamp),
+            "linkToOriginalFile": f"https://archive.example.test/original/{tstamp}"}
+
+
+class HtmlAlongsideFirstCaptureTests(OfflineTestCase):
+    """HTML em bruto (`docs/experiments.md`) pedido na mesma passagem que o
+    texto da captura mais antiga, só sob `TEXT_POLICY_FIRST`."""
+
+    def test_html_is_requested_only_for_the_oldest_capture_under_first_policy(self) -> None:
+        captures = [
+            policy_capture_with_html(ORIGINAL_URL, "20200301000000"),
+            policy_capture_with_html(ORIGINAL_URL, "20200101000000"),
+            policy_capture_with_html(OTHER_URL, "20210505000000"),
+        ]
+        # A FixtureSession falha perante qualquer pedido fora destes quatro:
+        # só as capturas mais antigas de cada artigo pedem texto e HTML, pela
+        # mesma ordem em que `build_manifest_records` os pede (texto, depois
+        # HTML, por captura).
+        session = self.fixture_session(
+            ("https://archive.example.test/text/20200101000000", b"texto A"),
+            ("https://archive.example.test/original/20200101000000", b"<html>A</html>"),
+            ("https://archive.example.test/text/20210505000000", b"texto B"),
+            ("https://archive.example.test/original/20210505000000", b"<html>B</html>"),
+        )
+        client = ArquivoClient(data_dir=self.root / "raw", session=session)
+
+        records = build_manifest_records(
+            client, captures, self.root, text_policy=TEXT_POLICY_FIRST
+        )
+
+        by_tstamp = {r["tstamp"]: r for r in records}
+        oldest = by_tstamp["20200101000000"]
+        self.assertEqual(
+            (oldest["html_requested"], oldest["html_download_success"],
+             oldest["html_downloaded_now"]),
+            (True, True, True),
+        )
+        self.assertEqual(
+            (self.root / oldest["original_html_path"]).read_bytes(), b"<html>A</html>",
+        )
+        self.assertTrue(by_tstamp["20210505000000"]["html_requested"])
+        not_oldest = by_tstamp["20200301000000"]
+        self.assertEqual(
+            (not_oldest["html_requested"], not_oldest["html_download_success"],
+             not_oldest["original_html_path"]),
+            (False, False, None),
+        )
+
+    def test_all_policy_never_requests_html_even_when_field_is_present(self) -> None:
+        captures = [policy_capture_with_html(ORIGINAL_URL, "20200101000000")]
+        # Sob TEXT_POLICY_ALL só o texto pode ser pedido; um pedido de HTML
+        # não registado faria a FixtureSession falhar o teste.
+        session = self.fixture_session(
+            ("https://archive.example.test/text/20200101000000", b"texto"),
+        )
+        client = ArquivoClient(data_dir=self.root / "raw", session=session)
+
+        records = build_manifest_records(
+            client, captures, self.root, text_policy=TEXT_POLICY_ALL
+        )
+
+        self.assertEqual(
+            (records[0]["html_requested"], records[0]["html_download_success"],
+             records[0]["original_html_path"]),
+            (False, False, None),
+        )
+
+    def test_missing_html_field_fails_without_blocking_the_text(self) -> None:
+        captures = [policy_capture(ORIGINAL_URL, "20200101000000")]  # sem linkToOriginalFile
+        session = self.fixture_session(
+            ("https://archive.example.test/text/20200101000000", b"texto"),
+        )
+        client = ArquivoClient(data_dir=self.root / "raw", session=session)
+
+        records = build_manifest_records(
+            client, captures, self.root, text_policy=TEXT_POLICY_FIRST
+        )
+
+        self.assertTrue(records[0]["text_download_success"])
+        self.assertTrue(records[0]["html_requested"])
+        self.assertFalse(records[0]["html_download_success"])
+        self.assertEqual(records[0]["html_error"], "linkToOriginalFile ausente")
+
+
 if __name__ == "__main__":
     unittest.main()

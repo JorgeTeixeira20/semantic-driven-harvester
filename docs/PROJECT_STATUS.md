@@ -1,7 +1,8 @@
 # Estado do projeto
 
-Atualizado em **2026-10-10** (RDF dos Caminhos D e B), a partir do código, testes,
-documentação e histórico; a última revisão integral foi até `a3208f4`.
+Atualizado em **2026-10-19** (alcance real da descoberta e download do HTML
+em bruto), a partir do código, testes, documentação e histórico; a última
+revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
 [README.md](../README.md).
@@ -136,7 +137,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 191 testes em catorze módulos de `tests/`.
+pacote conforme o README. Existem 202 testes em dezasseis módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -160,12 +161,19 @@ partir de URLs) e o vocabulário da Wikidata (`test_wikidata_vocabulary.py`:
 sobreposição de datas, regras de variantes e homónimos, respostas guardadas
 em bruto, com sessão simulada) e o protótipo de navegação
 (`test_navigation_prototype.py`: contagens das queries sobre um grafo pequeno,
-ordem e filtro do histórico, ligações entre páginas e escape de títulos).
+ordem e filtro do histórico, ligações entre páginas e escape de títulos) e o
+HTML em bruto da captura mais antiga (`test_arquivo_client.py`: download,
+reutilização de ficheiro existente, campo ausente e falha de rede; mais
+testes em `test_history_pipeline.py` sobre a ligação a `TEXT_POLICY_FIRST`,
+incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
+(`test_corpus_phase1.py`: paragem só por página incompleta/vazia,
+independente de `next_page`; lista de termos alargada).
 
-Última validação em **2026-10-19**, com o Python 3.12.4 do ambiente virtual (macOS):
-`.venv/bin/python -m unittest discover -s tests` — **191 testes, todos
-passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-09-20, Python
-3.13.1 no Windows, 68 testes OK.)
+Última validação em **2026-10-19**, com o Python 3.11.17 do ambiente virtual
+(sessão remota Linux): `.venv/bin/python -m unittest discover -s tests` —
+**202 testes, todos passaram (`OK`)**, sem chamadas à API real. (Anterior:
+2026-10-15, Python 3.12.4 no ambiente virtual (macOS), 190 testes OK;
+2026-09-20, Python 3.13.1 no Windows, 68 testes OK.)
 
 [tests/support.py](../tests/support.py) fornece respostas simuladas, temporários
 e bloqueio de rede. As [fixtures](../tests/fixtures/README.md) são sintéticas.
@@ -328,6 +336,30 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
 
    O Caminho D foi concluído em 2026-10-02 e revisto em 2026-10-09 (passo 3
    abaixo).
+
+   **Investigação do limite de resultados e das páginas de secção, e
+   alargamento da descoberta (2026-10-19, `experiments.md`).** Confirmado
+   (sessão local, com acesso à API): não há limite de 2000 resultados por
+   pesquisa (~826 mil URLs alcançáveis para `futebol`, ~810 mil para
+   `Benfica`); `next_page` e `estimated_nr_results` continuam não fiáveis
+   mesmo a esta escala (o segundo é ~3× o valor real). As páginas de secção
+   só cobrem bem 2018–meados de 2020 (crawl diário do site inteiro nessa
+   janela, não uma recolha dedicada à secção) — não servem para alargar a
+   1999–2026. Decisão: alargar a Fase 1 com 11 termos novos (5 modalidades,
+   6 competições, a partir de valores reais do vocabulário do Caminho B) a
+   somar aos 13 já usados, com `from=1999`/`to=2026`, e corrigir a paragem
+   da paginação para não depender de `next_page`. Implementado em
+   `corpus_phase1.py`; **ainda não corrido contra a API** (ambiente remoto
+   sem acesso a `arquivo.pt`). Numa investigação relacionada (mesma sessão
+   local), o HTML em bruto (`linkToOriginalFile`) mostrou conter
+   marcação de corpo mais fiável do que a heurística atual em dois casos
+   (deteção de Premium, recuperação de corpo sem texto em cache); decisão de
+   design híbrida registada, **não implementada**. O que ficou implementado
+   e testado offline dessa investigação é só o download/preservação do HTML
+   em bruto da captura mais antiga de artigos novos, na mesma passagem que o
+   texto (`ArquivoClient.download_original_html`, `data/raw/original_html/`,
+   ligado a `history_pipeline.build_manifest_records` sob
+   `TEXT_POLICY_FIRST`). Detalhe completo em `experiments.md`.
 3. **D** — redução de redundância entre capturas do mesmo artigo. **Decisão de
    âmbito:** heurística de similaridade textual simples (não `digest` isolado,
    não embeddings), aplicada à escala do corpus produzido em A; comparação com
