@@ -1,19 +1,32 @@
 """Fase 1 do protocolo de queries do Caminho A — descoberta via TextSearch.
 
-Implementa a Opção 2 (Moderada) decidida em `docs/experiments.md`
-("Protocolo de queries para o corpus do Caminho A"): 13 termos de pesquisa
-(4 modalidades, 4 clubes, 5 atletas conhecidos), `siteSearch=record.pt`,
-`maxItems=50`, `dedupField=url`/`dedupValue=1` explícitos, 2 repetições por
-termo, com paginação por `offset` só quando uma página vier cheia (decisão
-da Experiência 2).
+Começou como a Opção 2 (Moderada) decidida em `docs/experiments.md`
+("Protocolo de queries para o corpus do Caminho A"): 13 termos (4
+modalidades, 4 clubes, 5 atletas), `from=2015`/`to=2020`, explicitamente uma
+amostra pequena. Essa execução deu o corpus atual de 125 artigos; o seu raw
+(`data/raw/corpus_queries/`) e os seus relatórios (`output/corpus_phase1_*`)
+são preservados e não são reescritos por este módulo.
 
-Alargado em `docs/experiments.md` ("Download do HTML em bruto da captura
-mais antiga e lista alargada de termos", 2026-10-19): mais 11 termos (5
-modalidades, 6 competições), com `from=1999`/`to=2026` em vez de
-`2015`/`2020` — a investigação do limite de 2000 resultados mostrou que não
-há parede que justifique dividir por datas. A paragem por página deixou de
-depender de `next_page` (não fiável mesmo a grande escala), só de página
-incompleta/vazia.
+**Âmbito atual (2026-10-19): decisão de âmbito explícita e muito mais
+ampla**, já não uma amostra moderada. As facetas de modalidade, clube e
+competição passam a enumerar todos os valores reais encontrados nos URLs do
+`record.pt` (`docs/experiments.md`, enumeração de 2026-10-19 com
+`themes_from_url()`, raw em
+`data/raw/api_diagnostics/enumeracao_2026-10-19/`), com as decisões do autor
+sobre os casos ambíguos: 39 modalidades (sem as secções editoriais `outras`,
+`record-pela-patagonia` e `aventura-em-mocambique`), 57 clubes (variantes de
+slug fundidas; `campeao` excluído; equipas B incluídas por terem ≥ 20 URLs)
+e as 7 competições. Os 5 atletas ficam deliberadamente como estavam: são uma
+faceta de descoberta, não vocabulário de entidades (decisão do Caminho B
+sobre circularidade). Total: 108 termos, `from=1999`/`to=2026` (não há
+limite de 2000 resultados que justifique dividir por datas).
+
+Parâmetros mantidos: `siteSearch=record.pt`, `maxItems=50`,
+`dedupField=url`/`dedupValue=1` explícitos, 2 repetições por termo, no
+máximo 6 páginas por termo/repetição, `offset` só quando a página vier
+cheia; a paragem não depende de `next_page` (não fiável mesmo a grande
+escala). Esta execução escreve o raw em `data/raw/corpus_queries/alargada/`
+e os relatórios em `output/corpus_phase1_alargada_*`.
 
 Preserva o raw de cada pedido, depois agrega/deduplica os `response_items`
 de todos os pedidos por `(originalURL, tstamp)` (captura) e por
@@ -49,13 +62,36 @@ MAX_PAGES_PER_TERM = 6
 RETRY_ATTEMPTS = 3
 RETRY_SLEEP_SECONDS = 10.0
 
+RUN_LABEL = "alargada"
+
+# Valores reais da enumeração de 2026-10-19 (docs/experiments.md), com as
+# decisões do autor sobre os casos ambíguos.
 MODALIDADES = (
-    "futebol", "basquetebol", "andebol", "voleibol",
-    # Alargamento de 2026-10-19 (docs/experiments.md): valores reais já no
-    # vocabulário do Caminho B (sdh:Tema, categoria "modalidade").
-    "atletismo", "ciclismo", "judo", "motores", "natação",
+    "futebol", "basquetebol", "andebol", "voleibol", "atletismo", "ciclismo",
+    "judo", "motores", "natação", "desporto-universitario", "jogos-europeus",
+    "ténis", "hóquei em patins", "surf", "jogos olímpicos", "golfe",
+    "desportos de combate", "rugby", "canoagem", "ténis de mesa", "triatlo",
+    "ginástica", "padel", "NFL", "orientação", "desportos radicais", "vela",
+    "remo", "desporto escolar", "badminton", "snooker", "MMA", "aventura",
+    "tiro", "esgrima", "desportos de inverno", "desporto adaptado",
+    "pólo aquático", "xadrez",
 )
-CLUBES = ("Benfica", "Sporting", "Porto", "SC Braga")
+CLUBES = (
+    "Benfica", "Sporting", "Porto", "SC Braga", "Vitória de Guimarães",
+    "Rio Ave", "Vitória de Setúbal", "Marítimo", "Portimonense", "Boavista",
+    "Tondela", "Chaves", "Aves", "Feirense", "Famalicão", "Belenenses",
+    "Paços de Ferreira", "Moreirense", "Santa Clara", "Estoril Praia",
+    "Gil Vicente", "Nacional", "Leixões", "Académica", "Farense",
+    "Belenenses SAD", "Arouca", "Varzim", "União da Madeira",
+    "Cova da Piedade", "Sporting da Covilhã", "Académico de Viseu",
+    "Vilafranquense", "Oliveirense", "Benfica B", "Casa Pia", "Vizela",
+    "Penafiel", "Estrela da Amadora", "Mafra", "Olhanense", "FC Porto B",
+    "Sporting B", "Fafe", "Real Sport Clube", "SC Braga B", "AVS",
+    "Vitória de Guimarães B", "Freamunde", "Trofense", "Torreense",
+    "União de Leiria", "Lank Vilaverdense", "Sporting Clube Oriental",
+    "Felgueiras", "Atlético Clube de Portugal", "Alverca",
+)
+# Faceta de descoberta, não vocabulário de entidades: não alargar.
 ATLETAS = (
     "Cristiano Ronaldo",
     "Bruno Fernandes",
@@ -63,11 +99,9 @@ ATLETAS = (
     "João Félix",
     "Nelson Évora",
 )
-# Faceta nova de 2026-10-19 (docs/experiments.md): valores reais já no
-# vocabulário do Caminho B (sdh:Tema, categoria "competicao").
 COMPETICOES = (
     "2.ª Liga", "CAN", "Europeu", "Liga Jovem da UEFA",
-    "Taça das Confederações", "Taça de Portugal",
+    "Taça das Confederações", "Taça de Portugal", "Liga NOS",
 )
 
 TERMS: tuple[tuple[str, str], ...] = (
@@ -267,7 +301,7 @@ def write_aggregation_markdown(
     )
 
     lines = [
-        "# Fase 1 — descoberta via TextSearch (Opção 2, corpus do Caminho A)\n",
+        "# Fase 1 alargada — descoberta via TextSearch (corpus do Caminho A)\n",
         f"Execução real. Parâmetros comuns: `siteSearch=record.pt`, "
         f"`from={FROM_DATE}`, `to={TO_DATE}`, `maxItems={MAX_ITEMS}`, "
         f"`dedupField=url`/`dedupValue=1` explícitos. {len(TERMS)} termos "
@@ -310,7 +344,8 @@ def write_aggregation_markdown(
 
     lines.append(
         "\nEstes valores são o resultado real desta execução, não uma "
-        "estimativa. Corpus agregado em `output/corpus_phase1_captures.csv` "
+        "estimativa. Corpus agregado em "
+        f"`output/corpus_phase1_{RUN_LABEL}_captures.csv` "
         "(uma linha por captura única, com proveniência de faceta/termo)."
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -320,7 +355,7 @@ def run_phase1(project_root: Path | None = None) -> tuple[
     list[TermRunStats], dict[tuple[str, str], CaptureRecord], list[tuple[str, str]]
 ]:
     root = project_root or Path(__file__).resolve().parents[2]
-    raw_dir = root / "data" / "raw" / "corpus_queries"
+    raw_dir = root / "data" / "raw" / "corpus_queries" / RUN_LABEL
     client = ArquivoClient(data_dir=root / "data" / "raw", timeout=(15.0, 120.0))
 
     stats: list[TermRunStats] = []
@@ -345,10 +380,10 @@ def run_phase1(project_root: Path | None = None) -> tuple[
 
     captures, divergent_keys = aggregate(records)
 
-    write_term_stats_csv(stats, root / "output" / "corpus_phase1_per_term.csv")
-    write_captures_csv(captures, root / "output" / "corpus_phase1_captures.csv")
+    write_term_stats_csv(stats, root / "output" / f"corpus_phase1_{RUN_LABEL}_per_term.csv")
+    write_captures_csv(captures, root / "output" / f"corpus_phase1_{RUN_LABEL}_captures.csv")
     write_aggregation_markdown(
-        stats, captures, divergent_keys, root / "output" / "corpus_phase1_aggregation.md"
+        stats, captures, divergent_keys, root / "output" / f"corpus_phase1_{RUN_LABEL}_aggregation.md"
     )
     return stats, captures, divergent_keys
 
@@ -366,8 +401,9 @@ def main() -> int:
     print(f"Capturas únicas: {len(captures)}")
     print(f"N (artigos únicos): {len(articles)}")
     print(f"Divergências: {len(divergent_keys)}")
-    print("Relatórios: output/corpus_phase1_per_term.csv, "
-          "output/corpus_phase1_captures.csv, output/corpus_phase1_aggregation.md")
+    print(f"Relatórios: output/corpus_phase1_{RUN_LABEL}_per_term.csv, "
+          f"output/corpus_phase1_{RUN_LABEL}_captures.csv, "
+          f"output/corpus_phase1_{RUN_LABEL}_aggregation.md")
     return 0
 
 

@@ -3771,3 +3771,54 @@ completa a confirmar depois da implementação.
   ou no terminal, nunca aqui.
 - A ressalva dos 3 valores de vocabulário não incluídos (acima) fica em
   aberto.
+
+## Fase 1 alargada: lista final de 108 termos (implementada; 2026-10-19)
+
+### Decisão
+
+A Fase 1 deixa de ser a "Opção 2 — Moderada" (13 termos, explicitamente uma
+amostra pequena) e passa a uma **decisão de âmbito explícita e muito mais
+ampla**: as facetas de modalidade, clube e competição enumeram os valores
+reais encontrados nos URLs do `record.pt`, e não uma lista escolhida à mão.
+Origem: a enumeração de 2026-10-19 com `themes_from_url()` (309 348
+`originalURL` únicos; tabelas e raw em
+`data/raw/api_diagnostics/enumeracao_2026-10-19/`). Decisões do autor sobre
+os casos ambíguos:
+
+- **39 modalidades.** Excluídas `outras`, `record-pela-patagonia` e
+  `aventura-em-mocambique` (secções editoriais, não modalidades).
+- **57 clubes.** `ac-viseu`/`ac--viseu` fundidos em "Académico de Viseu";
+  `belenenses-sad`/`b-sad` fundidos em "Belenenses SAD"; `campeao` excluído
+  (não é clube); as equipas B entram por terem ≥ 20 URLs na enumeração, não
+  por pedido explícito.
+- **7 competições:** as 6 já usadas e "Liga NOS", que cobre por completo os
+  valores reais da categoria.
+- **5 atletas, sem alterações:** é uma faceta de descoberta, não vocabulário
+  de entidades (decisão do Caminho B sobre circularidade); não se alarga.
+
+Total: **108 termos**, sem duplicados nem colisões de slug.
+
+### Implementação
+
+`corpus_phase1.py`: novas listas, docstring do módulo e um `RUN_LABEL =
+"alargada"` que separa esta execução da original. Sem ele, o raw da nova
+execução reescreveria os 26 ficheiros da Fase 1 original em
+`data/raw/corpus_queries/` (não versionados: perda irreversível), e os
+relatórios reescreveriam `output/corpus_phase1_*`, que a Fase 2 e a
+classificação leem por omissão. A execução alargada escreve em
+`data/raw/corpus_queries/alargada/` e `output/corpus_phase1_alargada_*`; a
+original, que deu o corpus de 125 artigos, fica intacta e continua a ser a
+entrada por omissão da Fase 2 até o `N` ser confirmado.
+
+Mantêm-se os restantes parâmetros: `maxItems=50`, `dedupValue=1`, 2
+repetições, no máximo 6 páginas (300 URLs) por termo/repetição e paragem na
+primeira página com menos de 50 resultados. Dois pontos já observados que
+afetam o `N` e ficam em aberto: o teto de 6 páginas limita cada termo a 300
+URLs por repetição; e, na enumeração de 2026-10-19 (com `maxItems=500`),
+houve páginas a meio da paginação com 490–499 URLs únicos seguidas de
+páginas cheias, pelo que uma página com menos de `maxItems` nem sempre é o
+fim.
+
+Testes offline (`test_corpus_phase1.py`): totais por faceta (39/57/5/7, 108),
+sem duplicados nem colisões de slug, casos ambíguos conforme a decisão,
+atletas inalterados. Suite completa: 206 testes OK.

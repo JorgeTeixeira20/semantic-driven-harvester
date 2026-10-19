@@ -199,24 +199,27 @@ execução.
 
 ## Fase 1 do corpus do Caminho A (descoberta via TextSearch)
 
-Para correr a Fase 1 do protocolo de queries decidido em
-`docs/experiments.md` ("Protocolo de queries para o corpus do Caminho A",
-Opção 2 — Moderada: 13 termos, 2 repetições por termo):
+Para correr a Fase 1 alargada (decisão de âmbito de 2026-10-19 em
+`docs/experiments.md`: 108 termos — 39 modalidades, 57 clubes, 5 atletas,
+7 competições —, `from=1999`/`to=2026`, 2 repetições por termo):
 
 ```bash
 python -m semantic_harvester.corpus_phase1
 ```
 
-Os JSON raw são guardados em `data/raw/corpus_queries/`; os resultados
-(estatísticas por termo, capturas agregadas/deduplicadas por
+Os JSON raw são guardados em `data/raw/corpus_queries/alargada/`; os
+resultados (estatísticas por termo, capturas agregadas/deduplicadas por
 `(originalURL, tstamp)` e o resumo com `N`) ficam em
-`output/corpus_phase1_per_term.csv`, `output/corpus_phase1_captures.csv` e
-`output/corpus_phase1_aggregation.md`. Este comando faz cerca de 26 pedidos
-reais (mais offset condicional se alguma página vier cheia) e pode demorar
-vários minutos; tem novas tentativas automáticas para timeouts/erros 500
-pontuais da API. **Não avança para a Fase 2 (`version_history`)** — essa
-etapa exige confirmação explícita do valor de `N` (ver
-`docs/experiments.md`).
+`output/corpus_phase1_alargada_per_term.csv`,
+`output/corpus_phase1_alargada_captures.csv` e
+`output/corpus_phase1_alargada_aggregation.md`. A Fase 1 original (Opção 2 —
+Moderada, 13 termos, 2015–2020), que deu o corpus atual de 125 artigos, fica
+preservada em `data/raw/corpus_queries/` e `output/corpus_phase1_*` e não é
+reescrita; a Fase 2 e a classificação continuam a ler essa por omissão.
+O comando faz até 1 296 pedidos reais (108 termos × 2 repetições × até 6
+páginas) e tem novas tentativas automáticas para timeouts/erros 500 pontuais
+da API. **Não avança para a Fase 2 (`version_history`)** — essa etapa exige
+confirmação explícita do valor de `N` (ver `docs/experiments.md`).
 
 ## Fase 2 do corpus do Caminho A (profundidade temporal via version_history)
 
