@@ -3267,3 +3267,264 @@ ainda não está feito.
 Testes: 2 novos em `tests/test_corpus_annotations_rdf.py` (a subclasse
 específica aparece no grafo; uma categoria desconhecida falha). Suite
 completa: **191 testes, todos a passar**. Nada foi corrido contra a API.
+
+## Corpo do artigo no HTML original do Record: alternativa às âncoras da c′? (2026-10-18)
+
+### Motivação
+
+A variante c′ (`article_body.py`) nunca vê o HTML: trabalha sobre o
+`linkToExtractedText` do Arquivo.pt, já aplanado, e delimita o corpo por
+âncoras literais (título repetido, depois o primeiro dos 14 marcadores de
+chrome). Pergunta: o HTML em bruto (`linkToOriginalFile`, URL `…id_/…`) tem
+uma marcação fiável só do corpo (`<article>`, `<div>` com classe/id estável,
+`itemprop="articleBody"` ou JSON-LD) que sirva de alternativa mais robusta?
+Nada foi mudado em `article_body.py`; esta secção só recolhe dados para a
+decisão.
+
+### 1. Prova de conceito: 7 capturas dos casos difíceis conhecidos
+
+Pedidas pelo `linkToOriginalFile` (7 pedidos, todos HTTP 200), guardadas em
+`data/raw/original_html/` (não versionado). Escolhidas para cobrir os casos
+já registados neste ficheiro: um artigo normal de 2017 (entrevista Daniel
+Ramos, `20171001032744`) e um de 2019 (Carlos Xistra, `20191102192301`); o
+artigo **Premium** sem corpo (crónica Boavista-Moreirense, `20171127045348`);
+os dois lados do **par 29**, página de jogo em direto reescrita
+(`20190429170841` e `20190430202203`); e duas páginas **AMP** (Jorge Jesus /
+Pini Zahavi, `20190228191520`; Nike Pegasus, `20190322194121`). Inspeção com
+o `html.parser` da biblioteca padrão (sem BeautifulSoup, que não está no
+ambiente).
+
+**Não há uma marcação única.** Nenhuma das 7 tem `itemprop="articleBody"`.
+Todas têm um bloco JSON-LD `NewsArticle`, mas sem `articleBody` (traz
+`headline`, `description`, `datePublished`, `keywords`, …). As tags
+`<article>` existem às dezenas, mas marcam os cartões de manchetes, não o
+corpo. O que existe é **um contentor diferente por template**, igual dentro
+de cada template:
+
+| Template | Contentor do corpo | Capturas |
+| --- | --- | --- |
+| site 2017 | `div.article-body` | normal 2017 |
+| site 2019 | `div.text_container` | normal 2019, direto (as duas) |
+| AMP (2019) | `div.bodybox` | Jorge Jesus, Nike |
+
+**Comparação com a c′** (Jaccard sobre conjuntos de palavras, texto do
+contentor vs. corpo da c′ sobre o texto extraído da mesma captura):
+
+| Captura | Palavras HTML / c′ | Jaccard | Observação |
+| --- | ---: | ---: | --- |
+| normal 2017 | 137 / 154 | 0,97 | a c′ só acrescenta título, lead e crédito da foto |
+| AMP Nike | 134 / 135 | 1,00 | idênticos |
+| direto, intervalo | 1594 / 1775 | 0,92 | a c′ inclui o formulário "Enviar o artigo…" e 4 manchetes de outras notícias |
+| direto, fim | 2191 / 2298 | 0,96 | a c′ inclui o formulário "Enviar o artigo…" |
+| **Premium 2017** | 0 / 113 | 0,00 | sem `div.article-body`; ver abaixo |
+| normal 2019 | 233 / — | — | captura da Camada 2: sem texto extraído |
+| AMP Jorge Jesus | 316 / — | — | captura da Camada 2: sem texto extraído |
+
+- **Premium: falso positivo real da c′.** No HTML, o `div.article-body` não
+  existe e aparece `div.article-premium` com o aviso "Esta notícia é
+  exclusiva para Assinantes Record Premium…": a página diz explicitamente que
+  não tem corpo. A c′ devolve `found=True` com 113 palavras — título, lead e
+  o texto do paywall —, tratando o aviso como corpo.
+- **Sinal estruturado de paywall, só em 2019.** O JSON-LD do template de
+  2019 declara `isAccessibleForFree` e `hasPart` com
+  `cssSelector: ".paywall"` (no artigo normal: `True`). Não existe em 2017 nem
+  nas AMP; nesta amostra não havia nenhum Premium de 2019 para ver o valor
+  `False`.
+- **Camada 2.** As duas capturas sem texto extraído têm, no HTML original, o
+  corpo completo (233 e 316 palavras).
+- O par 29 continua "texto alterado" pelo HTML: o relato é o conteúdo real
+  da página e difere entre as duas capturas.
+
+**Ressalva.** São 7 capturas escolhidas a dedo: prova de conceito, não
+medição do corpus. Não se sabe ainda quantos templates há no corpus, como é
+o site anterior (`interior.aspx`, `tn0cs.asp`) nem o Premium de 2019. O HTML
+tem 120–340 KB por captura e não está em cache: usá-lo exige descarregá-lo.
+
+### 2. Amostra alargada: 251 capturas (templates, Premium, Camada 2)
+
+251 pedidos ao `linkToOriginalFile`, todos HTTP 200, guardados em
+`data/raw/original_html/` com o resultado por captura em
+`data/raw/original_html/html_body_sample.csv` (nada disto é versionado; os
+scripts da verificação estão em `data/raw/original_html/_scripts/`). Três
+grupos, com sobreposição: **template** — 1 captura por artigo, a mais antiga
+com status 200 e texto em cache (125); **Camada 2** — todas as capturas com
+status 200 e sem texto extraído (113: as 110 da `2_sem_texto` e 3 "não
+avaliáveis"; as 31 de 301/302 e as 2 de 404 não têm corpo a recuperar);
+**`sem_corpo`** — as 18 em que a c′ não encontrou corpo.
+
+**Templates (1 por artigo, 125).** 109 têm um dos três contentores da prova
+de conceito: `article-body` 42 (2017–2018), `text_container` 39
+(2018–2019), `bodybox` 28 (AMP, 2017–2019). As 16 sem nenhum deles:
+5 Premium (`article-premium`), 8 páginas multimédia (vídeos e galerias,
+sem corpo de texto ou com uma descrição curta em `noticia_text`), 1 crónica
+de opinião (`article-opiniao-content`, quarto template), 1 AMP antiga de
+2017 (`div.mainBox`, quinto template) e 1 página `jogos-em-direto/live`.
+Nenhum template novo em notícias normais fora destes.
+
+**Concordância com a c′** (template com contentor e c′ com corpo, sem
+Premium: 98 capturas). Jaccard mediano 0,893 (mínimo 0,237); 34 com
+≥ 0,95 e 37 abaixo de 0,8. Por contentor: `article-body` mediana 0,953
+(40), `bodybox` 0,875 (26), `text_container` 0,728 (32). Os 37 casos abaixo
+de 0,8 dividem-se assim:
+
+- 25 com **texto a mais na c′** (`text_container` 23, `article-body` 2): nas
+  notícias de 2018–2019 as palavras só da c′ são o chrome do template — o
+  formulário "O meu email / Destinatários / Enviar", o aviso de login, "Deixe
+  o seu comentário", "Temas" —, que em notícias curtas puxa o Jaccard para
+  baixo; nas fotogalerias, a lista "Mais Fotogalerias", que não é um dos 14
+  marcadores. Aqui o HTML é mais limpo.
+- 12 com **chrome dentro do contentor HTML** (todos `bodybox`): em algumas
+  versões AMP o `div.bodybox` engloba "O Record recomenda para si" e
+  "Últimas Notícias"; a c′ corta bem nesses marcadores. Aqui o HTML é pior.
+
+21 páginas têm dois `div.text_container`; em todas o segundo está aninhado no
+primeiro e tem o mesmo texto, por isso ler o primeiro basta.
+
+**Premium.** Dois sinais estruturais, um por geração do site:
+`div.article-premium` (2017–2018) e `div.container_assinatura` (2018–2020,
+com `premiumBox_header` e o teaser em `p.fadeoutPremium`). Juntos marcam 26
+capturas de 12 artigos, exatamente as 26 em que o HTML tem o aviso "exclusiva
+para assinantes" — nenhuma página com sinal sem aviso, nenhuma com aviso sem
+sinal. **O JSON-LD não generaliza:** `isAccessibleForFree` só existe a partir
+de 2019 e marca 5 das 26 (`False` nas 5; `True` em 9 gratuitas); 3 Premium de
+2018–2019 com `container_assinatura` não o têm. **Premium de 2019 encontrado:**
+"Yony González é reforço para o Benfica" (`20191114000138`), com
+`isAccessibleForFree: False` e `hasPart` `{cssSelector: ".paywall",
+isAccessibleForFree: False}`; o `div.text_container.paywall` só tem o teaser
+(32 palavras). A c′ deu `found=True` em 11 das 13 capturas Premium com texto em
+cache — o mesmo falso positivo da prova de conceito, também em 2019. Um artigo
+(Zivkovic/Drulo) tem 6 de 8 capturas Premium e 2 não (páginas sem o artigo).
+
+**Camada 2 (113 capturas, 46 artigos).** O HTML original recupera o corpo
+em **55 capturas de 33 artigos** (`article-body` 33, `bodybox` 11,
+`text_container` 6, `article-opiniao-content` 5; mediana 222 palavras,
+mínimo 43); 2 desses 33 artigos não tinham nenhuma captura com corpo
+comparável. As restantes 58: 12 Premium (sem corpo, com sinal explícito),
+29 multimédia só com descrição curta (`noticia_text`, 2 artigos), 16
+multimédia sem texto (vídeo/galeria, 4 artigos) e 1 `jogos-em-direto/live`.
+
+**`sem_corpo` da c′ (18).** O HTML encontra corpo em 2: a AMP de 2017
+(`mainBox`, 347 palavras, onde a c′ não localiza o título) e uma notícia de
+2019 (`text_container`, 326 palavras). Nas outras 16 os dois métodos
+concordam que não há corpo: 8 `jogos-em-direto/live`, 3 multimédia sem
+texto, 2 Premium e 3 páginas sem o artigo (só menu e "O Record recomenda para
+si").
+
+**Achado lateral: texto extraído de outra captura.** Em 2 das 136 capturas
+com texto em cache e HTML, mais de 10% das palavras do texto em cache não
+existem em lado nenhum do HTML da mesma captura (27% e 11%). No caso
+verificado (Yuri Ribeiro, `20180717172856`), o HTML (`Memento-Datetime`
+exatamente 17:28:56, sem redirecionamento) é a versão "(em atualização)",
+mas o ficheiro em cache — descarregado a 18 set — é byte a byte igual ao
+texto da captura seguinte (`20180717181217`, `digest` diferente). O mesmo
+pedido ao `textextracted`, feito agora, devolve a versão curta, coerente com
+o HTML. A causa não foi apurada; fica registado que o `textextracted` pode,
+pelo menos às vezes, ter devolvido o texto de uma captura vizinha.
+
+### 3. Leitura (sem decisão)
+
+- **A favor do HTML:** deteta o Premium sem ambiguidade em todas as gerações
+  vistas (a c′ não); dá corpo sem o chrome do template de 2018–2019; recupera
+  corpo em 55 capturas da Camada 2 e em 2 `sem_corpo`; não depende de o título
+  se repetir nem da lista de marcadores.
+- **Contra ou por resolver:** precisa de um seletor por template (5 vistos,
+  mais os de multimédia); o `bodybox` de algumas AMP traz chrome e
+  precisaria dos marcadores da c′ para cortar; exige descarregar o HTML de
+  cada captura (cerca de 120–340 KB, contra o texto já em cache).
+- A recuperação da Camada 2 e a deteção do Premium valem por si,
+  independentemente de qual for o método principal.
+- Os números são desta amostra (251 capturas, 125 artigos, 2017–2020 pela
+  captura mais antiga); o site anterior a 2017 não está representado.
+
+## Descoberta de artigos: limite da TextSearch e páginas de secção (2026-10-19)
+
+### Motivação
+
+Antes de decidir como alargar a descoberta de artigos (por exemplo, divisão
+recursiva de datas ou descoberta pelas páginas de secção), duas perguntas de
+facto: (1) a TextSearch trava perto de 2000 resultados por pesquisa?
+(2) com que frequência estão arquivadas as páginas de secção por modalidade,
+e quanto do que publicam é visível nas capturas? Pedidos reais à API; nada
+mudou no código de produção nem no corpus. JSON e HTML em bruto em
+`data/raw/api_diagnostics/limite_2026-10-19/` e
+`data/raw/api_diagnostics/seccoes_2026-10-19/`; scripts e logs em
+`data/raw/api_diagnostics/_scripts_2026-10-19/` (não versionados).
+
+### 1. Limite de resultados da TextSearch: não há travão perto de 2000
+
+Pesquisas `q=futebol` e `q=Benfica`, `siteSearch=record.pt`, `maxItems=500`,
+sem datas e com `from=19990101000000&to=20261231235959`. Paginação por
+`offset`, de 500 em 500, seguindo a convenção do próprio `next_page`.
+
+- **Tamanho real da página.** A API normaliza `maxItems` para 500 e aplica por
+  omissão `dedupField=url`, `dedupValue=2` (até 2 capturas por URL): uma
+  página traz cerca de 500 URLs distintos mas 550–800 itens (ex.: 718 itens,
+  497 URLs na primeira página de "futebol"). "Página incompleta" mede-se,
+  portanto, em URLs, não em itens.
+- **Paginação contínua até `offset=20000`** (teto de segurança do script) nas
+  quatro combinações, sempre com cerca de 500 URLs novos por página e zero
+  repetidos das páginas anteriores: 20 324 URLs únicos para "futebol" e
+  20 461 para "Benfica", iguais com e sem datas.
+- **Fim real, por sondagens e bisseção com passo de 500:**
+
+| Termo | Última página com dados | Primeira página vazia | `estimated_nr_results` |
+| --- | --- | --- | ---: |
+| futebol | `offset=826000` (436 URLs) | `offset=826500` | 2 613 366 |
+| Benfica | `offset=810000` (143 URLs) | `offset=810500` | 2 460 613 |
+
+  A mesma fronteira com e sem o intervalo de datas. Isto dá cerca de 826 mil
+  e 810 mil URLs alcançáveis — cerca de um terço do `estimated_nr_results`.
+  Nas sondagens de `offset` 50 000, 100 000, 200 000 e 500 000 os resultados
+  continuam a ser todos do `record.pt` e nenhum repete os de 0–20 000; em
+  `offset=500000` aparecem já capturas de 2001–2007. Ressalva: entre 20 000
+  e o fim só foram pedidos os offsets da bisseção; o total assume que não
+  há páginas vazias pelo meio.
+- **`next_page` não marca o fim:** continua presente em páginas vazias (até
+  `offset=2600000`, o mais alto pedido). O sinal fiável foi página com menos
+  de 500 URLs seguida de página vazia.
+
+### 2. Páginas de secção por modalidade: andebol, judo, natação
+
+URLs confirmados: `https://www.record.pt/modalidades/andebol`, `.../judo`,
+`.../natacao` (secções presentes nos URLs dos artigos do corpus). O
+`versionHistory` (pedido com `maxItems=500`, aceite) devolve juntas as
+variantes com e sem barra final, com `//` e com `http://`; paginado até ao
+fim.
+
+| Secção | Capturas | Mais antiga | Mais recente | Por ano |
+| --- | ---: | --- | --- | --- |
+| andebol | 919 | 2018-08-06 | 2025-12-23 | 2018: 386 · 2019: 383 · 2020: 134 · 2021: 3 · 2022: 3 · 2023: 2 · 2024: 1 · 2025: 7 |
+| judo | 919 | 2018-08-06 | 2025-12-19 | igual ao andebol |
+| natação | 918 | 2018-08-06 | 2025-12-19 | 2018: 385 · 2019: 383 · 2020: 134 · 2021: 3 · 2022: 3 · 2023: 3 · 2024: 1 · 2025: 6 |
+
+- **Espaçamento.** Intervalo mediano entre capturas consecutivas de 0,98 dias
+  (Q1 0,08, Q3 1,00) nas três: praticamente diário de agosto de 2018 a meados
+  de 2020, por vezes várias por dia. Depois, 12–13 intervalos acima de 30
+  dias, o maior de 582 dias (2024-01-28 → 2025-09-01).
+- **Mesmo calendário nas três secções:** 650 dos 651 dias com captura de
+  andebol têm também captura de judo, com `tstamp` desfasados de minutos —
+  são recolhas do site inteiro, não da secção. A mais antiga (2018-08-06)
+  coincide com o início do feed RSS (ver "Alcance temporal do `record.pt`").
+  Antes disso não há nada para estes URLs.
+- `statusCode` 200 em 904–906 capturas por secção; 12–13 de 302 e 1–2 de 404.
+
+**Artigos listados (andebol).** Links `…/detalhe/…` extraídos do HTML
+original de capturas escolhidas:
+
+- Cada captura lista 24–28 artigos de andebol (59–75 links `/detalhe/` no
+  total da página).
+- Capturas vizinhas: 2018-08-06 → 2018-08-07, 0 artigos de andebol novos
+  (26 de 26 em comum); 2019-03-15 → 2019-03-16, 2 novos (25 em comum).
+- Capturas afastadas (221 dias, 360 dias, cerca de 5 anos): 0 artigos de
+  andebol em comum.
+- **22 dias seguidos** (uma captura por dia, 2019-03-15 a 2019-04-05): 67
+  artigos de andebol distintos, 1,9 novos por dia em média (máximo 5). Os 16
+  artigos que entraram e saíram dentro da janela ficaram listados 10–15 dias
+  (mediana 12); por a janela ter só 22 dias, a medida tende a subestimar a
+  permanência.
+
+**Leitura (sem decisão).** Em 2018–2020, com captura quase diária e cada
+artigo listado cerca de 12 dias, as capturas de uma secção cobrem
+praticamente tudo o que ela publicou; fora dessa janela (1–7 capturas por
+ano) quase tudo escapa. A TextSearch, por seu lado, não trava em 2000: o
+alcance é da ordem de centenas de milhares de URLs por termo genérico.

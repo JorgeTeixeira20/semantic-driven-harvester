@@ -22,6 +22,8 @@ data/raw/corpus_queries/*
 !data/raw/corpus_queries/.gitkeep
 data/raw/wikidata/*
 !data/raw/wikidata/.gitkeep
+data/raw/original_html/*
+!data/raw/original_html/.gitkeep
 data/processed/corpus_articles_triples.nt
 output/*
 !output/.gitkeep
