@@ -245,7 +245,7 @@ def aggregate(
 def write_term_stats_csv(stats: list[TermRunStats], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as output:
-        writer = csv.DictWriter(output, fieldnames=list(asdict(stats[0])))
+        writer = csv.DictWriter(output, fieldnames=list(asdict(stats[0])), lineterminator="\n")
         writer.writeheader()
         writer.writerows(asdict(row) for row in stats)
 
@@ -255,7 +255,7 @@ def write_captures_csv(
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as output:
-        writer = csv.writer(output)
+        writer = csv.writer(output, lineterminator="\n")
         writer.writerow(
             [
                 "original_url",
