@@ -3822,3 +3822,42 @@ fim.
 Testes offline (`test_corpus_phase1.py`): totais por faceta (39/57/5/7, 108),
 sem duplicados nem colisões de slug, casos ambíguos conforme a decisão,
 atletas inalterados. Suite completa: 206 testes OK.
+
+### Resultado da execução real (2026-10-19)
+
+`python -m semantic_harvester.corpus_phase1`, 108 termos × 2 repetições,
+`from=1999`/`to=2026`. 1 280 pedidos, todos com resposta (2 timeouts
+recuperados na segunda tentativa). Raw em `data/raw/corpus_queries/alargada/`
+(1 280 ficheiros, não versionados); relatórios em
+`output/corpus_phase1_alargada_{per_term.csv,captures.csv,aggregation.md}`.
+A Fase 1 original ficou intacta (checksum SHA-256 dos seus 26 ficheiros de
+raw e 3 relatórios igual antes e depois).
+
+- Itens brutos: 63 972; capturas únicas por `(originalURL, tstamp)`:
+  30 242; **N (artigos únicos por `originalURL`): 28 782**. Divergências de
+  metadados para a mesma captura: 1 445.
+
+| Faceta | Termos | Pedidos | Itens | Capturas | Artigos | Só por esta faceta | Termo/rep. no teto de 6 páginas |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| modalidade | 39 | 454 | 22 688 | 10 860 | 10 503 | 10 089 | 70 de 78 |
+| clube | 57 | 682 | 34 084 | 16 118 | 15 313 | 14 905 | 112 de 114 |
+| atleta | 5 | 60 | 3 000 | 1 496 | 1 486 | 1 358 | 10 de 10 |
+| competição | 7 | 84 | 4 200 | 2 097 | 2 052 | 1 876 | 14 de 14 |
+
+- **O `N` é limitado pelo teto, não pelo conteúdo.** 206 das 216
+  combinações termo/repetição pararam no limite de 6 páginas (300
+  resultados). Só 3 termos terminaram antes, nas duas repetições: "pólo
+  aquático" (98), "esgrima" (148) e "Lank Vilaverdense" (242). A
+  sobreposição entre facetas é pequena (a maioria dos artigos só aparece por
+  uma faceta), pelo que o `N` cresce quase linearmente com o número de termos
+  × 300.
+- As duas repetições de cada termo devolveram o mesmo número de resultados
+  nos 108 termos. Nenhum termo deu 0 resultados; todos os URLs são do
+  `record.pt`.
+- **Distribuição temporal das capturas:** 1999–2010: 2 147; 2011–2015: 0;
+  2016: 1; 2017–2020: 22 908; 2021–2024: 5 186. Com o teto de 300 por termo e
+  a ordem da TextSearch (não cronológica), nenhuma captura de 2011–2015
+  entrou nesta descoberta.
+- O `N` conta `originalURL` distintos: variantes do mesmo artigo (esquema,
+  `?ref=`) ainda não estão juntas, e páginas que não são artigos ainda não
+  foram filtradas (isso é a classificação, depois da Fase 2).
