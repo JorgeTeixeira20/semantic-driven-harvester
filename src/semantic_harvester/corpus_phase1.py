@@ -115,12 +115,14 @@ def collect_term_repetition(
     repetition: int,
     raw_dir: Path,
 ) -> tuple[list[dict[str, Any]], list[Path]]:
-    """Pede páginas para um termo/repetição, só avançando offset se a página vier cheia.
+    """Pede páginas até uma página vazia; não depende de `next_page` nem de
+    a página anterior ter vindo incompleta.
 
-    Pára só quando a página vem incompleta (ou vazia); não depende de
-    `next_page`, que a investigação de 2026-10-19 (`docs/experiments.md`)
-    mostrou não ser um sinal fiável de fim mesmo a grande escala (continua
-    presente em páginas já vazias).
+    Correção de 2026-10-19 (`docs/experiments.md`, achado da enumeração de
+    clubes/modalidades): uma página incompleta (`< MAX_ITEMS`) não é sinal
+    fiável de fim — foram observadas páginas com 490-499 de 500 seguidas de
+    página cheia. Só uma página vazia confirma o fim real; continuar sempre
+    que a página devolveu pelo menos um resultado, mesmo incompleta.
     """
 
     items: list[dict[str, Any]] = []
@@ -147,8 +149,7 @@ def collect_term_repetition(
         raw_paths.append(raw_path)
         items.extend(response.results)
 
-        page_full = len(response.results) == MAX_ITEMS
-        if not page_full:
+        if not response.results:
             break
         offset += len(response.results)
     else:

@@ -3510,3 +3510,34 @@ completa a confirmar depois da implementação.
   ou no terminal, nunca aqui.
 - A ressalva dos 3 valores de vocabulário não incluídos (acima) fica em
   aberto.
+
+## Correção: página incompleta também não é sinal fiável de fim (2026-10-19)
+
+**Achado, numa sessão local, ao enumerar clubes e modalidades reais** (ver
+secção seguinte): a meio de uma paginação por `offset` apareceram páginas
+com 490–499 resultados de `maxItems=500`, seguidas de uma página seguinte
+ainda cheia. Ou seja, uma página **incompleta não é o fim** — ao contrário
+do que a correção de `collect_term_repetition()` em "Download do HTML em
+bruto..." (acima) assumia (`if not page_full: break`). Isto confirma, com
+um caso concreto, a formulação já usada em "Alcance real da pesquisa por
+palavra-chave" ("o sinal fiável é uma página incompleta **seguida de uma
+vazia**") — a implementação anterior não tinha, na prática, essa segunda
+parte: parava já na primeira página incompleta, sem esperar pela vazia.
+
+**Correção:** `collect_term_repetition()` passa a parar só quando a página
+vem **vazia** (`len(resultados) == 0`); uma página incompleta mas não vazia
+já não para a recolha, continua a pedir a próxima página pelo offset real
+devolvido. O teto de `MAX_PAGES_PER_TERM` continua a ser a única rede de
+segurança contra uma recolha sem fim, consistente com a amostra deliberada
+do protocolo (não se pretende esgotar cada termo).
+
+Esta correção não foi generalizada a `collect_all_captures()`
+(`version_history`, Fase 2) — essa função tem os seus próprios testes de
+regressão validados para "página incompleta OU sem `next_page`", sobre um
+endpoint diferente (histórico de um único URL, não pesquisa por palavra-
+chave em grande volume); não há evidência própria de que o mesmo problema
+ocorra ali.
+
+Teste de regressão novo em `tests/test_corpus_phase1.py`
+(`test_incomplete_nonempty_page_does_not_stop_the_pagination`). Suite
+completa: **203 testes, todos a passar.**
