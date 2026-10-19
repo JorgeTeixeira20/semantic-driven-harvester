@@ -3925,3 +3925,68 @@ sem tocar nas execuções original e alargada. Testes offline: datas de 14
 dígitos enviadas, página incompleta não pára e página vazia pára, teto de
 páginas, ano no nome do raw, retoma sem pedido; suite completa 211 testes
 OK.
+
+### Resultado da execução ano a ano (2026-10-19)
+
+`python -m semantic_harvester.corpus_phase1`: 108 termos × 28 anos, 1
+repetição. **10 613 pedidos** (1 falha pontual de rede, recuperada na
+segunda tentativa); 421 494 itens brutos; 269 719 capturas únicas por
+`(originalURL, tstamp)`; **N (artigos únicos por `originalURL`): 211 359**.
+Raw em `data/raw/corpus_queries/por_ano/` (10 613 ficheiros); relatórios em
+`output/corpus_phase1_por_ano_*` (não versionados). As execuções original e
+alargada ficaram intactas (checksum SHA-256 de 1 313 ficheiros igual antes e
+depois).
+
+| Ano | Pedidos | Resultados | Termos no teto (de 108) | Termos com 0 | Capturas únicas | Artigos (pelo ano da 1.ª captura) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1999 | 260 | 6 226 | 17 | 35 | 394 | 348 |
+| 2000 | 432 | 16 403 | 6 | 7 | 5 453 | 4 528 |
+| 2001 | 497 | 21 566 | 63 | 6 | 11 932 | 11 591 |
+| 2002 | 461 | 19 122 | 57 | 6 | 7 316 | 6 998 |
+| 2003 | 206 | 3 210 | 2 | 54 | 688 | 632 |
+| 2004 | 251 | 5 283 | 4 | 38 | 1 426 | 972 |
+| 2005 | 327 | 8 454 | 5 | 10 | 1 337 | 608 |
+| 2006 | 499 | 20 976 | 53 | 3 | 14 012 | 8 858 |
+| 2007 | 542 | 24 288 | 68 | 2 | 16 115 | 12 905 |
+| 2008 | 546 | 24 720 | 61 | 2 | 13 202 | 7 882 |
+| 2009 | 501 | 21 553 | 60 | 5 | 8 596 | 7 752 |
+| 2010 | 177 | 1 910 | 0 | 68 | 770 | 724 |
+| 2011 | 108 | 0 | 0 | 108 | 0 | 0 |
+| 2012 | 108 | 0 | 0 | 108 | 0 | 0 |
+| 2013 | 113 | 7 | 0 | 103 | 5 | 4 |
+| 2014 | 112 | 5 | 0 | 104 | 3 | 1 |
+| 2015 | 117 | 333 | 1 | 103 | 324 | 324 |
+| 2016 | 113 | 34 | 0 | 103 | 33 | 9 |
+| 2017 | 629 | 30 927 | 99 | 2 | 24 443 | 20 002 |
+| 2018 | 629 | 31 098 | 101 | 2 | 26 921 | 20 944 |
+| 2019 | 630 | 31 201 | 101 | 2 | 27 179 | 22 482 |
+| 2020 | 627 | 30 769 | 97 | 2 | 25 464 | 20 504 |
+| 2021 | 622 | 30 505 | 92 | 1 | 19 122 | 15 232 |
+| 2022 | 625 | 30 563 | 93 | 0 | 21 063 | 15 480 |
+| 2023 | 637 | 31 500 | 96 | 0 | 22 778 | 16 886 |
+| 2024 | 628 | 30 841 | 97 | 0 | 21 143 | 15 693 |
+| 2025 | 108 | 0 | 0 | 108 | 0 | 0 |
+| 2026 | 108 | 0 | 0 | 108 | 0 | 0 |
+
+| Faceta | Termos | Pedidos | Itens | Capturas | Artigos | Só por esta faceta | Termo-anos no teto | Termo-anos com 0 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| modalidade | 39 | 3 735 | 146 995 | 98 785 | 82 534 | 58 567 | 417 | 419 |
+| clube | 57 | 5 705 | 227 916 | 156 842 | 125 359 | 97 571 | 633 | 553 |
+| atleta | 5 | 447 | 16 490 | 16 188 | 15 143 | 8 519 | 44 | 54 |
+| competição | 7 | 726 | 30 093 | 29 401 | 26 316 | 13 382 | 79 | 64 |
+
+- **2011–2016 continua quase vazio** (365 capturas em 6 anos, 324 delas em
+  2015) e **2025–2026 vazio**, agora com intervalos de um ano inteiro e
+  datas de 14 dígitos: confirma, para os 108 termos, o que as sondas do
+  teste de blocos mostraram para 2 — é a cobertura do índice da TextSearch
+  para o `record.pt`, não um efeito da forma de pedir.
+- **O teto de 6 páginas continua a limitar**, agora por ano: 1 173 dos
+  3 024 pares termo/ano bateram nas 300 resultados, sobretudo em 2017–2024
+  (92–101 dos 108 termos por ano) e em 2001–2002 e 2006–2009 (53–68).
+- As 66 587 "divergências de metadados" do relatório agregado são, numa
+  amostra de 4 000 ficheiros de raw, quase todas no campo `snippet` (que
+  depende do termo pesquisado; 36 909 casos) e uma no `digest`: não são
+  divergências reais da captura.
+- O `N` conta `originalURL` distintos, ainda sem juntar variantes do mesmo
+  artigo nem filtrar páginas que não são artigos (isso é a classificação,
+  depois da Fase 2).
