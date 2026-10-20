@@ -4051,3 +4051,33 @@ acrescentou uma pausa fixa entre pedidos (triplicaria a duração); o ritmo só
 abranda quando o serviço o pede. Testes offline: 429 com e sem
 `Retry-After` seguido de sucesso; 500 continua a gastar as tentativas.
 Suite completa: 220 testes OK.
+
+### Dois achados de escala (2026-10-20)
+
+**1. A taxa de variantes de URL da amostra pequena não generalizou.** Na
+Fase 1 original (159 `originalURL`), as variantes cosméticas do mesmo
+artigo eram 3: um par `http`/`https` (159 → 158 recursos, "Normalização
+http/https antes de classificar") e dois pares por parâmetros de rastreio
+(127 → 125 artigos retidos, "Correção da identidade dos artigos", 2026-10-04)
+— cerca de **1,9%**. Na Fase 1 ano a ano (211 359 `originalURL`), as
+variantes juntadas pela mesma regra foram **46 986, cerca de 22,2%**, quase
+todas (44 330) só por parâmetros de rastreio. A taxa observada na amostra
+pequena não servia de estimativa para o corpus alargado; a normalização do
+`originalURL` antes de contar o N é obrigatória a esta escala, não um
+detalhe.
+
+**2. O Arquivo.pt limita o ritmo de pedidos (429).** Sem pausa entre
+pedidos (~3 pedidos de `version_history` por segundo), a primeira resposta
+**429 Too Many Requests** chegou cerca de 4 minutos depois do arranque
+(01:01:33 → 01:05:16); em cerca de 13 minutos e 2 415 artigos houve 3
+artigos marcados como falhados só por isso. Nas execuções da Fase 1
+(TextSearch, também sem pausa explícita, mas a cerca de 1 pedido por segundo
+pela própria latência do serviço: 10 613 pedidos em cerca de 3,3 horas), não
+houve nenhum 429 em 11 893 pedidos (1 280 na alargada, 10 613 na ano a ano). A correção não impõe uma pausa
+fixa: num 429 respeita-se o `Retry-After` (ou 60 s quando falta) e repete-se
+sem contar como falha, pelo que o ritmo só abranda quando o serviço o pede.
+Nos primeiros 6 minutos depois do relançamento (01:16) houve 2 dessas
+esperas e 0 falhas, a cerca de 1,6 artigos por segundo em média (550 em
+350 s, incluindo as esperas). É um facto sobre o Arquivo.pt como
+infraestrutura: qualquer recolha longa tem de tratar o 429 como "esperar",
+não como erro.
