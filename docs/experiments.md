@@ -4081,3 +4081,80 @@ esperas e 0 falhas, a cerca de 1,6 artigos por segundo em média (550 em
 350 s, incluindo as esperas). É um facto sobre o Arquivo.pt como
 infraestrutura: qualquer recolha longa tem de tratar o 429 como "esperar",
 não como erro.
+
+## Corpus alargado sem Fase 2: paragem, classificação por URL e RDF da Fase 1 (2026-10-20)
+
+### Decisão: parar a Fase 2
+
+A Fase 2 ano a ano (`version_history` dos 164 373 artigos) foi parada às
+09:13 de 2026-10-20, por decisão do autor, com **62 414 artigos processados
+(38,0%)**, 698 702 capturas e 0 falhas depois da correção do 429 (houve 192
+esperas por 429 até então, todas resolvidas). Ao ritmo medido (cerca de 2
+artigos por segundo, limitado pelo serviço), faltariam cerca de 15 horas.
+Razões: a classificação deixou de precisar do número de capturas por artigo
+(ver abaixo), e a profundidade temporal por artigo já foi estudada no corpus
+pequeno e não é central para este motor (`docs/PROJECT_STATUS.md`,
+"Limitações e problemas conhecidos"). O que correu fica como está, sem uso
+a jusante: `output/corpus_phase2_por_ano_{history.csv,summary.md,progress.log}`
+e `data/raw/phase2_por_ano/` (não versionado). O raw de `version_history` do
+corpus de 125 artigos e a Fase 2 original ficaram intactos (checksum
+SHA-256 igual antes e depois, 290 ficheiros).
+
+### Classificação sem a Fase 2: sinal de caminho de URL
+
+`corpus_classification.py` substitui o sinal "mais de 100 capturas na Fase
+2" por um sinal de caminho de URL: um recurso só é `Artigo` se o URL seguir
+um dos esquemas de página de artigo do Record (`ARTICLE_URL_SCHEMES`), além
+de não ser `/sabermais/` nem ter título "Object moved" (os dois sinais
+anteriores, que já vêm do CSV da Fase 1). Os esquemas incluídos são os três
+formatos de página individual de notícia conhecidos em gerações diferentes
+do site, para o sinal não depender da época:
+
+- `/detalhe/` ou `/amp/` no caminho — site atual (o AMP antigo aparece como
+  `/detalhe/AMP/`, já coberto por `/detalhe/`);
+- `interior.aspx?content_id=` — site antigo; no corpus pequeno o `=`
+  aparece codificado (`content_id/x3d…`), por isso aceitam-se as duas formas;
+- `tn0cs.asp?nid=` / `tn1cs.asp?nid=` — 1999–2000 ("Alcance temporal do
+  `record.pt`").
+
+Comparação feita em minúsculas. A classificação lê
+`output/corpus_phase1_por_ano_captures.csv` e escreve
+`output/corpus_classification_por_ano.{csv,_summary.md}` (`--label`), sem
+reescrever `output/corpus_classification.csv`, de que dependem o RDF e os
+Caminhos D e B do corpus de 125 artigos.
+
+**Resultado real (sem pedidos à API):** 164 373 recursos; **83 320
+Artigo**; excluídos 2 945 por `/sabermais/`, 0 por "Object moved" e 78 108
+por URL fora dos esquemas. Artigos por esquema: `/detalhe/` 72 170, `/amp/`
+8 790, `tn0cs.asp` 1 695, `tn1cs.asp` 665, `interior.aspx?content_id` 0.
+
+**Observação, sem decisão tomada:** nesta descoberta não há nenhum URL
+`interior.aspx?content_id`. Entre os excluídos por URL estão três esquemas
+do site de 2000–2009 com o mesmo padrão de "um id por notícia":
+`noticia.asp?id=` (33 773 recursos, 2001–2009), `shownews.asp?id=` (8 410,
+2000–2001) e `noticia.aspx?id=` (3 814, sobretudo 2009); os títulos são em
+geral genéricos (":.: Jornal Record :.:", "Record"), mas há títulos de
+notícia reais em `noticia.aspx`. Com a regra atual o corpus não tem nenhum
+Artigo de 2001 a 2009 (pela captura mais antiga: 1999: 294, 2000: 2 066,
+2017–2024: 80 960). Incluindo esses três esquemas seriam 129 317 Artigos
+(mais 45 997, dos quais cerca de 43 600 em 2001–2009). `imprimir.asp` e
+`enviar.asp` são versões de impressão/envio da mesma notícia, não artigos
+novos.
+
+### RDF a partir só da Fase 1 (implementado, não corrido)
+
+`corpus_rdf.py --fase1 por_ano`: os artigos vêm de
+`output/corpus_classification_por_ano.csv`; cada um é registado com **uma
+só captura, a mais antiga que a descoberta encontrou**, lida do raw da
+TextSearch (`data/raw/corpus_queries/por_ano/`, agrupando variantes com
+`normalize_for_grouping`), sem `version_history`. **Ressalva:** é a captura
+mais antiga *conhecida* (a que a TextSearch devolveu dentro do teto de
+páginas), não necessariamente a mais antiga que existe no Arquivo.pt. Texto
+e HTML só dessa captura (`TEXT_POLICY_FIRST`). Os itens da TextSearch não
+trazem `statusCode` nem `contentLength` (o `version_history` trazia), que
+ficam ausentes do grafo. Outputs separados e retomáveis:
+`output/corpus_articles_por_ano.ttl`,
+`output/corpus_rdf_por_ano_{report.csv,summary.md,progress.log}` e
+`data/processed/corpus_articles_por_ano_triples.nt`. Testes offline: usa a
+captura mais antiga (incluindo de uma variante de rastreio), escreve só nos
+caminhos etiquetados, retoma sem pedidos. Suite completa: 224 testes OK.
