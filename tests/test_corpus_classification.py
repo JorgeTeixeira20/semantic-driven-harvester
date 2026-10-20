@@ -46,9 +46,17 @@ class ArticleUrlSchemeTests(unittest.TestCase):
         self.assertEqual(article_url_scheme("https://record.pt/tn0cs.asp?nid=40907"), "tn0cs.asp?nid")
         self.assertEqual(article_url_scheme("https://record.pt/TN1CS.asp?nid=56007"), "tn1cs.asp?nid")
 
+    def test_2000_2009_site_noticia_and_shownews(self) -> None:
+        self.assertEqual(article_url_scheme("https://record.pt/noticia.asp?id=1&idcanal=2"), "noticia.asp?id")
+        self.assertEqual(article_url_scheme("https://record.pt/shownews.asp?id=7"), "shownews.asp?id")
+        self.assertEqual(article_url_scheme("https://record.pt/noticia.aspx?id=3"), "noticia.aspx?id")
+        # Outra query no mesmo ficheiro não é página de notícia.
+        self.assertIsNone(article_url_scheme("https://record.pt/noticia.aspx?idcanal=3"))
+
     def test_other_pages_are_not_article_urls(self) -> None:
         for url in ("https://www.record.pt/futebol", "https://www.record.pt/jogos-em-direto/live/78799",
-                    "https://record.pt/noticia.asp?id=1&idcanal=2", "https://record.pt/imprimir.asp?id=1"):
+                    "https://record.pt/imprimir.asp?id=1", "https://record.pt/enviar.asp?id=1",
+                    "https://record.pt/canal.asp?idcanal=1"):
             self.assertIsNone(article_url_scheme(url), url)
 
 
@@ -100,7 +108,7 @@ class ClassifyCorpusTests(OfflineTestCase):
             phase1_row("https://www.record.pt/futebol/detalhe/noticia-real", "Notícia real"),
             phase1_row("https://www.record.pt/sabermais/jogador-exemplo", "Saber Mais"),
             phase1_row("http://www.record.pt/Futebol/interior.aspx?content_id/x3d1", "Object moved"),
-            phase1_row("https://record.pt/noticia.asp?id=1&idcanal=2", ":.: Jornal Record :.:"),
+            phase1_row("https://record.pt/imprimir.asp?id=1", ":.: Jornal Record :.:"),
         ])
 
         reasons = {r.original_url: r.reason for r in classify_corpus(captures_csv)}
@@ -109,7 +117,7 @@ class ClassifyCorpusTests(OfflineTestCase):
             "https://www.record.pt/futebol/detalhe/noticia-real": REASON_ARTIGO,
             "https://www.record.pt/sabermais/jogador-exemplo": REASON_SABERMAIS,
             "http://www.record.pt/Futebol/interior.aspx?content_id/x3d1": REASON_OBJECT_MOVED,
-            "https://record.pt/noticia.asp?id=1&idcanal=2": REASON_URL_NOT_ARTICLE,
+            "https://record.pt/imprimir.asp?id=1": REASON_URL_NOT_ARTICLE,
         })
 
     def test_run_writes_labelled_outputs_and_not_the_125_article_classification(self) -> None:

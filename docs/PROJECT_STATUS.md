@@ -154,16 +154,18 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
   (subclasse de `sdh:Tema`) para todas as modalidades, a partir do URL, mas
   `EntidadeMencionada` não tem subclasses por modalidade (fica para quando o
   vocabulário for alargado). No corpus alargado, a cobertura por modalidade
-  é muito desigual: dos 83 320 Artigos, 36 869 têm `futebol` no URL e 28 079
-  nenhuma modalidade no URL; as restantes vão de 1 558 (andebol) e
-  1 522 (hóquei em patins) a menos de 10 (tiro, esgrima, xadrez, pólo
-  aquático). Estes números refletem também o teto da descoberta (300
+  é muito desigual: dos 129 317 Artigos, 36 869 têm `futebol` no URL e
+  74 076 nenhuma modalidade no URL (entre eles todos os do site de
+  1999–2009, cujos URLs `noticia.asp?id=`/`shownews.asp?id=`/`tn0cs.asp?nid=`
+  não têm caminho temático: aí a modalidade só se sabe pelo termo de
+  pesquisa que os encontrou); as restantes vão de 1 558 (andebol) e 1 522
+  (hóquei em patins) a menos de 10 (tiro, esgrima, xadrez, pólo aquático). Estes números refletem também o teto da descoberta (300
   resultados por termo e ano), não só o volume publicado pelo Record.
 
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 224 testes em dezassete módulos de `tests/`.
+pacote conforme o README. Existem 225 testes em dezassete módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -197,7 +199,7 @@ independente de `next_page`; lista de termos alargada).
 
 Última validação em **2026-10-19**, com o Python 3.11.17 do ambiente virtual
 (sessão remota Linux): `.venv/bin/python -m unittest discover -s tests` —
-**224 testes, todos passaram (`OK`)**, sem chamadas à API real. (Anterior:
+**225 testes, todos passaram (`OK`)**, sem chamadas à API real. (Anterior:
 2026-10-15, Python 3.12.4 no ambiente virtual (macOS), 190 testes OK;
 2026-09-20, Python 3.13.1 no Windows, 68 testes OK.)
 

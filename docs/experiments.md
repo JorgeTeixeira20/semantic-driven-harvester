@@ -4128,18 +4128,28 @@ Artigo**; excluídos 2 945 por `/sabermais/`, 0 por "Object moved" e 78 108
 por URL fora dos esquemas. Artigos por esquema: `/detalhe/` 72 170, `/amp/`
 8 790, `tn0cs.asp` 1 695, `tn1cs.asp` 665, `interior.aspx?content_id` 0.
 
-**Observação, sem decisão tomada:** nesta descoberta não há nenhum URL
-`interior.aspx?content_id`. Entre os excluídos por URL estão três esquemas
-do site de 2000–2009 com o mesmo padrão de "um id por notícia":
-`noticia.asp?id=` (33 773 recursos, 2001–2009), `shownews.asp?id=` (8 410,
-2000–2001) e `noticia.aspx?id=` (3 814, sobretudo 2009); os títulos são em
-geral genéricos (":.: Jornal Record :.:", "Record"), mas há títulos de
-notícia reais em `noticia.aspx`. Com a regra atual o corpus não tem nenhum
-Artigo de 2001 a 2009 (pela captura mais antiga: 1999: 294, 2000: 2 066,
-2017–2024: 80 960). Incluindo esses três esquemas seriam 129 317 Artigos
-(mais 45 997, dos quais cerca de 43 600 em 2001–2009). `imprimir.asp` e
-`enviar.asp` são versões de impressão/envio da mesma notícia, não artigos
-novos.
+**Observação e decisão (2026-10-20).** Nesta descoberta não há nenhum URL
+`interior.aspx?content_id`. Com só os esquemas acima, o corpus não tinha
+nenhum Artigo de 2001 a 2009 (83 320 Artigos: 1999: 294, 2000: 2 066,
+2017–2024: 80 960). Entre os excluídos por URL estavam três esquemas do site
+de 2000–2009 com o mesmo padrão de "um id por notícia": `noticia.asp?id=`
+(33 773 recursos, 2001–2009), `shownews.asp?id=` (8 410, 2000–2001) e
+`noticia.aspx?id=` (3 814, sobretudo 2009); os títulos são em geral
+genéricos (":.: Jornal Record :.:", "Record"), mas há títulos de notícia
+reais em `noticia.aspx`. **Decisão do autor: incluí-los** em
+`ARTICLE_URL_SCHEMES`. `imprimir.asp` e `enviar.asp` (versões de
+impressão/envio da mesma notícia) e as outras queries no mesmo ficheiro (por
+exemplo `noticia.aspx?idcanal=`) continuam excluídos.
+
+**Resultado final:** **129 317 Artigo** em 164 373 recursos; excluídos
+2 945 por `/sabermais/`, 0 por "Object moved" e 32 111 por URL fora dos
+esquemas. Por esquema: `/detalhe/` 72 170, `noticia.asp` 33 773,
+`/amp/` 8 790, `shownews.asp` 8 410, `noticia.aspx` 3 814, `tn0cs.asp`
+1 695, `tn1cs.asp` 665, `interior.aspx?content_id` 0. Por ano da captura
+mais antiga: 1999: 294 · 2000: 4 430 · 2001: 10 376 · 2002: 6 586 · 2003: 16
+· 2004: 43 · 2005: 156 · 2006: 6 981 · 2007: 10 602 · 2008: 5 119 · 2009:
+3 754 · 2017: 16 819 · 2018: 14 179 · 2019: 12 444 · 2020: 10 554 · 2021:
+5 564 · 2022: 6 786 · 2023: 7 609 · 2024: 7 005.
 
 ### RDF a partir só da Fase 1 (implementado, não corrido)
 
@@ -4157,4 +4167,4 @@ ficam ausentes do grafo. Outputs separados e retomáveis:
 `output/corpus_rdf_por_ano_{report.csv,summary.md,progress.log}` e
 `data/processed/corpus_articles_por_ano_triples.nt`. Testes offline: usa a
 captura mais antiga (incluindo de uma variante de rastreio), escreve só nos
-caminhos etiquetados, retoma sem pedidos. Suite completa: 224 testes OK.
+caminhos etiquetados, retoma sem pedidos. Suite completa: 225 testes OK.

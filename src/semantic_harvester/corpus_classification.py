@@ -23,7 +23,8 @@ seguintes se verificar:
 3. O URL não segue nenhum dos esquemas de página de artigo
    (`ARTICLE_URL_SCHEMES`): `/detalhe/` ou `/amp/` no caminho (site atual),
    `interior.aspx?content_id=` (site antigo; o `=` aparece também codificado,
-   `content_id/x3d`) ou `tn0cs.asp?nid=`/`tn1cs.asp?nid=` (1999–2000).
+   `content_id/x3d`), `tn0cs.asp?nid=`/`tn1cs.asp?nid=` (1999–2000) ou
+   `noticia.asp?id=`, `shownews.asp?id=`, `noticia.aspx?id=` (2000–2009).
 
 O sinal 3 substitui o anterior "mais de 100 capturas na Fase 2"
 (`version_history`), que deixou de existir para o corpus alargado.
@@ -60,6 +61,10 @@ ARTICLE_URL_SCHEMES = (
     ("interior.aspx?content_id", _query_starts("/interior.aspx", "content_id=", "content_id/x3d")),
     ("tn0cs.asp?nid", _query_starts("/tn0cs.asp", "nid=")),
     ("tn1cs.asp?nid", _query_starts("/tn1cs.asp", "nid=")),
+    # Site de 2000–2009 (2026-10-20, decisão do autor; docs/experiments.md).
+    ("noticia.asp?id", _query_starts("/noticia.asp", "id=")),
+    ("shownews.asp?id", _query_starts("/shownews.asp", "id=")),
+    ("noticia.aspx?id", _query_starts("/noticia.aspx", "id=")),
 )
 
 
