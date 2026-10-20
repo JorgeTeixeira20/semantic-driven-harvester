@@ -248,6 +248,21 @@ presentes em `output/corpus_phase2_history.csv`. Não descarrega textos nem
 gera RDF — isso fica para depois da classificação Artigo/redirecionamento
 (ver `docs/experiments.md`).
 
+Para a Fase 1 ano a ano (corrigir antes a agregação a partir do raw, com
+`originalURL` normalizado, e depois correr a Fase 2 separada da original):
+
+```bash
+python -m semantic_harvester.corpus_phase1 --rebuild-offline
+nohup python -m semantic_harvester.corpus_phase2 \
+    --captures-csv output/corpus_phase1_por_ano_captures.csv --label por_ano \
+    > output/phase2.log 2>&1 &
+```
+
+Com `--label por_ano`, os resultados ficam em
+`output/corpus_phase2_por_ano_{history.csv,summary.md,progress.log}` e o raw
+em `data/raw/phase2_por_ano/version_history/`, sem tocar na Fase 2 original
+nem no raw do corpus de 125 artigos. É retomável por artigo.
+
 ## Classificação Artigo/redirecionamento (passo 6 do Caminho A)
 
 Depois da Fase 2, para classificar os artigos descobertos como `Artigo` ou

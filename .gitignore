@@ -24,6 +24,7 @@ data/raw/wikidata/*
 !data/raw/wikidata/.gitkeep
 data/raw/original_html/*
 !data/raw/original_html/.gitkeep
+data/raw/phase2_*/
 data/processed/corpus_articles_triples.nt
 output/*
 !output/.gitkeep

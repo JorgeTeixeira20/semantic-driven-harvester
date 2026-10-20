@@ -3990,3 +3990,46 @@ depois).
 - O `N` conta `originalURL` distintos, ainda sem juntar variantes do mesmo
   artigo nem filtrar páginas que não são artigos (isso é a classificação,
   depois da Fase 2).
+
+## Fase 1 ano a ano: N com `originalURL` normalizado e Fase 2 separada (2026-10-20)
+
+### Agregação corrigida (sem pedidos à API)
+
+O N de 211 359 contava `originalURL` exatos, pelo que variantes cosméticas
+do mesmo artigo contavam como artigos diferentes. A agregação passa a usar a
+regra de "mesma página" já usada pela classificação e pelo RDF,
+`normalize_for_grouping()` (movida de `corpus_rdf.py` para
+`url_identity.py`, onde está o resto da regra; `corpus_rdf` continua a
+exportá-la): sem esquema, barras repetidas colapsadas, sem barra final, sem
+`ref`/`utm_*`/`act`/`est`; a restante query string mantém-se (no site
+antigo é o identificador do artigo). Cada grupo fica com um URL
+representativo: sem parâmetros de rastreio, depois sem `//`, depois
+`https`, depois o que tem mais capturas, depois a ordem alfabética. O CSV de
+capturas ganha a coluna `url_variants` (as outras formas reais).
+
+`python -m semantic_harvester.corpus_phase1 --rebuild-offline` refez os
+relatórios a partir dos 10 613 ficheiros de raw já em disco
+(`data/raw/corpus_queries/por_ano/`), sem rede; o CSV anterior ficou em
+`output/corpus_phase1_por_ano_captures.pre-normalizacao.csv`.
+
+- `originalURL` exatos: 211 359 → **N corrigido: 164 373** (46 986 variantes
+  juntadas: 44 330 só por parâmetros de rastreio, 2 605 por barras
+  duplas, 51 por rastreio e barra final). Capturas únicas: 269 718.
+- `www.record.pt` e `record.pt` não se juntam (o host é diferente), tal
+  como na classificação.
+- A divergência de metadados só se compara entre itens com o mesmo
+  `originalURL` real (entre variantes os campos com o URL diferem por
+  construção). As 66 587 que se mantêm são, como já registado, o `snippet`.
+
+### Fase 2 separada da original
+
+`corpus_phase2.py` ganha `--captures-csv` e `--label`. Com
+`--label por_ano`, os resultados vão para
+`output/corpus_phase2_por_ano_{history.csv,summary.md,progress.log}` e o raw
+de `version_history` para `data/raw/phase2_por_ano/version_history/` (não
+versionado). Sem isto, a nova execução escreveria no
+`output/corpus_phase2_history.csv` da Fase 2 original e reescreveria, para
+os URLs em comum, o raw de `data/raw/version_history/` de que depende a
+reconstrução offline do corpus de 125 artigos. Testes offline: a execução
+com etiqueta só escreve nos seus caminhos e é retomável. Suite completa:
+218 testes OK.

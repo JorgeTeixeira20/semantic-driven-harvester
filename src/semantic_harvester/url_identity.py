@@ -14,6 +14,7 @@ query nunca é descartada por inteiro (`docs/experiments.md`).
 
 from __future__ import annotations
 
+import re
 from urllib.parse import urlsplit
 
 TRACKING_PARAMS = frozenset({"ref", "act", "est"})
@@ -49,3 +50,17 @@ def without_tracking(url: str) -> str:
 
 def strip_scheme(url: str) -> str:
     return url.split("://", 1)[-1]
+
+
+def normalize_for_grouping(url: str) -> str:
+    """Remove esquema, parâmetros de rastreio, barras repetidas e uma barra final.
+
+    Usado só para decidir se dois URLs são a mesma página modulo variação
+    cosmética — nunca para gerar identificadores (esses continuam a usar o
+    `originalURL` canónico tal como veio da descoberta/classificação).
+    """
+
+    head, _, query = strip_scheme(url).partition("?")
+    collapsed = re.sub(r"/{2,}", "/", head).rstrip("/")
+    query = strip_tracking_params(query)
+    return f"{collapsed}?{query}" if query else collapsed

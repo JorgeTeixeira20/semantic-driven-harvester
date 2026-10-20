@@ -8,7 +8,8 @@ import unittest
 from semantic_harvester.arquivo_client import ArquivoClient
 from semantic_harvester.corpus_phase1 import (
     ATLETAS, CLUBES, COMPETICOES, MAX_PAGES_PER_TERM, MODALIDADES, REPETITIONS, RUN_LABEL,
-    TERMS, YEARS, collect_term_year, slugify, year_bounds,
+    RUN_LABEL as LABEL, TERMS, YEARS, aggregate, collect_term_year, rebuild_offline,
+    records_from_raw, representative_urls, slugify, year_bounds,
 )
 from tests.support import OfflineTestCase
 
@@ -128,6 +129,87 @@ class FinalTermsTests(unittest.TestCase):
     def test_one_repetition_per_year_from_1999_to_2026(self) -> None:
         self.assertEqual(REPETITIONS, 1)
         self.assertEqual((YEARS[0], YEARS[-1], len(YEARS)), (1999, 2026, 28))
+
+
+BASE = "https://www.record.pt/futebol/detalhe/jonas-renova"
+
+
+def hit(url: str, tstamp: str, **extra) -> dict:
+    return {"originalURL": url, "tstamp": tstamp, "title": "Jonas", **extra}
+
+
+class NormalizedAggregationTests(unittest.TestCase):
+    """Variantes do mesmo `originalURL` (`url_identity.normalize_for_grouping`)
+    contam como um só artigo; ver `docs/experiments.md`, 2026-10-20."""
+
+    def test_variants_merge_into_one_representative(self) -> None:
+        records = [
+            ("clube", "Benfica", hit("http://www.record.pt/futebol/detalhe/jonas-renova", "1")),
+            ("clube", "Benfica", hit(BASE + "?ref=HP_A", "2")),
+            ("clube", "Benfica", hit("https://www.record.pt//futebol/detalhe/jonas-renova/", "3")),
+            ("atleta", "Jonas", hit(BASE, "4")),
+            ("atleta", "Jonas", hit(BASE + "?utm_source=x", "4")),
+        ]
+        url_map = representative_urls(records)
+        self.assertEqual(set(url_map.values()), {BASE})
+
+        captures, divergent = aggregate(records, url_map)
+        self.assertEqual({url for url, _ in captures}, {BASE})
+        self.assertEqual(len(captures), 4)  # tstamps 1, 2, 3, 4
+        self.assertEqual(captures[(BASE, "4")].facets, {"atleta"})
+        self.assertEqual(captures[(BASE, "4")].variants, {BASE, BASE + "?utm_source=x"})
+        # Itens de variantes diferem no URL por construção: não é divergência.
+        self.assertEqual(divergent, [])
+
+    def test_old_site_content_ids_are_not_merged(self) -> None:
+        old = "http://www.record.pt/Futebol/interior.aspx?content_id/x3d"
+        records = [("clube", "Benfica", hit(old + "1", "1")),
+                   ("clube", "Benfica", hit(old + "2", "1"))]
+        self.assertEqual(len(set(representative_urls(records).values())), 2)
+
+    def test_representative_prefers_clean_https_then_most_captures(self) -> None:
+        http = "http://www.record.pt/futebol/detalhe/x"
+        records = [("clube", "Benfica", hit(http, t)) for t in "123"]
+        records.append(("clube", "Benfica", hit("https://www.record.pt/futebol/detalhe/x", "4")))
+        self.assertEqual(set(representative_urls(records).values()),
+                         {"https://www.record.pt/futebol/detalhe/x"})
+
+
+class RebuildOfflineTests(OfflineTestCase):
+    def write_raw(self, name: str, items: list[dict]) -> None:
+        raw_dir = self.root / "data" / "raw" / "corpus_queries" / LABEL
+        raw_dir.mkdir(parents=True, exist_ok=True)
+        (raw_dir / name).write_bytes(page(items, next_page=None))
+
+    def test_rebuild_reads_raw_without_network_and_keeps_the_old_csv_once(self) -> None:
+        self.write_raw("clube_benfica_2017_rep1_offset-0000.json",
+                       [hit(BASE, "1"), hit(BASE + "?ref=x", "2")])
+        self.write_raw("clube_benfica_2017_rep1_offset-0050.json", [])
+        self.write_raw("atleta_joao-felix_2018_rep1_offset-0000.json", [hit(BASE + "/", "3")])
+        output = self.root / "output"
+        output.mkdir()
+        old_csv = output / f"corpus_phase1_{LABEL}_captures.csv"
+        old_csv.write_text("antigo\n", encoding="utf-8")
+
+        stats, captures, _ = rebuild_offline(self.root)
+
+        self.assertEqual({url for url, _ in captures}, {BASE})
+        self.assertEqual(
+            [(r.facet, r.query, r.year, r.requests_made, r.results_received) for r in stats],
+            [("clube", "Benfica", 2017, 2, 2), ("atleta", "João Félix", 2018, 1, 1)],
+        )
+        backup = output / f"corpus_phase1_{LABEL}_captures.pre-normalizacao.csv"
+        self.assertEqual(backup.read_text("utf-8"), "antigo\n")
+        rebuild_offline(self.root)  # segunda vez: não reescreve a cópia
+        self.assertEqual(backup.read_text("utf-8"), "antigo\n")
+        summary = (output / f"corpus_phase1_{LABEL}_aggregation.md").read_text("utf-8")
+        self.assertIn("`originalURL` distintos tal como vieram da API: 3", summary)
+        self.assertIn("(2 variantes juntadas)", summary)
+
+    def test_unknown_term_in_raw_fails(self) -> None:
+        self.write_raw("clube_desconhecido_2017_rep1_offset-0000.json", [])
+        with self.assertRaises(ValueError):
+            records_from_raw(self.root / "data" / "raw" / "corpus_queries" / LABEL)
 
 
 if __name__ == "__main__":

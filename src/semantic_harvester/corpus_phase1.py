@@ -46,6 +46,7 @@ um passo manual seguinte, condicional à confirmação do valor de `N`.
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import logging
@@ -53,13 +54,14 @@ import re
 import time
 import unicodedata
 from collections import defaultdict
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
 import requests
 
 from .arquivo_client import ArquivoClient, SearchResponse
+from .url_identity import has_tracking_params, normalize_for_grouping, strip_scheme
 
 LOGGER = logging.getLogger(__name__)
 
@@ -232,18 +234,57 @@ class CaptureRecord:
     facets: set[str]
     queries: set[str]
     divergent: bool = False
+    variants: set[str] = field(default_factory=set)
+
+
+def representative_urls(records: list[tuple[str, str, dict[str, Any]]]) -> dict[str, str]:
+    """Cada `originalURL` → representante do seu grupo de variantes.
+
+    Grupo: o mesmo `normalize_for_grouping()` (`url_identity.py`: esquema,
+    barras repetidas, barra final, `ref`/`utm_*`/`act`/`est`), a mesma regra
+    da classificação e do RDF. Representante: sem parâmetros de rastreio,
+    depois sem `//` no caminho, depois `https`, depois o que tem mais
+    capturas distintas, depois a ordem alfabética (determinístico).
+    """
+
+    tstamps: dict[str, set[str]] = defaultdict(set)
+    for _, _, item in records:
+        tstamps[str(item.get("originalURL"))].add(str(item.get("tstamp")))
+    groups: dict[str, list[str]] = defaultdict(list)
+    for url in tstamps:
+        groups[normalize_for_grouping(url)].append(url)
+    mapping: dict[str, str] = {}
+    for urls in groups.values():
+        best = min(urls, key=lambda url: (
+            has_tracking_params(url),
+            "//" in strip_scheme(url),
+            not url.startswith("https://"),
+            -len(tstamps[url]),
+            url,
+        ))
+        for url in urls:
+            mapping[url] = best
+    return mapping
 
 
 def aggregate(
-    records: list[tuple[str, str, dict[str, Any]]]
+    records: list[tuple[str, str, dict[str, Any]]],
+    url_map: dict[str, str] | None = None,
 ) -> tuple[dict[tuple[str, str], CaptureRecord], list[tuple[str, str]]]:
-    """Deduplica por (originalURL, tstamp); sinaliza divergências de metadados."""
+    """Deduplica por (originalURL, tstamp); sinaliza divergências de metadados.
+
+    Com `url_map` (de `representative_urls()`), as variantes do mesmo URL
+    juntam-se no representante e o `originalURL` real fica em `variants`; a
+    divergência só se compara entre itens com o mesmo `originalURL` real
+    (entre variantes os campos com o URL diferem por construção).
+    """
 
     captures: dict[tuple[str, str], CaptureRecord] = {}
     divergent_keys: list[tuple[str, str]] = []
 
     for facet, query, item in records:
-        original_url = str(item.get("originalURL"))
+        real_url = str(item.get("originalURL"))
+        original_url = url_map.get(real_url, real_url) if url_map else real_url
         tstamp = str(item.get("tstamp"))
         key = (original_url, tstamp)
 
@@ -255,13 +296,16 @@ def aggregate(
                 item=item,
                 facets={facet},
                 queries={query},
+                variants={real_url},
             )
             continue
 
         existing = captures[key]
         existing.facets.add(facet)
         existing.queries.add(query)
-        if existing.item != item and not existing.divergent:
+        existing.variants.add(real_url)
+        same_real_url = str(existing.item.get("originalURL")) == real_url
+        if same_real_url and existing.item != item and not existing.divergent:
             existing.divergent = True
             divergent_keys.append(key)
 
@@ -291,6 +335,7 @@ def write_captures_csv(
                 "queries",
                 "num_queries_matched",
                 "divergent",
+                "url_variants",
             ]
         )
         for record in captures.values():
@@ -303,6 +348,7 @@ def write_captures_csv(
                     ";".join(sorted(record.queries)),
                     len(record.queries),
                     record.divergent,
+                    ";".join(sorted(record.variants - {record.original_url})),
                 ]
             )
 
@@ -313,6 +359,7 @@ def write_aggregation_markdown(
     divergent_keys: list[tuple[str, str]],
     path: Path,
 ) -> None:
+    exact_urls = len({variant for record in captures.values() for variant in record.variants})
     total_requests = sum(row.requests_made for row in stats)
     total_raw_items = sum(row.results_received for row in stats)
     total_captures = len(captures)
@@ -340,7 +387,10 @@ def write_aggregation_markdown(
         f"- Pedidos reais efetuados: {total_requests}",
         f"- Itens brutos recebidos (antes de deduplicar): {total_raw_items}",
         f"- Capturas únicas por `(originalURL, tstamp)`: {total_captures}",
-        f"- **N (artigos únicos por `originalURL`): {n_articles}**",
+        f"- `originalURL` distintos tal como vieram da API: {exact_urls}",
+        f"- **N (artigos únicos, `originalURL` normalizado — esquema, barras, "
+        f"barra final, `ref`/`utm_*`/`act`/`est`): {n_articles}** "
+        f"({exact_urls - n_articles} variantes juntadas)",
         f"- Capturas encontradas por mais do que uma query: {multi_query_articles}",
         f"- Divergências de metadados para a mesma `(originalURL, tstamp)`: "
         f"{len(divergent_keys)}",
@@ -433,7 +483,15 @@ def run_phase1(project_root: Path | None = None) -> tuple[
                     records.append((facet, query, item))
         LOGGER.info("Termo %d/%d concluído: %s/%s", index, len(TERMS), facet, query)
 
-    captures, divergent_keys = aggregate(records)
+    return write_outputs(root, stats, records)
+
+
+def write_outputs(
+    root: Path,
+    stats: list[TermRunStats],
+    records: list[tuple[str, str, dict[str, Any]]],
+) -> tuple[list[TermRunStats], dict[tuple[str, str], CaptureRecord], list[tuple[str, str]]]:
+    captures, divergent_keys = aggregate(records, representative_urls(records))
 
     write_term_stats_csv(stats, root / "output" / f"corpus_phase1_{RUN_LABEL}_per_term.csv")
     write_captures_csv(captures, root / "output" / f"corpus_phase1_{RUN_LABEL}_captures.csv")
@@ -443,10 +501,81 @@ def run_phase1(project_root: Path | None = None) -> tuple[
     return stats, captures, divergent_keys
 
 
-def main() -> int:
+RAW_NAME = re.compile(
+    r"^(?P<facet>[a-z]+)_(?P<slug>[a-z0-9-]+)_(?P<year>\d{4})_rep(?P<rep>\d+)"
+    r"_offset-(?P<offset>\d+)\.json$"
+)
+
+
+def records_from_raw(
+    raw_dir: Path,
+) -> tuple[list[TermRunStats], list[tuple[str, str, dict[str, Any]]]]:
+    """Reconstrói estatísticas e registos a partir do raw já em disco, sem rede.
+
+    Segue a ordem de `TERMS`/`YEARS`/offset, a mesma da execução, para que a
+    primeira ocorrência de cada captura seja a mesma.
+    """
+
+    query_of = {(facet, slugify(query)): query for facet, query in TERMS}
+    order = {term: index for index, term in enumerate(TERMS)}
+    pages: dict[tuple[str, str, int, int], list[tuple[int, Path]]] = defaultdict(list)
+    for path in raw_dir.iterdir():
+        match = RAW_NAME.match(path.name)
+        if not match:
+            continue
+        query = query_of.get((match["facet"], match["slug"]))
+        if query is None:
+            raise ValueError(f"Ficheiro de raw de um termo desconhecido: {path.name}")
+        key = (match["facet"], query, int(match["year"]), int(match["rep"]))
+        pages[key].append((int(match["offset"]), path))
+
+    stats: list[TermRunStats] = []
+    records: list[tuple[str, str, dict[str, Any]]] = []
+    for facet, query, year, repetition in sorted(
+        pages, key=lambda key: (order[(key[0], key[1])], key[2], key[3])
+    ):
+        received = 0
+        for _, path in sorted(pages[(facet, query, year, repetition)]):
+            items = json.loads(path.read_bytes()).get("response_items") or []
+            received += len(items)
+            records.extend((facet, query, item) for item in items)
+        stats.append(TermRunStats(
+            facet=facet, query=query, year=year, repetition=repetition,
+            requests_made=len(pages[(facet, query, year, repetition)]),
+            results_received=received,
+        ))
+    return stats, records
+
+
+def rebuild_offline(project_root: Path | None = None) -> tuple[
+    list[TermRunStats], dict[tuple[str, str], CaptureRecord], list[tuple[str, str]]
+]:
+    """Refaz os relatórios desta execução a partir do raw, com URLs normalizados.
+
+    O CSV de capturas anterior é preservado como `.pre-normalizacao.csv`
+    (uma vez; não é reescrito em reconstruções seguintes).
+    """
+
+    root = project_root or Path(__file__).resolve().parents[2]
+    captures_csv = root / "output" / f"corpus_phase1_{RUN_LABEL}_captures.csv"
+    backup = captures_csv.with_suffix(".pre-normalizacao.csv")
+    if captures_csv.is_file() and not backup.exists():
+        captures_csv.rename(backup)
+    stats, records = records_from_raw(root / "data" / "raw" / "corpus_queries" / RUN_LABEL)
+    return write_outputs(root, stats, records)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="python -m semantic_harvester.corpus_phase1")
+    parser.add_argument(
+        "--rebuild-offline", action="store_true",
+        help="refaz os relatórios a partir do raw já em disco, sem pedidos à API",
+    )
+    args = parser.parse_args(argv)
+
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     try:
-        stats, captures, divergent_keys = run_phase1()
+        stats, captures, divergent_keys = rebuild_offline() if args.rebuild_offline else run_phase1()
     except (requests.RequestException, RuntimeError, OSError, ValueError) as exc:
         LOGGER.error("A Fase 1 falhou: %s", exc)
         return 1
@@ -454,7 +583,10 @@ def main() -> int:
     articles = {record.original_url for record in captures.values()}
     print(f"Pedidos efetuados: {sum(row.requests_made for row in stats)}")
     print(f"Capturas únicas: {len(captures)}")
-    print(f"N (artigos únicos): {len(articles)}")
+    exact = {variant for record in captures.values() for variant in record.variants}
+    print(f"originalURL distintos (exatos): {len(exact)}")
+    print(f"N (artigos únicos, URL normalizado): {len(articles)} "
+          f"({len(exact) - len(articles)} variantes juntadas)")
     print(f"Divergências: {len(divergent_keys)}")
     print(f"Relatórios: output/corpus_phase1_{RUN_LABEL}_per_term.csv, "
           f"output/corpus_phase1_{RUN_LABEL}_captures.csv, "

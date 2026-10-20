@@ -53,7 +53,6 @@ import csv
 import hashlib
 import json
 import logging
-import re
 import shutil
 import tempfile
 import time
@@ -66,7 +65,7 @@ from rdflib import RDF, RDFS, Graph, XSD
 from .arquivo_client import ArquivoClient, TextDownloadResult
 from .history_pipeline import TEXT_POLICY_ALL, TEXT_POLICY_FIRST, build_manifest_records
 from .rdf_mapper import SDH, build_article_history_graph, stable_hash
-from .url_identity import strip_scheme, strip_tracking_params
+from .url_identity import normalize_for_grouping
 
 LOGGER = logging.getLogger(__name__)
 
@@ -124,20 +123,6 @@ def load_article_captures(
 
 def variants_of(row: dict[str, str]) -> list[str]:
     return [url for url in (row.get("variantes") or "").split("|") if url]
-
-
-def normalize_for_grouping(url: str) -> str:
-    """Remove esquema, parâmetros de rastreio, barras repetidas e uma barra final.
-
-    Usado só para decidir se dois URLs são a mesma página modulo variação
-    cosmética — nunca para gerar identificadores (esses continuam a usar o
-    `originalURL` canónico tal como veio da descoberta/classificação).
-    """
-
-    head, _, query = strip_scheme(url).partition("?")
-    collapsed = re.sub(r"/{2,}", "/", head).rstrip("/")
-    query = strip_tracking_params(query)
-    return f"{collapsed}?{query}" if query else collapsed
 
 
 def normalize_captures_to_canonical_url(
