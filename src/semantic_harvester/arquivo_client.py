@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -67,6 +68,22 @@ class HtmlDownloadResult:
     downloaded: bool
     html_url: str | None
     error: str | None = None
+
+
+# 429 Too Many Requests nos downloads de texto e HTML (2026-10-20,
+# docs/experiments.md): esperar o `Retry-After` (ou 60 s) e repetir, até este
+# número de esperas por pedido; só depois conta como falha.
+RATE_LIMIT_DEFAULT_WAIT_SECONDS = 60.0
+RATE_LIMIT_MAX_WAITS = 20
+
+
+def retry_after_seconds(response: Any) -> float:
+    """Espera indicada por uma resposta 429 (`Retry-After` em segundos, ou 60 s)."""
+
+    try:
+        return max(float(response.headers.get("Retry-After", "")), 1.0)
+    except (AttributeError, TypeError, ValueError):
+        return RATE_LIMIT_DEFAULT_WAIT_SECONDS
 
 
 class ArquivoClient:
@@ -254,7 +271,7 @@ class ArquivoClient:
             )
 
         try:
-            response = self.session.get(str(text_url), timeout=self.timeout)
+            response = self._get_respecting_rate_limit(str(text_url))
             response.raise_for_status()
             destination.write_bytes(response.content)
         except (requests.RequestException, OSError) as exc:
@@ -275,6 +292,24 @@ class ArquivoClient:
             downloaded=True,
             text_url=str(text_url),
         )
+
+    def _get_respecting_rate_limit(self, url: str) -> Any:
+        """GET que, num 429, espera o `Retry-After` e repete (até `RATE_LIMIT_MAX_WAITS`).
+
+        Devolve a última resposta; se continuar a ser 429 depois das esperas,
+        o `raise_for_status()` do chamador regista-a como falha.
+        """
+
+        waits = 0
+        while True:
+            response = self.session.get(url, timeout=self.timeout)
+            if getattr(response, "status_code", 200) != 429 or waits >= RATE_LIMIT_MAX_WAITS:
+                return response
+            waits += 1
+            wait = retry_after_seconds(response)
+            LOGGER.warning("429 em %s: a esperar %.0fs antes de repetir (espera %d/%d).",
+                           url, wait, waits, RATE_LIMIT_MAX_WAITS)
+            time.sleep(wait)
 
     def download_original_html(
         self,
@@ -312,7 +347,7 @@ class ArquivoClient:
             )
 
         try:
-            response = self.session.get(str(html_url), timeout=self.timeout)
+            response = self._get_respecting_rate_limit(str(html_url))
             response.raise_for_status()
             destination.write_bytes(response.content)
         except (requests.RequestException, OSError) as exc:

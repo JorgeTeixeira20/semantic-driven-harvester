@@ -8,10 +8,13 @@ HTML em bruto da captura mais antiga"): lê `linkToOriginalFile` em vez de
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 import requests
 
-from semantic_harvester.arquivo_client import ArquivoClient
+from semantic_harvester.arquivo_client import (
+    RATE_LIMIT_DEFAULT_WAIT_SECONDS, RATE_LIMIT_MAX_WAITS, ArquivoClient,
+)
 from tests.support import ORIGINAL_URL, FixtureSession, OfflineTestCase
 
 HTML_URL = "https://archive.example.test/original/20200101000000"
@@ -85,6 +88,75 @@ class DownloadOriginalHtmlTests(OfflineTestCase):
             client._capture_filename(CAPTURE, "html"),
             client._text_filename(CAPTURE).replace(".txt", ".html"),
         )
+
+
+TEXT_URL = "https://archive.example.test/text/20200101000000"
+
+
+class StatusResponse:
+    def __init__(self, status: int, body: bytes = b"", retry_after: str | None = None) -> None:
+        self.status_code = status
+        self.content = body
+        self.headers = {"Retry-After": retry_after} if retry_after else {}
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"{self.status_code} Client Error", response=self)
+
+
+class ScriptedSession:
+    def __init__(self, *responses: StatusResponse) -> None:
+        self.responses = list(responses)
+        self.headers: dict[str, str] = {}
+        self.calls: list[str] = []
+
+    def get(self, url: str, **kwargs) -> StatusResponse:
+        self.calls.append(url)
+        return self.responses.pop(0)
+
+
+class RateLimitedDownloadTests(OfflineTestCase):
+    """429 nos downloads de texto e HTML (2026-10-20): esperar o `Retry-After`
+    e repetir; só conta como falha se continuar 429 depois das esperas."""
+
+    def client(self, *responses: StatusResponse) -> tuple[ArquivoClient, ScriptedSession]:
+        session = ScriptedSession(*responses)
+        return ArquivoClient(data_dir=self.root / "raw", session=session), session
+
+    def test_text_waits_retry_after_then_succeeds(self) -> None:
+        client, session = self.client(StatusResponse(429, retry_after="5"),
+                                      StatusResponse(200, b"texto"))
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
+        self.assertTrue(result.success)
+        self.assertEqual(result.path.read_bytes(), b"texto")
+        self.assertEqual([call.args[0] for call in sleep.call_args_list], [5.0])
+        self.assertEqual(session.calls, [TEXT_URL, TEXT_URL])
+
+    def test_html_without_retry_after_waits_the_default(self) -> None:
+        client, _ = self.client(StatusResponse(429), StatusResponse(200, b"<html/>"))
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_original_html(CAPTURE)
+        self.assertTrue(result.success)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list],
+                         [RATE_LIMIT_DEFAULT_WAIT_SECONDS])
+
+    def test_persistent_429_is_a_failure_after_the_waits(self) -> None:
+        client, session = self.client(*(StatusResponse(429) for _ in range(RATE_LIMIT_MAX_WAITS + 1)))
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_original_html(CAPTURE)
+        self.assertFalse(result.success)
+        self.assertIn("429", result.error)
+        self.assertEqual(sleep.call_count, RATE_LIMIT_MAX_WAITS)
+        self.assertEqual(session.responses, [])
+
+    def test_other_errors_are_not_retried(self) -> None:
+        for status in (404, 500):
+            client, session = self.client(StatusResponse(status))
+            with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+                result = client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
+            self.assertFalse(result.success)
+            self.assertEqual((sleep.call_count, len(session.calls)), (0, 1))
 
 
 if __name__ == "__main__":

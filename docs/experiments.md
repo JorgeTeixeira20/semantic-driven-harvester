@@ -4168,3 +4168,24 @@ ficam ausentes do grafo. Outputs separados e retomáveis:
 `data/processed/corpus_articles_por_ano_triples.nt`. Testes offline: usa a
 captura mais antiga (incluindo de uma variante de rastreio), escreve só nos
 caminhos etiquetados, retoma sem pedidos. Suite completa: 225 testes OK.
+
+### 429 também nos downloads de texto e HTML (2026-10-20)
+
+Antes de correr `corpus_rdf --fase1 por_ano` (129 317 Artigos, 258 634
+pedidos: texto e HTML da captura mais antiga conhecida), um piloto de 63
+artigos, estratificado por esquema de URL, mediu 0,55 s de rede por artigo
+(mediana 0,39 s, máximo 7,9 s): cerca de 20 horas sem limitação de ritmo,
+ou cerca de 36 horas ao ritmo sustentado de ~2 pedidos por segundo
+observado na Fase 2 com 429. Texto obtido em 62 de 63 (1 404); HTML em 58
+de 63, as 5 falhas todas `500` e todas em `noticia.asp` (5 de 16).
+Espaço estimado: ~21 GB de HTML e ~1,1 GB de texto.
+
+O download de texto e HTML do `ArquivoClient` tratava um 429 como falha
+definitiva; como o relatório do `corpus_rdf` é retomável por artigo, esse
+texto nunca seria pedido outra vez. Correção, a mesma da Fase 2:
+`_get_respecting_rate_limit()` espera o `Retry-After` (ou 60 s) e repete,
+até 20 esperas por pedido; só depois um 429 conta como falha. Os outros
+erros (404, 500, rede) mantêm o comportamento anterior, sem repetição.
+Testes offline: 429 com e sem `Retry-After` seguido de sucesso (texto e
+HTML), 429 persistente como falha depois das esperas, 404/500 sem
+repetição. Suite completa: 229 testes OK.
