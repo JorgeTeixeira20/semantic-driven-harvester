@@ -44,6 +44,11 @@ LOGGER = logging.getLogger(__name__)
 
 RETRY_ATTEMPTS = 3
 RETRY_SLEEP_SECONDS = 10.0
+# 429 Too Many Requests: o serviço pede para abrandar. Espera-se (o
+# `Retry-After` indicado, ou 60 s) e tenta-se outra vez sem gastar as
+# tentativas acima, até este número de esperas por artigo (2026-10-20).
+RATE_LIMIT_DEFAULT_WAIT_SECONDS = 60.0
+RATE_LIMIT_MAX_WAITS = 20
 PROGRESS_EVERY = 10
 
 RESULTS_CSV_FIELDS = (
@@ -99,15 +104,37 @@ def load_already_processed(results_csv: Path) -> dict[str, ArticleHistoryResult]
     return processed
 
 
+def rate_limit_wait(exc: Exception) -> float | None:
+    """Segundos a esperar se `exc` for um 429; `None` para qualquer outro erro."""
+
+    response = getattr(exc, "response", None)
+    if not isinstance(exc, requests.HTTPError) or response is None or response.status_code != 429:
+        return None
+    try:
+        return max(float(response.headers.get("Retry-After", "")), 1.0)
+    except ValueError:
+        return RATE_LIMIT_DEFAULT_WAIT_SECONDS
+
+
 def _collect_with_retries(
     client: ArquivoClient, original_url: str
 ) -> tuple[list[dict[str, Any]], list[Path], int | None]:
-    last_exc: Exception | None = None
-    for attempt in range(1, RETRY_ATTEMPTS + 1):
+    attempt = 0
+    waits = 0
+    while True:
         try:
             return collect_all_captures(client, original_url=original_url)
         except (requests.RequestException, RuntimeError) as exc:
-            last_exc = exc
+            wait = rate_limit_wait(exc)
+            if wait is not None and waits < RATE_LIMIT_MAX_WAITS:
+                waits += 1
+                LOGGER.warning(
+                    "429 em %s: a esperar %.0fs antes de repetir (espera %d/%d).",
+                    original_url, wait, waits, RATE_LIMIT_MAX_WAITS,
+                )
+                time.sleep(wait)
+                continue
+            attempt += 1
             LOGGER.warning(
                 "Falha em %s (tentativa %d/%d): %s",
                 original_url,
@@ -115,10 +142,9 @@ def _collect_with_retries(
                 RETRY_ATTEMPTS,
                 exc,
             )
-            if attempt < RETRY_ATTEMPTS:
-                time.sleep(RETRY_SLEEP_SECONDS)
-    assert last_exc is not None
-    raise last_exc
+            if attempt >= RETRY_ATTEMPTS:
+                raise
+            time.sleep(RETRY_SLEEP_SECONDS)
 
 
 def write_summary_markdown(

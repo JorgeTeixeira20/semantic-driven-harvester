@@ -4033,3 +4033,21 @@ os URLs em comum, o raw de `data/raw/version_history/` de que depende a
 reconstrução offline do corpus de 125 artigos. Testes offline: a execução
 com etiqueta só escreve nos seus caminhos e é retomável. Suite completa:
 218 testes OK.
+
+### 429 Too Many Requests na Fase 2 (2026-10-20)
+
+Lançada às 01:01 (`nohup caffeinate -i python -m
+semantic_harvester.corpus_phase2 --captures-csv
+output/corpus_phase1_por_ano_captures.csv --label por_ano`), a Fase 2
+processou 2 415 artigos em cerca de 13 minutos (~3 por segundo, sem pausa
+entre pedidos) e registou 3 falhas, todas **429 Too Many Requests**: o
+serviço a pedir para abrandar, não 404 nem quebra de rede. O código tratava
+o 429 como qualquer erro (3 tentativas com 10 s de intervalo) e depois
+marcava o artigo como falhado. Execução parada (CSV íntegro, última linha
+completa) e corrigida: num 429, `_collect_with_retries` espera o
+`Retry-After` indicado (ou 60 s) e repete sem gastar as 3 tentativas, até 20
+esperas por artigo; os outros erros mantêm o comportamento anterior. Não se
+acrescentou uma pausa fixa entre pedidos (triplicaria a duração); o ritmo só
+abranda quando o serviço o pede. Testes offline: 429 com e sem
+`Retry-After` seguido de sucesso; 500 continua a gastar as tentativas.
+Suite completa: 220 testes OK.
