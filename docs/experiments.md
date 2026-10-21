@@ -4393,3 +4393,204 @@ der 400 depois de 3 pausas, conta como falha real. Implementado como
 `BAD_REQUEST_PAUSE_SECONDS = 600`, `BAD_REQUEST_MAX_PAUSES = 3`). Testes
 offline: 400 seguido de sucesso; 400 depois de 3 pausas como falha real; sem
 pausa por omissão. Suite completa: 253 testes OK.
+
+## Vocabulário alargado 1999–2024: medição e construção (2026-10-21)
+
+**Pedido do autor:** alargar o vocabulário fechado do Caminho B (só
+futebolistas da Primeira Liga 2015–2020) a (a) 1999–2024, (b) as 39
+modalidades de `corpus_phase1.MODALIDADES` e (c) dois tipos de entidade,
+jogadores/atletas e clubes. Módulo novo `wikidata_vocabulary_alargado.py`;
+`wikidata_vocabulary.py` e `data/processed/caminho_b_vocabulario_wikidata.csv`
+ficam intocados (o módulo recusa escrever nesse caminho; teste com checksum).
+Raw em `data/raw/wikidata/alargado/` (byte a byte, fora do Git; 228
+ficheiros, 37 MB), vocabulário em
+`data/processed/caminho_b_vocabulario_wikidata_alargado.csv`, resumo
+completo da execução (JSON) em `output/wikidata_vocabulario_alargado.md`.
+**Não foi aplicado a nenhum corpus:** `corpus_entities`/`corpus_entities_rdf`
+não foram corridos (escrevem nos outputs oficiais), e o corpus de 129 317
+artigos ainda não carrega em `load_corpus()` (falta `contentLength`/
+`statusCode` no grafo da Fase 1; trabalho separado).
+
+### Passo 1 — medição
+
+Exploração com consultas de leitura (mesmo User-Agent, uma de cada vez,
+≥ 1 s), e depois a execução final do módulo, de onde vêm todos os números
+abaixo (115 pedidos, nenhuma consulta falhada; a execução anterior de
+desenvolvimento ficou em `data/raw/wikidata/alargado_iteracoes_2026-10-21/`).
+
+**Futebol — clubes.** Participantes (`wdt:P1923`) nas épocas 1999–2000 a
+2023–24: na Primeira Liga só 3 de 25 épocas (2016–17, 2017–18, 2019–20), na
+Segunda Liga só 1 de 25 (2017–18) → 38 clubes. Exploração: `wdt:P710` dá 0
+em todas as épocas e `wdt:P1344` (participa em) no máximo 3 clubes por
+época. Alternativa medida: clubes portugueses com `wdt:P118` (liga) Primeira
+ou Segunda Liga (sem datas; a propriedade também aparece em pessoas,
+filtradas) → 57; épocas ∪ liga = 58. Contra os 57 clubes de `CLUBES` (Fase 1),
+resolvidos à mão para QIDs (`CLUBES_QID`, a partir de uma consulta por
+rótulo/nome alternativo, escolhendo o clube masculino principal): 52 estão
+nas épocas ou na liga; **5 só entram pela tabela explícita: Fafe, Lank
+Vilaverdense, Mafra, Olhanense, Sporting Clube Oriental** (este último
+resolvido para o Clube Oriental de Lisboa, Q2749186; Lank Vilaverdense para
+o Vilaverdense FC, Q7930110). Os 10 clubes de `caminho_b_clubes_url.csv`
+estão todos nas épocas ou na liga. Total: 63 clubes de futebol.
+
+**Modalidades.** Para cada termo, um item de desporto e uma ou mais
+ocupações de atleta (a consulta inclui subclasses, `wdt:P279*`); rótulos
+verificados na execução (nenhum QID sem rótulo). 33 mapeados (7 de equipa:
+futebol, basquetebol, andebol, voleibol, hóquei em patins, rugby, pólo
+aquático; 26 individuais). Quatro são termos guarda-chuva e foram mapeados a
+várias ocupações, explicitamente: motores (pilotos de automóveis, ralis,
+F1, motociclismo, motocross), desportos de combate (boxe, kickboxing,
+karaté, taekwondo, luta; judo e MMA têm termo próprio), desportos radicais
+(skate, BMX, bodyboard, escalada) e desportos de inverno (esqui alpino e de
+fundo, biatlo, patinagem artística, snowboard, esqui de montanha); desporto
+adaptado → atleta paralímpico / para-atleta. **Sem mapeamento (6):**
+desporto-universitario e desporto escolar (enquadramentos competitivos, os
+atletas pertencem às modalidades que praticam), jogos olímpicos e
+jogos-europeus (eventos multidesportivos), NFL (liga estrangeira de futebol
+americano; entidades estrangeiras fora do âmbito) e aventura (secção que
+agrega trail/corridas de aventura/montanha, sem ocupação de atleta própria).
+Padel e orientação têm item e ocupação, mas **0** atletas portugueses na
+Wikidata.
+
+Atletas por modalidade (pessoas devolvidas → incluídas pela regra abaixo).
+Desportos de equipa = passagem (`p:P54`) por clube português (`wdt:P17
+wd:Q45`, excluídas 118 seleções nacionais) ∪ nacionalidade portuguesa
+(`wdt:P27 wd:Q45`); futebol = passagens pelos 63 clubes (futebolistas
+portugueses na Wikidata, para comparação: 4 521). Individuais = nacionalidade
+portuguesa.
+
+| Modalidade | Pessoas | Incluídas | — pela regra original (passagem datada) |
+| --- | ---: | ---: | ---: |
+| futebol | 6 045 | 4 980 | 3 913 |
+| basquetebol | 1 269 | 1 226 | 54 |
+| andebol | 106 | 101 | 19 |
+| voleibol | 105 | 100 | 41 |
+| hóquei em patins | 87 | 76 | 45 |
+| rugby | 95 | 75 | 4 |
+| pólo aquático | 10 | 5 | 0 |
+| ciclismo | 440 | 315 | — |
+| atletismo | 375 | 301 | — |
+| badminton | 244 | 174 | — |
+| natação | 100 | 77 | — |
+| motores | 146 | 86 | — |
+| ténis | 71 | 60 | — |
+| remo | 90 | 57 | — |
+| ginástica | 71 | 50 | — |
+| judo | 41 | 38 | — |
+| canoagem | 36 | 32 | — |
+| desportos de combate | 49 | 29 | — |
+| xadrez | 38 | 26 | — |
+| vela | 58 | 24 | — |
+| desporto adaptado | 32 | 23 | — |
+| esgrima | 61 | 16 | — |
+| triatlo | 20 | 16 | — |
+| surf | 19 | 13 | — |
+| tiro | 54 | 13 | — |
+| desportos de inverno | 13 | 11 | — |
+| ténis de mesa | 10 | 8 | — |
+| golfe | 9 | 6 | — |
+| MMA | 5 | 5 | — |
+| desportos radicais | 5 | 3 | — |
+| snooker | 2 | 2 | — |
+| padel, orientação | 0 | 0 | — |
+
+**Datas.** No futebol há 12 044 passagens datadas, 4 só com fim e 1 459 sem
+nenhuma data. Os atletas individuais quase nunca têm período de atividade
+(`P2031`/`P2032`): por exemplo 5 de 375 no atletismo, 1 de 440 no ciclismo,
+23 de 71 no ténis; quase todos têm data de nascimento. Com a regra original
+("passagem sem datas fica de fora", e sem regra para individuais), o
+futebol ficaria com 3 913 dos 4 980 jogadores (perdem-se 1 067: 988 só com
+passagens sem datas e nascimento no intervalo, 77 com período de atividade,
+2 só com data de fim) e nenhum atleta individual entraria.
+
+### Regras escolhidas e custo
+
+- **Passagem:** com início, conta se início ≤ 2024 e (fim ≥ 1999 ou sem
+  fim) — a regra original com o intervalo novo; só com fim, conta se fim ≥
+  1999; sem datas, conta se a pessoa estiver ativa no intervalo.
+- **Pessoa ativa** (passagens sem datas e atletas individuais): pelo período
+  de atividade (`P2031`/`P2032`) se existir (prevalece sobre o nascimento);
+  senão, **pelo nascimento como aproximação**: idade de 15 a 40 anos algures
+  em 1999–2024, isto é nascida em 1959–2009, e sem morte antes de 1999; sem
+  nenhuma destas datas, fica de fora.
+- **Custo:** a maioria das inclusões fora do futebol depende só do
+  nascimento (por exemplo 1 079 dos 1 226 no basquetebol, 297 dos 301 no
+  atletismo); a aproximação inclui quem nasceu no intervalo mas não competiu
+  nele (juniores, carreiras curtas) e exclui carreiras longas (tiro, vela,
+  xadrez: 41 de 54, 34 de 58 e 12 de 38 pessoas ficam de fora). No futebol
+  ficam de fora 1 065 pessoas, das quais 176 tinham alguma passagem sem
+  datas e 18 não tinham nenhuma data.
+
+### Passo 2 — construção
+
+- **Clubes** (categoria `clube`, coluna nova `modalidade`): os 63 de
+  futebol mais os clubes portugueses das passagens que contam nos outros
+  desportos de equipa. O "principal campeonato nacional" destas modalidades
+  não é utilizável na Wikidata (exploração: `wdt:P118` liga 5 clubes à Liga
+  Portuguesa de Basquetebol, 6 à de andebol, 1 à A1 de voleibol, 1 à de pólo
+  aquático), por isso os clubes vêm das passagens: inclui divisões
+  inferiores e alguns erros da Wikidata (por exemplo itens de futebol
+  feminino ligados a jogadores de voleibol).
+- **Regra das cidades:** um nome de clube de uma palavra que seja rótulo de
+  município, cidade, sede de município ou distrito português não entra
+  (Chaves, Fafe, Fátima/Fatima, Freamunde, Guimarães, Porto); se for o
+  rótulo, usa-se a forma mais longa com 2+ palavras. Junta-se uma lista
+  manual de palavras comuns com o mesmo tratamento (Aves, Estrela, Nacional,
+  Naval, Real, Técnico, União, Vitória) — **decisão a confirmar pelo autor**.
+  Ao contrário dos jogadores, os outros nomes alternativos de uma palavra
+  dos clubes entram (32: "Benfica" não, por não ser alias; "Marítimo",
+  "Belenenses", "Sporting", "SLB", "FCP", "Leixões", "Estoril", …), porque a
+  regra das cidades só faz sentido se os restantes entrarem.
+- **Jogadores/atletas** (categoria `jogador`, com `modalidade` e `clubes`):
+  regras do vocabulário original (rótulo pt ou en; rótulo noutra língua
+  sempre; nomes alternativos só com 2+ palavras, 309 descartados);
+  homónimos fundidos numa linha com todos os QIDs **entre modalidades e entre
+  clube e jogador** (a chave é o rótulo, qualquer que seja a categoria;
+  categoria `clube|jogador` se misturar); variantes partilhadas descartadas
+  (170).
+
+**Totais:** 7 780 linhas — 133 clubes (141 QIDs) e 7 647 jogadores/atletas
+(7 855 QIDs; 32 pessoas em mais de uma modalidade; 54 sem rótulo pt/en
+descartadas); 179 rótulos com homónimos (173 de jogadores, 6 de clubes,
+por exemplo "Sport Lisboa e Benfica" com 4 QIDs de secções), 129 deles entre
+modalidades diferentes (por exemplo "Rui Silva": atletismo e basquetebol);
+nenhum entre clube e jogador; 235 rótulos de uma só palavra. Por modalidade
+(linhas; uma linha pode ter várias): clubes — futebol 63, basquetebol 30,
+voleibol 21, hóquei em patins 15, andebol 14, rugby 7; jogadores — futebol
+4 932, basquetebol 1 211, ciclismo 304, atletismo 283, badminton 172,
+andebol 98, voleibol 98, motores 85, rugby 68, hóquei em patins 68, ténis
+60, remo 56, ginástica 50, judo 38, canoagem 32, desportos de combate 29,
+xadrez 26, vela 24, desporto adaptado 23, esgrima 16, triatlo 16, surf 13,
+tiro 13, desportos de inverno 11, ténis de mesa 8, golfe 6, MMA 5, pólo
+aquático 5, desportos radicais 3, snooker 2. **Todos os clubes de `CLUBES` e
+de `caminho_b_clubes_url.csv` aparecem no vocabulário** (por QID). O CSV
+carrega com `corpus_entities.load_vocabulary` (7 780 termos; as colunas
+extra são ignoradas).
+
+**Testes** (`tests/test_wikidata_vocabulary_alargado.py`, 14, offline, com
+sessão simulada): consultas novas, regra das datas (passagem e pessoa),
+regra das cidades e das palavras comuns, fusão de homónimos entre
+modalidades e entre clube e jogador, seleções nacionais excluídas, não
+sobrescrita do vocabulário original (checksum), reutilização do raw sem
+pedidos, falha repetida uma vez e registada, carregamento por
+`load_vocabulary`. Suite completa: 267 testes OK.
+
+### Limitações
+
+- **Cobertura da Wikidata:** épocas quase sem participantes (4 de 50);
+  ligas das outras modalidades quase vazias; passagens e atletas dependem
+  do que está registado (padel e orientação sem ninguém; 1 166 jogadores
+  portugueses de basquetebol contra 41 judocas sugerem importações em massa
+  desiguais, não a realidade desportiva).
+- **Aproximação pelo nascimento:** a maioria dos atletas fora do futebol
+  entra só por ela (ver custo acima).
+- **Âmbito português:** atletas estrangeiros só entram por passagem por
+  clube português; clubes e ligas estrangeiras ficam de fora (por exemplo
+  NFL; os clubes estrangeiros de jogadores portugueses não estão em
+  `clubes`).
+- **Mais homónimos e mais ambiguidade:** 179 rótulos com homónimos (contra
+  3 no vocabulário original) e 235 rótulos de uma palavra; os nomes de
+  clube de uma palavra admitidos ("Sporting", "Estoril") e a lista manual
+  de palavras comuns são decisões a rever antes de aplicar a um corpus.
+- **Clubes por passagem** nas outras modalidades incluem divisões
+  inferiores e erros de ligação da Wikidata.

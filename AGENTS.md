@@ -53,6 +53,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   capitalizadas, sem NER) que o vocabulário fechado não cobre; sem rede.
 - `wikidata_vocabulary.py`: vocabulário de jogadores do Caminho B a partir da
   Wikidata (rede: endpoint SPARQL); raw em `data/raw/wikidata/`.
+- `wikidata_vocabulary_alargado.py`: vocabulário alargado (1999–2024, 39
+  modalidades, clubes e atletas) a partir da Wikidata, noutros caminhos; não
+  altera o vocabulário original; raw em `data/raw/wikidata/alargado/`.
 - `article_body.py`: corpo do artigo entre o título e 14 marcadores literais
   de chrome (variante c′, adotada em D e B); sem dependências.
 - `corpus_body.py`: avaliação da variante (c′) contra D e B, sem rede.
@@ -107,6 +110,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_entities --vocabulario CSV [--texto corpo\|sem-chrome\|completo]` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.corpus_candidate_entities --vocabulario CSV [--texto corpo\|completo]` | Sem rede; lê o Turtle e `data/raw/texts/`; teste exploratório (candidatos fora do vocabulário fechado, sem NER); grava `output/corpus_candidate_entities*`; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.wikidata_vocabulary` | Rede (28 pedidos SPARQL à Wikidata); grava raw em `data/raw/wikidata/` e `data/processed/caminho_b_vocabulario_wikidata.csv`. |
+| `python -m semantic_harvester.wikidata_vocabulary_alargado [--reutilizar-raw]` | Rede (~115 pedidos SPARQL à Wikidata, um de cada vez); grava raw em `data/raw/wikidata/alargado/`, `data/processed/caminho_b_vocabulario_wikidata_alargado.csv` e `output/wikidata_vocabulario_alargado.md`; com `--reutilizar-raw` só pede o que mudou. |
 | `python -m semantic_harvester.corpus_body [--vocabulario CSV]` | Sem rede; lê o Turtle, os textos e a amostra rotulada; grava `output/corpus_body_*`. |
 | `python -m semantic_harvester.corpus_redundancy_rdf` / `corpus_entities_rdf` | Sem rede; leem os CSV oficiais de D/B (e o vocabulário); gravam `output/corpus_redundancy.ttl` / `output/corpus_entities.ttl`; não alteram `corpus_articles.ttl`. |
 | `python -m semantic_harvester.navigation_prototype` | Sem rede; lê `output/corpus_articles.ttl` e `queries/`; regenera `output/prototipo/`. |

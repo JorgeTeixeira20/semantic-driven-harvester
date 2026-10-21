@@ -165,7 +165,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 253 testes em dezoito módulos de `tests/`.
+pacote conforme o README. Existem 267 testes em dezanove módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -187,7 +187,9 @@ separação dos rótulos e execução não destrutiva) e os temas/entidades do C
 variantes, chrome do menu removido, persistência entre capturas, temas a
 partir de URLs) e o vocabulário da Wikidata (`test_wikidata_vocabulary.py`:
 sobreposição de datas, regras de variantes e homónimos, respostas guardadas
-em bruto, com sessão simulada) e o protótipo de navegação
+em bruto, com sessão simulada; `test_wikidata_vocabulary_alargado.py`: regra
+das datas, regra das cidades, homónimos entre modalidades, não sobrescrita do
+vocabulário original, carregamento por `load_vocabulary`) e o protótipo de navegação
 (`test_navigation_prototype.py`: contagens das queries sobre um grafo pequeno,
 ordem e filtro do histórico, ligações entre páginas e escape de títulos) e o
 HTML em bruto da captura mais antiga (`test_arquivo_client.py`: download,
@@ -198,9 +200,10 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 independente de `next_page`; lista de termos alargada).
 
 Última validação em **2026-10-21**, com o Python 3.12.4 do ambiente virtual
-(macOS), depois de juntar o ramo do teste de candidatos ao `main`:
-`.venv/bin/python -m unittest discover -s tests` — **253 testes, todos
-passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-21, sessão
+(macOS), depois do vocabulário alargado da Wikidata:
+`.venv/bin/python -m unittest discover -s tests` — **267 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-21, depois de
+juntar o ramo do teste de candidatos, 253 testes OK; 2026-10-21, sessão
 remota Linux, 248 testes OK; 2026-10-19, Python 3.11.17, 232 testes OK;
 2026-10-15, Python 3.12.4 no ambiente virtual (macOS), 190 testes OK;
 2026-09-20, Python 3.13.1 no Windows, 68 testes OK.)
@@ -556,6 +559,19 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    os 125 artigos porque este ambiente remoto não tem `data/raw/texts/`
    (ver "Nota operacional" abaixo); 16 testes offline próprios. Detalhe em
    `experiments.md` ("Candidatos a entidade fora do vocabulário fechado").
+
+   **Vocabulário alargado (2026-10-21, construído, não aplicado):**
+   `wikidata_vocabulary_alargado.py` gera
+   `data/processed/caminho_b_vocabulario_wikidata_alargado.csv` (1999–2024,
+   33 das 39 modalidades da descoberta; 6 sem mapeamento): 7 780 linhas, 133
+   clubes e 7 647 jogadores/atletas, com coluna `modalidade`; 115 pedidos à
+   Wikidata. O vocabulário original e os resultados dos 125 artigos não
+   mudam. A maioria dos atletas fora do futebol entra só pela data de
+   nascimento (aproximação documentada); a lista manual de palavras comuns
+   e os nomes de clube de uma palavra admitidos são decisões a confirmar.
+   Não aplicado ao corpus alargado (o grafo da Fase 1 não tem
+   `contentLength`/`statusCode` para `load_corpus()`). Detalhe em
+   `experiments.md` ("Vocabulário alargado 1999–2024").
 5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
    **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
    construída cedo (não deixada para o fim) para reduzir o risco de ficar sem
