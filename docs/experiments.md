@@ -4189,3 +4189,27 @@ erros (404, 500, rede) mantêm o comportamento anterior, sem repetição.
 Testes offline: 429 com e sem `Retry-After` seguido de sucesso (texto e
 HTML), 429 persistente como falha depois das esperas, 404/500 sem
 repetição. Suite completa: 229 testes OK.
+
+### Execução de `corpus_rdf --fase1 por_ano` e artefactos de rede (2026-10-20/21)
+
+Lançada às 10:03:37 de 2026-10-20 (`nohup caffeinate -i`); os 129 317
+artigos foram processados até às 00:09:34 e o Turtle final ficou escrito às
+01:09 (2 208 257 triplos). Nenhum 429. Mas a partir de ~22:52 o serviço
+degradou-se: primeiro respostas **400 Bad Request** para URLs válidos (2 514
+de texto, 1 909 de HTML) e, a partir de 22:57, **"Connection reset by
+peer"** em série (34 731 de HTML e 34 712 de texto, mais de 1 200 por
+minuto, cada pedido a falhar em ~50 ms); mais 243/225 erros de ligação e
+11/8 timeouts. Às 01:14 o serviço respondia normalmente, incluindo os URLs
+exatos que tinham dado reset e 400 (verificado por amostragem). Estes erros
+são artefactos, não falhas reais: afetam **37 481 artigos** (37 479 com o
+texto em falta, 36 872 com o HTML). Os 500 do HTML (5 418, quase todos
+`noticia.asp`) persistem (5 de 6 testados de novo) e contam como reais, tal
+como os 404.
+
+Salvaguarda antes de repetir só esses artigos: `ArquivoClient` ganha
+`connection_error_max_waits` — num erro de ligação, espera 60 s e repete
+até esse número de vezes por pedido, para uma quebra pausar a recolha em vez
+de gerar falhas em série. Desligado por omissão (o `corpus_text_retry` tem a
+sua própria retentativa, que não muda); `corpus_rdf --fase1` usa 10. Testes
+offline: reset seguido de sucesso, erro persistente como falha depois das
+esperas, sem repetição por omissão. Suite completa: 232 testes OK.

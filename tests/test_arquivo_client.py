@@ -13,7 +13,8 @@ from unittest.mock import patch
 import requests
 
 from semantic_harvester.arquivo_client import (
-    RATE_LIMIT_DEFAULT_WAIT_SECONDS, RATE_LIMIT_MAX_WAITS, ArquivoClient,
+    CONNECTION_ERROR_MAX_WAITS, CONNECTION_ERROR_WAIT_SECONDS, RATE_LIMIT_DEFAULT_WAIT_SECONDS,
+    RATE_LIMIT_MAX_WAITS, ArquivoClient,
 )
 from tests.support import ORIGINAL_URL, FixtureSession, OfflineTestCase
 
@@ -112,7 +113,10 @@ class ScriptedSession:
 
     def get(self, url: str, **kwargs) -> StatusResponse:
         self.calls.append(url)
-        return self.responses.pop(0)
+        response = self.responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
 
 
 class RateLimitedDownloadTests(OfflineTestCase):
@@ -121,7 +125,9 @@ class RateLimitedDownloadTests(OfflineTestCase):
 
     def client(self, *responses: StatusResponse) -> tuple[ArquivoClient, ScriptedSession]:
         session = ScriptedSession(*responses)
-        return ArquivoClient(data_dir=self.root / "raw", session=session), session
+        client = ArquivoClient(data_dir=self.root / "raw", session=session,
+                               connection_error_max_waits=CONNECTION_ERROR_MAX_WAITS)
+        return client, session
 
     def test_text_waits_retry_after_then_succeeds(self) -> None:
         client, session = self.client(StatusResponse(429, retry_after="5"),
@@ -157,6 +163,32 @@ class RateLimitedDownloadTests(OfflineTestCase):
                 result = client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
             self.assertFalse(result.success)
             self.assertEqual((sleep.call_count, len(session.calls)), (0, 1))
+
+
+    def test_connection_reset_waits_and_then_succeeds(self) -> None:
+        reset = requests.ConnectionError("Connection aborted: reset by peer")
+        client, session = self.client(reset, reset, StatusResponse(200, b"texto"))
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
+        self.assertTrue(result.success)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list],
+                         [CONNECTION_ERROR_WAIT_SECONDS] * 2)
+
+    def test_connection_errors_are_not_retried_by_default(self) -> None:
+        session = ScriptedSession(requests.ConnectionError("reset"))
+        client = ArquivoClient(data_dir=self.root / "raw", session=session)
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_original_html(CAPTURE)
+        self.assertFalse(result.success)
+        self.assertEqual(sleep.call_count, 0)
+
+    def test_persistent_connection_error_is_a_failure_after_the_waits(self) -> None:
+        client, _ = self.client(*(requests.ConnectionError("reset")
+                                  for _ in range(CONNECTION_ERROR_MAX_WAITS + 1)))
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_original_html(CAPTURE)
+        self.assertFalse(result.success)
+        self.assertEqual(sleep.call_count, CONNECTION_ERROR_MAX_WAITS)
 
 
 if __name__ == "__main__":
