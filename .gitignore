@@ -26,6 +26,7 @@ data/raw/original_html/*
 !data/raw/original_html/.gitkeep
 data/raw/phase2_*/
 data/processed/corpus_articles_triples.nt
+data/processed/corpus_articles_*_triples.nt
 output/*
 !output/.gitkeep
 !output/sample_capture.ttl

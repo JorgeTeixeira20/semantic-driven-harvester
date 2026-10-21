@@ -191,5 +191,25 @@ class RateLimitedDownloadTests(OfflineTestCase):
         self.assertEqual(sleep.call_count, CONNECTION_ERROR_MAX_WAITS)
 
 
+
+    def test_min_request_interval_spaces_consecutive_downloads(self) -> None:
+        session = ScriptedSession(StatusResponse(200, b"a"), StatusResponse(200, b"b"))
+        client = ArquivoClient(data_dir=self.root / "raw", session=session, min_request_interval=1.0)
+        clock = iter([100.0, 100.25, 101.0])  # 1.º pedido; verificação e registo do 2.º
+        with patch("semantic_harvester.arquivo_client.time.monotonic", side_effect=lambda: next(clock)), \
+                patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
+            client.download_original_html(CAPTURE)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list], [0.75])
+
+    def test_no_pacing_by_default(self) -> None:
+        session = ScriptedSession(StatusResponse(200, b"a"), StatusResponse(200, b"b"))
+        client = ArquivoClient(data_dir=self.root / "raw", session=session)
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
+            client.download_original_html(CAPTURE)
+        self.assertEqual(sleep.call_count, 0)
+
+
 if __name__ == "__main__":
     unittest.main()

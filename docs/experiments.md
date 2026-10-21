@@ -4213,3 +4213,19 @@ de gerar falhas em série. Desligado por omissão (o `corpus_text_retry` tem a
 sua própria retentativa, que não muda); `corpus_rdf --fase1` usa 10. Testes
 offline: reset seguido de sucesso, erro persistente como falha depois das
 esperas, sem repetição por omissão. Suite completa: 232 testes OK.
+
+**Primeira repetição (2026-10-21, 01:20–03:59) e ritmo explícito.** A
+repetição dos 37 481 artigos refez 7 850 (texto obtido em 4 453) até os
+400 voltarem às 01:47 e os "connection reset" às 01:49; a salvaguarda de
+ligação fez 120 esperas, mas os 400 continuaram a contar como falha. Às
+03:59 até um pedido isolado (`curl`) levava "connection reset": sinal de
+bloqueio ou de serviço degradado, não de sobrecarga momentânea. Repetição
+parada (retomável). Às 10:07 dois pedidos isolados aos mesmos URLs
+responderam 200 com conteúdo. Decisão do autor: retomar a ~1 pedido por
+segundo, não aos 2–4 de antes (o serviço degradou-se sem nunca responder
+429). `ArquivoClient` ganha `min_request_interval` (pausa mínima entre
+downloads de texto/HTML; desligada por omissão), que `corpus_rdf --fase1`
+usa com 1 s. Os 3 393 artigos que falharam na repetição por 400 ou erro de
+ligação voltaram a ser marcados como artefacto (os 404 e 500 ficam como
+reais): **33 024 artigos pendentes**. O autor contactou a equipa do
+Arquivo.pt. Suite completa: 234 testes OK.

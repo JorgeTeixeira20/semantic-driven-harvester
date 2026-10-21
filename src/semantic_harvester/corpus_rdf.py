@@ -82,6 +82,7 @@ from .url_identity import normalize_for_grouping
 LOGGER = logging.getLogger(__name__)
 
 PROGRESS_EVERY = 10
+PHASE1_MIN_REQUEST_INTERVAL = 1.0
 
 
 def url_hash16(original_url: str) -> str:
@@ -522,6 +523,8 @@ def build_corpus_graph(
             # Modo --fase1: uma quebra de ligação pausa a recolha em vez de
             # gerar falhas em série (2026-10-21, docs/experiments.md).
             connection_error_max_waits=CONNECTION_ERROR_MAX_WAITS if phase1_label else 0,
+            # ~1 pedido/s no modo --fase1 (2026-10-21, docs/experiments.md).
+            min_request_interval=PHASE1_MIN_REQUEST_INTERVAL if phase1_label else 0.0,
         )
 
     results: list[ArticleGraphResult] = list(already.values())

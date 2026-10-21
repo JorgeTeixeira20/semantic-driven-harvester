@@ -105,9 +105,15 @@ class ArquivoClient:
         timeout: tuple[float, float] = (10.0, 30.0),
         session: requests.Session | None = None,
         connection_error_max_waits: int = 0,
+        min_request_interval: float = 0.0,
     ) -> None:
         self.data_dir = Path(data_dir)
         self.connection_error_max_waits = connection_error_max_waits
+        # Ritmo explícito dos downloads de texto/HTML (segundos entre pedidos;
+        # 0 = sem pausa). 2026-10-21: o serviço degradou-se (400 e
+        # "connection reset") a 2–4 pedidos/s sem nunca responder 429.
+        self.min_request_interval = min_request_interval
+        self._last_request_at: float | None = None
         self.searches_dir = self.data_dir / "searches"
         self.texts_dir = self.data_dir / "texts"
         self.html_dir = self.data_dir / "original_html"
@@ -303,6 +309,15 @@ class ArquivoClient:
             text_url=str(text_url),
         )
 
+    def _pace(self) -> None:
+        """Espera o que faltar para `min_request_interval` desde o pedido anterior."""
+
+        if self.min_request_interval > 0 and self._last_request_at is not None:
+            remaining = self.min_request_interval - (time.monotonic() - self._last_request_at)
+            if remaining > 0:
+                time.sleep(remaining)
+        self._last_request_at = time.monotonic()
+
     def _get_respecting_rate_limit(self, url: str) -> Any:
         """GET que, num 429, espera o `Retry-After` e repete (até `RATE_LIMIT_MAX_WAITS`);
         num erro de ligação, espera `CONNECTION_ERROR_WAIT_SECONDS` e repete (até
@@ -315,6 +330,7 @@ class ArquivoClient:
         waits = 0
         connection_waits = 0
         while True:
+            self._pace()
             try:
                 response = self.session.get(url, timeout=self.timeout)
             except requests.ConnectionError as exc:
