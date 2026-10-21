@@ -1,8 +1,8 @@
 # Estado do projeto
 
-Atualizado em **2026-10-19** (alcance real da descoberta e download do HTML
-em bruto), a partir do código, testes, documentação e histórico; a última
-revisão integral foi até `a3208f4`.
+Atualizado em **2026-10-21** (teste exploratório de candidatos a entidade,
+não o Caminho B), a partir do código, testes, documentação e histórico; a
+última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
 [README.md](../README.md).
@@ -165,7 +165,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 234 testes em dezassete módulos de `tests/`.
+pacote conforme o README. Existem 250 testes em dezoito módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -197,9 +197,11 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 (`test_corpus_phase1.py`: paragem só por página incompleta/vazia,
 independente de `next_page`; lista de termos alargada).
 
-Última validação em **2026-10-19**, com o Python 3.11.17 do ambiente virtual
-(sessão remota Linux): `.venv/bin/python -m unittest discover -s tests` —
-**234 testes, todos passaram (`OK`)**, sem chamadas à API real. (Anterior:
+Última validação em **2026-10-21**, com o Python 3.12.4 do ambiente virtual
+(macOS), depois de juntar o ramo do teste de candidatos ao `main`:
+`.venv/bin/python -m unittest discover -s tests` — **250 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-21, sessão
+remota Linux, 248 testes OK; 2026-10-19, Python 3.11.17, 232 testes OK;
 2026-10-15, Python 3.12.4 no ambiente virtual (macOS), 190 testes OK;
 2026-09-20, Python 3.13.1 no Windows, 68 testes OK.)
 
@@ -543,6 +545,17 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    no corpus atual só "Pedro Mendes" ocorre, 1 linha. Os três Turtle (corpus,
    D, B) combinados dão 16 469 triplos com URIs comuns. Detalhe em
    `experiments.md` ("RDF dos Caminhos D e B").
+
+   **Teste exploratório, não o Caminho B (proposta e script testado em
+   2026-10-21, não corrido sobre o corpus real):**
+   `corpus_candidate_entities.py` deteta, por heurística (sequências de
+   palavras capitalizadas fora do início de frase, sem NER), candidatos a
+   entidade que o vocabulário fechado da Wikidata não cobre — para avaliar
+   com evidência própria se vale a pena perguntar à Wikidata só por esses
+   casos, sem reabrir a decisão de vocabulário fechado. Não corrido sobre
+   os 125 artigos porque este ambiente remoto não tem `data/raw/texts/`
+   (ver "Nota operacional" abaixo); 16 testes offline próprios. Detalhe em
+   `experiments.md` ("Candidatos a entidade fora do vocabulário fechado").
 5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
    **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
    construída cedo (não deixada para o fim) para reduzir o risco de ficar sem
