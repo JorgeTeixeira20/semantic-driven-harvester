@@ -401,7 +401,7 @@ rotulados. Escreve `output/corpus_chrome_summary.md` e
 ## Caminho B — temas e entidades mencionadas
 
 ```bash
-python -m semantic_harvester.corpus_entities --vocabulario CAMINHO.csv [--texto corpo|sem-chrome|completo]
+python -m semantic_harvester.corpus_entities --vocabulario CAMINHO.csv [--texto corpo|sem-chrome|completo] [--correspondencia-simples]
 ```
 
 Sem rede e sem alterar grafo nem raw. Temas a partir do `originalURL`

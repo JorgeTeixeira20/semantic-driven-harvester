@@ -2,11 +2,11 @@
 
 Gerado de `output/corpus_entities.csv` (variante c′) e do vocabulário da Wikidata, sem pedidos à API; `output/corpus_articles.ttl` não foi alterado (checksum igual antes e depois).
 
-- Triplos: 1703
-- Linhas de tema / de menção no CSV: 308 / 119
+- Triplos: 1734
+- Linhas de tema / de menção no CSV: 308 / 118
 - Nós `Tema` (partilhados por categoria e valor): 40
 - Nós `EntidadeMencionada`: 82 — 81 com URI da Wikidata, 1 com URI próprio (homónimos)
-- Nós `Mencao`: 119
+- Nós `Mencao`: 118
 
 ## Exceção: rótulos homónimos
 

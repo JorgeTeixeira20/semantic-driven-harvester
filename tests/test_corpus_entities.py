@@ -80,8 +80,10 @@ class CountMentionsTests(unittest.TestCase):
         counts = count_mentions(text, terms, longest_match=True)
         self.assertEqual(counts["Sporting Clube de Braga"], 1)
         self.assertEqual(counts["Sporting Clube de Portugal"], 1)
-        # Por omissão (resultados publicados), "Sporting" conta também dentro.
-        self.assertEqual(count_mentions(text, terms)["Sporting Clube de Portugal"], 2)
+        # Por omissão (desde 2026-10-22) é a regra mais longa; a contagem
+        # anterior continua disponível.
+        self.assertEqual(count_mentions(text, terms), count_mentions(text, terms, longest_match=True))
+        self.assertEqual(count_mentions(text, terms, longest_match=False)["Sporting Clube de Portugal"], 2)
 
     def test_short_name_inside_another_players_name_is_not_counted(self) -> None:
         # Caso real do corpus: "Rodrigo" (Rodrigo Moreno Machado) dentro de "Rodrigo Pinho".

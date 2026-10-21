@@ -58,7 +58,7 @@ Sem pedidos à API; não altera o grafo nem o raw. Anotação por artigo. Vocabu
 
 - Artigos com pelo menos uma entidade, regra de persistência (todas as capturas com texto): 58
 - Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): 60
-- Pares artigo–entidade: 119 pela regra fraca, 113 pela regra de persistência; destes, 31 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
+- Pares artigo–entidade: 118 pela regra fraca, 112 pela regra de persistência; destes, 31 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
 
 ### Coerência de clube (sinal, não filtro)
 
@@ -68,7 +68,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | --- | ---: | ---: |
 | sim | 34 | 34 |
 | nao | 16 | 16 |
-| sem_tema | 69 | 63 |
+| sem_tema | 68 | 62 |
 
 | Entidade | Artigos (persistência) | Artigos (≥ 1 captura) |
 | --- | ---: | ---: |
@@ -89,7 +89,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Nuno Santos | 2 | 2 |
 | Nélson Oliveira | 2 | 2 |
 | Paulo Sérgio Mota | 2 | 2 |
-| Rodrigo Moreno Machado | 2 | 2 |
 | Éderzito António Macedo Lopes | 2 | 2 |
 | Adrien Silva | 1 | 1 |
 | Ahmed Sayed | 1 | 1 |
@@ -142,6 +141,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Renato Sanches | 1 | 1 |
 | Ricardo Costa | 1 | 1 |
 | Ricardo Quaresma | 1 | 1 |
+| Rodrigo Moreno Machado | 1 | 1 |
 | Rodrigo Pinho | 1 | 1 |
 | Romário Baldé | 1 | 1 |
 | Rui Daniel Morais Gomes | 1 | 1 |

@@ -131,16 +131,16 @@ def club_coherence(
 
 
 def count_mentions(
-    segments: list[list[str]], terms: list[Term], longest_match: bool = False
+    segments: list[list[str]], terms: list[Term], longest_match: bool = True
 ) -> Counter[str]:
     """Ocorrências de cada termo (por rótulo) em segmentos de palavras já normalizadas.
 
-    Por omissão, cada variante conta em todas as posições onde aparece, mesmo
-    dentro de outra mais longa (comportamento dos resultados publicados). Com
-    `longest_match` (2026-10-21, `docs/experiments.md`; por ligar): em cada
-    posição conta só a variante mais comprida que aí começa, e a leitura
-    continua depois dela — "Sporting de Braga" já não conta também
-    "Sporting". Variantes de comprimento igual na mesma posição contam todas.
+    Correspondência mais longa (por omissão desde 2026-10-22,
+    `docs/experiments.md`): em cada posição conta só a variante mais comprida
+    que aí começa, e a leitura continua depois dela — "Sporting de Braga" já
+    não conta também "Sporting". Variantes de comprimento igual na mesma
+    posição contam todas. Com `longest_match=False`, a contagem anterior: cada
+    variante em todas as posições, mesmo dentro de outra mais longa.
 
     Não há correspondências entre segmentos: um bloco de chrome removido não
     junta as palavras que estavam de um lado e do outro.
@@ -232,7 +232,7 @@ def analyse_article(
     chrome: set[tuple[str, ...]] | None,
     n: int = DEFAULT_N,
     club_map: dict[str, str] | None = None,
-    longest_match: bool = False,
+    longest_match: bool = True,
 ) -> list[dict[str, str]]:
     themes = themes_from_url(article)
     club_slugs = [value for categoria, value in themes if categoria == "clube"]
@@ -392,7 +392,7 @@ def run(
     chrome_fraction: float | None = DEFAULT_CHROME_FRACTION,
     club_map_path: Path | None = None,
     use_body: bool = False,
-    longest_match: bool = False,
+    longest_match: bool = True,
 ) -> list[dict[str, str]]:
     root = project_root or Path(__file__).resolve().parents[2]
     if vocabulary_path is None:
@@ -433,9 +433,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--clubes-url", type=Path, default=DEFAULT_CLUB_MAP,
                         help="tabela slug do URL → clube do vocabulário, para a coluna "
                         "clube_coerente (por omissão data/processed/caminho_b_clubes_url.csv)")
-    parser.add_argument("--correspondencia-mais-longa", action="store_true",
-                        help="conta só a variante mais longa em cada posição (\"Sporting de "
-                        "Braga\" não conta \"Sporting\"); por ligar, ver docs/experiments.md")
+    parser.add_argument("--correspondencia-simples", action="store_true",
+                        help="contagem anterior a 2026-10-22: cada variante em todas as posições, "
+                        "mesmo dentro de outra mais longa (por omissão, só a mais longa)")
     args = parser.parse_args(argv)
     fraction = args.fracao_chrome if args.texto == "sem-chrome" else None
     if fraction is not None and not 0.0 < fraction <= 1.0:
@@ -443,7 +443,7 @@ def main(argv: list[str] | None = None) -> int:
 
     rows = run(vocabulary_path=args.vocabulario, chrome_fraction=fraction,
                club_map_path=args.clubes_url, use_body=args.texto == "corpo",
-               longest_match=args.correspondencia_mais_longa)
+               longest_match=not args.correspondencia_simples)
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")
     print("Saídas: output/corpus_entities.csv, output/corpus_entities_summary.md")
     return 0

@@ -73,7 +73,10 @@ def entity_pairs(corpus, terms, bodies=None, chrome=None) -> list[dict[str, str]
     rows = []
     for article, caps in corpus.items():
         caps = body_captures(caps, bodies) if bodies is not None else caps
-        rows += [r for r in analyse_article(article, caps, terms, chrome) if r["origem"] == "texto"]
+        # Avaliação histórica da c′: contagem anterior a 2026-10-22, para os
+        # números publicados continuarem reproduzíveis.
+        rows += [r for r in analyse_article(article, caps, terms, chrome, longest_match=False)
+                 if r["origem"] == "texto"]
     return rows
 
 

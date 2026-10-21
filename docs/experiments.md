@@ -4664,7 +4664,7 @@ Vilaverdense") está hoje no vocabulário.
 **Correspondência mais longa em `count_mentions` (preparada, por ligar).**
 Hoje cada variante conta em todas as posições, mesmo dentro de outra mais
 longa ("Sporting de Braga" conta também "Sporting"). Nova opção
-`longest_match` (`--correspondencia-mais-longa`; desligada por omissão):
+`longest_match` (então `--correspondencia-mais-longa`, desligada; ligada por omissão desde 2026-10-22, ver abaixo):
 em cada posição conta só a variante mais comprida, e a leitura continua
 depois dela; empates contam todos. Verificado sobre o corpus de 125 artigos
 com o vocabulário **antigo**, em memória (sem escrever outputs): por
@@ -4701,3 +4701,35 @@ não se explica por isto e continua com a sua própria espera.
 
 Diagnóstico parado às 20:30 e recolha relançada **sem cookies** (modo
 normal do `--fase1`), sobre os 30 016 artigos pendentes.
+
+### Correspondência mais longa ligada por omissão; Caminho B regenerado (2026-10-22)
+
+Decisão do autor: a regra da correspondência mais longa passa a ser a de
+omissão em `count_mentions` (`--correspondencia-simples` repõe a contagem
+anterior). `corpus_body.py`, a avaliação histórica da variante c′, fixa
+`longest_match=False`, para os números publicados continuarem
+reproduzíveis.
+
+**Comparação antes/depois** (corpus de 125 artigos, vocabulário antigo,
+corpo do artigo; as duas execuções feitas primeiro numa pasta temporária,
+com os outputs oficiais intactos; a execução sem a regra reproduz o CSV
+oficial anterior byte a byte). Mudam 2 das 427 linhas, ambas **falsos
+positivos corrigidos**:
+
+| Artigo | Entidade | Antes | Depois | Causa |
+| --- | --- | --- | --- | --- |
+| FC Porto B 1-3 SC Braga B (2.ª Liga) | Rodrigo Moreno Machado | 44 capturas, 308 ocorrências | linha removida | as ocorrências de "Rodrigo" eram todas "Rodrigo Pinho", outro jogador do vocabulário (continua contado) |
+| "Danilo: Nova Zelândia tem bons argumentos…" (Taça das Confederações) | Danilo Luiz da Silva | 4 ocorrências | 3 | uma era "Danilo Pereira" |
+
+Pares artigo–entidade: **119 → 118** pela regra fraca e **113 → 112** pela
+de persistência ("sem tema": 69/63 → 68/62); "Rodrigo Moreno Machado" passa
+de 2 artigos para 1. Outputs oficiais regenerados: `output/corpus_entities.csv`
+(426 linhas), `output/corpus_entities_summary.md`,
+`output/corpus_entities.ttl` e `output/corpus_entities_rdf_summary.md`
+(`corpus_articles.ttl` intacto, checksum). No Turtle: **1 `Mencao` a menos
+(119 → 118)**, ou seja, menos 9 triplos, mais a troca do literal de
+ocorrências do Danilo (4 → 3). O total passa de 1 703 para **1 734
+triplos** porque o Turtle versionado era anterior às subclasses OWL de
+`Tema` (`0009a21`, que não o tinha regenerado): essas acrescentam 40
+triplos (um `a sdh:Clube`/`Competicao`/`Modalidade`/`Secao` por cada nó
+`Tema`), independentes desta regra.

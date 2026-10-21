@@ -512,10 +512,8 @@
 
 <urn:semantic-driven-harvester:prototype:article/d14a83bbecd98e3cf8d5fa63984b7973b98bc3ac157776f9a1ad640e03bd0cd9> sdh:mencionaEntidade wd:Q10298795,
         wd:Q20047629,
-        wd:Q376394,
         wd:Q7197539 ;
     sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/160713eba9529929c9ba15d9622b06d886645c717787a7bbca7b35023f72ac2c>,
-        <urn:semantic-driven-harvester:prototype:mencao/8d8ef61e0a1a31b6a7386d13c79a32a7cf8b5286ae0e820ee4a7d6d331b8732d>,
         <urn:semantic-driven-harvester:prototype:mencao/ea2f73947e546ba17ee127b319db2ee0d5ae69902b740a19b693a92cd4381850>,
         <urn:semantic-driven-harvester:prototype:mencao/f35a96398e9139d3db4e71654f560e36bb50f196542634bd32620d73f5e14d6b> ;
     sdh:temTema <urn:semantic-driven-harvester:prototype:tema/608d660bea3262a2456e9226d24e3364376696da26a53428d2542d9db71dd4ea>,
@@ -1102,7 +1100,7 @@
     sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
     sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
     sdh:clubeCoerente "sem_tema"^^xsd:string ;
-    sdh:ocorrencias "4"^^xsd:nonNegativeInteger ;
+    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
     sdh:persistente true ;
     sdh:sobreEntidade wd:Q437329 .
 
@@ -1217,14 +1215,6 @@
     sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
     sdh:persistente true ;
     sdh:sobreEntidade wd:Q1991022 .
-
-<urn:semantic-driven-harvester:prototype:mencao/8d8ef61e0a1a31b6a7386d13c79a32a7cf8b5286ae0e820ee4a7d6d331b8732d> a sdh:Mencao ;
-    sdh:capturasComMencao "44"^^xsd:nonNegativeInteger ;
-    sdh:capturasComTexto "44"^^xsd:nonNegativeInteger ;
-    sdh:clubeCoerente "sem_tema"^^xsd:string ;
-    sdh:ocorrencias "308"^^xsd:nonNegativeInteger ;
-    sdh:persistente true ;
-    sdh:sobreEntidade wd:Q376394 .
 
 <urn:semantic-driven-harvester:prototype:mencao/8e91a70541ae46a6151160b5f978e1b0f79d8bbbd2fe2bb137c3c706fd1d8fe5> a sdh:Mencao ;
     sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
@@ -1626,92 +1616,110 @@
     sdh:persistente true ;
     sdh:sobreEntidade <urn:semantic-driven-harvester:prototype:entity/d0c9d5ec22565219419de1a1dd11b3ddeee8d99bb42db00282e0b590bc1e6496> .
 
-<urn:semantic-driven-harvester:prototype:tema/01173f2aeebe5251fd73950397523f3c31baccb03b6c450e0b8e3aee011145de> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/01173f2aeebe5251fd73950397523f3c31baccb03b6c450e0b8e3aee011145de> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: jogo-da-vida" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "jogo-da-vida"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/025435cf78f8a041b333e687f9daa81e3a0679d6a0d3eb9591fad244c82344d2> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/025435cf78f8a041b333e687f9daa81e3a0679d6a0d3eb9591fad244c82344d2> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: jogos-em-direto" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "jogos-em-direto"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/0b538186ec54bd987eb1d080b085c8a77d9ad9c3009a43611b91b0f7f8bc2556> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/0b538186ec54bd987eb1d080b085c8a77d9ad9c3009a43611b91b0f7f8bc2556> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: maritimo" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "maritimo"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/2d13b537409c753f297ba615c36ea396f6cb7f226687479b335f41b010eb4322> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/2d13b537409c753f297ba615c36ea396f6cb7f226687479b335f41b010eb4322> a sdh:Competicao,
+        sdh:Tema ;
     rdfs:label "competicao: taca-de-portugal" ;
     sdh:categoriaTema "competicao"^^xsd:string ;
     sdh:valorTema "taca-de-portugal"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/31395661c597434ef8a901ca224c3dcbc4f1064eb70b34f1a0f480a2fd5d0378> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/31395661c597434ef8a901ca224c3dcbc4f1064eb70b34f1a0f480a2fd5d0378> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: aves" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "aves"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/3aee6d1337a08b45d77060631a79680afa3806ed299e8c8782d79b03ba81ed46> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/3aee6d1337a08b45d77060631a79680afa3806ed299e8c8782d79b03ba81ed46> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: andebol" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "andebol"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/490ada6687e1d39107155cda1b9f5343ad3c2e555ec461b07daa97b9ac2dc170> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/490ada6687e1d39107155cda1b9f5343ad3c2e555ec461b07daa97b9ac2dc170> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: natacao" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "natacao"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/4c5fc1e46cdb931db2ce76db53255368b56bb5ad60cc2606add671f458ba8c0d> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/4c5fc1e46cdb931db2ce76db53255368b56bb5ad60cc2606add671f458ba8c0d> a sdh:Competicao,
+        sdh:Tema ;
     rdfs:label "competicao: can" ;
     sdh:categoriaTema "competicao"^^xsd:string ;
     sdh:valorTema "can"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/59f38b3d62dbf8da0dd0f554c31fb23d81340b6e4d9f689deff5799f28e9639d> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/59f38b3d62dbf8da0dd0f554c31fb23d81340b6e4d9f689deff5799f28e9639d> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: desporto-universitario" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "desporto-universitario"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/628235906022836d21694a3347909ef1418dd3dcaf0f3683f323c210a32d1775> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/628235906022836d21694a3347909ef1418dd3dcaf0f3683f323c210a32d1775> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: entrevistas" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "entrevistas"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/72a09064f39cbbb4f20eb35f1f8bfecd2205421089ae4f71a3df0fe3224a2428> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/72a09064f39cbbb4f20eb35f1f8bfecd2205421089ae4f71a3df0fe3224a2428> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: liga-record" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "liga-record"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/73729e0d10a92ccf677b9ccb5cfc2f9a79d8c18ec269907bf18e308ee3aff539> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/73729e0d10a92ccf677b9ccb5cfc2f9a79d8c18ec269907bf18e308ee3aff539> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: record-gaming" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "record-gaming"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/7497ef4bd73f266c80627e3fca063bd181451def04a9521156ea2519918631ce> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/7497ef4bd73f266c80627e3fca063bd181451def04a9521156ea2519918631ce> a sdh:Competicao,
+        sdh:Tema ;
     rdfs:label "competicao: liga-jovem-da-uefa" ;
     sdh:categoriaTema "competicao"^^xsd:string ;
     sdh:valorTema "liga-jovem-da-uefa"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/8d2d60384a89ec66a2e37a5a213d5997f2d19041ceb168ffc876ab3ad12084b0> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/8d2d60384a89ec66a2e37a5a213d5997f2d19041ceb168ffc876ab3ad12084b0> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: jogos-europeus" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "jogos-europeus"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/91c2157f4b4a7e6150d41b39a8e2ef291cfa66ce7333857aaa650c2db34d2081> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/91c2157f4b4a7e6150d41b39a8e2ef291cfa66ce7333857aaa650c2db34d2081> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: liga-allianz-running-record" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "liga-allianz-running-record"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/9a8c0c55dfd15b5151f5201d7f3a34e213f15f3da9c95bdad2f9d41c55f83f0a> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/9a8c0c55dfd15b5151f5201d7f3a34e213f15f3da9c95bdad2f9d41c55f83f0a> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: record-mais" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "record-mais"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/9ba5381b4ff184d17abc9935304220cf8e23b39b5712986e130e2ecfbd6afbd9> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/9ba5381b4ff184d17abc9935304220cf8e23b39b5712986e130e2ecfbd6afbd9> a sdh:Competicao,
+        sdh:Tema ;
     rdfs:label "competicao: taca-das-confederacoes" ;
     sdh:categoriaTema "competicao"^^xsd:string ;
     sdh:valorTema "taca-das-confederacoes"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/d62bad3e16a44e067ed44adbc4f191b5a23f0069b0d20c86d60815a290a3120e> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/d62bad3e16a44e067ed44adbc4f191b5a23f0069b0d20c86d60815a290a3120e> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: portimonense" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "portimonense"^^xsd:string .
@@ -1809,6 +1817,9 @@ wd:Q318383 a sdh:EntidadeMencionada ;
 wd:Q3329570 a sdh:EntidadeMencionada ;
     rdfs:label "Alan Ruiz" .
 
+wd:Q376394 a sdh:EntidadeMencionada ;
+    rdfs:label "Rodrigo Moreno Machado" .
+
 wd:Q38217836 a sdh:EntidadeMencionada ;
     rdfs:label "Diogo Queirós" .
 
@@ -1902,62 +1913,74 @@ wd:Q970801 a sdh:EntidadeMencionada ;
 <urn:semantic-driven-harvester:prototype:entity/d0c9d5ec22565219419de1a1dd11b3ddeee8d99bb42db00282e0b590bc1e6496> a sdh:EntidadeMencionada ;
     rdfs:label "Pedro Mendes" .
 
-<urn:semantic-driven-harvester:prototype:tema/05a97665c7cc6b65725d7b2306f69d82efc84e03eabf22357cf65a38318ed004> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/05a97665c7cc6b65725d7b2306f69d82efc84e03eabf22357cf65a38318ed004> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: moreirense" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "moreirense"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/1f8ebece18af0e15515891a310997f72198497e7be1218f5a341a94e0dece743> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/1f8ebece18af0e15515891a310997f72198497e7be1218f5a341a94e0dece743> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: fora-de-campo" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "fora-de-campo"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/2ba7a8118ed4f82898bf7dda8acd5d49a4c539fd5b2404c255738569ddc6c20e> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/2ba7a8118ed4f82898bf7dda8acd5d49a4c539fd5b2404c255738569ddc6c20e> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: motores" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "motores"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/3a1ec9cdfcb4efa849d2de83ab2f559c03cf413d3c00511ebf365946877bd0be> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/3a1ec9cdfcb4efa849d2de83ab2f559c03cf413d3c00511ebf365946877bd0be> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: sp--braga" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "sp--braga"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/40cc4d15bc95e6ec2ec68e945fec7e7509c2054dedb366ab99977fdd4c0cef15> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/40cc4d15bc95e6ec2ec68e945fec7e7509c2054dedb366ab99977fdd4c0cef15> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: o-diario-de-cr7-by-meo" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "o-diario-de-cr7-by-meo"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/602c04a7b4447c2bf68c391c33b4f35fe16351cd4ceb85d68b9dbafd1a1599ba> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/602c04a7b4447c2bf68c391c33b4f35fe16351cd4ceb85d68b9dbafd1a1599ba> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: judo" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "judo"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/608d660bea3262a2456e9226d24e3364376696da26a53428d2542d9db71dd4ea> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/608d660bea3262a2456e9226d24e3364376696da26a53428d2542d9db71dd4ea> a sdh:Competicao,
+        sdh:Tema ;
     rdfs:label "competicao: 2--liga" ;
     sdh:categoriaTema "competicao"^^xsd:string ;
     sdh:valorTema "2--liga"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/9eedda80b396edb4c7e8530130219a283aa0523d69db1112368bb37c6ad45821> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/9eedda80b396edb4c7e8530130219a283aa0523d69db1112368bb37c6ad45821> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: atletismo" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "atletismo"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/cb401b334b2b27903d90be77a754082b6ff79894339e120537a0d54633261ac1> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/cb401b334b2b27903d90be77a754082b6ff79894339e120537a0d54633261ac1> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: opiniao" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "opiniao"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/e3b0fbc5b12ffa966b4da4f3404c603fdcee0b668591989130d150d2f8a391d0> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/e3b0fbc5b12ffa966b4da4f3404c603fdcee0b668591989130d150d2f8a391d0> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: boavista" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "boavista"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/fccf093940b90410b2a3615f4bac5827f5acd581dc18a58b65c0e1821d4e88e8> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/fccf093940b90410b2a3615f4bac5827f5acd581dc18a58b65c0e1821d4e88e8> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: ciclismo" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "ciclismo"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/c1ba74bc9f46ff966c036ce70689213567e907135b1d2d0c9c2beb100b32a63b> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/c1ba74bc9f46ff966c036ce70689213567e907135b1d2d0c9c2beb100b32a63b> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: v--guimaraes" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "v--guimaraes"^^xsd:string .
@@ -1986,9 +2009,6 @@ wd:Q312507 a sdh:EntidadeMencionada ;
 wd:Q326476 a sdh:EntidadeMencionada ;
     rdfs:label "Jonas" .
 
-wd:Q376394 a sdh:EntidadeMencionada ;
-    rdfs:label "Rodrigo Moreno Machado" .
-
 wd:Q6292355 a sdh:EntidadeMencionada ;
     rdfs:label "José Gomes da Silva" .
 
@@ -1998,12 +2018,14 @@ wd:Q7069892 a sdh:EntidadeMencionada ;
 wd:Q7155313 a sdh:EntidadeMencionada ;
     rdfs:label "Paulo Sérgio Mota" .
 
-<urn:semantic-driven-harvester:prototype:tema/9595d81dfca9a4a13822efd73208e1a7be55979bc10a536d898790f8ca1c94c2> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/9595d81dfca9a4a13822efd73208e1a7be55979bc10a536d898790f8ca1c94c2> a sdh:Competicao,
+        sdh:Tema ;
     rdfs:label "competicao: europeu" ;
     sdh:categoriaTema "competicao"^^xsd:string ;
     sdh:valorTema "europeu"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/24228a619992d4b9a8111f19050bf35a74d8d37329feadf6ca4f8f2e3fb3d787> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/24228a619992d4b9a8111f19050bf35a74d8d37329feadf6ca4f8f2e3fb3d787> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: fc-porto" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "fc-porto"^^xsd:string .
@@ -2032,42 +2054,50 @@ wd:Q4979316 a sdh:EntidadeMencionada ;
 wd:Q27049064 a sdh:EntidadeMencionada ;
     rdfs:label "João Félix" .
 
-<urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: modalidades" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "modalidades"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/9f20a690764e31dc8df0187ff87f9b58a4f7c7eeab40a99ad1c67e01f027aee7> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: benfica" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "benfica"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/bbb8f5a78f1aa8dfeaa4a63912979dac2dbfe70fc872bd73ab4c2aea909b5665> a sdh:Clube,
+        sdh:Tema ;
     rdfs:label "clube: sporting" ;
     sdh:categoriaTema "clube"^^xsd:string ;
     sdh:valorTema "sporting"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: multimedia" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "multimedia"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: internacional" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "internacional"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/4247b507bb3658b1c098446e3de47d4d2fc094eaaa7c0bf6728f687444e5a39e> a sdh:Competicao,
+        sdh:Tema ;
     rdfs:label "competicao: liga-nos" ;
     sdh:categoriaTema "competicao"^^xsd:string ;
     sdh:valorTema "liga-nos"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/8c7c0a69bee5ff296b77c3aaa07f510185b19b9c765e8f5ebbab57d4bae4502c> a sdh:Modalidade,
+        sdh:Tema ;
     rdfs:label "modalidade: futebol" ;
     sdh:categoriaTema "modalidade"^^xsd:string ;
     sdh:valorTema "futebol"^^xsd:string .
 
-<urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> a sdh:Tema ;
+<urn:semantic-driven-harvester:prototype:tema/e3b84c5e3f81503af6571942c9ea567a0582f5bccc52201b0b1abc76eaa69501> a sdh:Secao,
+        sdh:Tema ;
     rdfs:label "secao: futebol" ;
     sdh:categoriaTema "secao"^^xsd:string ;
     sdh:valorTema "futebol"^^xsd:string .
