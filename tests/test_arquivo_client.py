@@ -245,5 +245,62 @@ class RateLimitedDownloadTests(OfflineTestCase):
         self.assertEqual(sleep.call_count, 0)
 
 
+
+
+class CookieJarSession(ScriptedSession):
+    """Sessão com cookies e `close()`, como a `requests.Session`."""
+
+    def __init__(self, *responses) -> None:
+        super().__init__(*responses)
+        self.cookies = requests.cookies.RequestsCookieJar()
+        self.closed = 0
+
+    def close(self) -> None:
+        self.closed += 1
+
+
+class SessionRenewalTests(OfflineTestCase):
+    """400 vindo do estado da sessão (2026-10-21): diagnóstico, renovação e
+    repetição imediata; só depois as pausas; e sessão sem cookies."""
+
+    def client(self, session, **options) -> ArquivoClient:
+        return ArquivoClient(data_dir=self.root / "raw", session=session,
+                             renew_session_on_bad_request=True,
+                             bad_request_max_pauses=BAD_REQUEST_MAX_PAUSES, **options)
+
+    def test_400_logs_diagnostics_renews_and_retries_without_pause(self) -> None:
+        session = CookieJarSession(StatusResponse(400, b"<h1>Request Header Or Cookie Too Large</h1>"),
+                                   StatusResponse(200, b"texto"))
+        session.cookies.set("ASPSESSIONIDQASDATQQ", "LNPHBGOCFCDODDLJDLANLOAJ", domain="arquivo.pt")
+        client = self.client(session)
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep, \
+                self.assertLogs("semantic_harvester.arquivo_client", level="WARNING") as logs:
+            result = client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
+        self.assertTrue(result.success)
+        self.assertEqual(sleep.call_count, 0)
+        self.assertEqual((session.closed, len(session.cookies)), (1, 0))
+        diagnostic = next(line for line in logs.output if "Diagnóstico 400" in line)
+        self.assertIn("1 cookies na sessão (45 bytes de Cookie)", diagnostic)
+        self.assertIn("Request Header Or Cookie Too Large", diagnostic)
+
+    def test_400_that_persists_after_renewal_falls_back_to_the_pauses(self) -> None:
+        session = CookieJarSession(StatusResponse(400), StatusResponse(400), StatusResponse(200, b"x"))
+        client = self.client(session)
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_original_html(CAPTURE)
+        self.assertTrue(result.success)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list], [BAD_REQUEST_PAUSE_SECONDS])
+        self.assertEqual(session.closed, 1)
+
+    def test_without_store_cookies_the_session_refuses_cookies(self) -> None:
+        session = requests.Session()
+        client = ArquivoClient(data_dir=self.root / "raw", session=session, store_cookies=False)
+        cookie = requests.cookies.create_cookie("ASPSESSIONIDQASDATQQ", "X", domain="arquivo.pt")
+        request = requests.Request("GET", "https://arquivo.pt/noFrame/x").prepare()
+        self.assertFalse(client.session.cookies._policy.set_ok(cookie, requests.cookies.MockRequest(request)))
+        self.assertEqual(client.cookie_state(), (0, 0))
+        session.close()
+
+
 if __name__ == "__main__":
     unittest.main()

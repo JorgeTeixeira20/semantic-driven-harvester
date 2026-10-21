@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import time
+from http.cookiejar import DefaultCookiePolicy
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -90,6 +91,12 @@ CONNECTION_ERROR_MAX_WAITS = 10
 # se o mesmo URL der 400 depois dessas pausas, conta como falha real.
 BAD_REQUEST_PAUSE_SECONDS = 600.0
 BAD_REQUEST_MAX_PAUSES = 3
+# 2026-10-21: no mesmo minuto, o URL que dava 400 ao processo longo dava 200 a
+# um `curl` e a uma sessão nova — o 400 vem do estado acumulado da sessão
+# (cookies reencaminhados pelo replay ou ligações reutilizadas), não de uma
+# quota. Com `renew_session_on_bad_request`, um 400 renova a sessão (limpa
+# cookies, fecha ligações) e repete logo, antes das pausas acima.
+BAD_REQUEST_BODY_LOG_CHARS = 300
 
 
 def retry_after_seconds(response: Any) -> float:
@@ -114,10 +121,13 @@ class ArquivoClient:
         connection_error_max_waits: int = 0,
         min_request_interval: float = 0.0,
         bad_request_max_pauses: int = 0,
+        renew_session_on_bad_request: bool = False,
+        store_cookies: bool = True,
     ) -> None:
         self.data_dir = Path(data_dir)
         self.connection_error_max_waits = connection_error_max_waits
         self.bad_request_max_pauses = bad_request_max_pauses
+        self.renew_session_on_bad_request = renew_session_on_bad_request
         # Ritmo explícito dos downloads de texto/HTML (segundos entre pedidos;
         # 0 = sem pausa). 2026-10-21: o serviço degradou-se (400 e
         # "connection reset") a 2–4 pedidos/s sem nunca responder 429.
@@ -131,6 +141,10 @@ class ArquivoClient:
         self.session.headers.setdefault(
             "User-Agent", "semantic-driven-harvester/0.1 (academic prototype)"
         )
+        if not store_cookies and hasattr(self.session, "cookies"):
+            # Os downloads não precisam de cookies; o replay reencaminha os das
+            # páginas arquivadas (por exemplo `ASPSESSIONID…` do site antigo).
+            self.session.cookies.set_policy(DefaultCookiePolicy(allowed_domains=[]))
 
         self.searches_dir.mkdir(parents=True, exist_ok=True)
         self.texts_dir.mkdir(parents=True, exist_ok=True)
@@ -327,6 +341,34 @@ class ArquivoClient:
                 time.sleep(remaining)
         self._last_request_at = time.monotonic()
 
+    def cookie_state(self) -> tuple[int, int]:
+        """(número de cookies na sessão, bytes do cabeçalho `Cookie` que enviariam)."""
+
+        jar = getattr(self.session, "cookies", None) or []
+        cookies = list(jar)
+        size = len("; ".join(f"{cookie.name}={cookie.value}" for cookie in cookies))
+        return len(cookies), size
+
+    def _renew_session(self) -> None:
+        """Limpa os cookies e fecha as ligações reutilizadas da sessão."""
+
+        jar = getattr(self.session, "cookies", None)
+        if jar is not None:
+            jar.clear()
+        close = getattr(self.session, "close", None)
+        if close is not None:
+            close()
+
+    def _log_bad_request(self, url: str, response: Any) -> None:
+        count, size = self.cookie_state()
+        try:
+            body = response.content.decode("utf-8", "replace")
+        except AttributeError:
+            body = ""
+        body = " ".join(body.split())[:BAD_REQUEST_BODY_LOG_CHARS]
+        LOGGER.warning("Diagnóstico 400 em %s: %d cookies na sessão (%d bytes de Cookie); "
+                       "corpo: %s", url, count, size, body or "(vazio)")
+
     def _get_respecting_rate_limit(self, url: str) -> Any:
         """GET que, num 429, espera o `Retry-After` e repete (até `RATE_LIMIT_MAX_WAITS`);
         num erro de ligação, espera `CONNECTION_ERROR_WAIT_SECONDS` e repete (até
@@ -339,6 +381,7 @@ class ArquivoClient:
         waits = 0
         connection_waits = 0
         bad_request_pauses = 0
+        renewed = False
         while True:
             self._pace()
             try:
@@ -353,6 +396,13 @@ class ArquivoClient:
                 time.sleep(CONNECTION_ERROR_WAIT_SECONDS)
                 continue
             status = getattr(response, "status_code", 200)
+            if status == 400 and (self.renew_session_on_bad_request or self.bad_request_max_pauses):
+                self._log_bad_request(url, response)
+            if status == 400 and self.renew_session_on_bad_request and not renewed:
+                renewed = True
+                self._renew_session()
+                LOGGER.warning("400 em %s: sessão renovada; a repetir já.", url)
+                continue
             if status == 400 and bad_request_pauses < self.bad_request_max_pauses:
                 bad_request_pauses += 1
                 LOGGER.warning("400 em %s: quota provável; pausa de %.0fs (%d/%d).",

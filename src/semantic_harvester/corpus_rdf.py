@@ -479,6 +479,7 @@ def build_corpus_graph(
     project_root: Path | None = None,
     client: ArquivoClient | None = None,
     phase1_label: str | None = None,
+    store_cookies: bool = False,
 ) -> tuple[Graph, list[ArticleGraphResult]]:
     """Retomável por artigo: uma execução interrompida pode ser repetida sem
     repetir pedidos de rede para artigos já processados (sucesso ou falha).
@@ -525,8 +526,11 @@ def build_corpus_graph(
             connection_error_max_waits=CONNECTION_ERROR_MAX_WAITS if phase1_label else 0,
             # ~1 pedido/s no modo --fase1 (2026-10-21, docs/experiments.md).
             min_request_interval=PHASE1_MIN_REQUEST_INTERVAL if phase1_label else 0.0,
-            # 400 = quota provável: pausa ~10 min, até 3 vezes por URL (2026-10-21).
+            # 400: renova a sessão e repete; se persistir, pausa ~10 min, até 3
+            # vezes por URL. Sem cookies, salvo --guardar-cookies (diagnóstico).
             bad_request_max_pauses=BAD_REQUEST_MAX_PAUSES if phase1_label else 0,
+            renew_session_on_bad_request=bool(phase1_label),
+            store_cookies=store_cookies or not phase1_label,
         )
 
     results: list[ArticleGraphResult] = list(already.values())
@@ -913,11 +917,13 @@ def rebuild_offline(
 
 
 def run(
-    project_root: Path | None = None, phase1_label: str | None = None
+    project_root: Path | None = None,
+    phase1_label: str | None = None,
+    store_cookies: bool = False,
 ) -> tuple[Graph, list[ArticleGraphResult]]:
     root = project_root or Path(__file__).resolve().parents[2]
     paths = rdf_paths(root, phase1_label)
-    graph, results = build_corpus_graph(root, phase1_label=phase1_label)
+    graph, results = build_corpus_graph(root, phase1_label=phase1_label, store_cookies=store_cookies)
 
     output_path = paths["turtle"]
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -951,7 +957,15 @@ def main(argv: list[str] | None = None) -> int:
         "uma captura por artigo (a mais antiga encontrada pela Fase 1 <LABEL>); "
         "outputs etiquetados",
     )
+    parser.add_argument(
+        "--guardar-cookies",
+        action="store_true",
+        help="com --fase1: a sessão guarda cookies (só para diagnóstico do 400; "
+        "por omissão o modo --fase1 recusa-os)",
+    )
     args = parser.parse_args(argv)
+    if args.guardar_cookies and not args.fase1:
+        parser.error("--guardar-cookies só faz sentido com --fase1")
     if args.check_only and not args.rebuild_offline:
         parser.error("--check-only só faz sentido com --rebuild-offline")
     if args.fase1 and args.rebuild_offline:
@@ -984,7 +998,7 @@ def main(argv: list[str] | None = None) -> int:
                   "data/processed/corpus_articles_triples.nt.pre-rebuild).")
         return 0
 
-    graph, results = run(phase1_label=args.fase1)
+    graph, results = run(phase1_label=args.fase1, store_cookies=args.guardar_cookies)
     paths = rdf_paths(Path(__file__).resolve().parents[2], args.fase1)
     successes = [r for r in results if r.error is None]
     print(f"Artigos mapeados: {len(successes)} de {len(results)}")

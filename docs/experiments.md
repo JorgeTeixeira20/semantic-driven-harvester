@@ -4594,3 +4594,30 @@ pedidos, falha repetida uma vez e registada, carregamento por
   de palavras comuns são decisões a rever antes de aplicar a um corpus.
 - **Clubes por passagem** nas outras modalidades incluem divisões
   inferiores e erros de ligação da Wikidata.
+
+### O 400 vem da sessão do processo, não de uma quota (2026-10-21)
+
+Terceira repetição (16:06, 1 pedido por segundo, 400 = pausa de 10 min):
+860 artigos sem falhas até às 16:35; depois, 400 em todos os pedidos. O
+URL `noticia.asp?id=745057` esgotou as 3 pausas e foi marcado como falha
+real às 17:05 (falso positivo, de novo pendente). Às 17:11, a partir da
+mesma máquina e do mesmo IP, esse URL devolveu **200** a um `curl` e a uma
+sessão Python nova, enquanto o processo longo continuava a receber 400: o
+400 vem do estado acumulado da sessão HTTP do processo (cookies
+reencaminhados pelo replay — o `noFrame/replay` devolve `Set-Cookie:
+ASPSESSIONID…` das páginas ASP antigas, com domínio `arquivo.pt` — ou
+ligações reutilizadas), não de uma quota do serviço. Em 12 capturas
+`noticia.asp` testadas com uma sessão nova não se acumulou nenhum cookie,
+pelo que a causa exata ficou por confirmar. Repetição parada às 17:13.
+
+Decisão do autor e correção (`ArquivoClient`, opções desligadas por
+omissão; `corpus_rdf --fase1` liga-as): cada 400 regista no log o início do
+corpo da resposta e o número e tamanho dos cookies da sessão; num 400 a
+sessão é renovada (cookies limpos, ligações fechadas) e o pedido repete-se
+logo, e só se o 400 persistir se aplicam as pausas de 10 min e o limite de 3
+por URL; os downloads deixam de guardar cookies (`store_cookies=False`;
+`--guardar-cookies` mantém-nos, para diagnóstico); as esperas por erro de
+ligação mantêm-se (os "connection reset" das 03:59, até com `curl`
+isolado, não se explicam por cookies). Testes offline: diagnóstico,
+renovação sem pausa, pausa quando o 400 persiste, sessão que recusa
+cookies. Suite completa: 270 testes OK.
