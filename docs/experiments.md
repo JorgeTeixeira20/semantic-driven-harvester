@@ -4678,3 +4678,26 @@ num artigo da Taça das Confederações (uma era "Danilo Pereira"). Testes:
 regra ligada e desligada, nome curto dentro do de outro jogador, um rótulo
 uma só vez por posição. Suite completa: 274 testes OK. O vocabulário novo
 não foi aplicado a nenhum corpus.
+
+### Evidência do 400: cabeçalho `Cookie` demasiado grande (2026-10-21)
+
+Repetição de diagnóstico (20:07, `--guardar-cookies`, 1 pedido por segundo,
+renovação da sessão ligada): o primeiro 400 chegou às 20:27, ao fim de 20
+minutos e cerca de 660 artigos. Diagnóstico registado no momento: **166
+cookies na sessão, 7 800 bytes no cabeçalho `Cookie`**; corpo da resposta:
+"400 Bad Request — Your browser sent a request that this server could not
+understand" (a página de erro do Apache, que é a que o Apache devolve
+quando um campo do cabeçalho passa o limite, por omissão 8 190 bytes; não
+vem a frase "Request Header Or Cookie Too Large", que é a do nginx). A
+sessão foi renovada e o pedido repetido de imediato, e a recolha continuou
+sem nenhuma pausa nem falha (680 artigos às 20:30). Causa confirmada: o
+`noFrame/replay` reencaminha os `Set-Cookie` das páginas arquivadas (por
+exemplo `ASPSESSIONID…` do site ASP antigo), com domínio `arquivo.pt`; a
+sessão acumulava-os e, perto dos 8 KB, o servidor passava a recusar todos
+os pedidos dessa sessão. Explica o padrão observado: os 400 só apareciam
+depois de muitos pedidos, nunca em pedidos isolados, e começavam nos
+`noticia.asp`. O "connection reset" das 03:59 (também com `curl` isolado)
+não se explica por isto e continua com a sua própria espera.
+
+Diagnóstico parado às 20:30 e recolha relançada **sem cookies** (modo
+normal do `--fase1`), sobre os 30 016 artigos pendentes.
