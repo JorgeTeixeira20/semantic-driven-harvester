@@ -44,6 +44,18 @@ por esta retoma. `--rebuild-offline` reconstrói o grafo de todos os artigos a
 partir do raw, da classificação e da cache de textos, sem qualquer pedido à
 API (`CacheOnlyClient`), com o mesmo código de produção, e só substitui os
 outputs se todas as verificações de `verify_rebuild()` passarem.
+
+Modo `--fase1 <label>` (2026-10-20, `docs/experiments.md`), para o corpus
+alargado sem Fase 2: os artigos vêm de `output/corpus_classification_<label>.csv`
+e cada um é registado com **uma só captura, a mais antiga que a descoberta
+(Fase 1) encontrou**, lida do raw da TextSearch
+(`data/raw/corpus_queries/<label>/`), sem reconstruir de `version_history`.
+Ressalva: é a captura mais antiga *conhecida*, não necessariamente a mais
+antiga que existe no Arquivo.pt. Texto e HTML seguem `TEXT_POLICY_FIRST`.
+Os itens da TextSearch não trazem `statusCode` nem `contentLength`, que
+ficam por isso ausentes do grafo. Outputs separados:
+`output/corpus_articles_<label>.ttl`, `output/corpus_rdf_<label>_{report.csv,summary.md}`
+e `data/processed/corpus_articles_<label>_triples.nt`.
 """
 
 from __future__ import annotations
@@ -53,7 +65,6 @@ import csv
 import hashlib
 import json
 import logging
-import re
 import shutil
 import tempfile
 import time
@@ -63,10 +74,10 @@ from typing import Any
 
 from rdflib import RDF, RDFS, Graph, XSD
 
-from .arquivo_client import ArquivoClient, TextDownloadResult
+from .arquivo_client import CONNECTION_ERROR_MAX_WAITS, ArquivoClient, TextDownloadResult
 from .history_pipeline import TEXT_POLICY_ALL, TEXT_POLICY_FIRST, build_manifest_records
 from .rdf_mapper import SDH, build_article_history_graph, stable_hash
-from .url_identity import strip_scheme, strip_tracking_params
+from .url_identity import normalize_for_grouping
 
 LOGGER = logging.getLogger(__name__)
 
@@ -126,20 +137,6 @@ def variants_of(row: dict[str, str]) -> list[str]:
     return [url for url in (row.get("variantes") or "").split("|") if url]
 
 
-def normalize_for_grouping(url: str) -> str:
-    """Remove esquema, parâmetros de rastreio, barras repetidas e uma barra final.
-
-    Usado só para decidir se dois URLs são a mesma página modulo variação
-    cosmética — nunca para gerar identificadores (esses continuam a usar o
-    `originalURL` canónico tal como veio da descoberta/classificação).
-    """
-
-    head, _, query = strip_scheme(url).partition("?")
-    collapsed = re.sub(r"/{2,}", "/", head).rstrip("/")
-    query = strip_tracking_params(query)
-    return f"{collapsed}?{query}" if query else collapsed
-
-
 def normalize_captures_to_canonical_url(
     captures: list[dict[str, Any]], canonical_url: str
 ) -> tuple[list[dict[str, Any]], int, int]:
@@ -168,6 +165,29 @@ def normalize_captures_to_canonical_url(
             rewritten += 1
         normalized.append(capture)
     return normalized, dropped, rewritten
+
+
+def load_phase1_oldest_captures(
+    raw_dir: Path, canonical_urls: list[str]
+) -> dict[str, dict[str, Any]]:
+    """URL canónico → item da captura mais antiga que a Fase 1 encontrou.
+
+    Lê todos os `response_items` do raw da TextSearch em `raw_dir`; um item
+    pertence ao artigo se `normalize_for_grouping()` coincidir (a mesma regra
+    da agregação da Fase 1). O `originalURL` do item devolvido é o canónico.
+    """
+
+    by_key = {normalize_for_grouping(url): url for url in canonical_urls}
+    oldest: dict[str, dict[str, Any]] = {}
+    for path in sorted(raw_dir.glob("*.json")):
+        for item in json.loads(path.read_bytes()).get("response_items") or []:
+            canonical = by_key.get(normalize_for_grouping(str(item.get("originalURL"))))
+            if canonical is None:
+                continue
+            current = oldest.get(canonical)
+            if current is None or str(item.get("tstamp")) < str(current.get("tstamp")):
+                oldest[canonical] = {**item, "originalURL": canonical}
+    return oldest
 
 
 def load_retained_articles(classification_csv: Path) -> list[dict[str, str]]:
@@ -299,7 +319,63 @@ def build_one_article_graph(
     )
 
 
-def _summary_intro(n_articles: int, rebuilt_offline: bool) -> list[str]:
+def build_article_graph_from_capture(
+    client: ArquivoClient,
+    capture: dict[str, Any],
+    title: str,
+    project_root: Path,
+) -> tuple[Graph | None, ArticleGraphResult]:
+    """Grafo de um artigo com uma só captura (modo `--fase1`); texto e HTML pela política "primeira"."""
+
+    original_url = str(capture["originalURL"])
+    records = build_manifest_records(client, [capture], project_root, text_policy=TEXT_POLICY_FIRST)
+    try:
+        graph = build_article_history_graph(records, title, project_root)
+    except ValueError as exc:
+        LOGGER.error("Falha ao mapear %s: %s", original_url, exc)
+        return None, ArticleGraphResult(original_url, len(records), 0, 0, 0, 0, 0, str(exc))
+    (record,) = records
+    return graph, ArticleGraphResult(
+        original_url=original_url,
+        captures_used=1,
+        captures_url_variants_normalized=0,
+        captures_dropped_mismatched_url=0,
+        texts_downloaded_now=int(record["text_downloaded_now"]),
+        texts_reused=int(record["text_download_success"] and not record["text_downloaded_now"]),
+        texts_failed=int(record["text_requested"] and not record["text_download_success"]),
+        error=None,
+    )
+
+
+def rdf_paths(root: Path, phase1_label: str | None) -> dict[str, Path]:
+    """Caminhos de uma execução; sem `phase1_label`, os do corpus de 125 artigos."""
+
+    tag = f"_{phase1_label}" if phase1_label else ""
+    return {
+        "classification": root / "output" / f"corpus_classification{tag}.csv",
+        "report": root / "output" / f"corpus_rdf{tag}_report.csv",
+        "triples": root / "data" / "processed" / f"corpus_articles{tag}_triples.nt",
+        "turtle": root / "output" / f"corpus_articles{tag}.ttl",
+        "summary": root / "output" / f"corpus_rdf{tag}_summary.md",
+        "progress": root / "output" / f"corpus_rdf{tag}_progress.log",
+        "phase1_raw": root / "data" / "raw" / "corpus_queries" / (phase1_label or ""),
+    }
+
+
+def _summary_intro(
+    n_articles: int, rebuilt_offline: bool, phase1_label: str | None = None
+) -> list[str]:
+    if phase1_label:
+        return [
+            f"Execução real sobre os {n_articles} artigos classificados como "
+            f"`Artigo` em `output/corpus_classification_{phase1_label}.csv`. Cada "
+            "artigo tem **uma só captura: a mais antiga que a descoberta (Fase 1) "
+            "encontrou**, lida do raw da TextSearch "
+            f"(`data/raw/corpus_queries/{phase1_label}/`), sem `version_history`. "
+            "Ressalva: é a mais antiga conhecida, não necessariamente a mais antiga "
+            "que existe no Arquivo.pt. Texto e HTML só dessa captura. A execução é "
+            f"retomável por artigo (`output/corpus_rdf_{phase1_label}_report.csv`).\n"
+        ]
     if rebuilt_offline:
         return [
             f"Reconstrução **offline** sobre os {n_articles} artigos "
@@ -346,6 +422,7 @@ def write_summary_markdown(
     graph_size: int,
     path: Path,
     rebuilt_offline: bool = False,
+    phase1_label: str | None = None,
 ) -> None:
     successes = [r for r in results if r.error is None]
     failures = [r for r in results if r.error is not None]
@@ -362,7 +439,7 @@ def write_summary_markdown(
 
     lines = [
         "# Grafo RDF do corpus do Caminho A (passo final)\n",
-        *_summary_intro(len(results), rebuilt_offline),
+        *_summary_intro(len(results), rebuilt_offline, phase1_label),
         "## Resumo\n",
         f"- Artigos mapeados com sucesso: {len(successes)} de {len(results)}",
         f"- Artigos com falha (raw em falta ou manifesto inválido): {len(failures)}",
@@ -400,6 +477,7 @@ def write_summary_markdown(
 def build_corpus_graph(
     project_root: Path | None = None,
     client: ArquivoClient | None = None,
+    phase1_label: str | None = None,
 ) -> tuple[Graph, list[ArticleGraphResult]]:
     """Retomável por artigo: uma execução interrompida pode ser repetida sem
     repetir pedidos de rede para artigos já processados (sucesso ou falha).
@@ -413,14 +491,19 @@ def build_corpus_graph(
     """
 
     root = project_root or Path(__file__).resolve().parents[2]
-    classification_csv = root / "output" / "corpus_classification.csv"
+    paths = rdf_paths(root, phase1_label)
+    classification_csv = paths["classification"]
     version_history_dir = root / "data" / "raw" / "version_history"
-    report_csv = root / "output" / "corpus_rdf_report.csv"
-    triples_path = root / "data" / "processed" / "corpus_articles_triples.nt"
+    report_csv = paths["report"]
+    triples_path = paths["triples"]
 
     articles = load_retained_articles(classification_csv)
     already = load_already_processed(report_csv)
     pending = [row for row in articles if row["original_url"] not in already]
+    oldest = (
+        load_phase1_oldest_captures(paths["phase1_raw"], [row["original_url"] for row in pending])
+        if phase1_label else {}
+    )
 
     LOGGER.info(
         "Grafo RDF: %d artigos no total, %d já concluídos numa execução "
@@ -434,7 +517,12 @@ def build_corpus_graph(
         # tstamp é um pedido direto, não pesquisa de texto livre, e um
         # read_timeout de 120s revelou-se demasiado tolerante a ligações
         # penduradas/cortadas (ver docs/experiments.md).
-        client = ArquivoClient(data_dir=root / "data" / "raw")
+        client = ArquivoClient(
+            data_dir=root / "data" / "raw",
+            # Modo --fase1: uma quebra de ligação pausa a recolha em vez de
+            # gerar falhas em série (2026-10-21, docs/experiments.md).
+            connection_error_max_waits=CONNECTION_ERROR_MAX_WAITS if phase1_label else 0,
+        )
 
     results: list[ArticleGraphResult] = list(already.values())
 
@@ -455,10 +543,17 @@ def build_corpus_graph(
                     title = row["title"]
                     # Artigos novos (os já no relatório são saltados): só o
                     # texto da captura mais antiga (docs/experiments.md).
-                    graph, result = build_one_article_graph(
-                        client, url, title, version_history_dir, root, variants_of(row),
-                        text_policy=TEXT_POLICY_FIRST,
-                    )
+                    if phase1_label and url not in oldest:
+                        graph, result = None, ArticleGraphResult(
+                            url, 0, 0, 0, 0, 0, 0, "sem captura no raw da Fase 1")
+                    elif phase1_label:
+                        graph, result = build_article_graph_from_capture(
+                            client, oldest[url], title, root)
+                    else:
+                        graph, result = build_one_article_graph(
+                            client, url, title, version_history_dir, root, variants_of(row),
+                            text_policy=TEXT_POLICY_FIRST,
+                        )
                     if graph is not None:
                         triples_handle.write(graph.serialize(format="nt"))
                         triples_handle.write("\n")
@@ -812,15 +907,18 @@ def rebuild_offline(
     return checks, results, new_graph
 
 
-def run(project_root: Path | None = None) -> tuple[Graph, list[ArticleGraphResult]]:
+def run(
+    project_root: Path | None = None, phase1_label: str | None = None
+) -> tuple[Graph, list[ArticleGraphResult]]:
     root = project_root or Path(__file__).resolve().parents[2]
-    graph, results = build_corpus_graph(root)
+    paths = rdf_paths(root, phase1_label)
+    graph, results = build_corpus_graph(root, phase1_label=phase1_label)
 
-    output_path = root / "output" / "corpus_articles.ttl"
+    output_path = paths["turtle"]
     output_path.parent.mkdir(parents=True, exist_ok=True)
     graph.serialize(destination=output_path, format="turtle")
 
-    write_summary_markdown(results, len(graph), root / "output" / "corpus_rdf_summary.md")
+    write_summary_markdown(results, len(graph), paths["summary"], phase1_label=phase1_label)
     return graph, results
 
 
@@ -841,9 +939,18 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="com --rebuild-offline: só reconstrói e verifica, sem escrever",
     )
+    parser.add_argument(
+        "--fase1",
+        metavar="LABEL",
+        help="corpus alargado sem Fase 2: artigos de corpus_classification_<LABEL>.csv, "
+        "uma captura por artigo (a mais antiga encontrada pela Fase 1 <LABEL>); "
+        "outputs etiquetados",
+    )
     args = parser.parse_args(argv)
     if args.check_only and not args.rebuild_offline:
         parser.error("--check-only só faz sentido com --rebuild-offline")
+    if args.fase1 and args.rebuild_offline:
+        parser.error("--fase1 não se combina com --rebuild-offline")
 
     logging.basicConfig(
         level=logging.INFO,
@@ -851,7 +958,7 @@ def main(argv: list[str] | None = None) -> int:
         handlers=[
             logging.StreamHandler(),
             logging.FileHandler(
-                Path(__file__).resolve().parents[2] / "output" / "corpus_rdf_progress.log",
+                rdf_paths(Path(__file__).resolve().parents[2], args.fase1)["progress"],
                 mode="a",
                 encoding="utf-8",
             ),
@@ -872,14 +979,13 @@ def main(argv: list[str] | None = None) -> int:
                   "data/processed/corpus_articles_triples.nt.pre-rebuild).")
         return 0
 
-    graph, results = run()
+    graph, results = run(phase1_label=args.fase1)
+    paths = rdf_paths(Path(__file__).resolve().parents[2], args.fase1)
     successes = [r for r in results if r.error is None]
     print(f"Artigos mapeados: {len(successes)} de {len(results)}")
     print(f"Triplos no grafo: {len(graph)}")
-    print("Turtle: output/corpus_articles.ttl")
-    print(
-        "Relatórios: output/corpus_rdf_report.csv, output/corpus_rdf_summary.md"
-    )
+    print(f"Turtle: {paths['turtle']}")
+    print(f"Relatórios: {paths['report']}, {paths['summary']}")
     return 0
 
 

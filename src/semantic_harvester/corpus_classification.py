@@ -1,9 +1,9 @@
 """Classificação Artigo vs. redirecionamento/não-artigo (Caminho A, passo 6).
 
-Implementa a regra proposta e justificada em `docs/experiments.md`
-("Classificação Artigo vs. redirecionamento/não-artigo"), com base apenas
-em evidência já recolhida nas Fases 1–2 do protocolo de queries — não faz
-pedidos novos à API.
+Regra justificada em `docs/experiments.md` ("Classificação Artigo vs.
+redirecionamento/não-artigo" e, para o sinal de URL, "Classificação sem a
+Fase 2", 2026-10-20). Usa só o CSV de capturas da Fase 1 (o título vem nos
+resultados da pesquisa) — não faz pedidos à API nem depende da Fase 2.
 
 Antes de classificar, agrupa `originalURL` que só diferem no esquema
 (`http://`/`https://`) ou em parâmetros de rastreio (`ref`, `utm_*`, `act`,
@@ -20,25 +20,60 @@ seguintes se verificar:
 1. `/sabermais/` no caminho do URL — página de referência/perfil.
 2. `title` igual a ou começado por "Object moved" — página de
    redirecionamento arquivada.
-3. Número de capturas (Fase 2) superior a `CAPTURES_THRESHOLD` — página
-   persistente/reutilizada, não uma publicação editorial pontual.
+3. O URL não segue nenhum dos esquemas de página de artigo
+   (`ARTICLE_URL_SCHEMES`): `/detalhe/` ou `/amp/` no caminho (site atual),
+   `interior.aspx?content_id=` (site antigo; o `=` aparece também codificado,
+   `content_id/x3d`), `tn0cs.asp?nid=`/`tn1cs.asp?nid=` (1999–2000) ou
+   `noticia.asp?id=`, `shownews.asp?id=`, `noticia.aspx?id=` (2000–2009).
+
+O sinal 3 substitui o anterior "mais de 100 capturas na Fase 2"
+(`version_history`), que deixou de existir para o corpus alargado.
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
+import re
+from collections import Counter
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from urllib.parse import urlsplit
 
 from .url_identity import has_tracking_params, strip_scheme, without_tracking
 
-CAPTURES_THRESHOLD = 100
-
 REASON_ARTIGO = "artigo"
 REASON_SABERMAIS = "sabermais"
 REASON_OBJECT_MOVED = "object_moved"
-REASON_CAPTURES_OUTLIER = "captures_outlier"
+REASON_URL_NOT_ARTICLE = "url_nao_artigo"
+
+
+def _query_starts(path_end: str, *prefixes: str):
+    def matches(path: str, query: str) -> bool:
+        return path.endswith(path_end) and query.startswith(prefixes)
+    return matches
+
+
+# (nome, teste sobre o caminho e a query em minúsculas)
+ARTICLE_URL_SCHEMES = (
+    ("detalhe", lambda path, query: "/detalhe/" in path),
+    ("amp", lambda path, query: "/amp/" in path),
+    ("interior.aspx?content_id", _query_starts("/interior.aspx", "content_id=", "content_id/x3d")),
+    ("tn0cs.asp?nid", _query_starts("/tn0cs.asp", "nid=")),
+    ("tn1cs.asp?nid", _query_starts("/tn1cs.asp", "nid=")),
+    # Site de 2000–2009 (2026-10-20, decisão do autor; docs/experiments.md).
+    ("noticia.asp?id", _query_starts("/noticia.asp", "id=")),
+    ("shownews.asp?id", _query_starts("/shownews.asp", "id=")),
+    ("noticia.aspx?id", _query_starts("/noticia.aspx", "id=")),
+)
+
+
+def article_url_scheme(url: str) -> str | None:
+    """Nome do esquema de URL de artigo a que `url` corresponde, ou `None`."""
+
+    parts = urlsplit(url)
+    path, query = parts.path.lower(), parts.query.lower()
+    return next((name for name, matches in ARTICLE_URL_SCHEMES if matches(path, query)), None)
 
 
 @dataclass(frozen=True)
@@ -79,7 +114,7 @@ def group_captures(urls: list[str], captures_by_url: dict[str, int]) -> int:
     return sum(by_scheme_free.values())
 
 
-def classify(original_url: str, title: str | None, captures: int) -> ClassificationResult:
+def classify(original_url: str, title: str | None, captures: int = 0) -> ClassificationResult:
     path = urlsplit(original_url).path
     normalized_title = (title or "").strip().lower()
 
@@ -87,8 +122,8 @@ def classify(original_url: str, title: str | None, captures: int) -> Classificat
         reason = REASON_SABERMAIS
     elif normalized_title.startswith("object moved"):
         reason = REASON_OBJECT_MOVED
-    elif captures > CAPTURES_THRESHOLD:
-        reason = REASON_CAPTURES_OUTLIER
+    elif article_url_scheme(original_url) is None:
+        reason = REASON_URL_NOT_ARTICLE
     else:
         reason = REASON_ARTIGO
 
@@ -104,6 +139,7 @@ def classify(original_url: str, title: str | None, captures: int) -> Classificat
 def load_phase1_titles(captures_csv: Path) -> dict[str, dict[str, str]]:
     """Um registo por `originalURL`, mantendo o de maior `num_queries_matched`."""
 
+    csv.field_size_limit(1 << 30)
     by_url: dict[str, dict[str, str]] = {}
     with captures_csv.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle):
@@ -116,19 +152,20 @@ def load_phase1_titles(captures_csv: Path) -> dict[str, dict[str, str]]:
     return by_url
 
 
-def load_phase2_captures(history_csv: Path) -> dict[str, int]:
-    captures_by_url: dict[str, int] = {}
-    with history_csv.open(encoding="utf-8", newline="") as handle:
+def load_phase1_capture_counts(captures_csv: Path) -> dict[str, int]:
+    """Capturas distintas por `originalURL` na Fase 1 (informativo; não classifica)."""
+
+    csv.field_size_limit(1 << 30)
+    tstamps: dict[str, set[str]] = {}
+    with captures_csv.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle):
-            captures_by_url[row["original_url"]] = int(row["captures"])
-    return captures_by_url
+            tstamps.setdefault(row["original_url"], set()).add(row["tstamp"])
+    return {url: len(values) for url, values in tstamps.items()}
 
 
-def classify_corpus(
-    captures_csv: Path, history_csv: Path
-) -> list[ClassificationResult]:
+def classify_corpus(captures_csv: Path) -> list[ClassificationResult]:
     phase1 = load_phase1_titles(captures_csv)
-    captures_by_url = load_phase2_captures(history_csv)
+    captures_by_url = load_phase1_capture_counts(captures_csv)
 
     groups: dict[str, list[str]] = {}
     for url in phase1:
@@ -154,7 +191,19 @@ def write_csv(results: list[ClassificationResult], path: Path) -> None:
         writer.writerows(asdict(result) for result in results)
 
 
-def write_summary_markdown(results: list[ClassificationResult], path: Path) -> None:
+def first_path_pattern(url: str) -> str:
+    """Host, primeiro segmento do caminho e primeiro parâmetro (para resumir exclusões)."""
+
+    parts = urlsplit(url)
+    segments = [segment for segment in parts.path.split("/") if segment]
+    first = segments[0].lower() if segments else ""
+    param = re.split(r"[=/]", parts.query, maxsplit=1)[0].lower() if parts.query else ""
+    return f"{parts.hostname or ''}/{first}" + (f"?{param}" if param else "")
+
+
+def write_summary_markdown(
+    results: list[ClassificationResult], path: Path, source_name: str, csv_name: str
+) -> None:
     by_reason: dict[str, list[ClassificationResult]] = {}
     for result in results:
         by_reason.setdefault(result.reason, []).append(result)
@@ -162,76 +211,88 @@ def write_summary_markdown(results: list[ClassificationResult], path: Path) -> N
     artigos = by_reason.get(REASON_ARTIGO, [])
     sabermais = by_reason.get(REASON_SABERMAIS, [])
     moved = by_reason.get(REASON_OBJECT_MOVED, [])
-    outliers = by_reason.get(REASON_CAPTURES_OUTLIER, [])
+    not_article = by_reason.get(REASON_URL_NOT_ARTICLE, [])
+    schemes = Counter(article_url_scheme(r.original_url) for r in artigos)
 
     lines = [
         "# Classificação Artigo vs. redirecionamento/não-artigo (passo 6)\n",
         "Regra e justificação em `docs/experiments.md`. Execução real sobre "
-        "os dados já recolhidos nas Fases 1–2, sem pedidos novos à API.\n",
+        f"`output/{source_name}` (Fase 1), sem pedidos à API e sem a Fase 2.\n",
         "## Resumo\n",
         f"- Recursos distintos (depois de agrupar variantes de esquema http/https "
         f"e de parâmetros de rastreio): {len(results)}",
         f"- Recursos com variantes de URL agrupadas: "
         f"{sum(1 for r in results if r.variantes)}",
-        f"- Classificados como Artigo: {len(artigos)}",
+        f"- **Classificados como Artigo: {len(artigos)}**",
         f"- Excluídos — `/sabermais/`: {len(sabermais)}",
         f"- Excluídos — `Object moved`: {len(moved)}",
-        f"- Excluídos — capturas > {CAPTURES_THRESHOLD}: {len(outliers)}",
-        "\n## Excluídos — /sabermais/\n",
-        "| originalURL | title | capturas |",
-        "| --- | --- | ---: |",
+        f"- Excluídos — URL fora dos esquemas de artigo: {len(not_article)}",
+        "\n## Artigos por esquema de URL\n",
+        "| Esquema | Artigos |",
+        "| --- | ---: |",
     ]
-    for result in sabermais:
-        lines.append(f"| {result.original_url} | {result.title} | {result.captures} |")
+    for name, _ in ARTICLE_URL_SCHEMES:
+        lines.append(f"| `{name}` | {schemes.get(name, 0)} |")
 
-    lines.extend(
-        [
-            "\n## Excluídos — Object moved\n",
-            "| originalURL | capturas |",
-            "| --- | ---: |",
-        ]
-    )
-    for result in moved:
-        lines.append(f"| {result.original_url} | {result.captures} |")
+    lines.extend([
+        "\n## Excluídos por URL — padrões mais frequentes\n",
+        "Host, primeiro segmento do caminho e primeiro parâmetro; os 40 mais "
+        "frequentes.\n",
+        "| Padrão | Recursos |",
+        "| --- | ---: |",
+    ])
+    for pattern, count in Counter(first_path_pattern(r.original_url) for r in not_article).most_common(40):
+        lines.append(f"| `{pattern}` | {count} |")
 
-    lines.extend(
-        [
-            "\n## Excluídos — capturas acima do limiar\n",
-            "| originalURL | title | capturas |",
-            "| --- | --- | ---: |",
-        ]
-    )
-    for result in sorted(outliers, key=lambda r: -r.captures):
-        lines.append(f"| {result.original_url} | {result.title} | {result.captures} |")
+    lines.extend([
+        "\n## Excluídos — Object moved\n",
+        f"{len(moved)} recursos; lista completa em `output/{csv_name}`.",
+    ])
 
     lines.append(
-        "\nLista completa (incluindo os classificados como Artigo) em "
-        "`output/corpus_classification.csv`."
+        f"\nLista completa (incluindo os classificados como Artigo) em `output/{csv_name}`."
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def run_classification(project_root: Path | None = None) -> list[ClassificationResult]:
+def run_classification(
+    project_root: Path | None = None,
+    captures_csv: Path | None = None,
+    label: str = "por_ano",
+) -> list[ClassificationResult]:
+    """Classifica a Fase 1 `label`; escreve `output/corpus_classification_<label>.*`.
+
+    Não reescreve `output/corpus_classification.csv`, a classificação do
+    corpus de 125 artigos de que dependem `corpus_rdf` (reconstrução offline)
+    e os Caminhos D e B.
+    """
+
     root = project_root or Path(__file__).resolve().parents[2]
-    captures_csv = root / "output" / "corpus_phase1_captures.csv"
-    history_csv = root / "output" / "corpus_phase2_history.csv"
+    captures_csv = captures_csv or root / "output" / f"corpus_phase1_{label}_captures.csv"
+    csv_path = root / "output" / f"corpus_classification_{label}.csv"
 
-    results = classify_corpus(captures_csv, history_csv)
+    results = classify_corpus(captures_csv)
 
-    write_csv(results, root / "output" / "corpus_classification.csv")
-    write_summary_markdown(results, root / "output" / "corpus_classification_summary.md")
+    write_csv(results, csv_path)
+    write_summary_markdown(
+        results, root / "output" / f"corpus_classification_{label}_summary.md",
+        captures_csv.name, csv_path.name,
+    )
     return results
 
 
-def main() -> int:
-    results = run_classification()
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="python -m semantic_harvester.corpus_classification")
+    parser.add_argument("--label", default="por_ano",
+                        help="Fase 1 a classificar (output/corpus_phase1_<label>_captures.csv)")
+    parser.add_argument("--captures-csv", type=Path, help="CSV de capturas explícito")
+    args = parser.parse_args(argv)
+    results = run_classification(captures_csv=args.captures_csv, label=args.label)
     artigos = [r for r in results if r.is_artigo]
     print(f"Recursos distintos: {len(results)}")
     print(f"Classificados como Artigo: {len(artigos)}")
-    print(
-        "Relatórios: output/corpus_classification.csv, "
-        "output/corpus_classification_summary.md"
-    )
+    print(f"Relatórios: output/corpus_classification_{args.label}.csv, "
+          f"output/corpus_classification_{args.label}_summary.md")
     return 0
 
 

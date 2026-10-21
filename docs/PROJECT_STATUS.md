@@ -134,10 +134,38 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 - As dependências têm intervalos em `pyproject.toml`, sem lockfile versionado.
   Não há configuração de CI nem testes dedicados a profiling/diagnóstico no repositório.
 
+### Para a escrita da tese (2026-10-20)
+
+- **Profundidade temporal por artigo: estudada, não uma lacuna.** No corpus
+  de 125 artigos (941 capturas via `version_history`; mediana de 3 capturas
+  por artigo, máximo 73), o Caminho D (variante c′, limiar 0,90) mostrou que
+  a maioria dos artigos não muda entre capturas: dos 121 artigos com
+  capturas comparáveis, 112 têm uma só versão distinta do corpo, 8 têm duas
+  e 1 tem cinco. A variação entre capturas é sobretudo chrome. Por isso o
+  corpus alargado regista uma captura por artigo (a mais antiga que a
+  descoberta encontrou) e a Fase 2 foi parada (`docs/experiments.md`,
+  2026-10-20): é uma escolha de âmbito do motor, não uma falha de recolha.
+- **Wikidata, ontologia e cobertura desigual por modalidade.** O vocabulário
+  fechado de entidades do Caminho B
+  (`data/processed/caminho_b_vocabulario_wikidata.csv`) tem 1 091 entradas,
+  **todas jogadores de futebol** dos plantéis da Primeira Liga 2015–16 a
+  2019–20 (só 3 épocas com participantes na Wikidata, 23 clubes): a deteção
+  de entidades só cobre futebol. A ontologia formaliza `sdh:Modalidade`
+  (subclasse de `sdh:Tema`) para todas as modalidades, a partir do URL, mas
+  `EntidadeMencionada` não tem subclasses por modalidade (fica para quando o
+  vocabulário for alargado). No corpus alargado, a cobertura por modalidade
+  é muito desigual: dos 129 317 Artigos, 36 869 têm `futebol` no URL e
+  74 076 nenhuma modalidade no URL (entre eles todos os do site de
+  1999–2009, cujos URLs `noticia.asp?id=`/`shownews.asp?id=`/`tn0cs.asp?nid=`
+  não têm caminho temático: aí a modalidade só se sabe pelo termo de
+  pesquisa que os encontrou); as restantes vão de 1 558 (andebol) e 1 522
+  (hóquei em patins) a menos de 10 (tiro, esgrima, xadrez, pólo aquático). Estes números refletem também o teto da descoberta (300
+  resultados por termo e ano), não só o volume publicado pelo Record.
+
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 202 testes em dezasseis módulos de `tests/`.
+pacote conforme o README. Existem 248 testes em dezoito módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -169,9 +197,10 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 (`test_corpus_phase1.py`: paragem só por página incompleta/vazia,
 independente de `next_page`; lista de termos alargada).
 
-Última validação em **2026-10-19**, com o Python 3.11.17 do ambiente virtual
-(sessão remota Linux): `.venv/bin/python -m unittest discover -s tests` —
-**202 testes, todos passaram (`OK`)**, sem chamadas à API real. (Anterior:
+Última validação em **2026-10-21**, sessão remota Linux, depois de juntar o
+`main` ao ramo do teste de candidatos: `.venv/bin/python -m unittest discover -s tests` —
+**248 testes, todos passaram (`OK`)**, sem chamadas à API real. (Anterior:
+2026-10-19, Python 3.11.17, 232 testes OK;
 2026-10-15, Python 3.12.4 no ambiente virtual (macOS), 190 testes OK;
 2026-09-20, Python 3.13.1 no Windows, 68 testes OK.)
 

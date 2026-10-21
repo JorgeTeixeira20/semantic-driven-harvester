@@ -199,24 +199,30 @@ execução.
 
 ## Fase 1 do corpus do Caminho A (descoberta via TextSearch)
 
-Para correr a Fase 1 do protocolo de queries decidido em
-`docs/experiments.md` ("Protocolo de queries para o corpus do Caminho A",
-Opção 2 — Moderada: 13 termos, 2 repetições por termo):
+Para correr a Fase 1 ano a ano (decisões de âmbito de 2026-10-19 em
+`docs/experiments.md`: 108 termos — 39 modalidades, 57 clubes, 5 atletas,
+7 competições —, um intervalo por ano de 1999 a 2026 com datas de 14
+dígitos, 1 repetição, paragem só em página vazia):
 
 ```bash
 python -m semantic_harvester.corpus_phase1
 ```
 
-Os JSON raw são guardados em `data/raw/corpus_queries/`; os resultados
-(estatísticas por termo, capturas agregadas/deduplicadas por
-`(originalURL, tstamp)` e o resumo com `N`) ficam em
-`output/corpus_phase1_per_term.csv`, `output/corpus_phase1_captures.csv` e
-`output/corpus_phase1_aggregation.md`. Este comando faz cerca de 26 pedidos
-reais (mais offset condicional se alguma página vier cheia) e pode demorar
-vários minutos; tem novas tentativas automáticas para timeouts/erros 500
-pontuais da API. **Não avança para a Fase 2 (`version_history`)** — essa
-etapa exige confirmação explícita do valor de `N` (ver
-`docs/experiments.md`).
+Os JSON raw são guardados em `data/raw/corpus_queries/por_ano/` (o ano
+entra no nome de cada ficheiro); os resultados (estatísticas por termo e ano,
+capturas agregadas/deduplicadas por `(originalURL, tstamp)` e o resumo com
+`N` e a distribuição por ano) ficam em
+`output/corpus_phase1_por_ano_per_term.csv`,
+`output/corpus_phase1_por_ano_captures.csv` e
+`output/corpus_phase1_por_ano_aggregation.md`. As execuções anteriores — a
+original (13 termos, 2015–2020, que deu o corpus atual de 125 artigos, em
+`data/raw/corpus_queries/` e `output/corpus_phase1_*`) e a alargada (108
+termos num só intervalo, `.../alargada/` e `output/corpus_phase1_alargada_*`)
+— não são reescritas; a Fase 2 e a classificação continuam a ler a original
+por omissão. O comando faz no máximo 18 144 pedidos (108 termos × 28 anos ×
+até 6 páginas) e retoma a partir do raw já gravado se for interrompido.
+**Não avança para a Fase 2 (`version_history`)** — essa etapa exige
+confirmação explícita do valor de `N` (ver `docs/experiments.md`).
 
 ## Fase 2 do corpus do Caminho A (profundidade temporal via version_history)
 
@@ -241,6 +247,21 @@ o comando outra vez retoma automaticamente a partir dos artigos ainda não
 presentes em `output/corpus_phase2_history.csv`. Não descarrega textos nem
 gera RDF — isso fica para depois da classificação Artigo/redirecionamento
 (ver `docs/experiments.md`).
+
+Para a Fase 1 ano a ano (corrigir antes a agregação a partir do raw, com
+`originalURL` normalizado, e depois correr a Fase 2 separada da original):
+
+```bash
+python -m semantic_harvester.corpus_phase1 --rebuild-offline
+nohup python -m semantic_harvester.corpus_phase2 \
+    --captures-csv output/corpus_phase1_por_ano_captures.csv --label por_ano \
+    > output/phase2.log 2>&1 &
+```
+
+Com `--label por_ano`, os resultados ficam em
+`output/corpus_phase2_por_ano_{history.csv,summary.md,progress.log}` e o raw
+em `data/raw/phase2_por_ano/version_history/`, sem tocar na Fase 2 original
+nem no raw do corpus de 125 artigos. É retomável por artigo.
 
 ## Classificação Artigo/redirecionamento (passo 6 do Caminho A)
 

@@ -16,10 +16,18 @@ Escreve o resultado por artigo incrementalmente em
 `output/corpus_phase2_history.csv` (uma linha por pedido concluído, com
 flush imediato) para não perder progresso se a execução for interrompida;
 uma nova execução salta automaticamente os artigos já presentes nesse CSV.
+
+Com `--label` (ex.: `por_ano`, sobre `output/corpus_phase1_por_ano_captures.csv`,
+2026-10-20), a execução fica separada da original: resultados em
+`output/corpus_phase2_<label>_{history.csv,summary.md,progress.log}` e raw de
+`version_history` em `data/raw/phase2_<label>/version_history/`. Assim não
+reescreve o raw de `data/raw/version_history/`, de que depende a
+reconstrução offline do corpus de 125 artigos (`corpus_rdf.py`).
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 import logging
 import time
@@ -36,6 +44,11 @@ LOGGER = logging.getLogger(__name__)
 
 RETRY_ATTEMPTS = 3
 RETRY_SLEEP_SECONDS = 10.0
+# 429 Too Many Requests: o serviço pede para abrandar. Espera-se (o
+# `Retry-After` indicado, ou 60 s) e tenta-se outra vez sem gastar as
+# tentativas acima, até este número de esperas por artigo (2026-10-20).
+RATE_LIMIT_DEFAULT_WAIT_SECONDS = 60.0
+RATE_LIMIT_MAX_WAITS = 20
 PROGRESS_EVERY = 10
 
 RESULTS_CSV_FIELDS = (
@@ -91,15 +104,37 @@ def load_already_processed(results_csv: Path) -> dict[str, ArticleHistoryResult]
     return processed
 
 
+def rate_limit_wait(exc: Exception) -> float | None:
+    """Segundos a esperar se `exc` for um 429; `None` para qualquer outro erro."""
+
+    response = getattr(exc, "response", None)
+    if not isinstance(exc, requests.HTTPError) or response is None or response.status_code != 429:
+        return None
+    try:
+        return max(float(response.headers.get("Retry-After", "")), 1.0)
+    except ValueError:
+        return RATE_LIMIT_DEFAULT_WAIT_SECONDS
+
+
 def _collect_with_retries(
     client: ArquivoClient, original_url: str
 ) -> tuple[list[dict[str, Any]], list[Path], int | None]:
-    last_exc: Exception | None = None
-    for attempt in range(1, RETRY_ATTEMPTS + 1):
+    attempt = 0
+    waits = 0
+    while True:
         try:
             return collect_all_captures(client, original_url=original_url)
         except (requests.RequestException, RuntimeError) as exc:
-            last_exc = exc
+            wait = rate_limit_wait(exc)
+            if wait is not None and waits < RATE_LIMIT_MAX_WAITS:
+                waits += 1
+                LOGGER.warning(
+                    "429 em %s: a esperar %.0fs antes de repetir (espera %d/%d).",
+                    original_url, wait, waits, RATE_LIMIT_MAX_WAITS,
+                )
+                time.sleep(wait)
+                continue
+            attempt += 1
             LOGGER.warning(
                 "Falha em %s (tentativa %d/%d): %s",
                 original_url,
@@ -107,14 +142,16 @@ def _collect_with_retries(
                 RETRY_ATTEMPTS,
                 exc,
             )
-            if attempt < RETRY_ATTEMPTS:
-                time.sleep(RETRY_SLEEP_SECONDS)
-    assert last_exc is not None
-    raise last_exc
+            if attempt >= RETRY_ATTEMPTS:
+                raise
+            time.sleep(RETRY_SLEEP_SECONDS)
 
 
 def write_summary_markdown(
-    results: list[ArticleHistoryResult], path: Path
+    results: list[ArticleHistoryResult],
+    path: Path,
+    captures_name: str = "corpus_phase1_captures.csv",
+    history_name: str = "corpus_phase2_history.csv",
 ) -> None:
     successes = [r for r in results if r.error is None]
     failures = [r for r in results if r.error is not None]
@@ -128,7 +165,7 @@ def write_summary_markdown(
     lines = [
         "# Fase 2 — profundidade temporal via version_history\n",
         f"Execução real sobre os {len(results)} artigos únicos descobertos na "
-        "Fase 1 (`output/corpus_phase1_captures.csv`). Sem restrição de "
+        f"Fase 1 (`output/{captures_name}`). Sem restrição de "
         "datas por artigo (como o M3); paginação por offset só quando a "
         "página anterior veio cheia; `estimated_nr_results` não é usado "
         "como condição de paragem (correção de 2026-09-18).\n",
@@ -161,17 +198,33 @@ def write_summary_markdown(
 
     lines.append(
         "\nEstes valores são o resultado real desta execução, não uma "
-        "estimativa. Detalhe por artigo em `output/corpus_phase2_history.csv`."
+        f"estimativa. Detalhe por artigo em `output/{history_name}`."
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def phase2_paths(root: Path, label: str | None) -> dict[str, Path]:
+    """Caminhos de uma execução; sem `label`, os da Fase 2 original."""
+
+    stem = f"corpus_phase2_{label}" if label else "corpus_phase2"
+    return {
+        "history": root / "output" / f"{stem}_history.csv",
+        "summary": root / "output" / f"{stem}_summary.md",
+        "progress": root / "output" / f"{stem}_progress.log",
+        "data_dir": root / "data" / "raw" / (f"phase2_{label}" if label else ""),
+    }
+
+
 def run_phase2(
-    project_root: Path | None = None, captures_csv: Path | None = None
+    project_root: Path | None = None,
+    captures_csv: Path | None = None,
+    label: str | None = None,
+    client: ArquivoClient | None = None,
 ) -> list[ArticleHistoryResult]:
     root = project_root or Path(__file__).resolve().parents[2]
     captures_csv = captures_csv or root / "output" / "corpus_phase1_captures.csv"
-    results_csv = root / "output" / "corpus_phase2_history.csv"
+    paths = phase2_paths(root, label)
+    results_csv = paths["history"]
 
     urls = load_unique_urls(captures_csv)
     already = load_already_processed(results_csv)
@@ -185,13 +238,13 @@ def run_phase2(
         len(pending),
     )
 
-    client = ArquivoClient(data_dir=root / "data" / "raw", timeout=(15.0, 120.0))
+    client = client or ArquivoClient(data_dir=paths["data_dir"], timeout=(15.0, 120.0))
     results: list[ArticleHistoryResult] = list(already.values())
 
     write_header = not results_csv.is_file()
     results_csv.parent.mkdir(parents=True, exist_ok=True)
     with results_csv.open("a", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(RESULTS_CSV_FIELDS))
+        writer = csv.DictWriter(handle, fieldnames=list(RESULTS_CSV_FIELDS), lineterminator="\n")
         if write_header:
             writer.writeheader()
 
@@ -237,25 +290,31 @@ def run_phase2(
                     failures_so_far,
                 )
 
-    write_summary_markdown(results, root / "output" / "corpus_phase2_summary.md")
+    write_summary_markdown(results, paths["summary"], captures_csv.name, paths["history"].name)
     return results
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="python -m semantic_harvester.corpus_phase2")
+    parser.add_argument("--captures-csv", type=Path,
+                        help="CSV de capturas da Fase 1 (por omissão, o da Fase 1 original)")
+    parser.add_argument("--label",
+                        help="separa a execução: output/corpus_phase2_<label>_* e "
+                             "data/raw/phase2_<label>/")
+    args = parser.parse_args(argv)
+    root = Path(__file__).resolve().parents[2]
+    paths = phase2_paths(root, args.label)
+    paths["progress"].parent.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s: %(message)s",
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler(
-                Path(__file__).resolve().parents[2] / "output" / "corpus_phase2_progress.log",
-                mode="a",
-                encoding="utf-8",
-            ),
+            logging.FileHandler(paths["progress"], mode="a", encoding="utf-8"),
         ],
     )
     try:
-        results = run_phase2()
+        results = run_phase2(root, args.captures_csv, args.label)
     except (requests.RequestException, RuntimeError, OSError, ValueError) as exc:
         LOGGER.error("A Fase 2 falhou: %s", exc)
         return 1
@@ -265,10 +324,7 @@ def main() -> int:
     print(f"Artigos processados: {len(results)}")
     print(f"Sucessos: {len(successes)}, falhas: {len(failures)}")
     print(f"Total de capturas: {sum(r.captures for r in successes)}")
-    print(
-        "Relatórios: output/corpus_phase2_history.csv, "
-        "output/corpus_phase2_summary.md"
-    )
+    print(f"Relatórios: {paths['history']}, {paths['summary']}")
     return 0
 
 

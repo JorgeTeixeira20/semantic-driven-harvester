@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -69,6 +70,30 @@ class HtmlDownloadResult:
     error: str | None = None
 
 
+# 429 Too Many Requests nos downloads de texto e HTML (2026-10-20,
+# docs/experiments.md): esperar o `Retry-After` (ou 60 s) e repetir, até este
+# número de esperas por pedido; só depois conta como falha.
+RATE_LIMIT_DEFAULT_WAIT_SECONDS = 60.0
+RATE_LIMIT_MAX_WAITS = 20
+# Erro de ligação (inclui "connection reset by peer") nos mesmos downloads:
+# na execução de 2026-10-20 o serviço passou a recusar ligações ao fim de
+# ~13 h e cada pedido falhava de imediato. Com `connection_error_max_waits`
+# (desligado por omissão, para não mudar `corpus_text_retry`, que tem a sua
+# própria retentativa), espera-se e repete-se até esse número de vezes por
+# pedido, para a recolha pausar em vez de gerar falhas.
+CONNECTION_ERROR_WAIT_SECONDS = 60.0
+CONNECTION_ERROR_MAX_WAITS = 10
+
+
+def retry_after_seconds(response: Any) -> float:
+    """Espera indicada por uma resposta 429 (`Retry-After` em segundos, ou 60 s)."""
+
+    try:
+        return max(float(response.headers.get("Retry-After", "")), 1.0)
+    except (AttributeError, TypeError, ValueError):
+        return RATE_LIMIT_DEFAULT_WAIT_SECONDS
+
+
 class ArquivoClient:
     """Pesquisa capturas e descarrega o respetivo texto extraído."""
 
@@ -79,8 +104,10 @@ class ArquivoClient:
         data_dir: Path | str = Path("data/raw"),
         timeout: tuple[float, float] = (10.0, 30.0),
         session: requests.Session | None = None,
+        connection_error_max_waits: int = 0,
     ) -> None:
         self.data_dir = Path(data_dir)
+        self.connection_error_max_waits = connection_error_max_waits
         self.searches_dir = self.data_dir / "searches"
         self.texts_dir = self.data_dir / "texts"
         self.html_dir = self.data_dir / "original_html"
@@ -254,7 +281,7 @@ class ArquivoClient:
             )
 
         try:
-            response = self.session.get(str(text_url), timeout=self.timeout)
+            response = self._get_respecting_rate_limit(str(text_url))
             response.raise_for_status()
             destination.write_bytes(response.content)
         except (requests.RequestException, OSError) as exc:
@@ -275,6 +302,37 @@ class ArquivoClient:
             downloaded=True,
             text_url=str(text_url),
         )
+
+    def _get_respecting_rate_limit(self, url: str) -> Any:
+        """GET que, num 429, espera o `Retry-After` e repete (até `RATE_LIMIT_MAX_WAITS`);
+        num erro de ligação, espera `CONNECTION_ERROR_WAIT_SECONDS` e repete (até
+        `self.connection_error_max_waits`, 0 por omissão), depois deixa o erro seguir.
+
+        Devolve a última resposta; se continuar a ser 429 depois das esperas,
+        o `raise_for_status()` do chamador regista-a como falha.
+        """
+
+        waits = 0
+        connection_waits = 0
+        while True:
+            try:
+                response = self.session.get(url, timeout=self.timeout)
+            except requests.ConnectionError as exc:
+                if connection_waits >= self.connection_error_max_waits:
+                    raise
+                connection_waits += 1
+                LOGGER.warning("Erro de ligação em %s (%s): a esperar %.0fs (espera %d/%d).",
+                               url, exc, CONNECTION_ERROR_WAIT_SECONDS, connection_waits,
+                               self.connection_error_max_waits)
+                time.sleep(CONNECTION_ERROR_WAIT_SECONDS)
+                continue
+            if getattr(response, "status_code", 200) != 429 or waits >= RATE_LIMIT_MAX_WAITS:
+                return response
+            waits += 1
+            wait = retry_after_seconds(response)
+            LOGGER.warning("429 em %s: a esperar %.0fs antes de repetir (espera %d/%d).",
+                           url, wait, waits, RATE_LIMIT_MAX_WAITS)
+            time.sleep(wait)
 
     def download_original_html(
         self,
@@ -312,7 +370,7 @@ class ArquivoClient:
             )
 
         try:
-            response = self.session.get(str(html_url), timeout=self.timeout)
+            response = self._get_respecting_rate_limit(str(html_url))
             response.raise_for_status()
             destination.write_bytes(response.content)
         except (requests.RequestException, OSError) as exc:

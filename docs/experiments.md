@@ -3268,6 +3268,267 @@ Testes: 2 novos em `tests/test_corpus_annotations_rdf.py` (a subclasse
 específica aparece no grafo; uma categoria desconhecida falha). Suite
 completa: **191 testes, todos a passar**. Nada foi corrido contra a API.
 
+## Corpo do artigo no HTML original do Record: alternativa às âncoras da c′? (2026-10-18)
+
+### Motivação
+
+A variante c′ (`article_body.py`) nunca vê o HTML: trabalha sobre o
+`linkToExtractedText` do Arquivo.pt, já aplanado, e delimita o corpo por
+âncoras literais (título repetido, depois o primeiro dos 14 marcadores de
+chrome). Pergunta: o HTML em bruto (`linkToOriginalFile`, URL `…id_/…`) tem
+uma marcação fiável só do corpo (`<article>`, `<div>` com classe/id estável,
+`itemprop="articleBody"` ou JSON-LD) que sirva de alternativa mais robusta?
+Nada foi mudado em `article_body.py`; esta secção só recolhe dados para a
+decisão.
+
+### 1. Prova de conceito: 7 capturas dos casos difíceis conhecidos
+
+Pedidas pelo `linkToOriginalFile` (7 pedidos, todos HTTP 200), guardadas em
+`data/raw/original_html/` (não versionado). Escolhidas para cobrir os casos
+já registados neste ficheiro: um artigo normal de 2017 (entrevista Daniel
+Ramos, `20171001032744`) e um de 2019 (Carlos Xistra, `20191102192301`); o
+artigo **Premium** sem corpo (crónica Boavista-Moreirense, `20171127045348`);
+os dois lados do **par 29**, página de jogo em direto reescrita
+(`20190429170841` e `20190430202203`); e duas páginas **AMP** (Jorge Jesus /
+Pini Zahavi, `20190228191520`; Nike Pegasus, `20190322194121`). Inspeção com
+o `html.parser` da biblioteca padrão (sem BeautifulSoup, que não está no
+ambiente).
+
+**Não há uma marcação única.** Nenhuma das 7 tem `itemprop="articleBody"`.
+Todas têm um bloco JSON-LD `NewsArticle`, mas sem `articleBody` (traz
+`headline`, `description`, `datePublished`, `keywords`, …). As tags
+`<article>` existem às dezenas, mas marcam os cartões de manchetes, não o
+corpo. O que existe é **um contentor diferente por template**, igual dentro
+de cada template:
+
+| Template | Contentor do corpo | Capturas |
+| --- | --- | --- |
+| site 2017 | `div.article-body` | normal 2017 |
+| site 2019 | `div.text_container` | normal 2019, direto (as duas) |
+| AMP (2019) | `div.bodybox` | Jorge Jesus, Nike |
+
+**Comparação com a c′** (Jaccard sobre conjuntos de palavras, texto do
+contentor vs. corpo da c′ sobre o texto extraído da mesma captura):
+
+| Captura | Palavras HTML / c′ | Jaccard | Observação |
+| --- | ---: | ---: | --- |
+| normal 2017 | 137 / 154 | 0,97 | a c′ só acrescenta título, lead e crédito da foto |
+| AMP Nike | 134 / 135 | 1,00 | idênticos |
+| direto, intervalo | 1594 / 1775 | 0,92 | a c′ inclui o formulário "Enviar o artigo…" e 4 manchetes de outras notícias |
+| direto, fim | 2191 / 2298 | 0,96 | a c′ inclui o formulário "Enviar o artigo…" |
+| **Premium 2017** | 0 / 113 | 0,00 | sem `div.article-body`; ver abaixo |
+| normal 2019 | 233 / — | — | captura da Camada 2: sem texto extraído |
+| AMP Jorge Jesus | 316 / — | — | captura da Camada 2: sem texto extraído |
+
+- **Premium: falso positivo real da c′.** No HTML, o `div.article-body` não
+  existe e aparece `div.article-premium` com o aviso "Esta notícia é
+  exclusiva para Assinantes Record Premium…": a página diz explicitamente que
+  não tem corpo. A c′ devolve `found=True` com 113 palavras — título, lead e
+  o texto do paywall —, tratando o aviso como corpo.
+- **Sinal estruturado de paywall, só em 2019.** O JSON-LD do template de
+  2019 declara `isAccessibleForFree` e `hasPart` com
+  `cssSelector: ".paywall"` (no artigo normal: `True`). Não existe em 2017 nem
+  nas AMP; nesta amostra não havia nenhum Premium de 2019 para ver o valor
+  `False`.
+- **Camada 2.** As duas capturas sem texto extraído têm, no HTML original, o
+  corpo completo (233 e 316 palavras).
+- O par 29 continua "texto alterado" pelo HTML: o relato é o conteúdo real
+  da página e difere entre as duas capturas.
+
+**Ressalva.** São 7 capturas escolhidas a dedo: prova de conceito, não
+medição do corpus. Não se sabe ainda quantos templates há no corpus, como é
+o site anterior (`interior.aspx`, `tn0cs.asp`) nem o Premium de 2019. O HTML
+tem 120–340 KB por captura e não está em cache: usá-lo exige descarregá-lo.
+
+### 2. Amostra alargada: 251 capturas (templates, Premium, Camada 2)
+
+251 pedidos ao `linkToOriginalFile`, todos HTTP 200, guardados em
+`data/raw/original_html/` com o resultado por captura em
+`data/raw/original_html/html_body_sample.csv` (nada disto é versionado; os
+scripts da verificação estão em `data/raw/original_html/_scripts/`). Três
+grupos, com sobreposição: **template** — 1 captura por artigo, a mais antiga
+com status 200 e texto em cache (125); **Camada 2** — todas as capturas com
+status 200 e sem texto extraído (113: as 110 da `2_sem_texto` e 3 "não
+avaliáveis"; as 31 de 301/302 e as 2 de 404 não têm corpo a recuperar);
+**`sem_corpo`** — as 18 em que a c′ não encontrou corpo.
+
+**Templates (1 por artigo, 125).** 109 têm um dos três contentores da prova
+de conceito: `article-body` 42 (2017–2018), `text_container` 39
+(2018–2019), `bodybox` 28 (AMP, 2017–2019). As 16 sem nenhum deles:
+5 Premium (`article-premium`), 8 páginas multimédia (vídeos e galerias,
+sem corpo de texto ou com uma descrição curta em `noticia_text`), 1 crónica
+de opinião (`article-opiniao-content`, quarto template), 1 AMP antiga de
+2017 (`div.mainBox`, quinto template) e 1 página `jogos-em-direto/live`.
+Nenhum template novo em notícias normais fora destes.
+
+**Concordância com a c′** (template com contentor e c′ com corpo, sem
+Premium: 98 capturas). Jaccard mediano 0,893 (mínimo 0,237); 34 com
+≥ 0,95 e 37 abaixo de 0,8. Por contentor: `article-body` mediana 0,953
+(40), `bodybox` 0,875 (26), `text_container` 0,728 (32). Os 37 casos abaixo
+de 0,8 dividem-se assim:
+
+- 25 com **texto a mais na c′** (`text_container` 23, `article-body` 2): nas
+  notícias de 2018–2019 as palavras só da c′ são o chrome do template — o
+  formulário "O meu email / Destinatários / Enviar", o aviso de login, "Deixe
+  o seu comentário", "Temas" —, que em notícias curtas puxa o Jaccard para
+  baixo; nas fotogalerias, a lista "Mais Fotogalerias", que não é um dos 14
+  marcadores. Aqui o HTML é mais limpo.
+- 12 com **chrome dentro do contentor HTML** (todos `bodybox`): em algumas
+  versões AMP o `div.bodybox` engloba "O Record recomenda para si" e
+  "Últimas Notícias"; a c′ corta bem nesses marcadores. Aqui o HTML é pior.
+
+21 páginas têm dois `div.text_container`; em todas o segundo está aninhado no
+primeiro e tem o mesmo texto, por isso ler o primeiro basta.
+
+**Premium.** Dois sinais estruturais, um por geração do site:
+`div.article-premium` (2017–2018) e `div.container_assinatura` (2018–2020,
+com `premiumBox_header` e o teaser em `p.fadeoutPremium`). Juntos marcam 26
+capturas de 12 artigos, exatamente as 26 em que o HTML tem o aviso "exclusiva
+para assinantes" — nenhuma página com sinal sem aviso, nenhuma com aviso sem
+sinal. **O JSON-LD não generaliza:** `isAccessibleForFree` só existe a partir
+de 2019 e marca 5 das 26 (`False` nas 5; `True` em 9 gratuitas); 3 Premium de
+2018–2019 com `container_assinatura` não o têm. **Premium de 2019 encontrado:**
+"Yony González é reforço para o Benfica" (`20191114000138`), com
+`isAccessibleForFree: False` e `hasPart` `{cssSelector: ".paywall",
+isAccessibleForFree: False}`; o `div.text_container.paywall` só tem o teaser
+(32 palavras). A c′ deu `found=True` em 11 das 13 capturas Premium com texto em
+cache — o mesmo falso positivo da prova de conceito, também em 2019. Um artigo
+(Zivkovic/Drulo) tem 6 de 8 capturas Premium e 2 não (páginas sem o artigo).
+
+**Camada 2 (113 capturas, 46 artigos).** O HTML original recupera o corpo
+em **55 capturas de 33 artigos** (`article-body` 33, `bodybox` 11,
+`text_container` 6, `article-opiniao-content` 5; mediana 222 palavras,
+mínimo 43); 2 desses 33 artigos não tinham nenhuma captura com corpo
+comparável. As restantes 58: 12 Premium (sem corpo, com sinal explícito),
+29 multimédia só com descrição curta (`noticia_text`, 2 artigos), 16
+multimédia sem texto (vídeo/galeria, 4 artigos) e 1 `jogos-em-direto/live`.
+
+**`sem_corpo` da c′ (18).** O HTML encontra corpo em 2: a AMP de 2017
+(`mainBox`, 347 palavras, onde a c′ não localiza o título) e uma notícia de
+2019 (`text_container`, 326 palavras). Nas outras 16 os dois métodos
+concordam que não há corpo: 8 `jogos-em-direto/live`, 3 multimédia sem
+texto, 2 Premium e 3 páginas sem o artigo (só menu e "O Record recomenda para
+si").
+
+**Achado lateral: texto extraído de outra captura.** Em 2 das 136 capturas
+com texto em cache e HTML, mais de 10% das palavras do texto em cache não
+existem em lado nenhum do HTML da mesma captura (27% e 11%). No caso
+verificado (Yuri Ribeiro, `20180717172856`), o HTML (`Memento-Datetime`
+exatamente 17:28:56, sem redirecionamento) é a versão "(em atualização)",
+mas o ficheiro em cache — descarregado a 18 set — é byte a byte igual ao
+texto da captura seguinte (`20180717181217`, `digest` diferente). O mesmo
+pedido ao `textextracted`, feito agora, devolve a versão curta, coerente com
+o HTML. A causa não foi apurada; fica registado que o `textextracted` pode,
+pelo menos às vezes, ter devolvido o texto de uma captura vizinha.
+
+### 3. Leitura (sem decisão)
+
+- **A favor do HTML:** deteta o Premium sem ambiguidade em todas as gerações
+  vistas (a c′ não); dá corpo sem o chrome do template de 2018–2019; recupera
+  corpo em 55 capturas da Camada 2 e em 2 `sem_corpo`; não depende de o título
+  se repetir nem da lista de marcadores.
+- **Contra ou por resolver:** precisa de um seletor por template (5 vistos,
+  mais os de multimédia); o `bodybox` de algumas AMP traz chrome e
+  precisaria dos marcadores da c′ para cortar; exige descarregar o HTML de
+  cada captura (cerca de 120–340 KB, contra o texto já em cache).
+- A recuperação da Camada 2 e a deteção do Premium valem por si,
+  independentemente de qual for o método principal.
+- Os números são desta amostra (251 capturas, 125 artigos, 2017–2020 pela
+  captura mais antiga); o site anterior a 2017 não está representado.
+
+## Descoberta de artigos: limite da TextSearch e páginas de secção (2026-10-19)
+
+### Motivação
+
+Antes de decidir como alargar a descoberta de artigos (por exemplo, divisão
+recursiva de datas ou descoberta pelas páginas de secção), duas perguntas de
+facto: (1) a TextSearch trava perto de 2000 resultados por pesquisa?
+(2) com que frequência estão arquivadas as páginas de secção por modalidade,
+e quanto do que publicam é visível nas capturas? Pedidos reais à API; nada
+mudou no código de produção nem no corpus. JSON e HTML em bruto em
+`data/raw/api_diagnostics/limite_2026-10-19/` e
+`data/raw/api_diagnostics/seccoes_2026-10-19/`; scripts e logs em
+`data/raw/api_diagnostics/_scripts_2026-10-19/` (não versionados).
+
+### 1. Limite de resultados da TextSearch: não há travão perto de 2000
+
+Pesquisas `q=futebol` e `q=Benfica`, `siteSearch=record.pt`, `maxItems=500`,
+sem datas e com `from=19990101000000&to=20261231235959`. Paginação por
+`offset`, de 500 em 500, seguindo a convenção do próprio `next_page`.
+
+- **Tamanho real da página.** A API normaliza `maxItems` para 500 e aplica por
+  omissão `dedupField=url`, `dedupValue=2` (até 2 capturas por URL): uma
+  página traz cerca de 500 URLs distintos mas 550–800 itens (ex.: 718 itens,
+  497 URLs na primeira página de "futebol"). "Página incompleta" mede-se,
+  portanto, em URLs, não em itens.
+- **Paginação contínua até `offset=20000`** (teto de segurança do script) nas
+  quatro combinações, sempre com cerca de 500 URLs novos por página e zero
+  repetidos das páginas anteriores: 20 324 URLs únicos para "futebol" e
+  20 461 para "Benfica", iguais com e sem datas.
+- **Fim real, por sondagens e bisseção com passo de 500:**
+
+| Termo | Última página com dados | Primeira página vazia | `estimated_nr_results` |
+| --- | --- | --- | ---: |
+| futebol | `offset=826000` (436 URLs) | `offset=826500` | 2 613 366 |
+| Benfica | `offset=810000` (143 URLs) | `offset=810500` | 2 460 613 |
+
+  A mesma fronteira com e sem o intervalo de datas. Isto dá cerca de 826 mil
+  e 810 mil URLs alcançáveis — cerca de um terço do `estimated_nr_results`.
+  Nas sondagens de `offset` 50 000, 100 000, 200 000 e 500 000 os resultados
+  continuam a ser todos do `record.pt` e nenhum repete os de 0–20 000; em
+  `offset=500000` aparecem já capturas de 2001–2007. Ressalva: entre 20 000
+  e o fim só foram pedidos os offsets da bisseção; o total assume que não
+  há páginas vazias pelo meio.
+- **`next_page` não marca o fim:** continua presente em páginas vazias (até
+  `offset=2600000`, o mais alto pedido). O sinal fiável foi página com menos
+  de 500 URLs seguida de página vazia.
+
+### 2. Páginas de secção por modalidade: andebol, judo, natação
+
+URLs confirmados: `https://www.record.pt/modalidades/andebol`, `.../judo`,
+`.../natacao` (secções presentes nos URLs dos artigos do corpus). O
+`versionHistory` (pedido com `maxItems=500`, aceite) devolve juntas as
+variantes com e sem barra final, com `//` e com `http://`; paginado até ao
+fim.
+
+| Secção | Capturas | Mais antiga | Mais recente | Por ano |
+| --- | ---: | --- | --- | --- |
+| andebol | 919 | 2018-08-06 | 2025-12-23 | 2018: 386 · 2019: 383 · 2020: 134 · 2021: 3 · 2022: 3 · 2023: 2 · 2024: 1 · 2025: 7 |
+| judo | 919 | 2018-08-06 | 2025-12-19 | igual ao andebol |
+| natação | 918 | 2018-08-06 | 2025-12-19 | 2018: 385 · 2019: 383 · 2020: 134 · 2021: 3 · 2022: 3 · 2023: 3 · 2024: 1 · 2025: 6 |
+
+- **Espaçamento.** Intervalo mediano entre capturas consecutivas de 0,98 dias
+  (Q1 0,08, Q3 1,00) nas três: praticamente diário de agosto de 2018 a meados
+  de 2020, por vezes várias por dia. Depois, 12–13 intervalos acima de 30
+  dias, o maior de 582 dias (2024-01-28 → 2025-09-01).
+- **Mesmo calendário nas três secções:** 650 dos 651 dias com captura de
+  andebol têm também captura de judo, com `tstamp` desfasados de minutos —
+  são recolhas do site inteiro, não da secção. A mais antiga (2018-08-06)
+  coincide com o início do feed RSS (ver "Alcance temporal do `record.pt`").
+  Antes disso não há nada para estes URLs.
+- `statusCode` 200 em 904–906 capturas por secção; 12–13 de 302 e 1–2 de 404.
+
+**Artigos listados (andebol).** Links `…/detalhe/…` extraídos do HTML
+original de capturas escolhidas:
+
+- Cada captura lista 24–28 artigos de andebol (59–75 links `/detalhe/` no
+  total da página).
+- Capturas vizinhas: 2018-08-06 → 2018-08-07, 0 artigos de andebol novos
+  (26 de 26 em comum); 2019-03-15 → 2019-03-16, 2 novos (25 em comum).
+- Capturas afastadas (221 dias, 360 dias, cerca de 5 anos): 0 artigos de
+  andebol em comum.
+- **22 dias seguidos** (uma captura por dia, 2019-03-15 a 2019-04-05): 67
+  artigos de andebol distintos, 1,9 novos por dia em média (máximo 5). Os 16
+  artigos que entraram e saíram dentro da janela ficaram listados 10–15 dias
+  (mediana 12); por a janela ter só 22 dias, a medida tende a subestimar a
+  permanência.
+
+**Leitura (sem decisão).** Em 2018–2020, com captura quase diária e cada
+artigo listado cerca de 12 dias, as capturas de uma secção cobrem
+praticamente tudo o que ela publicou; fora dessa janela (1–7 capturas por
+ano) quase tudo escapa. A TextSearch, por seu lado, não trava em 2000: o
+alcance é da ordem de centenas de milhares de URLs por termo genérico.
+
 ## Alcance real da pesquisa por palavra-chave e das páginas de secção (2026-10-19)
 
 **Execução real, numa sessão local com acesso à API** (este ambiente remoto
@@ -3362,8 +3623,8 @@ e B.
 ### Prova de conceito (7 capturas)
 
 Amostra deliberada: a crónica Premium (Boavista–Moreirense), as duas
-páginas do "par 29" (FC Porto–Chelsea, direto), 2 páginas AMP (Nike
-Pegasus) e 2 artigos normais (2017 e 2019); os 7 pedidos devolveram 200.
+páginas do "par 29" (FC Porto–Chelsea, direto), 2 páginas AMP (Jorge
+Jesus/Pini Zahavi e Nike Pegasus) e 2 artigos normais (2017 e 2019); os 7 pedidos devolveram 200.
 
 - Nenhuma tem `itemprop="articleBody"`; há JSON-LD em todas, mas sem a
   propriedade `articleBody` (só `headline`, `datePublished`, `keywords`).
@@ -3377,7 +3638,7 @@ Pegasus) e 2 artigos normais (2017 e 2019); os 7 pedidos devolveram 200.
 - Na página AMP, o Jaccard entre os dois métodos (heurística vs.
   contentor HTML) é 1,00.
 
-### Amostra maior (251 capturas, 125 artigos — uma captura por artigo)
+### Amostra maior (251 capturas: 1 por artigo nos 125 artigos, mais Camada 2 e `sem_corpo`)
 
 - **Templates**: 109 dos 125 artigos têm um dos três contentores já vistos
   (`article-body` em 42, `text_container` em 39, `bodybox`/AMP em 28). Os 16
@@ -3538,9 +3799,451 @@ endpoint diferente (histórico de um único URL, não pesquisa por palavra-
 chave em grande volume); não há evidência própria de que o mesmo problema
 ocorra ali.
 
-Teste de regressão novo em `tests/test_corpus_phase1.py`
-(`test_incomplete_nonempty_page_does_not_stop_the_pagination`). Suite
-completa: **203 testes, todos a passar.**
+Teste de regressão em `tests/test_corpus_phase1.py` (no `main`, a mesma
+regra ficou em `collect_term_year()`, testada por
+`test_incomplete_page_does_not_stop_only_an_empty_page_does`).
+
+## Fase 1 alargada: lista final de 108 termos (implementada; 2026-10-19)
+
+### Decisão
+
+A Fase 1 deixa de ser a "Opção 2 — Moderada" (13 termos, explicitamente uma
+amostra pequena) e passa a uma **decisão de âmbito explícita e muito mais
+ampla**: as facetas de modalidade, clube e competição enumeram os valores
+reais encontrados nos URLs do `record.pt`, e não uma lista escolhida à mão.
+Origem: a enumeração de 2026-10-19 com `themes_from_url()` (309 348
+`originalURL` únicos; tabelas e raw em
+`data/raw/api_diagnostics/enumeracao_2026-10-19/`). Decisões do autor sobre
+os casos ambíguos:
+
+- **39 modalidades.** Excluídas `outras`, `record-pela-patagonia` e
+  `aventura-em-mocambique` (secções editoriais, não modalidades).
+- **57 clubes.** `ac-viseu`/`ac--viseu` fundidos em "Académico de Viseu";
+  `belenenses-sad`/`b-sad` fundidos em "Belenenses SAD"; `campeao` excluído
+  (não é clube); as equipas B entram por terem ≥ 20 URLs na enumeração, não
+  por pedido explícito.
+- **7 competições:** as 6 já usadas e "Liga NOS", que cobre por completo os
+  valores reais da categoria.
+- **5 atletas, sem alterações:** é uma faceta de descoberta, não vocabulário
+  de entidades (decisão do Caminho B sobre circularidade); não se alarga.
+
+Total: **108 termos**, sem duplicados nem colisões de slug.
+
+### Implementação
+
+`corpus_phase1.py`: novas listas, docstring do módulo e um `RUN_LABEL =
+"alargada"` que separa esta execução da original. Sem ele, o raw da nova
+execução reescreveria os 26 ficheiros da Fase 1 original em
+`data/raw/corpus_queries/` (não versionados: perda irreversível), e os
+relatórios reescreveriam `output/corpus_phase1_*`, que a Fase 2 e a
+classificação leem por omissão. A execução alargada escreve em
+`data/raw/corpus_queries/alargada/` e `output/corpus_phase1_alargada_*`; a
+original, que deu o corpus de 125 artigos, fica intacta e continua a ser a
+entrada por omissão da Fase 2 até o `N` ser confirmado.
+
+Mantêm-se os restantes parâmetros: `maxItems=50`, `dedupValue=1`, 2
+repetições, no máximo 6 páginas (300 URLs) por termo/repetição e paragem na
+primeira página com menos de 50 resultados. Dois pontos já observados que
+afetam o `N` e ficam em aberto: o teto de 6 páginas limita cada termo a 300
+URLs por repetição; e, na enumeração de 2026-10-19 (com `maxItems=500`),
+houve páginas a meio da paginação com 490–499 URLs únicos seguidas de
+páginas cheias, pelo que uma página com menos de `maxItems` nem sempre é o
+fim.
+
+Testes offline (`test_corpus_phase1.py`): totais por faceta (39/57/5/7, 108),
+sem duplicados nem colisões de slug, casos ambíguos conforme a decisão,
+atletas inalterados. Suite completa: 206 testes OK.
+
+### Resultado da execução real (2026-10-19)
+
+`python -m semantic_harvester.corpus_phase1`, 108 termos × 2 repetições,
+`from=1999`/`to=2026`. 1 280 pedidos, todos com resposta (2 timeouts
+recuperados na segunda tentativa). Raw em `data/raw/corpus_queries/alargada/`
+(1 280 ficheiros, não versionados); relatórios em
+`output/corpus_phase1_alargada_{per_term.csv,captures.csv,aggregation.md}`.
+A Fase 1 original ficou intacta (checksum SHA-256 dos seus 26 ficheiros de
+raw e 3 relatórios igual antes e depois).
+
+- Itens brutos: 63 972; capturas únicas por `(originalURL, tstamp)`:
+  30 242; **N (artigos únicos por `originalURL`): 28 782**. Divergências de
+  metadados para a mesma captura: 1 445.
+
+| Faceta | Termos | Pedidos | Itens | Capturas | Artigos | Só por esta faceta | Termo/rep. no teto de 6 páginas |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| modalidade | 39 | 454 | 22 688 | 10 860 | 10 503 | 10 089 | 70 de 78 |
+| clube | 57 | 682 | 34 084 | 16 118 | 15 313 | 14 905 | 112 de 114 |
+| atleta | 5 | 60 | 3 000 | 1 496 | 1 486 | 1 358 | 10 de 10 |
+| competição | 7 | 84 | 4 200 | 2 097 | 2 052 | 1 876 | 14 de 14 |
+
+- **O `N` é limitado pelo teto, não pelo conteúdo.** 206 das 216
+  combinações termo/repetição pararam no limite de 6 páginas (300
+  resultados). Só 3 termos terminaram antes, nas duas repetições: "pólo
+  aquático" (98), "esgrima" (148) e "Lank Vilaverdense" (242). A
+  sobreposição entre facetas é pequena (a maioria dos artigos só aparece por
+  uma faceta), pelo que o `N` cresce quase linearmente com o número de termos
+  × 300.
+- As duas repetições de cada termo devolveram o mesmo número de resultados
+  nos 108 termos. Nenhum termo deu 0 resultados; todos os URLs são do
+  `record.pt`.
+- **Distribuição temporal das capturas:** 1999–2010: 2 147; 2011–2015: 0;
+  2016: 1; 2017–2020: 22 908; 2021–2024: 5 186. Com o teto de 300 por termo e
+  a ordem da TextSearch (não cronológica), nenhuma captura de 2011–2015
+  entrou nesta descoberta.
+- O `N` conta `originalURL` distintos: variantes do mesmo artigo (esquema,
+  `?ref=`) ainda não estão juntas, e páginas que não são artigos ainda não
+  foram filtradas (isso é a classificação, depois da Fase 2).
+
+## Teste de blocos de data e recolha ano a ano na Fase 1 (2026-10-19)
+
+### Teste controlado: 2 termos × 3 blocos
+
+Motivação: na Fase 1 alargada (`from=1999`/`to=2026` num só intervalo), as
+capturas concentraram-se em 2017–2020, com 0 em 2011–2015. Teste com
+"Benfica" e "Vitória de Guimarães" (clubes; o segundo tinha batido no
+teto), mesmos parâmetros da Fase 1 (`maxItems=50`, `dedupValue=1`, até 6
+páginas), paragem só em página vazia, 1 repetição, em três blocos pedidos
+com o ano sozinho: 1999–2016, 2017–2020, 2021–2026. Raw, sondas e script em
+`data/raw/corpus_queries/teste_blocos_2026-10-19/` (não versionados).
+
+| Termo | Bloco | Páginas | Paragem | Resultados | Por ano |
+| --- | --- | ---: | --- | ---: | --- |
+| Benfica | 1999–2016 | 6 | teto | 300 | 2001: 1 · 2006: 2 · 2007: 144 · 2008: 146 · 2009: 7 |
+| Benfica | 2017–2020 | 6 | teto | 300 | 2017: 86 · 2018: 106 · 2019: 108 |
+| Benfica | 2021–2026 | 6 | teto | 300 | 2021: 58 · 2022: 86 · 2023: 106 · 2024: 50 |
+| V. Guimarães | 1999–2016 | 6 | teto | 300 | 1999: 1 · 2000: 4 · 2001: 45 · 2002: 18 · 2003: 1 · 2004: 13 · 2006: 27 · 2007: 88 · 2008: 65 · 2009: 37 · 2010: 1 |
+| V. Guimarães | 2017–2020 | 6 | teto | 300 | 2017: 95 · 2018: 54 · 2019: 151 |
+| V. Guimarães | 2021–2026 | 6 | teto | 300 | 2021: 87 · 2022: 88 · 2023: 70 · 2024: 55 |
+
+Na corrida sem blocos, os mesmos termos tinham 300 capturas cada:
+Benfica 2007–2009: 17, 2017–2019: 271, 2020: 12; V. Guimarães 2001: 1,
+2007: 3, 2017–2020: 213, 2021–2024: 83. Os blocos triplicam os resultados
+por termo e repartem-nos melhor, mas cada bloco bate no teto e, dentro de um
+bloco largo, os 300 resultados concentram-se em 2–3 anos (1999–2016:
+2007–2008 para Benfica).
+
+Sondas de uma página, com datas de 14 dígitos: 2011-01-01 a 2016-12-31 e
+2025-01-01 a 2026-12-31 deram **0 resultados** para os dois termos; 2020
+inteiro deu 50 (página cheia) para cada um. A Fase 1 original
+(`from=2015`/`to=2020`) também só tem capturas de 2017–2019. A lacuna de
+2011–2016 é, para estes termos, do índice da TextSearch para o `record.pt`,
+não do teto nem da divisão em blocos.
+
+### Erro de datas: um ano sozinho é o início desse ano
+
+A API lê `to=2020` como `20200000000000` (confirmado no
+`request_parameters` devolvido: `from=2017&to=2020` →
+`from=20170000000000`, `to=20200000000000`), excluindo o ano de 2020
+inteiro. Afetou a Fase 1 original (`to=2020`, por isso nunca teve 2020), a
+Fase 1 alargada (`to=2026`) e o bloco "2017–2020" do teste acima. Correção:
+todo o `from`/`to` passa a ser construído com 14 dígitos, `AAAA0101000000`
+a `AAAA1231235959` (`corpus_phase1.year_bounds`), o mesmo formato do
+`tstamp`. O `ArquivoClient` não muda: só serializa o que recebe.
+
+### Decisão: recolha ano a ano
+
+Como um bloco largo (18 anos) ainda concentra quase tudo em 2–3 anos, a
+Fase 1 passa a pedir cada termo **um ano de cada vez**, de 1999 a 2026 (28
+intervalos), com a paginação corrigida: paragem só na primeira página vazia
+(uma página com menos de 50 resultados não é o fim) ou no teto de 6
+páginas, agora por ano. `REPETITIONS` passa de 2 para 1 (decisão de âmbito
+do autor, pelo prazo; na corrida alargada as duas repetições deram sempre o
+mesmo número de resultados). Implementado em `corpus_phase1.py`:
+`collect_term_year()` substitui `collect_term_repetition()`; o ano entra no
+nome do raw (`<faceta>_<termo>_<ano>_rep1_offset-NNNN.json`), para não
+colidir entre anos; a execução retoma a partir do raw já gravado. Escreve
+em `data/raw/corpus_queries/por_ano/` e `output/corpus_phase1_por_ano_*`,
+sem tocar nas execuções original e alargada. Testes offline: datas de 14
+dígitos enviadas, página incompleta não pára e página vazia pára, teto de
+páginas, ano no nome do raw, retoma sem pedido; suite completa 211 testes
+OK.
+
+### Resultado da execução ano a ano (2026-10-19)
+
+`python -m semantic_harvester.corpus_phase1`: 108 termos × 28 anos, 1
+repetição. **10 613 pedidos** (1 falha pontual de rede, recuperada na
+segunda tentativa); 421 494 itens brutos; 269 719 capturas únicas por
+`(originalURL, tstamp)`; **N (artigos únicos por `originalURL`): 211 359**.
+Raw em `data/raw/corpus_queries/por_ano/` (10 613 ficheiros); relatórios em
+`output/corpus_phase1_por_ano_*` (não versionados). As execuções original e
+alargada ficaram intactas (checksum SHA-256 de 1 313 ficheiros igual antes e
+depois).
+
+| Ano | Pedidos | Resultados | Termos no teto (de 108) | Termos com 0 | Capturas únicas | Artigos (pelo ano da 1.ª captura) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1999 | 260 | 6 226 | 17 | 35 | 394 | 348 |
+| 2000 | 432 | 16 403 | 6 | 7 | 5 453 | 4 528 |
+| 2001 | 497 | 21 566 | 63 | 6 | 11 932 | 11 591 |
+| 2002 | 461 | 19 122 | 57 | 6 | 7 316 | 6 998 |
+| 2003 | 206 | 3 210 | 2 | 54 | 688 | 632 |
+| 2004 | 251 | 5 283 | 4 | 38 | 1 426 | 972 |
+| 2005 | 327 | 8 454 | 5 | 10 | 1 337 | 608 |
+| 2006 | 499 | 20 976 | 53 | 3 | 14 012 | 8 858 |
+| 2007 | 542 | 24 288 | 68 | 2 | 16 115 | 12 905 |
+| 2008 | 546 | 24 720 | 61 | 2 | 13 202 | 7 882 |
+| 2009 | 501 | 21 553 | 60 | 5 | 8 596 | 7 752 |
+| 2010 | 177 | 1 910 | 0 | 68 | 770 | 724 |
+| 2011 | 108 | 0 | 0 | 108 | 0 | 0 |
+| 2012 | 108 | 0 | 0 | 108 | 0 | 0 |
+| 2013 | 113 | 7 | 0 | 103 | 5 | 4 |
+| 2014 | 112 | 5 | 0 | 104 | 3 | 1 |
+| 2015 | 117 | 333 | 1 | 103 | 324 | 324 |
+| 2016 | 113 | 34 | 0 | 103 | 33 | 9 |
+| 2017 | 629 | 30 927 | 99 | 2 | 24 443 | 20 002 |
+| 2018 | 629 | 31 098 | 101 | 2 | 26 921 | 20 944 |
+| 2019 | 630 | 31 201 | 101 | 2 | 27 179 | 22 482 |
+| 2020 | 627 | 30 769 | 97 | 2 | 25 464 | 20 504 |
+| 2021 | 622 | 30 505 | 92 | 1 | 19 122 | 15 232 |
+| 2022 | 625 | 30 563 | 93 | 0 | 21 063 | 15 480 |
+| 2023 | 637 | 31 500 | 96 | 0 | 22 778 | 16 886 |
+| 2024 | 628 | 30 841 | 97 | 0 | 21 143 | 15 693 |
+| 2025 | 108 | 0 | 0 | 108 | 0 | 0 |
+| 2026 | 108 | 0 | 0 | 108 | 0 | 0 |
+
+| Faceta | Termos | Pedidos | Itens | Capturas | Artigos | Só por esta faceta | Termo-anos no teto | Termo-anos com 0 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| modalidade | 39 | 3 735 | 146 995 | 98 785 | 82 534 | 58 567 | 417 | 419 |
+| clube | 57 | 5 705 | 227 916 | 156 842 | 125 359 | 97 571 | 633 | 553 |
+| atleta | 5 | 447 | 16 490 | 16 188 | 15 143 | 8 519 | 44 | 54 |
+| competição | 7 | 726 | 30 093 | 29 401 | 26 316 | 13 382 | 79 | 64 |
+
+- **2011–2016 continua quase vazio** (365 capturas em 6 anos, 324 delas em
+  2015) e **2025–2026 vazio**, agora com intervalos de um ano inteiro e
+  datas de 14 dígitos: confirma, para os 108 termos, o que as sondas do
+  teste de blocos mostraram para 2 — é a cobertura do índice da TextSearch
+  para o `record.pt`, não um efeito da forma de pedir.
+- **O teto de 6 páginas continua a limitar**, agora por ano: 1 173 dos
+  3 024 pares termo/ano bateram nas 300 resultados, sobretudo em 2017–2024
+  (92–101 dos 108 termos por ano) e em 2001–2002 e 2006–2009 (53–68).
+- As 66 587 "divergências de metadados" do relatório agregado são, numa
+  amostra de 4 000 ficheiros de raw, quase todas no campo `snippet` (que
+  depende do termo pesquisado; 36 909 casos) e uma no `digest`: não são
+  divergências reais da captura.
+- O `N` conta `originalURL` distintos, ainda sem juntar variantes do mesmo
+  artigo nem filtrar páginas que não são artigos (isso é a classificação,
+  depois da Fase 2).
+
+## Fase 1 ano a ano: N com `originalURL` normalizado e Fase 2 separada (2026-10-20)
+
+### Agregação corrigida (sem pedidos à API)
+
+O N de 211 359 contava `originalURL` exatos, pelo que variantes cosméticas
+do mesmo artigo contavam como artigos diferentes. A agregação passa a usar a
+regra de "mesma página" já usada pela classificação e pelo RDF,
+`normalize_for_grouping()` (movida de `corpus_rdf.py` para
+`url_identity.py`, onde está o resto da regra; `corpus_rdf` continua a
+exportá-la): sem esquema, barras repetidas colapsadas, sem barra final, sem
+`ref`/`utm_*`/`act`/`est`; a restante query string mantém-se (no site
+antigo é o identificador do artigo). Cada grupo fica com um URL
+representativo: sem parâmetros de rastreio, depois sem `//`, depois
+`https`, depois o que tem mais capturas, depois a ordem alfabética. O CSV de
+capturas ganha a coluna `url_variants` (as outras formas reais).
+
+`python -m semantic_harvester.corpus_phase1 --rebuild-offline` refez os
+relatórios a partir dos 10 613 ficheiros de raw já em disco
+(`data/raw/corpus_queries/por_ano/`), sem rede; o CSV anterior ficou em
+`output/corpus_phase1_por_ano_captures.pre-normalizacao.csv`.
+
+- `originalURL` exatos: 211 359 → **N corrigido: 164 373** (46 986 variantes
+  juntadas: 44 330 só por parâmetros de rastreio, 2 605 por barras
+  duplas, 51 por rastreio e barra final). Capturas únicas: 269 718.
+- `www.record.pt` e `record.pt` não se juntam (o host é diferente), tal
+  como na classificação.
+- A divergência de metadados só se compara entre itens com o mesmo
+  `originalURL` real (entre variantes os campos com o URL diferem por
+  construção). As 66 587 que se mantêm são, como já registado, o `snippet`.
+
+### Fase 2 separada da original
+
+`corpus_phase2.py` ganha `--captures-csv` e `--label`. Com
+`--label por_ano`, os resultados vão para
+`output/corpus_phase2_por_ano_{history.csv,summary.md,progress.log}` e o raw
+de `version_history` para `data/raw/phase2_por_ano/version_history/` (não
+versionado). Sem isto, a nova execução escreveria no
+`output/corpus_phase2_history.csv` da Fase 2 original e reescreveria, para
+os URLs em comum, o raw de `data/raw/version_history/` de que depende a
+reconstrução offline do corpus de 125 artigos. Testes offline: a execução
+com etiqueta só escreve nos seus caminhos e é retomável. Suite completa:
+218 testes OK.
+
+### 429 Too Many Requests na Fase 2 (2026-10-20)
+
+Lançada às 01:01 (`nohup caffeinate -i python -m
+semantic_harvester.corpus_phase2 --captures-csv
+output/corpus_phase1_por_ano_captures.csv --label por_ano`), a Fase 2
+processou 2 415 artigos em cerca de 13 minutos (~3 por segundo, sem pausa
+entre pedidos) e registou 3 falhas, todas **429 Too Many Requests**: o
+serviço a pedir para abrandar, não 404 nem quebra de rede. O código tratava
+o 429 como qualquer erro (3 tentativas com 10 s de intervalo) e depois
+marcava o artigo como falhado. Execução parada (CSV íntegro, última linha
+completa) e corrigida: num 429, `_collect_with_retries` espera o
+`Retry-After` indicado (ou 60 s) e repete sem gastar as 3 tentativas, até 20
+esperas por artigo; os outros erros mantêm o comportamento anterior. Não se
+acrescentou uma pausa fixa entre pedidos (triplicaria a duração); o ritmo só
+abranda quando o serviço o pede. Testes offline: 429 com e sem
+`Retry-After` seguido de sucesso; 500 continua a gastar as tentativas.
+Suite completa: 220 testes OK.
+
+### Dois achados de escala (2026-10-20)
+
+**1. A taxa de variantes de URL da amostra pequena não generalizou.** Na
+Fase 1 original (159 `originalURL`), as variantes cosméticas do mesmo
+artigo eram 3: um par `http`/`https` (159 → 158 recursos, "Normalização
+http/https antes de classificar") e dois pares por parâmetros de rastreio
+(127 → 125 artigos retidos, "Correção da identidade dos artigos", 2026-10-04)
+— cerca de **1,9%**. Na Fase 1 ano a ano (211 359 `originalURL`), as
+variantes juntadas pela mesma regra foram **46 986, cerca de 22,2%**, quase
+todas (44 330) só por parâmetros de rastreio. A taxa observada na amostra
+pequena não servia de estimativa para o corpus alargado; a normalização do
+`originalURL` antes de contar o N é obrigatória a esta escala, não um
+detalhe.
+
+**2. O Arquivo.pt limita o ritmo de pedidos (429).** Sem pausa entre
+pedidos (~3 pedidos de `version_history` por segundo), a primeira resposta
+**429 Too Many Requests** chegou cerca de 4 minutos depois do arranque
+(01:01:33 → 01:05:16); em cerca de 13 minutos e 2 415 artigos houve 3
+artigos marcados como falhados só por isso. Nas execuções da Fase 1
+(TextSearch, também sem pausa explícita, mas a cerca de 1 pedido por segundo
+pela própria latência do serviço: 10 613 pedidos em cerca de 3,3 horas), não
+houve nenhum 429 em 11 893 pedidos (1 280 na alargada, 10 613 na ano a ano). A correção não impõe uma pausa
+fixa: num 429 respeita-se o `Retry-After` (ou 60 s quando falta) e repete-se
+sem contar como falha, pelo que o ritmo só abranda quando o serviço o pede.
+Nos primeiros 6 minutos depois do relançamento (01:16) houve 2 dessas
+esperas e 0 falhas, a cerca de 1,6 artigos por segundo em média (550 em
+350 s, incluindo as esperas). É um facto sobre o Arquivo.pt como
+infraestrutura: qualquer recolha longa tem de tratar o 429 como "esperar",
+não como erro.
+
+## Corpus alargado sem Fase 2: paragem, classificação por URL e RDF da Fase 1 (2026-10-20)
+
+### Decisão: parar a Fase 2
+
+A Fase 2 ano a ano (`version_history` dos 164 373 artigos) foi parada às
+09:13 de 2026-10-20, por decisão do autor, com **62 414 artigos processados
+(38,0%)**, 698 702 capturas e 0 falhas depois da correção do 429 (houve 192
+esperas por 429 até então, todas resolvidas). Ao ritmo medido (cerca de 2
+artigos por segundo, limitado pelo serviço), faltariam cerca de 15 horas.
+Razões: a classificação deixou de precisar do número de capturas por artigo
+(ver abaixo), e a profundidade temporal por artigo já foi estudada no corpus
+pequeno e não é central para este motor (`docs/PROJECT_STATUS.md`,
+"Limitações e problemas conhecidos"). O que correu fica como está, sem uso
+a jusante: `output/corpus_phase2_por_ano_{history.csv,summary.md,progress.log}`
+e `data/raw/phase2_por_ano/` (não versionado). O raw de `version_history` do
+corpus de 125 artigos e a Fase 2 original ficaram intactos (checksum
+SHA-256 igual antes e depois, 290 ficheiros).
+
+### Classificação sem a Fase 2: sinal de caminho de URL
+
+`corpus_classification.py` substitui o sinal "mais de 100 capturas na Fase
+2" por um sinal de caminho de URL: um recurso só é `Artigo` se o URL seguir
+um dos esquemas de página de artigo do Record (`ARTICLE_URL_SCHEMES`), além
+de não ser `/sabermais/` nem ter título "Object moved" (os dois sinais
+anteriores, que já vêm do CSV da Fase 1). Os esquemas incluídos são os três
+formatos de página individual de notícia conhecidos em gerações diferentes
+do site, para o sinal não depender da época:
+
+- `/detalhe/` ou `/amp/` no caminho — site atual (o AMP antigo aparece como
+  `/detalhe/AMP/`, já coberto por `/detalhe/`);
+- `interior.aspx?content_id=` — site antigo; no corpus pequeno o `=`
+  aparece codificado (`content_id/x3d…`), por isso aceitam-se as duas formas;
+- `tn0cs.asp?nid=` / `tn1cs.asp?nid=` — 1999–2000 ("Alcance temporal do
+  `record.pt`").
+
+Comparação feita em minúsculas. A classificação lê
+`output/corpus_phase1_por_ano_captures.csv` e escreve
+`output/corpus_classification_por_ano.{csv,_summary.md}` (`--label`), sem
+reescrever `output/corpus_classification.csv`, de que dependem o RDF e os
+Caminhos D e B do corpus de 125 artigos.
+
+**Resultado real (sem pedidos à API):** 164 373 recursos; **83 320
+Artigo**; excluídos 2 945 por `/sabermais/`, 0 por "Object moved" e 78 108
+por URL fora dos esquemas. Artigos por esquema: `/detalhe/` 72 170, `/amp/`
+8 790, `tn0cs.asp` 1 695, `tn1cs.asp` 665, `interior.aspx?content_id` 0.
+
+**Observação e decisão (2026-10-20).** Nesta descoberta não há nenhum URL
+`interior.aspx?content_id`. Com só os esquemas acima, o corpus não tinha
+nenhum Artigo de 2001 a 2009 (83 320 Artigos: 1999: 294, 2000: 2 066,
+2017–2024: 80 960). Entre os excluídos por URL estavam três esquemas do site
+de 2000–2009 com o mesmo padrão de "um id por notícia": `noticia.asp?id=`
+(33 773 recursos, 2001–2009), `shownews.asp?id=` (8 410, 2000–2001) e
+`noticia.aspx?id=` (3 814, sobretudo 2009); os títulos são em geral
+genéricos (":.: Jornal Record :.:", "Record"), mas há títulos de notícia
+reais em `noticia.aspx`. **Decisão do autor: incluí-los** em
+`ARTICLE_URL_SCHEMES`. `imprimir.asp` e `enviar.asp` (versões de
+impressão/envio da mesma notícia) e as outras queries no mesmo ficheiro (por
+exemplo `noticia.aspx?idcanal=`) continuam excluídos.
+
+**Resultado final:** **129 317 Artigo** em 164 373 recursos; excluídos
+2 945 por `/sabermais/`, 0 por "Object moved" e 32 111 por URL fora dos
+esquemas. Por esquema: `/detalhe/` 72 170, `noticia.asp` 33 773,
+`/amp/` 8 790, `shownews.asp` 8 410, `noticia.aspx` 3 814, `tn0cs.asp`
+1 695, `tn1cs.asp` 665, `interior.aspx?content_id` 0. Por ano da captura
+mais antiga: 1999: 294 · 2000: 4 430 · 2001: 10 376 · 2002: 6 586 · 2003: 16
+· 2004: 43 · 2005: 156 · 2006: 6 981 · 2007: 10 602 · 2008: 5 119 · 2009:
+3 754 · 2017: 16 819 · 2018: 14 179 · 2019: 12 444 · 2020: 10 554 · 2021:
+5 564 · 2022: 6 786 · 2023: 7 609 · 2024: 7 005.
+
+### RDF a partir só da Fase 1 (implementado, não corrido)
+
+`corpus_rdf.py --fase1 por_ano`: os artigos vêm de
+`output/corpus_classification_por_ano.csv`; cada um é registado com **uma
+só captura, a mais antiga que a descoberta encontrou**, lida do raw da
+TextSearch (`data/raw/corpus_queries/por_ano/`, agrupando variantes com
+`normalize_for_grouping`), sem `version_history`. **Ressalva:** é a captura
+mais antiga *conhecida* (a que a TextSearch devolveu dentro do teto de
+páginas), não necessariamente a mais antiga que existe no Arquivo.pt. Texto
+e HTML só dessa captura (`TEXT_POLICY_FIRST`). Os itens da TextSearch não
+trazem `statusCode` nem `contentLength` (o `version_history` trazia), que
+ficam ausentes do grafo. Outputs separados e retomáveis:
+`output/corpus_articles_por_ano.ttl`,
+`output/corpus_rdf_por_ano_{report.csv,summary.md,progress.log}` e
+`data/processed/corpus_articles_por_ano_triples.nt`. Testes offline: usa a
+captura mais antiga (incluindo de uma variante de rastreio), escreve só nos
+caminhos etiquetados, retoma sem pedidos. Suite completa: 225 testes OK.
+
+### 429 também nos downloads de texto e HTML (2026-10-20)
+
+Antes de correr `corpus_rdf --fase1 por_ano` (129 317 Artigos, 258 634
+pedidos: texto e HTML da captura mais antiga conhecida), um piloto de 63
+artigos, estratificado por esquema de URL, mediu 0,55 s de rede por artigo
+(mediana 0,39 s, máximo 7,9 s): cerca de 20 horas sem limitação de ritmo,
+ou cerca de 36 horas ao ritmo sustentado de ~2 pedidos por segundo
+observado na Fase 2 com 429. Texto obtido em 62 de 63 (1 404); HTML em 58
+de 63, as 5 falhas todas `500` e todas em `noticia.asp` (5 de 16).
+Espaço estimado: ~21 GB de HTML e ~1,1 GB de texto.
+
+O download de texto e HTML do `ArquivoClient` tratava um 429 como falha
+definitiva; como o relatório do `corpus_rdf` é retomável por artigo, esse
+texto nunca seria pedido outra vez. Correção, a mesma da Fase 2:
+`_get_respecting_rate_limit()` espera o `Retry-After` (ou 60 s) e repete,
+até 20 esperas por pedido; só depois um 429 conta como falha. Os outros
+erros (404, 500, rede) mantêm o comportamento anterior, sem repetição.
+Testes offline: 429 com e sem `Retry-After` seguido de sucesso (texto e
+HTML), 429 persistente como falha depois das esperas, 404/500 sem
+repetição. Suite completa: 229 testes OK.
+
+### Execução de `corpus_rdf --fase1 por_ano` e artefactos de rede (2026-10-20/21)
+
+Lançada às 10:03:37 de 2026-10-20 (`nohup caffeinate -i`); os 129 317
+artigos foram processados até às 00:09:34 e o Turtle final ficou escrito às
+01:09 (2 208 257 triplos). Nenhum 429. Mas a partir de ~22:52 o serviço
+degradou-se: primeiro respostas **400 Bad Request** para URLs válidos (2 514
+de texto, 1 909 de HTML) e, a partir de 22:57, **"Connection reset by
+peer"** em série (34 731 de HTML e 34 712 de texto, mais de 1 200 por
+minuto, cada pedido a falhar em ~50 ms); mais 243/225 erros de ligação e
+11/8 timeouts. Às 01:14 o serviço respondia normalmente, incluindo os URLs
+exatos que tinham dado reset e 400 (verificado por amostragem). Estes erros
+são artefactos, não falhas reais: afetam **37 481 artigos** (37 479 com o
+texto em falta, 36 872 com o HTML). Os 500 do HTML (5 418, quase todos
+`noticia.asp`) persistem (5 de 6 testados de novo) e contam como reais, tal
+como os 404.
+
+Salvaguarda antes de repetir só esses artigos: `ArquivoClient` ganha
+`connection_error_max_waits` — num erro de ligação, espera 60 s e repete
+até esse número de vezes por pedido, para uma quebra pausar a recolha em vez
+de gerar falhas em série. Desligado por omissão (o `corpus_text_retry` tem a
+sua própria retentativa, que não muda); `corpus_rdf --fase1` usa 10. Testes
+offline: reset seguido de sucesso, erro persistente como falha depois das
+esperas, sem repetição por omissão. Suite completa: 232 testes OK.
 
 ## Candidatos a entidade fora do vocabulário fechado — teste exploratório (proposta e script testado, não corrido sobre o corpus real; 2026-10-21)
 
@@ -3615,7 +4318,7 @@ contenção), agregação por artigo (contagem de artigos/ocorrências,
 captura sem texto ou não-200 ignorada, ordenação) e uma execução sobre
 um corpus Turtle sintético (não destrutiva, filtra a entidade já
 conhecida, reporta o novo candidato). Suite completa: **219 testes,
-todos a passar.**
+todos a passar** no ramo antes de juntar o `main`; **248** depois.
 
 **Nada foi corrido sobre o corpus real de 125 artigos.** Este ambiente
 remoto não tem os textos de `data/raw/texts/` (preservados fora do Git,
@@ -3626,3 +4329,30 @@ pronto a correr numa sessão local ou no terminal, mas os resultados
 sobre os artigos reais (quantos candidatos distintos, que proporção
 parece ruído vs. nomes próprios genuínos) ainda não têm evidência
 própria; não inventar esses números aqui.
+
+### Não corre sobre o corpus alargado tal como está (verificado no código, 2026-10-21)
+
+O script foi escrito para o corpus de 125 artigos
+(`output/corpus_articles.ttl`). Sobre o corpus alargado
+(`output/corpus_articles_por_ano.ttl`, 129 317 Artigos, uma captura cada,
+"Corpus alargado sem Fase 2" acima) não funciona sem adaptação — e o
+mesmo vale para o Caminho B (`corpus_entities.py`) e o D, que partilham a
+leitura do corpus:
+
+- `load_corpus()` (`corpus_redundancy.py`) faz `int(...)` de
+  `sdh:contentLength` e a Camada 1 exige `statusCode == 200`; o grafo da
+  Fase 1 não tem nenhum dos dois (a TextSearch não os devolve). Resultado:
+  erro na leitura, ou, se fosse contornado, nenhuma captura na Camada 1.
+- A variante c′ (`article_body.py`) foi calibrada no site 2017–2020
+  (título com " - " e 14 marcadores de chrome); as páginas de 1999–2009
+  (`noticia.asp`, `shownews.asp`, `tn0cs.asp`) têm outra estrutura e é
+  provável que fiquem "sem corpo" — não verificado.
+- O vocabulário fechado só tem futebolistas da Primeira Liga 2015–2020:
+  num corpus de 1999–2024 com todas as modalidades, a lista "fora do
+  vocabulário" será dominada por isso, não pela qualidade da heurística.
+- Escala: carregar 2,2 milhões de triplos com `rdflib` e ler ~95 000
+  textos é viável, mas lento; não medido.
+
+Recomendação: correr primeiro sobre o corpus de 125 artigos (que funciona
+como está) para ter evidência barata; adaptar a leitura ao corpus alargado
+só se essa evidência justificar.

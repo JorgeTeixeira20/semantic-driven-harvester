@@ -825,3 +825,74 @@ class TrackingVariantsTests(OfflineTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class Phase1OnlyCorpusTests(OfflineTestCase):
+    """Modo `--fase1` (2026-10-20): uma captura por artigo, a mais antiga que a
+    Fase 1 encontrou, sem `version_history`; outputs etiquetados."""
+
+    URL = "https://www.record.pt/futebol/detalhe/jonas-renova"
+
+    def item(self, url: str, tstamp: str) -> dict:
+        return {
+            "originalURL": url, "tstamp": tstamp, "title": "Jonas renova",
+            "digest": f"D{tstamp}", "mimeType": "text/html",
+            "linkToArchive": f"https://archive.example.test/{tstamp}",
+            "linkToExtractedText": f"https://archive.example.test/text/{tstamp}",
+            "linkToOriginalFile": f"https://archive.example.test/{tstamp}id_/{url}",
+        }
+
+    def setUp(self) -> None:
+        super().setUp()
+        raw = self.root / "data" / "raw" / "corpus_queries" / "por_ano"
+        raw.mkdir(parents=True)
+        pages = {
+            "clube_benfica_2019_rep1_offset-0000.json": [self.item(self.URL, "20190305000000")],
+            # Variante de rastreio, mais antiga: é esta a captura usada.
+            "atleta_joao-felix_2018_rep1_offset-0000.json": [
+                self.item(self.URL + "?ref=HP_A", "20180101000000")],
+            "clube_sporting_2018_rep1_offset-0000.json": [
+                self.item("https://www.record.pt/outro/detalhe/x", "20170101000000")],
+        }
+        for name, items in pages.items():
+            (raw / name).write_text(json.dumps({"response_items": items}), encoding="utf-8")
+        output = self.root / "output"
+        output.mkdir()
+        with (output / "corpus_classification_por_ano.csv").open("w", encoding="utf-8", newline="") as h:
+            writer = csv.DictWriter(h, fieldnames=["original_url", "title", "captures", "is_artigo",
+                                                   "reason", "variantes"])
+            writer.writeheader()
+            writer.writerow({"original_url": self.URL, "title": "Jonas renova", "captures": "2",
+                             "is_artigo": "True", "reason": "artigo", "variantes": ""})
+
+    def test_uses_the_oldest_known_capture_and_labelled_outputs(self) -> None:
+        old = self.item(self.URL + "?ref=HP_A", "20180101000000")
+        session = self.fixture_session(
+            (old["linkToExtractedText"], b"texto do artigo"),
+            (old["linkToOriginalFile"], b"<html>artigo</html>"),
+        )
+        client = ArquivoClient(data_dir=self.root / "data" / "raw", session=session)
+
+        graph, results = build_corpus_graph(self.root, client=client, phase1_label="por_ano")
+
+        self.assertEqual([(r.original_url, r.captures_used, r.texts_downloaded_now, r.error)
+                          for r in results], [(self.URL, 1, 1, None)])
+        captures = set(graph.subjects(RDF.type, SDH.CapturaArquivada))
+        self.assertEqual(captures, {capture_uri(self.URL, "20180101000000")})
+        self.assertIn((capture_uri(self.URL, "20180101000000"), SDH.temTextoExtraido,
+                       extracted_text_uri(self.URL, "20180101000000")), graph)
+        self.assertTrue((self.root / "output" / "corpus_rdf_por_ano_report.csv").is_file())
+        self.assertFalse((self.root / "output" / "corpus_rdf_report.csv").exists())
+        self.assertTrue((self.root / "data" / "processed" / "corpus_articles_por_ano_triples.nt").is_file())
+        html_files = list((self.root / "data" / "raw" / "original_html").iterdir())
+        self.assertEqual(len(html_files), 1)
+
+    def test_resume_skips_articles_already_in_the_labelled_report(self) -> None:
+        old = self.item(self.URL + "?ref=HP_A", "20180101000000")
+        first = ArquivoClient(data_dir=self.root / "data" / "raw", session=self.fixture_session(
+            (old["linkToExtractedText"], b"texto"), (old["linkToOriginalFile"], b"<html/>")))
+        build_corpus_graph(self.root, client=first, phase1_label="por_ano")
+        second = ArquivoClient(data_dir=self.root / "data" / "raw", session=self.fixture_session())
+        graph, results = build_corpus_graph(self.root, client=second, phase1_label="por_ano")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(len(set(graph.subjects(RDF.type, SDH.Artigo))), 1)
