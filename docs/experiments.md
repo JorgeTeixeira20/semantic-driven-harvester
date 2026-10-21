@@ -4733,3 +4733,25 @@ triplos** porque o Turtle versionado era anterior às subclasses OWL de
 `Tema` (`0009a21`, que não o tinha regenerado): essas acrescentam 40
 triplos (um `a sdh:Clube`/`Competicao`/`Modalidade`/`Secao` por cada nó
 `Tema`), independentes desta regra.
+
+### Clubes manuais: Oriental e Länk Vilaverdense (2026-10-22)
+
+Decisão do autor, acrescentada a `MANUAL_CLUB_VARIANTS` (regenerado com
+`--reutilizar-raw`, 0 pedidos; as únicas diferenças no CSV são estas duas
+linhas):
+
+- **Q2749186, Clube Oriental de Lisboa** (Lisboa; P118 = II Divisão;
+  sem nome oficial P1448 na Wikidata): variantes "Clube Oriental" e
+  "Oriental de Lisboa". **Nunca "Oriental" sozinho** — palavra comum
+  ("Timor Oriental", "Europa Oriental"), embora seja a forma que o Record
+  usa nos títulos e URLs.
+- **Q7930110, Vilaverdense Futebol Clube** (Vila Verde; P118 = III Divisão;
+  sem P1448): variantes "Länk Vilaverdense" e "Vilaverdense FC" (o rótulo
+  "Vilaverdense Futebol Clube" já é a forma principal). **Nunca
+  "Vilaverdense" sozinho** (gentílico de Vila Verde).
+
+**Limitação:** a equipa feminina (Q28225985, "Vilaverdense FC", que é na
+Wikidata o item com os nomes alternativos "Länk Vilaverdense" e "Länk")
+usa o mesmo nome; o texto não distingue as duas, e uma menção a "Länk
+Vilaverdense" conta sempre para o Q7930110 (masculino), que é a equipa das
+notícias do Record na 2.ª Liga em 2024.

@@ -1351,7 +1351,7 @@ entidade,clube,Clube Desportivo Santa Clara,C.D. Santa Clara|CD Santa Clara|Sant
 entidade,clube,Clube Desportivo Trofense,C.D. Trofense|CD Trofense|Trofense,Q1023233,futebol,,1
 entidade,clube,Clube Infante de Sagres,,Q20053390,hóquei em patins,,1
 entidade,clube,Clube Kairós,,Q139503177,voleibol,,1
-entidade,clube,Clube Oriental de Lisboa,Clube Oriental Lisboa,Q2749186,futebol,,1
+entidade,clube,Clube Oriental de Lisboa,Clube Oriental|Clube Oriental Lisboa|Oriental de Lisboa,Q2749186,futebol,,1
 entidade,jogador,Cláudia Bradstone,Claudia Bradstone|Cláudia Bradstone Freitas|Cláudia Freitas,Q124259373,desportos de combate,,1
 entidade,jogador,Cláudia Cianci,,Q61633178,ténis,,1
 entidade,jogador,Cláudia Da Veiga Rodrigues,,Q135345134,basquetebol,,1
@@ -7447,7 +7447,7 @@ entidade,jogador,Victória Rebeca Freitas Pacheco,,Q135345055,basquetebol,,1
 entidade,jogador,Vid Belec,,Q923884,futebol,Sporting Clube Olhanense,1
 entidade,jogador,Vidal Fitas,,Q22994277,ciclismo,,1
 entidade,jogador,Viktor Gyökeres,Viktor Einar Gyokeres|Viktor Einar Gyökeres|Viktor Gyokeres,Q47075606,futebol,Sporting Clube de Portugal,1
-entidade,clube,Vilaverdense Futebol Clube,Vilaverdense FC,Q7930110,futebol,,1
+entidade,clube,Vilaverdense Futebol Clube,Länk Vilaverdense|Vilaverdense FC,Q7930110,futebol,,1
 entidade,jogador,Vince Kelley,Vincent Kelley,Q20974196,basquetebol,Ginásio Clube Figueirense,1
 entidade,jogador,Vincent Aboubakar,,Q116743,futebol,Futebol Clube do Porto,1
 entidade,jogador,Vincent Carlier,,Q3559520,futebol,Clube Desportivo das Aves,1

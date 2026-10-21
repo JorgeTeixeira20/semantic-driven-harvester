@@ -155,6 +155,22 @@ class VocabularyTests(unittest.TestCase):
         self.assertEqual(by_label["Futebol Clube do Porto"]["variantes"], "")
         self.assertEqual(stats["variantes_manuais_de_clube"], 1)
 
+    def test_manual_oriental_and_vilaverdense_without_single_words(self) -> None:
+        # 2026-10-22: só formas de 2+ palavras ("Oriental" é palavra comum,
+        # "Vilaverdense" é o gentílico de Vila Verde).
+        entities = [
+            Entity("clube", "Q2749186", {"pt": "Clube Oriental de Lisboa"}, {"Clube Oriental Lisboa"}, {"futebol"}),
+            Entity("clube", "Q7930110", {"pt": "Vilaverdense Futebol Clube", "en": "Vilaverdense FC"},
+                   set(), {"futebol"}),
+        ]
+        rows, _ = build_vocabulary(entities, {}, set())
+        by_label = {r["rotulo"]: r["variantes"].split("|") for r in rows}
+        self.assertEqual(by_label["Clube Oriental de Lisboa"],
+                         ["Clube Oriental", "Clube Oriental Lisboa", "Oriental de Lisboa"])
+        self.assertEqual(by_label["Vilaverdense Futebol Clube"], ["Länk Vilaverdense", "Vilaverdense FC"])
+        forms = {v.casefold() for variants in by_label.values() for v in variants} | {k.casefold() for k in by_label}
+        self.assertTrue(forms.isdisjoint({"oriental", "vilaverdense"}))
+
     def test_homonyms_across_modalities_and_categories(self) -> None:
         entities = [
             Entity("clube", "Q10", {"pt": "Sport Lisboa e Benfica"}, set(), {"futebol"}),

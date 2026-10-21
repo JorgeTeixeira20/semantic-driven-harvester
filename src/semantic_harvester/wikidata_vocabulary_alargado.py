@@ -86,6 +86,13 @@ COMMON_WORDS = frozenset({"aves", "estrela", "nacional", "naval", "real", "tecni
 # fora (é a cidade): limitação documentada em docs/experiments.md.
 MANUAL_CLUB_VARIANTS: dict[str, tuple[str, ...]] = {
     "Q131499": ("Benfica",),  # Sport Lisboa e Benfica (futebol)
+    # Clube Oriental de Lisboa: nunca "Oriental" sozinho (palavra comum:
+    # "Timor Oriental", "Europa Oriental"), só formas de 2+ palavras.
+    "Q2749186": ("Clube Oriental", "Oriental de Lisboa"),
+    # Vilaverdense FC (masculino; o Record usa "Länk Vilaverdense"). Nunca
+    # "Vilaverdense" sozinho (gentílico de Vila Verde). A equipa feminina
+    # (Q28225985) também usa "Länk Vilaverdense" e o texto não as distingue.
+    "Q7930110": ("Länk Vilaverdense", "Vilaverdense FC", "Vilaverdense Futebol Clube"),
 }
 LEAGUES = {"Primeira Liga": "Q182994", "Segunda Liga": "Q754488"}
 FIRST_SEASON = 1999  # 1999–2000
