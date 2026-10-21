@@ -4372,3 +4372,24 @@ leitura do corpus:
 Recomendação: correr primeiro sobre o corpus de 125 artigos (que funciona
 como está) para ter evidência barata; adaptar a leitura ao corpus alargado
 só se essa evidência justificar.
+
+### O 400 como sinal de quota na recolha do `corpus_rdf --fase1` (2026-10-21)
+
+Segunda repetição (10:09, ~1 pedido por segundo): 1 600 artigos sem
+nenhuma falha durante 46 minutos; às 10:55 o serviço passou a responder 400
+a todos os pedidos (texto e HTML, ~60 por minuto) e o vigia parou o processo
+às 11:00 (288 erros em 5 minutos). URLs que tinham dado 400 um minuto antes
+responderam 200 com conteúdo; pedidos isolados passam sempre. O 400 é,
+portanto, um sinal de quota por janela de tempo, não um erro do URL: surgiu
+ao fim de ~12 h na execução principal, de 27 min a ~3 pedidos por segundo e
+de 46 min a ~1 pedido por segundo. Os 154 artigos afetados voltaram a ser
+marcados como artefacto: **31 573 pendentes** (97 744 de 129 317
+concluídos; texto em 95 400, 2 344 falhas reais de texto).
+
+**Decisão do autor:** tratar o 400 como o 429, só no modo `--fase1`, a 1
+pedido por segundo: num 400 o pedido pausa ~10 min e repete; se o mesmo URL
+der 400 depois de 3 pausas, conta como falha real. Implementado como
+`bad_request_max_pauses` no `ArquivoClient` (desligado por omissão;
+`BAD_REQUEST_PAUSE_SECONDS = 600`, `BAD_REQUEST_MAX_PAUSES = 3`). Testes
+offline: 400 seguido de sucesso; 400 depois de 3 pausas como falha real; sem
+pausa por omissão. Suite completa: 253 testes OK.

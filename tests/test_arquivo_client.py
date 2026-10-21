@@ -13,7 +13,8 @@ from unittest.mock import patch
 import requests
 
 from semantic_harvester.arquivo_client import (
-    CONNECTION_ERROR_MAX_WAITS, CONNECTION_ERROR_WAIT_SECONDS, RATE_LIMIT_DEFAULT_WAIT_SECONDS,
+    BAD_REQUEST_MAX_PAUSES, BAD_REQUEST_PAUSE_SECONDS, CONNECTION_ERROR_MAX_WAITS,
+    CONNECTION_ERROR_WAIT_SECONDS, RATE_LIMIT_DEFAULT_WAIT_SECONDS,
     RATE_LIMIT_MAX_WAITS, ArquivoClient,
 )
 from tests.support import ORIGINAL_URL, FixtureSession, OfflineTestCase
@@ -208,6 +209,39 @@ class RateLimitedDownloadTests(OfflineTestCase):
         with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
             client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
             client.download_original_html(CAPTURE)
+        self.assertEqual(sleep.call_count, 0)
+
+
+
+    def bad_request_client(self, *responses: StatusResponse) -> tuple[ArquivoClient, ScriptedSession]:
+        session = ScriptedSession(*responses)
+        client = ArquivoClient(data_dir=self.root / "raw", session=session,
+                               bad_request_max_pauses=BAD_REQUEST_MAX_PAUSES)
+        return client, session
+
+    def test_400_pauses_and_then_succeeds(self) -> None:
+        client, session = self.bad_request_client(StatusResponse(400), StatusResponse(200, b"texto"))
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_extracted_text({**CAPTURE, "linkToExtractedText": TEXT_URL})
+        self.assertTrue(result.success)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list], [BAD_REQUEST_PAUSE_SECONDS])
+        self.assertEqual(len(session.calls), 2)
+
+    def test_same_url_400_after_three_pauses_is_a_real_failure(self) -> None:
+        client, session = self.bad_request_client(
+            *(StatusResponse(400) for _ in range(BAD_REQUEST_MAX_PAUSES + 1)))
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_original_html(CAPTURE)
+        self.assertFalse(result.success)
+        self.assertIn("400", result.error)
+        self.assertEqual(sleep.call_count, BAD_REQUEST_MAX_PAUSES)
+        self.assertEqual(len(session.calls), BAD_REQUEST_MAX_PAUSES + 1)
+
+    def test_400_is_an_immediate_failure_by_default(self) -> None:
+        client, _ = self.client(StatusResponse(400))
+        with patch("semantic_harvester.arquivo_client.time.sleep") as sleep:
+            result = client.download_original_html(CAPTURE)
+        self.assertFalse(result.success)
         self.assertEqual(sleep.call_count, 0)
 
 

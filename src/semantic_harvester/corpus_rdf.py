@@ -74,7 +74,7 @@ from typing import Any
 
 from rdflib import RDF, RDFS, Graph, XSD
 
-from .arquivo_client import CONNECTION_ERROR_MAX_WAITS, ArquivoClient, TextDownloadResult
+from .arquivo_client import BAD_REQUEST_MAX_PAUSES, CONNECTION_ERROR_MAX_WAITS, ArquivoClient, TextDownloadResult
 from .history_pipeline import TEXT_POLICY_ALL, TEXT_POLICY_FIRST, build_manifest_records
 from .rdf_mapper import SDH, build_article_history_graph, stable_hash
 from .url_identity import normalize_for_grouping
@@ -525,6 +525,8 @@ def build_corpus_graph(
             connection_error_max_waits=CONNECTION_ERROR_MAX_WAITS if phase1_label else 0,
             # ~1 pedido/s no modo --fase1 (2026-10-21, docs/experiments.md).
             min_request_interval=PHASE1_MIN_REQUEST_INTERVAL if phase1_label else 0.0,
+            # 400 = quota provável: pausa ~10 min, até 3 vezes por URL (2026-10-21).
+            bad_request_max_pauses=BAD_REQUEST_MAX_PAUSES if phase1_label else 0,
         )
 
     results: list[ArticleGraphResult] = list(already.values())

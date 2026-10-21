@@ -83,6 +83,13 @@ RATE_LIMIT_MAX_WAITS = 20
 # pedido, para a recolha pausar em vez de gerar falhas.
 CONNECTION_ERROR_WAIT_SECONDS = 60.0
 CONNECTION_ERROR_MAX_WAITS = 10
+# 400 Bad Request como sinal de quota (2026-10-21, docs/experiments.md): o
+# serviço responde 400 a todos os pedidos depois de ~45 min de recolha
+# contínua, e os mesmos URLs dão 200 minutos depois. Com `bad_request_max_pauses`
+# (desligado por omissão), um 400 pausa `BAD_REQUEST_PAUSE_SECONDS` e repete;
+# se o mesmo URL der 400 depois dessas pausas, conta como falha real.
+BAD_REQUEST_PAUSE_SECONDS = 600.0
+BAD_REQUEST_MAX_PAUSES = 3
 
 
 def retry_after_seconds(response: Any) -> float:
@@ -106,9 +113,11 @@ class ArquivoClient:
         session: requests.Session | None = None,
         connection_error_max_waits: int = 0,
         min_request_interval: float = 0.0,
+        bad_request_max_pauses: int = 0,
     ) -> None:
         self.data_dir = Path(data_dir)
         self.connection_error_max_waits = connection_error_max_waits
+        self.bad_request_max_pauses = bad_request_max_pauses
         # Ritmo explícito dos downloads de texto/HTML (segundos entre pedidos;
         # 0 = sem pausa). 2026-10-21: o serviço degradou-se (400 e
         # "connection reset") a 2–4 pedidos/s sem nunca responder 429.
@@ -329,6 +338,7 @@ class ArquivoClient:
 
         waits = 0
         connection_waits = 0
+        bad_request_pauses = 0
         while True:
             self._pace()
             try:
@@ -342,7 +352,15 @@ class ArquivoClient:
                                self.connection_error_max_waits)
                 time.sleep(CONNECTION_ERROR_WAIT_SECONDS)
                 continue
-            if getattr(response, "status_code", 200) != 429 or waits >= RATE_LIMIT_MAX_WAITS:
+            status = getattr(response, "status_code", 200)
+            if status == 400 and bad_request_pauses < self.bad_request_max_pauses:
+                bad_request_pauses += 1
+                LOGGER.warning("400 em %s: quota provável; pausa de %.0fs (%d/%d).",
+                               url, BAD_REQUEST_PAUSE_SECONDS, bad_request_pauses,
+                               self.bad_request_max_pauses)
+                time.sleep(BAD_REQUEST_PAUSE_SECONDS)
+                continue
+            if status != 429 or waits >= RATE_LIMIT_MAX_WAITS:
                 return response
             waits += 1
             wait = retry_after_seconds(response)
