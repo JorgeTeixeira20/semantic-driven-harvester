@@ -72,6 +72,30 @@ class CountMentionsTests(unittest.TestCase):
         counts = count_mentions([["fc"], ["porto"]], [term("FC Porto", categoria="clube")])
         self.assertEqual(counts["FC Porto"], 0)
 
+    def test_longest_match_wins(self) -> None:
+        # "Sporting de Braga" já não conta também "Sporting" (2026-10-21).
+        terms = [term("Sporting Clube de Portugal", "Sporting", categoria="clube"),
+                 term("Sporting Clube de Braga", "Sporting de Braga", categoria="clube")]
+        text = [match_tokens("O Sporting de Braga venceu o Sporting")]
+        counts = count_mentions(text, terms, longest_match=True)
+        self.assertEqual(counts["Sporting Clube de Braga"], 1)
+        self.assertEqual(counts["Sporting Clube de Portugal"], 1)
+        # Por omissão (resultados publicados), "Sporting" conta também dentro.
+        self.assertEqual(count_mentions(text, terms)["Sporting Clube de Portugal"], 2)
+
+    def test_short_name_inside_another_players_name_is_not_counted(self) -> None:
+        # Caso real do corpus: "Rodrigo" (Rodrigo Moreno Machado) dentro de "Rodrigo Pinho".
+        terms = [term("Rodrigo Moreno Machado", "Rodrigo"), term("Rodrigo Pinho")]
+        counts = count_mentions([match_tokens("Rodrigo Pinho marcou; Rodrigo assistiu")], terms,
+                                longest_match=True)
+        self.assertEqual((counts["Rodrigo Pinho"], counts["Rodrigo Moreno Machado"]), (1, 1))
+
+    def test_label_counts_once_per_position_and_matching_continues_after_it(self) -> None:
+        counts = count_mentions([match_tokens("Danilo Luiz da Silva e Danilo Luiz")],
+                                [term("Danilo Luiz da Silva", "Danilo", "Danilo Luiz")],
+                                longest_match=True)
+        self.assertEqual(counts["Danilo Luiz da Silva"], 2)
+
 
 class TextSegmentsTests(unittest.TestCase):
     def test_chrome_menu_removed(self) -> None:

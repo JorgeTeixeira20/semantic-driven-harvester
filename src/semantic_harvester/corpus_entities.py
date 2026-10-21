@@ -130,8 +130,17 @@ def club_coherence(
     return COHERENT_YES if term.clubs & article_clubs else COHERENT_NO
 
 
-def count_mentions(segments: list[list[str]], terms: list[Term]) -> Counter[str]:
+def count_mentions(
+    segments: list[list[str]], terms: list[Term], longest_match: bool = False
+) -> Counter[str]:
     """Ocorrências de cada termo (por rótulo) em segmentos de palavras já normalizadas.
+
+    Por omissão, cada variante conta em todas as posições onde aparece, mesmo
+    dentro de outra mais longa (comportamento dos resultados publicados). Com
+    `longest_match` (2026-10-21, `docs/experiments.md`; por ligar): em cada
+    posição conta só a variante mais comprida que aí começa, e a leitura
+    continua depois dela — "Sporting de Braga" já não conta também
+    "Sporting". Variantes de comprimento igual na mesma posição contam todas.
 
     Não há correspondências entre segmentos: um bloco de chrome removido não
     junta as palavras que estavam de um lado e do outro.
@@ -143,11 +152,28 @@ def count_mentions(segments: list[list[str]], terms: list[Term]) -> Counter[str]
         for variant in term.variants:
             index[variant[0]].append((variant, term.rotulo))
     counts: Counter[str] = Counter()
+    if not longest_match:
+        for segment in segments:
+            for i, word in enumerate(segment):
+                for variant, label in index.get(word, ()):
+                    if tuple(segment[i:i + len(variant)]) == variant:
+                        counts[label] += 1
+        return counts
     for segment in segments:
-        for i, word in enumerate(segment):
-            for variant, label in index.get(word, ()):
-                if tuple(segment[i:i + len(variant)]) == variant:
-                    counts[label] += 1
+        i = 0
+        while i < len(segment):
+            matches = [
+                (len(variant), label)
+                for variant, label in index.get(segment[i], ())
+                if tuple(segment[i:i + len(variant)]) == variant
+            ]
+            if not matches:
+                i += 1
+                continue
+            longest = max(length for length, _ in matches)
+            for label in {label for length, label in matches if length == longest}:
+                counts[label] += 1
+            i += longest
     return counts
 
 
@@ -206,6 +232,7 @@ def analyse_article(
     chrome: set[tuple[str, ...]] | None,
     n: int = DEFAULT_N,
     club_map: dict[str, str] | None = None,
+    longest_match: bool = False,
 ) -> list[dict[str, str]]:
     themes = themes_from_url(article)
     club_slugs = [value for categoria, value in themes if categoria == "clube"]
@@ -220,7 +247,7 @@ def analyse_article(
     ]
 
     texts = [c.text or "" for c in captures if c.in_layer1]
-    per_capture = [count_mentions(text_segments(t, chrome, n), terms) for t in texts]
+    per_capture = [count_mentions(text_segments(t, chrome, n), terms, longest_match) for t in texts]
     by_label = {term.rotulo: term for term in terms}
     present = sorted({label for counts in per_capture for label in counts})
     for label in present:
@@ -365,6 +392,7 @@ def run(
     chrome_fraction: float | None = DEFAULT_CHROME_FRACTION,
     club_map_path: Path | None = None,
     use_body: bool = False,
+    longest_match: bool = False,
 ) -> list[dict[str, str]]:
     root = project_root or Path(__file__).resolve().parents[2]
     if vocabulary_path is None:
@@ -380,7 +408,8 @@ def run(
 
     rows = [
         row for article, captures in corpus.items()
-        for row in analyse_article(article, captures, terms, chrome, club_map=club_map)
+        for row in analyse_article(article, captures, terms, chrome, club_map=club_map,
+                                   longest_match=longest_match)
     ]
     write_csv(rows, output / "corpus_entities.csv")
     write_summary(corpus, rows, vocabulary_path, chrome_fraction,
@@ -404,13 +433,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--clubes-url", type=Path, default=DEFAULT_CLUB_MAP,
                         help="tabela slug do URL → clube do vocabulário, para a coluna "
                         "clube_coerente (por omissão data/processed/caminho_b_clubes_url.csv)")
+    parser.add_argument("--correspondencia-mais-longa", action="store_true",
+                        help="conta só a variante mais longa em cada posição (\"Sporting de "
+                        "Braga\" não conta \"Sporting\"); por ligar, ver docs/experiments.md")
     args = parser.parse_args(argv)
     fraction = args.fracao_chrome if args.texto == "sem-chrome" else None
     if fraction is not None and not 0.0 < fraction <= 1.0:
         parser.error("--fracao-chrome tem de estar em ]0, 1]")
 
     rows = run(vocabulary_path=args.vocabulario, chrome_fraction=fraction,
-               club_map_path=args.clubes_url, use_body=args.texto == "corpo")
+               club_map_path=args.clubes_url, use_body=args.texto == "corpo",
+               longest_match=args.correspondencia_mais_longa)
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")
     print("Saídas: output/corpus_entities.csv, output/corpus_entities_summary.md")
     return 0

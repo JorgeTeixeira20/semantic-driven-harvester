@@ -4621,3 +4621,60 @@ ligação mantêm-se (os "connection reset" das 03:59, até com `curl`
 isolado, não se explicam por cookies). Testes offline: diagnóstico,
 renovação sem pausa, pausa quando o 400 persiste, sessão que recusa
 cookies. Suite completa: 270 testes OK.
+
+### Vocabulário alargado: decisões do autor e correspondência mais longa (2026-10-21)
+
+**Decisões confirmadas.** A lista manual de palavras comuns tratadas como os
+nomes de lugar (`COMMON_WORDS` em `wikidata_vocabulary_alargado.py`: Aves,
+Estrela, Nacional, Naval, Real, Técnico, União, Vitória) é uma **decisão
+manual do autor**, fixada no código. Os nomes alternativos de uma palavra
+entram só para clubes (para jogadores continuam excluídos).
+
+**"Benfica" sozinho (acrescento manual).** Correção ao que a secção
+anterior afirma ("Benfica" não, por não ser alias): a Wikidata **tem**
+"Benfica" como nome alternativo de Q131499 (Sport Lisboa e Benfica), mas
+também do clube multidesportivo Q2895813 ("S.L. Benfica", que entra pelas
+passagens de andebol), e a regra das variantes partilhadas descartava-o das
+duas linhas. Nova tabela manual `MANUAL_CLUB_VARIANTS` (`Q131499 →
+"Benfica"`), como a dos 57 clubes: aplicada depois da regra das cidades e
+das palavras comuns, com prioridade sobre a regra das partilhadas (fica só
+na linha do clube indicado e sai das outras). Regenerado com
+`--reutilizar-raw` (0 pedidos): a única diferença no CSV é "Benfica" nas
+variantes de "Sport Lisboa e Benfica". **Limitação:** "Porto" sozinho
+continua de fora (é a cidade), pelo que o vocabulário só encontra o FC Porto
+por formas com mais de uma palavra ("FC Porto", "Futebol Clube do Porto").
+
+**Oriental e Lank Vilaverdense (por fixar; dados para a decisão).**
+
+| Termo da Fase 1 | QID atribuído | Rótulo / sede / liga na Wikidata | Como aparece no Record |
+| --- | --- | --- | --- |
+| Sporting Clube Oriental | Q2749186 | Clube Oriental de Lisboa; Lisboa; II Divisão (P118); fundado em 1946 | `…/campeonato-de-portugal/oriental/…` e `…/portugal-prio/oriental/…` (6 URLs, 2017–2018), títulos "… - Oriental - Jornal Record" |
+| Lank Vilaverdense | Q7930110 | Vilaverdense Futebol Clube; Vila Verde; III Divisão (P118); fundado em 1953 | `…/2--liga/lnk-vilaverdense/…` (4 URLs, 2024), títulos "… - Länk Vilaverdense - Jornal Record" |
+
+O Oriental do Record é o clube de Lisboa (Q2749186); o nome do termo da
+Fase 1, "Sporting Clube Oriental", não é o nome do clube (o Record usa
+"Oriental"; a Wikidata, "Clube Oriental de Lisboa"). Para o Länk
+Vilaverdense, a Wikidata tem dois itens "Vilaverdense FC": Q7930110
+(masculino, o atribuído) e Q28225985 (**feminino**), e é este último que
+tem os nomes alternativos "Länk Vilaverdense" e "Länk". As notícias do
+Record (2.ª Liga, transferências para o Tondela) referem-se à equipa
+masculina. Nenhuma das formas usadas pelo Record ("Oriental", "Länk
+Vilaverdense") está hoje no vocabulário.
+
+**Correspondência mais longa em `count_mentions` (preparada, por ligar).**
+Hoje cada variante conta em todas as posições, mesmo dentro de outra mais
+longa ("Sporting de Braga" conta também "Sporting"). Nova opção
+`longest_match` (`--correspondencia-mais-longa`; desligada por omissão):
+em cada posição conta só a variante mais comprida, e a leitura continua
+depois dela; empates contam todos. Verificado sobre o corpus de 125 artigos
+com o vocabulário **antigo**, em memória (sem escrever outputs): por
+omissão, o código reproduz `output/corpus_entities.csv` exatamente (427
+linhas); com a regra ligada mudam 2 linhas, ambas falsos positivos
+corrigidos — "Rodrigo Moreno Machado" (variante "Rodrigo") deixa de
+aparecer no artigo FC Porto B–SC Braga B, onde as 308 ocorrências em 44
+capturas eram todas "Rodrigo Pinho" (outro jogador do vocabulário, que
+continua contado); "Danilo Luiz da Silva" passa de 4 para 3 ocorrências
+num artigo da Taça das Confederações (uma era "Danilo Pereira"). Testes:
+regra ligada e desligada, nome curto dentro do de outro jogador, um rótulo
+uma só vez por posição. Suite completa: 274 testes OK. O vocabulário novo
+não foi aplicado a nenhum corpus.

@@ -76,6 +76,17 @@ NATIONAL_TEAM = "Q1194951"  # seleção nacional (desporto)
 # manual, decisão documentada): não entram, como os nomes de lugar.
 COMMON_WORDS = frozenset({"aves", "estrela", "nacional", "naval", "real", "tecnico",
                           "uniao", "vitoria"})
+# Variantes de clube acrescentadas à mão (decisão do autor, 2026-10-21): a
+# Wikidata não tem "Benfica" sozinho como nome alternativo do clube, e é a
+# forma mais usada nas notícias. Entram depois da regra das cidades e das
+# palavras comuns e têm prioridade sobre a regra das variantes partilhadas:
+# ficam só na linha do clube indicado e saem de qualquer outra (a Wikidata dá
+# "Benfica" também ao clube multidesportivo Q2895813, "S.L. Benfica", e a
+# regra das partilhadas descartava-o das duas). "Porto" sozinho continua de
+# fora (é a cidade): limitação documentada em docs/experiments.md.
+MANUAL_CLUB_VARIANTS: dict[str, tuple[str, ...]] = {
+    "Q131499": ("Benfica",),  # Sport Lisboa e Benfica (futebol)
+}
 LEAGUES = {"Primeira Liga": "Q182994", "Segunda Liga": "Q754488"}
 FIRST_SEASON = 1999  # 1999–2000
 LAST_SEASON = 2023  # 2023–24
@@ -541,6 +552,9 @@ def build_vocabulary(
                 continue
             label, other_labels, dropped = club_forms(entity, places)
             stats["formas_de_lugar_ou_palavra_comum_descartadas"] += dropped
+            manual = MANUAL_CLUB_VARIANTS.get(entity.qid, ())
+            other_labels = [*other_labels, *manual]
+            stats["variantes_manuais_de_clube"] += len(manual)
             if label is None:
                 stats["clubes_sem_forma_inequivoca"] += 1
                 continue
@@ -575,6 +589,12 @@ def build_vocabulary(
                 continue
             row["variants"].add(name)
 
+    manual_owner = {
+        variant.casefold(): key
+        for key, row in rows.items()
+        for qid, variants in MANUAL_CLUB_VARIANTS.items() if qid in row["qids"]
+        for variant in variants
+    }
     owners: dict[str, set[str]] = defaultdict(set)
     for key, row in rows.items():
         owners[key].add(key)
@@ -582,7 +602,11 @@ def build_vocabulary(
             owners[variant.casefold()].add(key)
     vocabulary = []
     for key, row in sorted(rows.items()):
-        variants = sorted(v for v in row["variants"] if len(owners[v.casefold()]) == 1)
+        variants = sorted(
+            v for v in row["variants"]
+            if (manual_owner[v.casefold()] == key if v.casefold() in manual_owner
+                else len(owners[v.casefold()]) == 1)
+        )
         stats["variantes_partilhadas_descartadas"] += len(row["variants"]) - len(variants)
         homonyms = len(row["entities"])
         if homonyms > 1:

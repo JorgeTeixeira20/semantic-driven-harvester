@@ -139,6 +139,22 @@ class VocabularyTests(unittest.TestCase):
         # Palavra comum de uma palavra também não entra.
         self.assertEqual(by_label["Vitória Sport Clube"]["variantes"], "Vitória de Guimarães")
 
+    def test_manual_benfica_variant_has_priority_over_shared_rule(self) -> None:
+        # "Benfica" sozinho: decisão manual (2026-10-21). A Wikidata dá-o também
+        # ao clube multidesportivo Q2895813; a variante fica só no Q131499.
+        # "Porto" sozinho continua fora (cidade).
+        entities = [
+            Entity("clube", "Q131499", {"pt": "Sport Lisboa e Benfica"}, {"SLB"}, {"futebol"}),
+            Entity("clube", "Q2895813", {"pt": "S.L. Benfica"}, {"Benfica", "SLB Andebol"}, {"andebol"}),
+            Entity("clube", "Q128446", {"pt": "Futebol Clube do Porto"}, {"Porto"}, {"futebol"}),
+        ]
+        rows, stats = build_vocabulary(entities, {}, {"porto"})
+        by_label = {r["rotulo"]: r for r in rows}
+        self.assertEqual(by_label["Sport Lisboa e Benfica"]["variantes"], "Benfica|SLB")
+        self.assertEqual(by_label["S.L. Benfica"]["variantes"], "SLB Andebol")
+        self.assertEqual(by_label["Futebol Clube do Porto"]["variantes"], "")
+        self.assertEqual(stats["variantes_manuais_de_clube"], 1)
+
     def test_homonyms_across_modalities_and_categories(self) -> None:
         entities = [
             Entity("clube", "Q10", {"pt": "Sport Lisboa e Benfica"}, set(), {"futebol"}),
