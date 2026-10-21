@@ -3541,3 +3541,88 @@ ocorra ali.
 Teste de regressão novo em `tests/test_corpus_phase1.py`
 (`test_incomplete_nonempty_page_does_not_stop_the_pagination`). Suite
 completa: **203 testes, todos a passar.**
+
+## Candidatos a entidade fora do vocabulário fechado — teste exploratório (proposta e script testado, não corrido sobre o corpus real; 2026-10-21)
+
+### Motivação
+
+Discussão sobre alargar o Caminho B (vocabulário fechado da Wikidata,
+"Decisões já tomadas" acima) a uma abordagem híbrida: perguntar à Wikidata
+só pelos nomes próprios que o vocabulário fechado não encontra, em vez de
+todos os candidatos de todos os artigos. Essa ideia reduziria o volume de
+pedidos à Wikidata, mas não resolve dois problemas:
+
+1. Para saber que um nome (ex. "Estádio da Pedreira") é candidato a
+   verificar, é preciso primeiro alguma deteção genérica de candidatos —
+   o próprio passo de reconhecimento leve que a opção (b) ("Fonte do
+   vocabulário fechado — opções", acima) tentava evitar. A híbrida só
+   limita onde essa dependência é usada depois, não a elimina.
+2. Perguntar à Wikidata sobre um candidato desconhecido não diz de
+   antemão que tipo de coisa é (estádio, treinador, árbitro, competição
+   menor, ...); cada tipo precisaria de validação própria para não
+   aceitar uma correspondência errada — trabalho de desambiguação novo.
+
+**Decisão:** não implementar a híbrida nem qualquer pedido à Wikidata
+nesta sessão. Em vez disso, um teste pequeno e barato, só com o que já
+existe (corpus e vocabulário atuais): aplicar uma deteção leve de
+candidatos (heurística, não NER a sério) e ver quantos não batem com o
+vocabulário fechado, para decidir com evidência própria se vale a pena
+avançar. A Bola/Expresso ficam fora de qualquer implementação (apenas
+reconhecimento leve por pesquisa manual, já registado como parágrafo
+separado, fora do âmbito desta secção).
+
+Esta proposta não reabre a decisão "vocabulário fechado em vez de NER
+genérico" do `PROJECT_STATUS.md`; é um teste exploratório para informar
+se/como estender essa decisão, não uma mudança a ela.
+
+### Heurística (deliberadamente simples)
+
+Implementada em `src/semantic_harvester/corpus_candidate_entities.py`,
+sem pedidos à API nem à Wikidata, sem alterar o Caminho B, o grafo ou o
+raw:
+
+1. O texto do corpo do artigo (variante c′, como no Caminho B) é partido
+   em frases por pontuação final (`.`, `!`, `?`).
+2. Cada frase é ainda partida em cláusulas por vírgula/ponto e vírgula/
+   parênteses/aspas — sem isto, duas sequências separadas só por uma
+   vírgula (ex. "no Estádio da Luz, Bruno Fernandes marcou") fundir-se-
+   iam num só candidato, porque a tokenização por palavra descarta a
+   pontuação.
+3. Um candidato é uma sequência de 2 ou mais palavras capitalizadas,
+   podendo incluir no meio os conectores "de", "da", "do", "das", "dos"
+   e "e" (para apanhar nomes como "Estádio da Pedreira"), desde que não
+   comece na primeira palavra da frase (só a primeira cláusula de cada
+   frase tem essa exclusão; uma cláusula depois de uma vírgula pode
+   começar com um candidato).
+4. Candidatos cuja forma normalizada (igual à de `corpus_entities.py`:
+   NFC, minúsculas, sem acentos, limites de palavra) corresponde a, ou
+   está contida em, uma variante já presente no vocabulário fechado
+   indicado são descartados.
+
+Agrega por artigo: para cada candidato fora do vocabulário, nº de
+artigos distintos, nº de ocorrências e um `originalURL` de exemplo, para
+inspeção manual de uma amostra — esse exame é trabalho humano fora do
+script, não uma avaliação de precisão automática.
+
+### Testes (offline, fixtures sintéticas) e o que não foi corrido
+
+16 testes novos em `tests/test_corpus_candidate_entities.py`: deteção
+pura (exclusão de início de frase, conector a juntar duas palavras,
+conector "e" entre dois nomes, sequência de uma só palavra não conta,
+cláusulas separadas por vírgula não se fundem, duas frases contribuem
+candidatos separados), correspondência com o vocabulário (exata e por
+contenção), agregação por artigo (contagem de artigos/ocorrências,
+captura sem texto ou não-200 ignorada, ordenação) e uma execução sobre
+um corpus Turtle sintético (não destrutiva, filtra a entidade já
+conhecida, reporta o novo candidato). Suite completa: **219 testes,
+todos a passar.**
+
+**Nada foi corrido sobre o corpus real de 125 artigos.** Este ambiente
+remoto não tem os textos de `data/raw/texts/` (preservados fora do Git,
+ver `PROJECT_STATUS.md`) — a mesma limitação operacional que já impede
+chamadas reais à API aqui. `python -m semantic_harvester.corpus_candidate_entities
+--vocabulario data/processed/caminho_b_vocabulario_wikidata.csv` fica
+pronto a correr numa sessão local ou no terminal, mas os resultados
+sobre os artigos reais (quantos candidatos distintos, que proporção
+parece ruído vs. nomes próprios genuínos) ainda não têm evidência
+própria; não inventar esses números aqui.

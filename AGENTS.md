@@ -48,6 +48,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   rotulados; sem rede, não altera grafo, raw nem as saídas da variante (a).
 - `corpus_entities.py`: Caminho B — temas pelo `originalURL` e entidades por
   vocabulário fechado no texto sem chrome; sem rede.
+- `corpus_candidate_entities.py`: teste exploratório (não o Caminho B) —
+  candidatos a entidade por heurística (sequências de palavras
+  capitalizadas, sem NER) que o vocabulário fechado não cobre; sem rede.
 - `wikidata_vocabulary.py`: vocabulário de jogadores do Caminho B a partir da
   Wikidata (rede: endpoint SPARQL); raw em `data/raw/wikidata/`.
 - `article_body.py`: corpo do artigo entre o título e 14 marcadores literais
@@ -102,6 +105,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_redundancy [--limiar X] [--texto corpo\|completo]` | Sem rede; lê `output/corpus_articles.ttl` e `data/raw/texts/`; grava `output/corpus_redundancy*`; não altera grafo nem raw; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.corpus_chrome --so-distribuicao \| --fracao F [--n 5]` | Sem rede; lê o Turtle, `data/raw/texts/` e a amostra rotulada; grava `output/corpus_chrome_*`. |
 | `python -m semantic_harvester.corpus_entities --vocabulario CSV [--texto corpo\|sem-chrome\|completo]` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`; por omissão só o corpo do artigo (c′). |
+| `python -m semantic_harvester.corpus_candidate_entities --vocabulario CSV [--texto corpo\|completo]` | Sem rede; lê o Turtle e `data/raw/texts/`; teste exploratório (candidatos fora do vocabulário fechado, sem NER); grava `output/corpus_candidate_entities*`; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.wikidata_vocabulary` | Rede (28 pedidos SPARQL à Wikidata); grava raw em `data/raw/wikidata/` e `data/processed/caminho_b_vocabulario_wikidata.csv`. |
 | `python -m semantic_harvester.corpus_body [--vocabulario CSV]` | Sem rede; lê o Turtle, os textos e a amostra rotulada; grava `output/corpus_body_*`. |
 | `python -m semantic_harvester.corpus_redundancy_rdf` / `corpus_entities_rdf` | Sem rede; leem os CSV oficiais de D/B (e o vocabulário); gravam `output/corpus_redundancy.ttl` / `output/corpus_entities.ttl`; não alteram `corpus_articles.ttl`. |

@@ -1,8 +1,8 @@
 # Estado do projeto
 
-Atualizado em **2026-10-19** (alcance real da descoberta e download do HTML
-em bruto), a partir do código, testes, documentação e histórico; a última
-revisão integral foi até `a3208f4`.
+Atualizado em **2026-10-21** (teste exploratório de candidatos a entidade,
+não o Caminho B), a partir do código, testes, documentação e histórico; a
+última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
 [README.md](../README.md).
@@ -515,6 +515,17 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    no corpus atual só "Pedro Mendes" ocorre, 1 linha. Os três Turtle (corpus,
    D, B) combinados dão 16 469 triplos com URIs comuns. Detalhe em
    `experiments.md` ("RDF dos Caminhos D e B").
+
+   **Teste exploratório, não o Caminho B (proposta e script testado em
+   2026-10-21, não corrido sobre o corpus real):**
+   `corpus_candidate_entities.py` deteta, por heurística (sequências de
+   palavras capitalizadas fora do início de frase, sem NER), candidatos a
+   entidade que o vocabulário fechado da Wikidata não cobre — para avaliar
+   com evidência própria se vale a pena perguntar à Wikidata só por esses
+   casos, sem reabrir a decisão de vocabulário fechado. Não corrido sobre
+   os 125 artigos porque este ambiente remoto não tem `data/raw/texts/`
+   (ver "Nota operacional" abaixo); 16 testes offline próprios. Detalhe em
+   `experiments.md` ("Candidatos a entidade fora do vocabulário fechado").
 5. **Protótipo de navegação** — objetivo do RPD ainda sem nenhuma implementação.
    **Decisão:** versão mínima baseada em SPARQL sobre o grafo já existente,
    construída cedo (não deixada para o fim) para reduzir o risco de ficar sem
