@@ -4755,3 +4755,49 @@ Wikidata o item com os nomes alternativos "Länk Vilaverdense" e "Länk")
 usa o mesmo nome; o texto não distingue as duas, e uma menção a "Länk
 Vilaverdense" conta sempre para o Q7930110 (masculino), que é a equipa das
 notícias do Record na 2.ª Liga em 2024.
+
+### Contentor do corpo no HTML por esquema de URL e época (medição, 2026-10-22)
+
+Sem pedidos à rede e sem tocar na recolha em curso. Amostra de 20 capturas
+por esquema de URL entre os HTML já descarregados pelo `corpus_rdf --fase1`
+(`data/raw/original_html/`; a captura mais antiga de Artigos escolhidos ao
+acaso; scripts e lista da amostra em `data/raw/original_html/_scripts/`).
+Um contentor conta como encontrado se tiver ≥ 30 palavras e as suas
+primeiras 8 palavras estiverem no texto extraído da mesma captura (o texto
+que o corpus usa). O extrator ainda não foi implementado.
+
+**Disponibilidade:** só `/detalhe/`, `/amp/` e `noticia.asp` têm HTML em
+disco. `noticia.aspx` (0 de 3 814), `shownews.asp` (0 de 8 410),
+`tn0cs.asp` (0 de 1 695) e `tn1cs.asp` (0 de 665) ainda não têm nenhum: as
+suas capturas estavam na zona dos 400 e a recolha só lá chega depois dos
+`noticia.asp`. Ficam por medir quando houver HTML.
+
+| Esquema | Época | Contentor do corpo | Encontrado |
+| --- | --- | --- | --- |
+| `/detalhe/` | 2017 | `div.row.article-body` > `div#readerBody.article-main` | 4/4 |
+| `/detalhe/` | 2018–2024 | `div.text_container` | 12/16 (2018: 1/4; 2019: 1/1; 2020: 4/4; 2021: 2/2; 2022: 1/1; 2023: 1/1; 2024: 2/3) |
+| `/amp/` | 2018–2020 | `div.bodybox` | 19/20 (mediana 130 palavras) |
+| `noticia.asp` | 2002–2007 | tag própria `<aux>` (em 2007 dentro de `span.apreto12n`, numa célula `td[width=600]`; antecedida pelo comentário `ENDParams …Noticia`) | 19/19 com texto extraído (2002: 4/4; 2006: 8/8; 2007: 7/7) |
+
+As falhas explicam-se todas:
+
+- **`/detalhe/` 2018 (3) e 2024 (1):** 2 são páginas AMP dentro do
+  `/detalhe/` (`…/detalhe/amp/…`), com o template AMP (o contentor certo é
+  `bodybox`): o template depende da página, não só do esquema de URL; 2
+  são **Premium** (2018 sem corpo, com `article-premium`; 2024 com o
+  `text_container` reduzido ao teaser, 29 palavras, e `container_assinatura`)
+  — ficar sem corpo é o resultado correto.
+- **`/amp/` 2020 (1):** fotogaleria cujo `bodybox` tem só a descrição (27
+  palavras, abaixo do limiar). `div.mainBox` existe nas 20, mas engloba mais
+  do que o corpo (mediana 212 palavras contra 130 do `bodybox`).
+- **`noticia.asp` 2001 (1):** o texto extraído desta captura está vazio,
+  pelo que não há como validar (o `<aux>` existe, com 63 palavras); é a
+  única captura de 2001 na amostra.
+
+Duas notas para o extrator: no `noticia.asp` a página declara
+`iso-8859-1` (a primeira medição deu 6/7 em 2007 por ter descodificado como
+UTF-8; com a codificação declarada, 7/7); e em todas as 20 capturas
+`noticia.asp` a variante c′ não encontra corpo no texto extraído, porque o
+título da página é genérico (":.: Jornal Record :.:") e a c′ ancora o corpo
+no título — para o site de 2000–2009, o HTML é a única via medida até agora
+para isolar o corpo.
