@@ -47,10 +47,10 @@ class ExtractHtmlBodyTests(unittest.TestCase):
         self.assertEqual(body.container, "text_container")
         self.assertEqual(body.text, "Primeira linha do corpo. Segunda linha. Terceira linha.")
 
-    def test_bodybox_drops_title_subtitle_photo_share_ads_author(self) -> None:
+    def test_bodybox_keeps_subtitle_drops_title_photo_share_ads_author(self) -> None:
         body = extract_html_body(BODYBOX_AMP.encode("utf-8"))
         self.assertEqual(body.container, "bodybox")
-        self.assertEqual(body.text, "Corpo da notícia AMP.")
+        self.assertEqual(body.text, "Subtítulo Corpo da notícia AMP.")
 
     def test_chrome_blocks_inside_bodybox_are_cut(self) -> None:
         body = extract_html_body(BODYBOX_AMP_IN_DETALHE.encode("utf-8"))
@@ -79,6 +79,46 @@ class ExtractHtmlBodyTests(unittest.TestCase):
         body = extract_html_body(b"<html><body><div>Menu e mais nada</div></body></html>")
         self.assertFalse(body.found)
         self.assertIsNone(body.container)
+
+
+class ValidationRegressionTests(unittest.TestCase):
+    """Falhas da validação sobre 60 HTML reais (2026-10-22), uma por teste."""
+
+    def test_longest_of_two_text_containers(self) -> None:
+        html = ('<div class="text_container">Em direto Record Talks</div>'
+                '<div class="text_container">O médio brasileiro Lucas Fernandes renovou '
+                'o contrato com o clube por mais duas épocas.</div>')
+        self.assertTrue(extract_html_body(html.encode()).text.startswith("O médio brasileiro"))
+
+    def test_related_block_mid_body_is_skipped_not_cut(self) -> None:
+        html = ('<div class="text_container">Antes do bloco.<div class="relacionadas">'
+                '<h2 class="moduleTitle">Relacionadas</h2><a>Outra notícia</a></div>'
+                'Rui Pedro Soares falou depois.</div>')
+        self.assertEqual(extract_html_body(html.encode()).text,
+                         "Antes do bloco. Rui Pedro Soares falou depois.")
+
+    def test_2018_read_more_button(self) -> None:
+        html = ('<div class="text_container">Corpo.<div class="lerMais">'
+                '<a class="btLerMais">Continuar a ler</a></div></div>')
+        self.assertEqual(extract_html_body(html.encode()).text, "Corpo.")
+
+    def test_comment_button_and_detail_ads_inside_bodybox(self) -> None:
+        html = ('<div class="bodybox"><p>Corpo da AMP.</p><div class="detalheAds">'
+                '<div class="pub">PUB</div></div><div class="comentarBtn">Deixe o seu '
+                'comentário</div><div class="comentarBtn">Comentar</div></div>')
+        self.assertEqual(extract_html_body(html.encode()).text, "Corpo da AMP.")
+
+    def test_photo_gallery_text_comes_from_subtitle(self) -> None:
+        html = ('<div class="bodybox"><h1>Só à altura das lendas</h1><h2 class="subtitle">'
+                'Cristiano Ronaldo no treino da seleção.</h2><div class="comentarBtn">'
+                'Deixe o seu comentário</div></div>')
+        self.assertEqual(extract_html_body(html.encode()).text,
+                         "Cristiano Ronaldo no treino da seleção.")
+
+    def test_cp1252_quotes_in_old_pages(self) -> None:
+        raw = "<aux>no livro “Futebol e Rock N’Roll”, que – diz</aux>".encode("cp1252")
+        self.assertEqual(extract_html_body(raw).text,
+                         "no livro “Futebol e Rock N’Roll”, que – diz")
 
 
 class BodyCorpusWithHtmlTests(OfflineTestCase):

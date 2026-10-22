@@ -13,8 +13,9 @@ tentativa — o template depende da página, não só do esquema de URL:
 sobre o texto aplicam-se os 14 marcadores de chrome da c′ mais
 "Relacionadas" (blocos de chrome dentro do `bodybox` das AMP em `/detalhe/`).
 
-Codificação: UTF-8 estrito e, se falhar, latin-1 — a declaração na página
-nem sempre é fiável (2002: declarada iso-8859-1, UTF-8 em 3 de 4).
+Codificação: UTF-8 estrito, depois cp1252 e, por fim, latin-1 — a
+declaração na página nem sempre é fiável (2002: declarada iso-8859-1, UTF-8
+em 3 de 4).
 Sem dependências fora da biblioteca padrão.
 """
 
@@ -38,8 +39,9 @@ SKIP_TAGS = frozenset({
     "amp-analytics", "amp-ad",
 })
 SKIP_CLASSES = frozenset({
-    "lerMaisCont", "autorDetalhe", "pub_inside_text", "texto_socialShare", "adbox",
-    "texto_autor", "container_assinatura", "subtitle",
+    "lerMaisCont", "lerMais", "btLerMais", "autorDetalhe", "pub_inside_text",
+    "texto_socialShare", "adbox", "texto_autor", "container_assinatura",
+    "relacionadas", "comentarBtn", "detalheAds", "pub",
 })
 SKIP_IDS = frozenset({"escondec", "relacContainer", "incontent"})
 PREMIUM_CLASSES = frozenset({"container_assinatura", "article-premium"})
@@ -61,10 +63,14 @@ class HtmlBody:
 
 
 def decode_html(raw: bytes) -> str:
-    try:
-        return raw.decode("utf-8")
-    except UnicodeDecodeError:
-        return raw.decode("latin-1")
+    # cp1252 antes de latin-1: as aspas e travessões “ ” ’ – do site antigo
+    # (0x80–0x9F) seriam caracteres de controlo em latin-1.
+    for encoding in ("utf-8", "cp1252"):
+        try:
+            return raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return raw.decode("latin-1")
 
 
 class _ContainerParser(HTMLParser):
@@ -91,9 +97,8 @@ class _ContainerParser(HTMLParser):
         if not self._skipping():
             for name, matches in CONTAINERS:
                 if matches(tag, ids, classes) and not any(n == name for n, _ in self.active):
-                    if name == "aux" or not self.parts[name]:
-                        self.parts[name].append([])
-                        self.active.append((name, len(self.stack)))
+                    self.parts[name].append([])
+                    self.active.append((name, len(self.stack)))
         skip = tag in SKIP_TAGS or bool(classes & SKIP_CLASSES) or bool(ids & SKIP_IDS)
         self.stack.append((tag, skip))
         self._write(" ")
@@ -131,14 +136,23 @@ def _cut_chrome(text: str) -> str:
     return text[:min(stops)] if stops else text
 
 
+def _clean(parts: list[str]) -> str:
+    text = unicodedata.normalize("NFC", _SPACES.sub(" ", "".join(parts)).strip())
+    return _cut_chrome(text).strip()
+
+
 def extract_html_body(raw: bytes) -> HtmlBody:
     parser = _ContainerParser()
     parser.feed(decode_html(raw))
     parser.close()
     for name, _ in CONTAINERS:
-        text = " ".join("".join(part) for part in parser.parts[name])
-        text = unicodedata.normalize("NFC", _SPACES.sub(" ", text).strip())
-        text = _cut_chrome(text).strip()
+        occurrences = [_clean(part) for part in parser.parts[name]]
+        if name == "aux":
+            text = " ".join(t for t in occurrences if t)
+        else:
+            # Uma página pode ter mais de um contentor igual (em 2024, o
+            # primeiro `text_container` é um destaque promocional): o mais longo.
+            text = max(occurrences, key=len, default="")
         if text:
             return HtmlBody(text, True, name, parser.premium)
     return HtmlBody("", False, None, parser.premium)

@@ -4946,3 +4946,47 @@ encontrada pelo HTML. Suite completa: **300 testes, todos a passar.**
 comando acima sobre as amostras da medição e comparar com os esqueletos.
 Os esquemas `noticia.aspx`, `shownews.asp`, `tn0cs.asp` e `tn1cs.asp` não
 foram medidos; se tiverem outro contentor, a lista tem de crescer.
+
+### Validação em HTML real e correções (2026-10-22)
+
+A sessão local correu `python -m semantic_harvester.html_body` sobre as
+mesmas 60 capturas da medição (saída em
+`output/html_body_validacao_cli.tsv`, fora do Git), sem alterar código.
+Contentor certo: `readerBody` 4/4; `text_container` 13/14 (a 14.ª é um
+Premium de 2018 sem corpo, correto); `bodybox` 20/20; AMP dentro de
+`/detalhe/` 2/2; `<aux>` 20/20. Premium certo em todas: 7 detetados, que são
+exatamente as 7 páginas com `container_assinatura` ou `article-premium`.
+Em 2021–2024 a frase "exclusiva para assinantes" está num modal escondido em
+todas as páginas e não serve de sinal; a classe sim.
+
+Falhas e correção de cada uma (um teste de regressão por falha, em
+`tests/test_html_body.py`):
+
+1. **Dois `text_container`** (1 de 3 em 2024): o primeiro é um destaque
+   promocional (15 palavras em vez de 116). Agora usa-se o mais longo dos
+   contentores iguais da página (as `<aux>` continuam a juntar-se).
+2. **Corte a mais** (2 em 2020, 1 em 2021): um `div.relacionadas` (título
+   `h2.moduleTitle` "Relacionadas") a meio do corpo fazia cortar tudo a
+   partir dali (75 palavras em vez de 444). Agora o elemento é saltado; o
+   corte por "Relacionadas" mantém-se para os blocos das AMP em
+   `/detalhe/`, que foram bem cortados.
+3. **"Continuar a ler" em 2018**: a classe é `lerMais` (botão
+   `a.btLerMais`), não `lerMaisCont`. Acrescentadas.
+4. **"Deixe o seu comentário" e "PUB Comentar"** no fim do `bodybox` (18 de
+   20, e as 2 AMP em `/detalhe/`): `div.comentarBtn` e
+   `div.detalheAds > div.pub`. Acrescentadas.
+5. **Fotogalerias e vídeos AMP** (3): o texto está no `h2.subtitle`, que era
+   descartado, e sobrava só "Deixe o seu comentário". **Decisão:** o
+   subtítulo passa a contar como corpo — é texto editorial da própria
+   notícia (o lead), não chrome, e não traz menções de outras notícias. O
+   `div.videoElement_description` não foi tratado: não se sabe onde está na
+   página; a confirmar.
+6. **Pontuação no `<aux>`** (4 de 15, 2006–2007): a alternativa ao UTF-8 era
+   latin-1, que transforma “ ” ’ – (bytes 0x80–0x9F) em caracteres de
+   controlo. Agora tenta-se UTF-8, depois cp1252 e só por fim latin-1. As
+   letras acentuadas já estavam certas em todos os anos.
+
+O teaser dos Premium (30 palavras em 2024, com `premium=True`) não é usado:
+no `--texto corpo-html` uma captura Premium fica sem corpo, como na decisão
+de 2026-10-19. Suite completa depois das correções: **306 testes, todos a
+passar.** Falta repetir a validação nos HTML reais com estas correções.

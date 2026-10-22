@@ -165,7 +165,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 300 testes em vinte e um módulos de `tests/`.
+pacote conforme o README. Existem 306 testes em vinte e um módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -200,8 +200,8 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 independente de `next_page`; lista de termos alargada).
 
 Última validação em **2026-10-22**, sessão remota Linux (Python 3.11.17),
-depois do corpo pelo contentor do HTML (`html_body.py`):
-`.venv/bin/python -m unittest discover -s tests` — **300 testes, todos
+depois das correções da validação do `html_body.py` em HTML real:
+`.venv/bin/python -m unittest discover -s tests` — **306 testes, todos
 passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-21, Python
 3.12.4 (macOS), vocabulário alargado, 275 testes OK; 2026-10-22, leitura do
 corpus da Fase 1, 286 testes OK; 2026-10-21, depois de
