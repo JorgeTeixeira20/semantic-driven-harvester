@@ -287,7 +287,7 @@ manual, um parágrafo por fonte na dissertação; sem implementação.
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 330 testes em vinte e três módulos de `tests/`.
+pacote conforme o README. Existem 333 testes em vinte e três módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -322,9 +322,10 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 independente de `next_page`; lista de termos alargada).
 
 Última validação em **2026-10-22**, sessão remota Linux (Python 3.11.17),
-depois do contentor do `noticia.aspx` no `html_body.py`:
-`.venv/bin/python -m unittest discover -s tests` — **330 testes, todos
-passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, rótulo
+depois do contentor do site de 1999–2000 (`tn0cs`/`tn1cs`) no `html_body.py`:
+`.venv/bin/python -m unittest discover -s tests` — **333 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, contentor
+do `noticia.aspx`, 330 testes OK; 2026-10-22, rótulo
 inglês na abordagem híbrida, 327 testes OK; 2026-10-22, regras
 revistas da abordagem híbrida, 326 testes OK; 2026-10-22, abordagem
 híbrida, 325 testes OK; 2026-10-22, protótipo

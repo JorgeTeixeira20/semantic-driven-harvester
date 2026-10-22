@@ -5310,3 +5310,40 @@ classificação da Volta saem **vazias**: os nomes estão na coluna
 maiúsculas, que não estão no vocabulário; ficam como limitação. No mesmo
 dia, o `shownews.asp` (2000–2001) foi medido com o HTML recuperado depois do
 503: `<aux>` em 20 de 20, sem contentor novo.
+
+## Contentor do corpo no site de 1999–2000 (`tn0cs`/`tn1cs.asp`) (2026-10-22)
+
+Depois da repetição do HTML dos 5 917 artigos com 503 (todos com HTML às
+16:59), a sessão local mediu 20 páginas de cada esquema antigo (sem alterar
+código): `shownews.asp` (2000–2001) → `<aux>` em 20 de 20, corpo validado em
+19; `tn0cs.asp` e `tn1cs.asp` (1999–2000) → nenhum contentor reconhecido (0 de
+20 em cada), corpo localizado à mão e validado contra o texto extraído em 19
+e 20. Esqueletos em `output/html_corpo_tn0cs.md` e `output/html_corpo_tn1cs.md`
+(fora do Git).
+
+O template (o mesmo nos dois) é só tabelas e `<font>`, sem `class` nem `id` e
+sem `charset`: dentro da coluna `td[width=480]` vêm o antetítulo (`font
+size=2` com cor, em `div align=left`), o título (`font size=6`), o lead
+(`font size=3`, itálico), o corpo (`p > font size=2` sem cor, com `<p>` nunca
+fechados) e a data (`font size=0`). O último parágrafo do corpo é a
+assinatura em maiúsculas ("CARLOS OLIVEIRA"). Uma página do `tn0cs` tem uma
+tabela de classificação nesse `font size=2`, em vez de prosa.
+
+**Decisões (2026-10-22), pelo critério já usado nos outros templates:**
+
+- **O lead entra no corpo**: é texto da própria notícia, como o subtítulo do
+  `bodybox` (decisão da validação de 2026-10-22).
+- **A assinatura sai**: nos templates modernos o autor já era retirado
+  (`autorDetalhe`, `texto_autor`); e um nome de jornalista repetido em muitos
+  artigos viraria candidato da abordagem híbrida e podia ser confundido na
+  Wikidata com um desportista homónimo.
+
+**Implementação (`html_body.py`):** contentor `td480` (a coluna
+`td[width=480]`, tentado em último lugar); dentro dele saltam-se os `font` de
+tamanho 6 e 0 e os de tamanho 2 com cor (estas regras só se aplicam dentro
+deste contentor); no fim retira-se uma assinatura de 2 a 4 palavras só em
+maiúsculas depois do fim de uma frase. Sem `charset`, a descodificação
+UTF-8 → cp1252 → latin-1 já cobre o caso. 3 testes novos (o esqueleto
+completo, uma tabela no corpo, e as regras de `font` sem efeito fora da
+coluna). Suite completa: **333 testes, todos a passar.** Falta validar nas 40
+páginas reais.

@@ -10,7 +10,9 @@ tentativa — o template depende da página, não só do esquema de URL:
 `div#readerBody` (2017), `div.text_container` (2018–2024), `div.bodybox`
 (AMP), a tag `<aux>` (`noticia.asp`; a classe do `span` à volta muda com a
 época) e, em `noticia.aspx` (2009), o `span.apreto12n` dentro da coluna
-`td[width=600]`. Dentro deles retiram-se os blocos medidos que não são corpo, e
+`td[width=600]`; nas `tn0cs`/`tn1cs.asp` (1999–2000), a coluna `td[width=480]`
+sem título, data e antetítulo, e sem a assinatura final. Dentro deles
+retiram-se os blocos medidos que não são corpo, e
 sobre o texto aplicam-se os 14 marcadores de chrome da c′ mais
 "Relacionadas" (blocos de chrome dentro do `bodybox` das AMP em `/detalhe/`).
 
@@ -29,17 +31,30 @@ from html.parser import HTMLParser
 
 from .article_body import find_marker, fold_same_length
 
-# (nome, teste sobre a tag, ids, classes e se está dentro da coluna principal)
+# (nome, teste sobre a tag, ids, classes, atributos e se está dentro da coluna principal)
 CONTAINERS = (
-    ("readerBody", lambda tag, ids, classes, main: tag == "div" and "readerBody" in ids),
-    ("text_container", lambda tag, ids, classes, main: tag == "div" and "text_container" in classes),
-    ("bodybox", lambda tag, ids, classes, main: tag == "div" and "bodybox" in classes),
-    ("aux", lambda tag, ids, classes, main: tag == "aux"),
+    ("readerBody", lambda tag, ids, classes, attrs, main: tag == "div" and "readerBody" in ids),
+    ("text_container", lambda tag, ids, classes, attrs, main: tag == "div" and "text_container" in classes),
+    ("bodybox", lambda tag, ids, classes, attrs, main: tag == "div" and "bodybox" in classes),
+    ("aux", lambda tag, ids, classes, attrs, main: tag == "aux"),
     # noticia.aspx (2009): `apreto12n` é só uma classe de tipo de letra (9 a 16 por
     # página); o corpo é o que está dentro da coluna `td[width=600]` (a votação fica fora).
-    ("apreto12n", lambda tag, ids, classes, main: tag == "span" and "apreto12n" in classes and main),
+    ("apreto12n", lambda tag, ids, classes, attrs, main: tag == "span" and "apreto12n" in classes and main),
+    # tn0cs/tn1cs.asp (1999–2000): só tabelas e <font>, sem classes; a coluna
+    # td[width=480] tem antetítulo, título, lead, corpo e data (ver OLD_SITE_SKIP).
+    ("td480", lambda tag, ids, classes, attrs, main: tag == "td" and _attr(attrs, "width") == "480"),
 )
 MAIN_COLUMN_WIDTH = "600"
+# Dentro do td480: título (size 6), data (size 0) e antetítulo (size 2 com cor)
+# não são corpo; ficam o lead (size 3, itálico) e o corpo (size 2 sem cor).
+OLD_SITE_SKIP_SIZES = frozenset({"6", "0"})
+# Assinatura no fim do corpo do site de 1999–2000 ("CARLOS OLIVEIRA"): 2 a 4
+# palavras só em maiúsculas depois do fim de uma frase.
+_SIGNATURE = re.compile(r"(?<=[.!?»”\"')])\s+(?:[A-ZÀ-Ý][A-ZÀ-Ý'.-]*\s+){1,3}[A-ZÀ-Ý][A-ZÀ-Ý'.-]*\s*$")
+
+
+def _attr(attrs: dict[str, str | None], name: str) -> str:
+    return (attrs.get(name) or "").strip()
 SKIP_TAGS = frozenset({
     "script", "style", "noscript", "template", "iframe", "button", "figure", "h1",
     "amp-analytics", "amp-ad",
@@ -101,14 +116,17 @@ class _ContainerParser(HTMLParser):
             if tag == "br":
                 self._write(" ")
             return
-        main_column = tag == "td" and (values.get("width") or "").strip() == MAIN_COLUMN_WIDTH
+        main_column = tag == "td" and _attr(values, "width") == MAIN_COLUMN_WIDTH
         in_main = main_column or any(main for _, _, main in self.stack)
         if not self._skipping():
             for name, matches in CONTAINERS:
-                if matches(tag, ids, classes, in_main) and not any(n == name for n, _ in self.active):
+                if matches(tag, ids, classes, values, in_main) and not any(n == name for n, _ in self.active):
                     self.parts[name].append([])
                     self.active.append((name, len(self.stack)))
         skip = tag in SKIP_TAGS or bool(classes & SKIP_CLASSES) or bool(ids & SKIP_IDS)
+        if tag == "font" and any(n == "td480" for n, _ in self.active):
+            size = _attr(values, "size")
+            skip = skip or size in OLD_SITE_SKIP_SIZES or (size == "2" and bool(_attr(values, "color")))
         self.stack.append((tag, skip, main_column))
         self._write(" ")
 
@@ -158,6 +176,8 @@ def extract_html_body(raw: bytes) -> HtmlBody:
         occurrences = [_clean(part) for part in parser.parts[name]]
         if name == "aux":
             text = " ".join(t for t in occurrences if t)
+        elif name == "td480":
+            text = _SIGNATURE.sub("", max(occurrences, key=len, default="")).strip()
         else:
             # Uma página pode ter mais de um contentor igual (em 2024, o
             # primeiro `text_container` é um destaque promocional): o mais longo.

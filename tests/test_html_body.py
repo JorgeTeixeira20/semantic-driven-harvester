@@ -157,6 +157,39 @@ class NoticiaAspxTests(unittest.TestCase):
         self.assertEqual(extract_html_body(html.encode()).container, "aux")
 
 
+TN_1999 = """<form name="thisForm"><html><body><table width="600"><tr><td width="480">
+<table width="100%"><tr><td><div align="left"><font size="2" color="#000000"><b>LATERAL DESILUDIDO
+COM SEGUNDO PENALTY</b></font></div></td></tr>
+<tr><td><div align="left"><font size="6" color="#FF0000"><b>Cristiano: «Ninguém sofre mais do que eu»</b></font></div></td></tr>
+<tr><td><table width="100%"><tr><td><font size="3" color="#000000"><i><b>O lateral-esquerdo aveirense
+lamenta o resultado.</b></i></font></td></tr></table></td></tr>
+<tr><td><p><font size="2" face="Arial, Helvetica, sans-serif"><p>O LATERAL-ESQUERDO Cristiano foi o
+réu da noite.<p>Este é, de resto, o segundo penálti da época.<p>CARLOS OLIVEIRA</font></td></tr>
+<tr><td><font size="0"><b>Data:</b> <i>Terça-Feira, 23 de Novembro de 1999 19:50</i></font></td></tr>
+</table></td><td width="120"><font size="2">Menu</font></td></tr></table></body></html></form>"""
+
+
+class OldSite1999Tests(unittest.TestCase):
+    """tn0cs/tn1cs.asp (1999–2000): medição de 2026-10-22, 40 páginas, esqueletos
+    em output/html_corpo_tn0cs.md e output/html_corpo_tn1cs.md (fora do Git)."""
+
+    def test_lead_and_body_without_title_date_kicker_and_signature(self) -> None:
+        body = extract_html_body(TN_1999.encode("cp1252"))
+        self.assertEqual(body.container, "td480")
+        self.assertEqual(body.text, "O lateral-esquerdo aveirense lamenta o resultado. "
+                         "O LATERAL-ESQUERDO Cristiano foi o réu da noite. "
+                         "Este é, de resto, o segundo penálti da época.")
+
+    def test_table_body_keeps_its_names(self) -> None:
+        html = ('<td width="480"><p><font size="2"><table><tr><td>1º Benfica B</td>'
+                '<td>2º Sporting B</td></tr></table></font></td>')
+        self.assertIn("1º Benfica B", extract_html_body(html.encode()).text)
+
+    def test_font_rules_only_inside_the_old_column(self) -> None:
+        html = '<aux><font size="2" color="#000000">Corpo de 2006.</font></aux>'
+        self.assertEqual(extract_html_body(html.encode()).text, "Corpo de 2006.")
+
+
 class BodyCorpusWithHtmlTests(OfflineTestCase):
     def capture(self, text: str, html: str | None) -> Capture:
         path = None
