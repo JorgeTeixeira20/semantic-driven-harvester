@@ -5195,3 +5195,30 @@ sessão não tem acesso): que o desempate escolhe o estádio atual e a Taça de
 futebol, e que a pesquisa encontra a Liga dos Campeões da UEFA. Testes com
 respostas simuladas para os três casos; suite completa: **326 testes, todos
 a passar.**
+
+### Verificação das regras revistas: 12 nomes (2026-10-22)
+
+Sessão local, contra a Wikidata, sem gravar nada no projeto: **os 12 nomes
+aceites como esperado**, sem falhas de consulta.
+
+| Nome | Tipo | QID | Portugal | Método | Desempate |
+| --- | --- | --- | --- | --- | --- |
+| Estádio da Luz | estadio | Q7875112 | sim | nome_exato | proeminencia |
+| Estádio José Alvalade | estadio | Q287359 | sim | nome_exato | proeminencia |
+| Estádio do Dragão | estadio | Q271454 | sim | nome_exato | unico |
+| Taça de Portugal | competicao | Q29224 | sim | nome_exato | proeminencia |
+| Liga dos Campeões | competicao | Q18756 | sim (UEFA) | pesquisa | proeminencia |
+| Liga Europa | competicao | Q18760 | sim (UEFA) | pesquisa | proeminencia |
+| Jorge Jesus | treinador | Q527550 | sim | nome_exato | unico |
+| Sérgio Conceição | treinador | Q317298 | sim | nome_exato | proeminencia |
+| Real Madrid | clube | Q8682 | não | nome_exato | proeminencia |
+| Lionel Messi | jogador | Q615 | não | nome_exato | unico |
+| Premier League | competicao | Q9448 | não | nome_exato | proeminencia |
+| Jogos Olímpicos | competicao | Q5389 | sim (COI) | nome_exato | unico |
+
+No Estádio da Luz o desempate escolheu o atual (Q7875112, inaugurado em
+2003, sem data de demolição) e não o antigo (Q2736585, 1954–2003). Messi e
+Premier League não têm rótulo pt na Wikidata: o rótulo passa a cair para o
+inglês quando falta o português (teste novo). Amostra de nomes conhecidos,
+escolhidos para testar as regras; não substitui a revisão de uma amostra dos
+aceites na corrida real. Suite completa: **327 testes, todos a passar.**

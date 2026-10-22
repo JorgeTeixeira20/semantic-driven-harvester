@@ -107,6 +107,15 @@ class DecideTests(unittest.TestCase):
                                binding("Q2", kind="clube", pt=False, links=1)])
         self.assertEqual(decide("Nome", 3, mixed, set(), only_portugal=True).qid, "Q1")
 
+    def test_label_falls_back_to_english(self) -> None:
+        en_only = {**binding("Q615", kind="jogador", pt=False, links=200),
+                   "labelEn": {"type": "literal", "value": "Lionel Messi"}}
+        self.assertEqual(decide("Lionel Messi", 9, parse_matches([en_only]), set()).wikidata_label,
+                         "Lionel Messi")
+        both = {**binding("Q1", "Estádio do Dragão", "estadio", True),
+                "labelEn": {"type": "literal", "value": "Dragão Stadium"}}
+        self.assertEqual(parse_matches([both])["Q1"].label, "Estádio do Dragão")
+
     def test_wrong_type_and_no_match(self) -> None:
         city = parse_matches([binding("Q1", "Lisboa")])
         self.assertEqual(decide("Lisboa", 4, city, set()).decision, WRONG_TYPE)

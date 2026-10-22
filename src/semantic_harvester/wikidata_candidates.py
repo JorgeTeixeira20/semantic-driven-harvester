@@ -100,9 +100,10 @@ def candidate_query(name: str, search: bool = False) -> str:
         f"VALUES ?name {{ {lit}@pt {lit}@en }} ?item rdfs:label|skos:altLabel ?name . "
     )
     return (
-        "SELECT DISTINCT ?item ?label ?links ?kind ?pt WHERE { "
+        "SELECT DISTINCT ?item ?label ?labelEn ?links ?kind ?pt WHERE { "
         f"{find}"
         "OPTIONAL { ?item rdfs:label ?label FILTER(lang(?label) = 'pt') } "
+        "OPTIONAL { ?item rdfs:label ?labelEn FILTER(lang(?labelEn) = 'en') } "
         "OPTIONAL { ?item wikibase:sitelinks ?links } "
         "OPTIONAL { "
         f"{{ ?item wdt:P31 wd:{HUMAN} ; wdt:P106/wdt:P279* wd:{COACH} . BIND('treinador' AS ?kind) "
@@ -137,8 +138,11 @@ def parse_matches(bindings: list[dict[str, Any]]) -> dict[str, Match]:
     for b in bindings:
         qid = b["item"]["value"].rsplit("/", 1)[-1]
         match = matches.setdefault(qid, Match(qid))
-        if "label" in b and not match.label:
+        if "label" in b:
             match.label = b["label"]["value"]
+        elif "labelEn" in b and not match.label:
+            # Sem rótulo pt (por exemplo, Lionel Messi, Premier League): o inglês.
+            match.label = b["labelEn"]["value"]
         if "links" in b:
             match.links = max(match.links, int(b["links"]["value"]))
         if "kind" in b:

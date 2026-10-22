@@ -245,7 +245,9 @@ de uma verificação com 8 nomes conhecidos: entidades estrangeiras são
 aceites** (o Record fala muito de desporto internacional); a ligação a
 Portugal é registada (coluna `portugal`), não exigida — a lista fechada
 continua só com desporto português, e `--so-portugal` reproduz a regra
-inicial. Os
+inicial. Verificada na sessão local com 12 nomes conhecidos: os 12 aceites
+como esperado (incluindo o Estádio da Luz atual, a Taça de Portugal de
+futebol e a Liga dos Campeões da UEFA pela pesquisa). Os
 aceites formam um vocabulário híbrido (lista fechada + confirmados, com a
 coluna `origem`), que alimenta o Caminho B; no RDF cada entidade leva
 `sdh:origemVocabulario` (propriedade nova da ontologia) e o painel mostra a
@@ -285,7 +287,7 @@ manual, um parágrafo por fonte na dissertação; sem implementação.
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 326 testes em vinte e três módulos de `tests/`.
+pacote conforme o README. Existem 327 testes em vinte e três módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -320,9 +322,10 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 independente de `next_page`; lista de termos alargada).
 
 Última validação em **2026-10-22**, sessão remota Linux (Python 3.11.17),
-depois das regras revistas da abordagem híbrida:
-`.venv/bin/python -m unittest discover -s tests` — **326 testes, todos
-passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, abordagem
+depois do rótulo inglês por omissão na abordagem híbrida:
+`.venv/bin/python -m unittest discover -s tests` — **327 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, regras
+revistas da abordagem híbrida, 326 testes OK; 2026-10-22, abordagem
 híbrida, 325 testes OK; 2026-10-22, protótipo
 do corpus da Fase 1, 313 testes OK; 2026-10-22, correções
 do `html_body.py`, 306 testes OK; 2026-10-21, Python
