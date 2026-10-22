@@ -17,8 +17,9 @@ from semantic_harvester.wikidata_vocabulary_alargado import CachingClient
 from tests.support import OfflineTestCase
 
 
-def binding(qid: str, label: str = "", kind: str = "", pt: bool | None = None) -> dict:
-    b = {"item": {"type": "uri", "value": f"http://www.wikidata.org/entity/{qid}"}}
+def binding(qid: str, label: str = "", kind: str = "", pt: bool | None = None, links: int = 0) -> dict:
+    b = {"item": {"type": "uri", "value": f"http://www.wikidata.org/entity/{qid}"},
+         "links": {"type": "literal", "value": str(links)}}
     if label:
         b["label"] = {"type": "literal", "value": label}
     if kind:
@@ -37,13 +38,20 @@ class Response:
 
 
 class FakeSession:
-    """Responde pelo nome que aparece na query; regista os nomes pedidos."""
+    """Responde pelo nome na query (nome exato ou pesquisa); regista os pedidos."""
 
-    def __init__(self, answers: dict[str, list[dict] | None]) -> None:
-        self.answers, self.headers, self.asked = answers, {}, []
+    def __init__(self, answers: dict[str, list[dict] | None],
+                 search: dict[str, list[dict]] | None = None) -> None:
+        self.answers, self.search, self.headers, self.asked = answers, search or {}, {}, []
 
     def get(self, url: str, params: dict, timeout: int) -> Response:
-        name = next(n for n in self.answers if f'"{n}"@pt' in params["query"])
+        query = params["query"]
+        if "EntitySearch" in query:
+            name = next(n for n in self.answers if f'mwapi:search "{n}"' in query)
+            self.asked.append(("pesquisa", name))
+            bindings = self.search.get(name, [])
+            return Response(json.dumps({"results": {"bindings": bindings}}).encode())
+        name = next(n for n in self.answers if f'"{n}"@pt' in query)
         self.asked.append(name)
         bindings = self.answers[name]
         if bindings is None:
@@ -56,8 +64,12 @@ class QueryTests(unittest.TestCase):
         query = candidate_query('Estádio "Novo"')
         self.assertIn('"Estádio \\"Novo\\""@pt', query)
         self.assertIn('"Estádio \\"Novo\\""@en', query)
-        for needed in ("wd:Q45", "wd:Q35572", "wdt:P664", "wdt:P6087", "'treinador'", "'estadio'"):
+        for needed in ("wd:Q45", "wd:Q35572", "wdt:P664", "wdt:P6087", "'treinador'", "'estadio'",
+                       "wikibase:sitelinks"):
             self.assertIn(needed, query)
+        search = candidate_query("Liga dos Campeões", search=True)
+        self.assertIn('mwapi:search "Liga dos Campeões"', search)
+        self.assertNotIn("skos:altLabel ?name", search)
 
 
 class DecideTests(unittest.TestCase):
@@ -71,17 +83,31 @@ class DecideTests(unittest.TestCase):
                            binding("Q1", "Jorge Jesus", "treinador", True)])
         self.assertEqual(decide("Jorge Jesus", 9, m, set()).kind, "treinador")
 
-    def test_two_valid_items_are_ambiguous(self) -> None:
+    def test_two_valid_items_without_a_clear_leader_are_ambiguous(self) -> None:
         m = parse_matches([binding("Q1", kind="clube", pt=True), binding("Q2", kind="clube", pt=True)])
         self.assertEqual(decide("Académico", 3, m, set()).decision, AMBIGUOUS)
+        close = parse_matches([binding("Q1", kind="estadio", pt=True, links=10),
+                               binding("Q2", kind="estadio", pt=True, links=8)])
+        self.assertEqual(decide("Estádio", 3, close, set()).decision, AMBIGUOUS)
 
-    def test_valid_item_wins_over_out_of_scope_one(self) -> None:
-        m = parse_matches([binding("Q1", kind="clube", pt=True), binding("Q2", kind="clube", pt=False)])
-        self.assertEqual(decide("Nome", 3, m, set()).qid, "Q1")
+    def test_prominence_breaks_the_tie(self) -> None:
+        # Estádio atual (muitas Wikipédias) e o antigo com o mesmo nome (poucas).
+        m = parse_matches([binding("Q287359", kind="estadio", pt=True, links=40),
+                           binding("Q3059094", kind="estadio", pt=True, links=6)])
+        d = decide("Estádio José Alvalade", 9, m, set())
+        self.assertEqual((d.decision, d.qid, d.tie), (ACCEPTED, "Q287359", "proeminencia"))
 
-    def test_foreign_wrong_type_and_no_match(self) -> None:
+    def test_foreign_is_accepted_and_recorded_unless_only_portugal(self) -> None:
         foreign = parse_matches([binding("Q1", kind="clube", pt=False)])
-        self.assertEqual(decide("Real Madrid", 4, foreign, set()).decision, OUT_OF_SCOPE)
+        d = decide("Real Madrid", 4, foreign, set())
+        self.assertEqual((d.decision, d.portugal), (ACCEPTED, False))
+        self.assertEqual(decide("Real Madrid", 4, foreign, set(), only_portugal=True).decision,
+                         OUT_OF_SCOPE)
+        mixed = parse_matches([binding("Q1", kind="clube", pt=True, links=1),
+                               binding("Q2", kind="clube", pt=False, links=1)])
+        self.assertEqual(decide("Nome", 3, mixed, set(), only_portugal=True).qid, "Q1")
+
+    def test_wrong_type_and_no_match(self) -> None:
         city = parse_matches([binding("Q1", "Lisboa")])
         self.assertEqual(decide("Lisboa", 4, city, set()).decision, WRONG_TYPE)
         self.assertEqual(decide("Nada Disto", 4, {}, set()).decision, NO_MATCH)
@@ -115,12 +141,15 @@ class RunTests(OfflineTestCase):
         self.session = FakeSession({
             "Estádio da Luz": [binding("Q100", "Estádio do Sport Lisboa e Benfica", "estadio", True)],
             "Estádio do Sport Lisboa e Benfica": [binding("Q100", "Estádio do Sport Lisboa e Benfica", "estadio", True)],
-            "Liga dos Campeões": [binding("Q101", "Liga dos Campeões da UEFA", "competicao", True)],
+            "Liga dos Campeões": [binding("Q102000", "Liga dos Campeões")],  # desambiguação
             "Sport Lisboa Benfica": [binding("Q131499", "Sport Lisboa e Benfica", "clube", True)],
             "Real Madrid": [binding("Q102", "Real Madrid", "clube", False)],
             "Notícias Recentes": [],
             "Falha Rede": None,
             "Raro Demais": [],
+        }, search={
+            "Liga dos Campeões": [binding("Q101", "Liga dos Campeões da UEFA", "competicao", True, 80),
+                                  binding("Q103", "Liga dos Campeões da AFC", "competicao", False, 20)],
         })
         client = CachingClient(self.root / "raw", session=self.session, pause=0, sleep=lambda s: None)
         self.decisions = {d.candidate: d for d in run(self.root, min_articles=3, client=client)}
@@ -130,8 +159,14 @@ class RunTests(OfflineTestCase):
         self.assertEqual({c: d.decision for c, d in self.decisions.items()}, {
             "Estádio da Luz": ACCEPTED, "Estádio do Sport Lisboa e Benfica": ACCEPTED,
             "Liga dos Campeões": ACCEPTED, "Sport Lisboa Benfica": NEW_VARIANT,
-            "Real Madrid": OUT_OF_SCOPE, "Notícias Recentes": NO_MATCH, "Falha Rede": FAILED,
+            "Real Madrid": ACCEPTED, "Notícias Recentes": NO_MATCH, "Falha Rede": FAILED,
         })
+        champions = self.decisions["Liga dos Campeões"]
+        self.assertEqual((champions.qid, champions.method, champions.tie),
+                         ("Q101", "pesquisa", "proeminencia"))
+        # A pesquisa só quando o nome exato não dá nenhum item válido.
+        self.assertNotIn(("pesquisa", "Estádio da Luz"), self.session.asked)
+        self.assertIn(("pesquisa", "Notícias Recentes"), self.session.asked)
 
     def test_hybrid_vocabulary(self) -> None:
         self.assertEqual(self.vocab.read_bytes(), self.before)
@@ -145,7 +180,8 @@ class RunTests(OfflineTestCase):
         self.assertEqual((rows["Q100"]["rotulo"], rows["Q100"]["variantes"], rows["Q100"]["categoria"]),
                          ("Estádio do Sport Lisboa e Benfica", "Estádio da Luz", "estadio"))
         self.assertEqual(rows["Q101"]["origem"], "candidato")
-        self.assertNotIn("Q102", rows)
+        self.assertEqual((rows["Q102"]["origem"], rows["Q102"]["portugal"]), ("candidato", "nao"))
+        self.assertEqual(rows["Q1"]["portugal"], "sim")
         terms = {t.rotulo: t for t in load_vocabulary(path)}
         self.assertIn(("estadio", "da", "luz"), terms["Estádio do Sport Lisboa e Benfica"].variants)
 

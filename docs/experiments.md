@@ -5153,3 +5153,45 @@ por_ano`; rever à mão uma amostra de ~50 aceites (descritivo); `corpus_entitie
 e `corpus_entities_rdf` com o vocabulário híbrido; `navigation_corpus` com o
 vocabulário híbrido. Para comparar "só lista fechada" com "lista fechada +
 híbrida", guardar as saídas da primeira passagem antes da segunda.
+
+### Verificação com 8 nomes conhecidos e regras revistas (2026-10-22)
+
+A sessão local correu a consulta inicial contra a Wikidata com 8 nomes, sem
+gravar nada no projeto. Só 3 deram o esperado (Jorge Jesus → treinador
+Q527550; Jogos Olímpicos → competição Q5389; Real Madrid → fora do âmbito).
+Os outros 5 falharam por duas razões, não pelos QIDs das classes:
+
+- **Dois itens válidos com o mesmo nome** → `ambiguo`: Estádio da Luz
+  (Q2736585 e Q7875112, ambos estádio em Portugal), Estádio José Alvalade
+  (Q287359, o atual, e Q3059094, o de 1956, "defunct sports venue"), Taça de
+  Portugal (Q29224, futebol, e Q2718266, râguebi) e Sérgio Conceição
+  (Q317298, o treinador, e Q86922080, outra pessoa; um terceiro item é uma
+  página de desambiguação e não conta).
+- **O nome no texto não é o rótulo**: "Liga dos Campeões" só existe como
+  rótulo pt de uma página de desambiguação; a competição da UEFA chama-se
+  "Liga dos Campeões da UEFA" → `tipo_nao_aceite`.
+
+Regras revistas (`wikidata_candidates.py`):
+
+1. **Desempate por proeminência**: entre vários itens válidos, aceita-se o
+   que tem mais artigos na Wikipédia (`wikibase:sitelinks`) **só se tiver
+   pelo menos o dobro do segundo** (coluna `desempate`: `unico` ou
+   `proeminencia`); senão continua `ambiguo`. É um critério de popularidade
+   comum em ligação de entidades; não usa o contexto do artigo.
+2. **Pesquisa como segunda tentativa**: se o nome exato não der nenhum item
+   válido, repete-se com a pesquisa da Wikidata (`EntitySearch`, rótulos e
+   nomes alternativos que começam pelo nome, 20 resultados), com as mesmas
+   regras (coluna `metodo`: `nome_exato` ou `pesquisa`). Mais larga do que o
+   nome exato, por isso só quando este falha.
+3. **Estrangeiros aceites (decisão do autor)**: a ligação a Portugal passa a
+   ser registada (coluna `portugal` nas decisões e no vocabulário híbrido;
+   `sim` em toda a lista fechada) e não exigida; `--so-portugal` repõe a
+   regra inicial. Justificação: a lista fechada define o domínio à partida
+   (desporto português); a camada híbrida parte do que aparece de facto no
+   texto, em vários artigos, e o Record cobre muito desporto internacional.
+
+Ainda **não verificado contra a Wikidata** com as regras revistas (esta
+sessão não tem acesso): que o desempate escolhe o estádio atual e a Taça de
+futebol, e que a pesquisa encontra a Liga dos Campeões da UEFA. Testes com
+respostas simuladas para os três casos; suite completa: **326 testes, todos
+a passar.**
