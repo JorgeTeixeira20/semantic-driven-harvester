@@ -44,11 +44,13 @@ O fluxo é API → raw local → manifesto/metadados → Turtle. A
 A redução de redundância entre capturas (Caminho D) está concluída como
 anotação por similaridade textual em `corpus_redundancy.py`, sobre o corpo do
 artigo (variante c′, `article_body.py`) com limiar 0,90 (ver "Trabalho em
-aberto"). Não estão implementados NER,
-deduplicação semântica, base de dados,
-frontend ou LLMs. Há parâmetros de deduplicação enviados à API; isso não é uma
-implementação local de deduplicação. `EntidadeMencionada` e `Tema` existem no
-vocabulário, mas não há pipeline de extração/enriquecimento correspondente.
+aberto"). O Caminho B povoa `Tema` (pelo URL) e `EntidadeMencionada` (por
+vocabulário fechado da Wikidata, no corpo do artigo; c′ e, sem corpo, o
+contentor do HTML); há dois protótipos de navegação. Não estão implementados
+NER genérico, deduplicação semântica (embeddings), base de dados ou LLMs. Há
+parâmetros de deduplicação enviados à API; isso não é uma implementação local
+de deduplicação. A lista acima é só o núcleo inicial: o mapa completo dos
+módulos está em [AGENTS.md](../AGENTS.md).
 
 ## Experiências e resultados conhecidos
 
@@ -146,11 +148,11 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
   descoberta encontrou) e a Fase 2 foi parada (`docs/experiments.md`,
   2026-10-20): é uma escolha de âmbito do motor, não uma falha de recolha.
 - **Wikidata, ontologia e cobertura desigual por modalidade.** O vocabulário
-  fechado de entidades do Caminho B
-  (`data/processed/caminho_b_vocabulario_wikidata.csv`) tem 1 091 entradas,
-  **todas jogadores de futebol** dos plantéis da Primeira Liga 2015–16 a
-  2019–20 (só 3 épocas com participantes na Wikidata, 23 clubes): a deteção
-  de entidades só cobre futebol. A ontologia formaliza `sdh:Modalidade`
+  original do Caminho B (`data/processed/caminho_b_vocabulario_wikidata.csv`,
+  o dos resultados do corpus de 125 artigos) tem 1 091 entradas, **todas
+  jogadores de futebol** dos plantéis da Primeira Liga 2015–16 a 2019–20 (só
+  3 épocas com participantes na Wikidata, 23 clubes). Foi alargado em
+  2026-10-21 (secção seguinte) a todas as modalidades e a clubes. A ontologia formaliza `sdh:Modalidade`
   (subclasse de `sdh:Tema`) para todas as modalidades, a partir do URL, mas
   `EntidadeMencionada` não tem subclasses por modalidade (fica para quando o
   vocabulário for alargado). No corpus alargado, a cobertura por modalidade
@@ -161,6 +163,102 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
   pesquisa que os encontrou); as restantes vão de 1 558 (andebol) e 1 522
   (hóquei em patins) a menos de 10 (tiro, esgrima, xadrez, pólo aquático). Estes números refletem também o teto da descoberta (300
   resultados por termo e ano), não só o volume publicado pelo Record.
+
+### Para a escrita da tese: decisões e estado em 2026-10-22
+
+Índice das decisões tomadas entre 2026-10-21 e 2026-10-22, com o sítio do
+detalhe (secções de `docs/experiments.md`, salvo indicação). Nenhum número
+abaixo é novo: vêm dessas secções.
+
+**Estado.** A recolha de texto e HTML do corpus alargado (`corpus_rdf --fase1
+por_ano`, 129 317 Artigos de 1999–2024) ainda corre numa sessão local (às
+02:48 de 2026-10-22: 110 441 concluídos). Depois dela: medir e validar o
+extrator do HTML nos esquemas antigos que ainda não têm HTML em disco
+(`noticia.aspx`, `shownews.asp`, `tn0cs.asp`, `tn1cs.asp`); corrida final,
+por esta ordem, com `--corpus por_ano`: `corpus_entities --texto corpo-html`
+com o vocabulário alargado, `corpus_entities_rdf`, `corpus_candidate_entities`
+e `navigation_corpus`. Um ensaio geral sobre uma cópia parcial foi proposto e
+**adiado pelo autor** para depois da escrita. Prazo-alvo: 31 de outubro.
+**Nenhum resultado do Caminho B, dos candidatos ou do painel sobre o corpus
+alargado existe ainda**; os números do corpus alargado que existem são os da
+descoberta, da classificação e da recolha.
+
+**Feedback do orientador.** Ontologia em RDF/OWL com subclasses de `Tema`:
+**feito** (2026-10-18, "Âmbito da ontologia OWL"). Embeddings: **não usados**
+(decisão do autor, 2026-10-22; ver Caminho D acima). Reduções de âmbito face
+ao RPD: ficam como trabalho futuro, justificadas como tal na dissertação.
+
+**Corpus alargado e profundidade temporal.** Uma captura por artigo (a mais
+antiga conhecida); o Caminho D (redundância entre capturas) **não se aplica**
+a este corpus e fica demonstrado no corpus de 125 artigos ("Corpus alargado
+sem Fase 2"; "Caminho B sobre o corpus da Fase 1"). Nenhum Artigo tem captura
+mais antiga entre 2010 e 2016 (contagens por ano em "Corpus alargado sem
+Fase 2").
+
+**Extração do corpo do artigo.** A c′ (âncoras literais) continua a ser o
+método principal; o contentor do HTML (`div#readerBody`, `div.text_container`,
+`div.bodybox`, `<aux>`) é usado quando a c′ não encontra corpo, e uma página
+Premium fica sem corpo (decisão de 2026-10-19). Medido em 2026-10-22: a c′ não
+encontra corpo em nenhuma das 20 `noticia.asp` (2000–2009), o HTML encontra-o
+em 20 de 20; validação em 60 HTML reais e 6 correções ("Corpo do artigo pelo
+contentor do HTML", incluindo a codificação UTF-8 → cp1252 → latin-1).
+
+**Entidades: vocabulário alargado** ("Vocabulário alargado 1999–2024:
+medição e construção" e as subsecções seguintes). Decisões do autor: épocas
+1999–2024, todas as modalidades da descoberta (33 de 39 mapeadas na
+Wikidata; 6 sem mapeamento por não serem modalidades com atletas próprios),
+jogadores/atletas e clubes; **só desporto português** (clubes portugueses e
+atletas portugueses ou com passagem por clube português; entidades
+estrangeiras fora do âmbito). Total: 7 780 linhas (133 clubes, 7 647
+atletas). Regras: lista manual de palavras comuns que nunca contam sozinhas
+(por exemplo "Nacional", "Real", "União", "Vitória"); nomes de uma palavra só
+para clubes; "Benfica" acrescentado à mão; "Porto", "Braga" e outros nomes de
+cidade só em formas sem ambiguidade ("FC Porto"); "Oriental" e
+"Vilaverdense" nunca sozinhos ("Clube Oriental", "Länk Vilaverdense"; a
+equipa feminina usa o mesmo nome); passagens sem datas e atletas individuais
+pelo período de atividade ou, na falta dele, pela idade de 15 a 40 anos em
+algum momento de 1999–2024. 179 rótulos com homónimos, que ficam com URI
+próprio, sem QID. **Correspondência mais longa** por omissão ("Sporting de
+Braga" deixa de contar também como "Sporting"): no corpus de 125 artigos,
+com o vocabulário original, corrigiu 2 falsos positivos e os outputs
+oficiais foram regenerados.
+
+**Candidatos a entidade** ("Candidatos a entidade fora do vocabulário
+fechado"). Teste exploratório: sequências de palavras capitalizadas fora do
+início de frase, sem NER, que o vocabulário não cobre. **Não são ligados à
+Wikidata nem entram no RDF**; servem só para medir o que a lista fechada
+deixa escapar (limitação e trabalho futuro). A alternativa de perguntar à
+Wikidata só pelos candidatos (abordagem híbrida) foi discutida e não
+implementada: continuaria a exigir uma deteção genérica de candidatos e uma
+desambiguação por tipo de entidade.
+
+**Tema e entidade.** Tema = classificação editorial que o próprio jornal deu
+ao artigo, lida do URL (secção, modalidade, competição, clube; subclasses OWL
+de `Tema`); não existe nos URLs do site de 1999–2009. Entidade = nome que
+ocorre no corpo do texto, ligado ao QID da Wikidata. No painel do corpus
+alargado, modalidade e clube são preenchidos pelo URL e, sem ele, pelo termo
+de pesquisa que encontrou o artigo (modalidade) ou pelos clubes mencionados
+no texto (clube), com a origem assinalada (decisão do autor, 2026-10-22).
+
+**Protótipos.** O do corpus de 125 artigos fica como está (histórico de
+capturas, SPARQL sobre o grafo; estudo de caso da profundidade temporal). O
+principal é o do corpus alargado: painel numa só página com resumos
+reativos aos filtros, lista paginada, fichas de entidade e estado no
+endereço; lê o grafo em streaming, **sem SPARQL**, por causa do tamanho
+("Protótipo principal para o corpus da Fase 1").
+
+**Contributos sobre o Arquivo.pt.** Os "400 Bad Request" ao fim de muitos
+pedidos vinham do acumular de cookies das páginas antigas, reencaminhados
+pelo replay (166 cookies, 7 800 bytes no cabeçalho `Cookie`, perto do limite
+de 8 190 do Apache); resolvidos renovando a sessão, sem cookies
+("O 400 vem da sessão do processo, não de uma quota" e "Evidência do 400").
+Juntam-se aos achados anteriores (estimativa ~3× o real, não ordenação
+cronológica, `to=<ano>` exclusivo, cobertura das secções). O autor contactou
+a equipa do Arquivo.pt, que propôs uma reunião; **o autor decidiu não
+prosseguir esse contacto até à entrega**, por falta de tempo.
+
+**Outras fontes (A Bola, Expresso).** Só reconhecimento leve por pesquisa
+manual, um parágrafo por fonte na dissertação; sem implementação.
 
 ## Testes existentes
 
@@ -435,11 +533,10 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    validação limitada: 34 artigos, um vídeo com 11 dos 60 pares, 2 pares
    "texto alterado".
 
-   **Decisão em aberto (não tomada):** avaliar um modelo de similaridade
-   semântica (embeddings) é trabalho futuro, condicional a (a) sobrar tempo
-   depois do Caminho B e do protótipo de navegação e (b) confirmação do
-   orientador de que o resultado atual não chega — ainda por validar em
-   reunião.
+   **Decisão do autor (2026-10-22): não usar embeddings.** Serviam para
+   comparar versões do mesmo artigo (este Caminho D); o D mostrou que quase
+   nenhum artigo muda entre capturas, e o corpus alargado tem uma só captura
+   por artigo. Ficam como trabalho futuro.
 
    **Variante (c′), avaliada em 2026-10-04 (adotada em 2026-10-09):**
    corpo do artigo delimitado entre o título e o primeiro de 13 marcadores
