@@ -7,7 +7,7 @@ from __future__ import annotations
 import unittest
 
 from semantic_harvester.corpus_redundancy import Capture, to_body_corpus
-from semantic_harvester.html_body import decode_html, extract_html_body
+from semantic_harvester.html_body import decode_html, extract_html_body, strip_signature
 from tests.support import OfflineTestCase
 
 READER_BODY_2017 = """<html><body><div class="article-body"><div id="readerBody">
@@ -179,6 +179,26 @@ class OldSite1999Tests(unittest.TestCase):
         self.assertEqual(body.text, "O lateral-esquerdo aveirense lamenta o resultado. "
                          "O LATERAL-ESQUERDO Cristiano foi o réu da noite. "
                          "Este é, de resto, o segundo penálti da época.")
+
+    def test_signatures_found_in_the_validation(self) -> None:
+        """As 6 assinaturas que a primeira regra deixava (validação de 2026-10-22)."""
+        cases = {
+            '…ximo jogo." JOÃO PEDRO ABECASIS, JOÃO RUI RODRIGUES e LUÍS PEDRO SOUSA': '…ximo jogo."',
+            "…o resto. ANTÓNIO JOSÉ OLIVEIRA e JOÃO ALMEIDA MOREIRA": "…o resto.",
+            "…foi bom. PEDRO ALVES E P.": "…foi bom.",
+            "…acabou. M.V.": "…acabou.",
+            "…acabou. LUSA": "…acabou.",
+            "…Boavista, 1 CARLOS ARSÉNIO": "…Boavista, 1",
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(strip_signature(text), expected)
+
+    def test_text_that_is_not_a_signature_stays(self) -> None:
+        for text in ("O LATERAL-ESQUERDO Cristiano foi bom.", "…golos. Fim do jogo, SL BENFICA ganhou",
+                     "…ver a nota. A", "…marcou aos 30 minutos."):
+            with self.subTest(text=text):
+                self.assertEqual(strip_signature(text), text)
 
     def test_table_body_keeps_its_names(self) -> None:
         html = ('<td width="480"><p><font size="2"><table><tr><td>1º Benfica B</td>'

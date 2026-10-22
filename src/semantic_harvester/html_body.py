@@ -48,9 +48,23 @@ MAIN_COLUMN_WIDTH = "600"
 # Dentro do td480: título (size 6), data (size 0) e antetítulo (size 2 com cor)
 # não são corpo; ficam o lead (size 3, itálico) e o corpo (size 2 sem cor).
 OLD_SITE_SKIP_SIZES = frozenset({"6", "0"})
-# Assinatura no fim do corpo do site de 1999–2000 ("CARLOS OLIVEIRA"): 2 a 4
-# palavras só em maiúsculas depois do fim de uma frase.
-_SIGNATURE = re.compile(r"(?<=[.!?»”\"')])\s+(?:[A-ZÀ-Ý][A-ZÀ-Ý'.-]*\s+){1,3}[A-ZÀ-Ý][A-ZÀ-Ý'.-]*\s*$")
+# Assinatura no fim do corpo do site de 1999–2000, depois do fim de uma frase
+# ou de um número (resultado): um ou mais autores só em maiúsculas, ligados por
+# vírgulas ou por "e" ("CARLOS OLIVEIRA"; "JOÃO PEDRO ABECASIS, JOÃO RUI
+# RODRIGUES e LUÍS PEDRO SOUSA"; "PEDRO ALVES E P."), iniciais ("M.V.") ou
+# agências ("LUSA", "AFP"). Validação de 2026-10-22: 26 páginas assinadas em 40.
+_CAPS_WORD = r"[A-ZÀ-Ý][A-ZÀ-Ý'.-]*"
+_AUTHOR = rf"{_CAPS_WORD}(?:\s+{_CAPS_WORD}){{0,4}}"
+_SIGNATURE = re.compile(
+    rf"(?<=[.!?»”\"')0-9])\s+(?P<sig>{_AUTHOR}(?:(?:\s*,\s*|\s+[eE]\s+){_AUTHOR})*)\s*$")
+
+
+def strip_signature(text: str) -> str:
+    match = _SIGNATURE.search(text)
+    # Uma só letra ("A") não é assinatura.
+    if match is None or len(match.group("sig").replace(".", "")) < 2:
+        return text
+    return text[:match.start()].rstrip()
 
 
 def _attr(attrs: dict[str, str | None], name: str) -> str:
@@ -177,7 +191,7 @@ def extract_html_body(raw: bytes) -> HtmlBody:
         if name == "aux":
             text = " ".join(t for t in occurrences if t)
         elif name == "td480":
-            text = _SIGNATURE.sub("", max(occurrences, key=len, default="")).strip()
+            text = strip_signature(max(occurrences, key=len, default=""))
         else:
             # Uma página pode ter mais de um contentor igual (em 2024, o
             # primeiro `text_container` é um destaque promocional): o mais longo.

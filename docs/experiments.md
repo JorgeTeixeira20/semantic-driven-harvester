@@ -5347,3 +5347,28 @@ UTF-8 → cp1252 → latin-1 já cobre o caso. 3 testes novos (o esqueleto
 completo, uma tabela no corpo, e as regras de `font` sem efeito fora da
 coluna). Suite completa: **333 testes, todos a passar.** Falta validar nas 40
 páginas reais.
+
+### Validação do `td480` e regra da assinatura revista (2026-10-22)
+
+Validação nas 40 páginas (sessão local, sem alterar código): contentor `td480`
+em 40 de 40; o corpo começa pelo lead nas 30 que o têm; sem antetítulo,
+título nem data em 40 de 40; início e fim do corpo no texto extraído em 40 de
+40; regressão limpa (as amostras já validadas do `html_body` saem iguais
+campo a campo). **A assinatura só saía em 20 das 26 páginas assinadas.** No
+corpus todo (2 352 páginas `tn0cs`/`tn1cs` com contentor), 182 corpos
+acabavam numa sequência em maiúsculas com ar de assinatura ("SANDRA SIMÕES"
+×10, "LUSA" ×7, "LUÍS LEAL" ×5, "M.V." ×4) e **32 continham um nome do
+vocabulário** (por exemplo "LUÍS LEAL" → Luís Leal; "VÍTOR PINTO E RUI
+SOUSA" → Rui Sousa): seriam jornalistas contados como jogadores. A cadeia não
+foi corrida.
+
+Os casos que a primeira regra (2 a 4 palavras depois do fim de uma frase)
+deixava: vários autores ligados por vírgulas e por "e"; uma só "palavra"
+(iniciais "M.V.", agências "LUSA", "AFP"); assinatura depois de um número
+("…Boavista, 1 CARLOS ARSÉNIO"). **Regra revista (`strip_signature`):** no
+fim do corpo, depois de pontuação de fim de frase ou de um algarismo, um ou
+mais autores só em maiúsculas (1 a 5 palavras cada, iniciais incluídas),
+ligados por vírgula ou por "e"/"E"; uma só letra não conta. 2 testes novos
+com os 6 casos e com 4 textos que não podem ser cortados. Suite completa:
+**335 testes, todos a passar.** Falta repetir a validação nas 40 páginas e a
+contagem nas 2 352.
