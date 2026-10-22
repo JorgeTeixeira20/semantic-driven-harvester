@@ -5271,3 +5271,27 @@ título genérico, sem corpo identificado. Codificação: 16 declaram
 `utf-8`, 4 não declaram. Esqueleto em `output/html_corpo_noticia_aspx.md`.
 Por decisão do autor, a cadeia do Caminho B não corre enquanto este
 contentor não estiver no extrator.
+
+## Contentor do corpo no `noticia.aspx` (2009) (2026-10-22)
+
+Medição na sessão local, 20 páginas `noticia.aspx`, todas de 2009 (esqueleto
+em `output/html_corpo_noticia_aspx.md`, fora do Git): nenhum dos contentores
+do `html_body.py` existe (0 de 20) e a página não usa `<aux>`. O corpo está em
+`table[width=980] > tr > td[width=600] > table > tr > td > span.apreto12n`
+(texto com `<br>` ou `<p>`), em 15 de 20 com 30 ou mais palavras, validado
+contra o texto extraído. `apreto12n` é só uma classe de tipo de letra (9 a 16
+elementos por página); numa página o maior é a pergunta de uma votação
+(`form#votacao`), fora da coluna `td[width=600]`. Das outras 5: 2 são tabelas
+de classificação (Volta), sem texto corrido; 3 têm 1 a 21 palavras nesse
+caminho e título genérico, sem corpo identificado. Codificação: 16 declaram
+UTF-8, 4 nada.
+
+**Implementação:** novo contentor `apreto12n` no `html_body.py`, tentado
+depois do `<aux>`: um `span.apreto12n` dentro da coluna `td[width=600]`;
+havendo vários, o mais longo (como no `text_container`). O `<aux>` continua a
+ter prioridade (nas `noticia.asp` de 2007 o `<aux>` está dentro de um
+`span.apreto12n`). Sem mínimo de palavras: as tabelas de classificação dão os
+nomes que contêm. 3 testes novos com um esqueleto sintético (votação fora da
+coluna, `span` de data curto, publicidade em `document.write`, prioridade do
+`<aux>`). Suite completa: **330 testes, todos a passar.** Falta validar nas 20
+páginas reais com `python -m semantic_harvester.html_body`.
