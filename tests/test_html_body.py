@@ -194,9 +194,23 @@ class OldSite1999Tests(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(strip_signature(text), expected)
 
+    def test_signatures_found_in_the_count_over_2352_pages(self) -> None:
+        """Os dois padrões que ficavam na contagem de 2026-10-22 (18 páginas)."""
+        cases = {
+            '…manutenção." JOÃO LOPES, com LINO DE SOUSA': '…manutenção."',
+            '…o resultado é justo." <p>MARCELO SOARES, com LUÍS LEAL': '…o resultado é justo."',
+            '…o confortar." JOÃO CARTAXANA, com AUGUSTO LEITE E MARCO AURÉLIO': '…o confortar."',
+            "…tendo apontado um total de 11 golos VÍTOR PINTO E RUI SOUSA": "…tendo apontado um total de 11 golos",
+            "…se acertou ou não em cheio na aposta JOÃO ALMEIDA MOREIRA": "…se acertou ou não em cheio na aposta",
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(strip_signature(text), expected)
+
     def test_text_that_is_not_a_signature_stays(self) -> None:
         for text in ("O LATERAL-ESQUERDO Cristiano foi bom.", "…golos. Fim do jogo, SL BENFICA ganhou",
-                     "…ver a nota. A", "…marcou aos 30 minutos."):
+                     "…ver a nota. A", "…marcou aos 30 minutos.", "…a vitória foi do FC PORTO",
+                     "…ganhou o SL BENFICA", "…empatado com o BOAVISTA", "…golo de JARDEL"):
             with self.subTest(text=text):
                 self.assertEqual(strip_signature(text), text)
 

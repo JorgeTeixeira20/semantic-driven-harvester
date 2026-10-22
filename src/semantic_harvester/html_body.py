@@ -48,21 +48,39 @@ MAIN_COLUMN_WIDTH = "600"
 # Dentro do td480: título (size 6), data (size 0) e antetítulo (size 2 com cor)
 # não são corpo; ficam o lead (size 3, itálico) e o corpo (size 2 sem cor).
 OLD_SITE_SKIP_SIZES = frozenset({"6", "0"})
-# Assinatura no fim do corpo do site de 1999–2000, depois do fim de uma frase
-# ou de um número (resultado): um ou mais autores só em maiúsculas, ligados por
-# vírgulas ou por "e" ("CARLOS OLIVEIRA"; "JOÃO PEDRO ABECASIS, JOÃO RUI
-# RODRIGUES e LUÍS PEDRO SOUSA"; "PEDRO ALVES E P."), iniciais ("M.V.") ou
-# agências ("LUSA", "AFP"). Validação de 2026-10-22: 26 páginas assinadas em 40.
+# Assinatura no fim do corpo do site de 1999–2000: um ou mais autores só em
+# maiúsculas, ligados por vírgula, "e" ou "com" ("CARLOS OLIVEIRA"; "JOÃO PEDRO
+# ABECASIS, JOÃO RUI RODRIGUES e LUÍS PEDRO SOUSA"; "JOÃO LOPES, com LUÍS
+# LEAL"; "PEDRO ALVES E P."), iniciais ("M.V.") ou agências ("LUSA", "AFP").
+# Validações de 2026-10-22 (40 páginas; contagem nas 2 352 com contentor).
 _CAPS_WORD = r"[A-ZÀ-Ý][A-ZÀ-Ý'.-]*"
 _AUTHOR = rf"{_CAPS_WORD}(?:\s+{_CAPS_WORD}){{0,4}}"
-_SIGNATURE = re.compile(
-    rf"(?<=[.!?»”\"')0-9])\s+(?P<sig>{_AUTHOR}(?:(?:\s*,\s*|\s+[eE]\s+){_AUTHOR})*)\s*$")
+_SEPARATOR = r"(?:\s*,\s*(?:(?:e|E|com)\s+)?|\s+(?:e|E|com)\s+)"
+_AUTHORS = rf"(?P<sig>{_AUTHOR}(?:{_SEPARATOR}{_AUTHOR})*)\s*$"
+# Depois do fim de uma frase ou de um número (resultado: "…Boavista, 1 CARLOS ARSÉNIO").
+_SIGNATURE = re.compile(rf"(?<=[.!?»”\"')0-9])\s+{_AUTHORS}")
+# Logo a seguir a uma palavra ("…11 golos VÍTOR PINTO E RUI SOUSA"): mais
+# arriscado, por isso só com 2+ palavras e sem termos de clube.
+_SIGNATURE_AFTER_WORD = re.compile(rf"(?<=[a-zà-ÿ])\s+{_AUTHORS}")
+CLUB_TOKENS = frozenset({"FC", "F.C.", "SC", "S.C.", "SL", "CF", "CD", "UD", "AD", "GD", "SAD",
+                         "BENFICA", "SPORTING", "PORTO", "BRAGA", "BOAVISTA", "CLUBE"})
+_LITERAL_P = re.compile(r"<\s*/?\s*p\s*>", re.IGNORECASE)
 
 
 def strip_signature(text: str) -> str:
+    # Um "<p>" escrito como texto (&lt;p&gt; no HTML) aparece antes de algumas assinaturas.
+    text = _LITERAL_P.sub(" ", text)
+    text = re.sub(r"\s+", " ", text).strip()
     match = _SIGNATURE.search(text)
+    if match is None:
+        match = _SIGNATURE_AFTER_WORD.search(text)
+        if match is not None:
+            words = re.findall(r"[^\s,]+", match.group("sig"))
+            names = [w for w in words if w not in ("e", "E", "com")]
+            if len(names) < 2 or any(w.rstrip(".") in CLUB_TOKENS or w in CLUB_TOKENS for w in names):
+                match = None
     # Uma só letra ("A") não é assinatura.
-    if match is None or len(match.group("sig").replace(".", "")) < 2:
+    if match is None or len(match.group("sig").replace(".", "").replace(" ", "")) < 2:
         return text
     return text[:match.start()].rstrip()
 

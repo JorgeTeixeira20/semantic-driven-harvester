@@ -5372,3 +5372,20 @@ ligados por vírgula ou por "e"/"E"; uma só letra não conta. 2 testes novos
 com os 6 casos e com 4 textos que não podem ser cortados. Suite completa:
 **335 testes, todos a passar.** Falta repetir a validação nas 40 páginas e a
 contagem nas 2 352.
+
+**Segunda revisão da assinatura (2026-10-22).** Com a regra anterior, as 26
+assinaturas da amostra de 40 saíram e os cortes nas 2 352 páginas (1 234
+corpos, 310 sequências diferentes) eram todos nomes de autores, iniciais ou
+agências, sem números nem termos de clube. Mas ficavam 125 corpos a acabar em
+maiúsculas e **19 correspondências a nomes do vocabulário em 18 páginas**,
+em dois padrões: (A) "AUTOR, com AUTOR" (15 páginas, declarações de
+treinadores: "JOÃO LOPES, com LUÍS LEAL"), duas delas com um `<p>` escrito
+como texto antes da assinatura; (B) assinatura logo a seguir a uma palavra,
+sem pontuação nem número ("…11 golos VÍTOR PINTO E RUI SOUSA"; 3 páginas).
+Correção: "com" (e ", com", ", e") passa a separar autores; o `<p>` literal é
+limpo; e a assinatura também é aceite logo a seguir a uma palavra, mas só com
+2 ou mais palavras e sem termos de clube (`FC`, `SL`, `BENFICA`, `PORTO`…),
+para não cortar uma frase que acabe num clube ou num jogador em maiúsculas.
+1 teste novo com os 5 casos representativos e mais 4 textos que não podem ser
+cortados. Suite completa: **336 testes, todos a passar.** Falta repetir a
+contagem nas 2 352 páginas.
