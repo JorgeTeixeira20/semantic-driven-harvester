@@ -5389,3 +5389,30 @@ para não cortar uma frase que acabe num clube ou num jogador em maiúsculas.
 1 teste novo com os 5 casos representativos e mais 4 textos que não podem ser
 cortados. Suite completa: **336 testes, todos a passar.** Falta repetir a
 contagem nas 2 352 páginas.
+
+**Resultado da segunda revisão e decisão de seguir (2026-10-22).** Contagem
+nas 2 352 páginas: corpos a acabar em maiúsculas 182 → 125 → **43**; com nomes
+do vocabulário 32 → 18 páginas → **0**. Cortes em 1 330 corpos (365 textos
+diferentes), nenhum com números ou termos de clube. Dos 40 cortes feitos só
+pela regra "logo a seguir a uma palavra", 38 são só assinaturas (os
+jogadores no fim das frases — Bino, Vítor Baía, Tó Luís… — ficam, porque
+estão em minúsculas); os 4 de uma só palavra (EPO, TVI, Sport TV, selecção B)
+foram corretamente recusados. **Limitações conhecidas, aceites pelo autor:**
+um corte leva uma palavra do corpo, colada à assinatura (`tn1cs.asp?nid=123591`:
+"…Mundial-94 nos ✂ EUA GOMES FERREIRA"); um corte fica incompleto
+(`tn0cs.asp?nid=80238`: "FILOMENA MARTINS, com" fica no corpo); das 43
+sequências que sobram, quase todas são iniciais com espaço ("M. V.") ou
+siglas que fecham uma frase ("RTP.", "TVI."), e uma ("BEIRA MAR") pode ser
+corpo. Nenhum destes casos toca no vocabulário, por isso não altera as
+contagens de entidades. Também visto, anterior ao corte: alguns corpos acabam
+num "o" colado à pontuação ("…referiu Hidalgo.o"). **Decisão do autor: não
+afinar mais a regra e correr a cadeia**, dado o prazo.
+
+**Fim da recolha do corpus alargado (2026-10-22, 18:26).** Depois da
+repetição do HTML dos 5 917 artigos com 503 (todos recuperados): relatório
+com 129 317 linhas e 0 erros de mapeamento; 2 320 151 triplos
+(`output/corpus_articles_por_ano.ttl`, 252 MB; N-Triples com 851,8 MB);
+**126 798 artigos com texto** (sem texto: 2 509 × 404, 9 × 500, 1 timeout) e
+**123 844 com HTML** (sem HTML: 5 436 × 500, quase todos `noticia.asp`; 24 ×
+404; 11 timeouts; 2 casos por explicar). Cópias anteriores guardadas com o
+sufixo `pre-html503`.
