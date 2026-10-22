@@ -165,7 +165,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 275 testes em dezanove módulos de `tests/`.
+pacote conforme o README. Existem 286 testes em vinte módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -199,10 +199,11 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 (`test_corpus_phase1.py`: paragem só por página incompleta/vazia,
 independente de `next_page`; lista de termos alargada).
 
-Última validação em **2026-10-21**, com o Python 3.12.4 do ambiente virtual
-(macOS), depois do vocabulário alargado da Wikidata:
-`.venv/bin/python -m unittest discover -s tests` — **275 testes, todos
-passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-21, depois de
+Última validação em **2026-10-22**, sessão remota Linux (Python 3.11.17),
+depois da leitura do corpus da Fase 1 pelo Caminho B:
+`.venv/bin/python -m unittest discover -s tests` — **286 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-21, Python
+3.12.4 (macOS), vocabulário alargado, 275 testes OK; 2026-10-21, depois de
 juntar o ramo do teste de candidatos, 253 testes OK; 2026-10-21, sessão
 remota Linux, 248 testes OK; 2026-10-19, Python 3.11.17, 232 testes OK;
 2026-10-15, Python 3.12.4 no ambiente virtual (macOS), 190 testes OK;

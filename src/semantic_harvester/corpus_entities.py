@@ -42,7 +42,7 @@ from .corpus_chrome import (
     DEFAULT_N, article_frequency, chrome_coverage, chrome_ngrams, layer1_tokens,
     tokens,
 )
-from .corpus_redundancy import Capture, load_corpus, to_body_corpus
+from .corpus_redundancy import Capture, corpus_graph_path, load_corpus, to_body_corpus
 
 DEFAULT_CHROME_FRACTION = 0.10
 ORIGIN_URL = "url"
@@ -56,6 +56,8 @@ CSV_FIELDS = (
 COHERENT_YES = "sim"
 COHERENT_NO = "nao"
 COHERENT_NO_THEME = "sem_tema"
+COHERENT_UNMAPPED = "sem_mapa"
+CLUB_CATEGORY = "clube"
 DEFAULT_CLUB_MAP = Path("data") / "processed" / "caminho_b_clubes_url.csv"
 
 _WORD_RE = re.compile(r"\w+")
@@ -114,20 +116,27 @@ def load_club_map(path: Path) -> dict[str, str]:
 
 
 def club_coherence(
-    term: Term, article_club_slugs: list[str], club_map: dict[str, str]
+    term: Term, article_club_slugs: list[str], club_map: dict[str, str],
+    strict: bool = True,
 ) -> str:
     """Sinal transparente: o clube do jogador coincide com o tema `clube` do artigo?
 
-    Não remove nem corrige nada; só compara.
+    Não remove nem corrige nada; só compara. Uma entidade da categoria
+    `clube` compara-se pelo próprio rótulo. Com `strict=False` (corpus da
+    Fase 1, com muitos clubes no URL fora da tabela), um slug sem
+    correspondência dá `sem_mapa` em vez de erro.
     """
 
     if not article_club_slugs:
         return COHERENT_NO_THEME
     missing = [slug for slug in article_club_slugs if slug not in club_map]
     if missing:
-        raise ValueError(f"Clube do URL sem correspondência na tabela: {missing}")
+        if strict:
+            raise ValueError(f"Clube do URL sem correspondência na tabela: {missing}")
+        return COHERENT_UNMAPPED
     article_clubs = {club_map[slug] for slug in article_club_slugs}
-    return COHERENT_YES if term.clubs & article_clubs else COHERENT_NO
+    own = term.clubs | ({term.rotulo} if term.categoria == CLUB_CATEGORY else set())
+    return COHERENT_YES if own & article_clubs else COHERENT_NO
 
 
 def count_mentions(
@@ -233,6 +242,7 @@ def analyse_article(
     n: int = DEFAULT_N,
     club_map: dict[str, str] | None = None,
     longest_match: bool = True,
+    strict_clubs: bool = True,
 ) -> list[dict[str, str]]:
     themes = themes_from_url(article)
     club_slugs = [value for categoria, value in themes if categoria == "clube"]
@@ -262,7 +272,8 @@ def analyse_article(
             "persistente": str(with_mention == len(texts)),
             "uma_so_captura": str(len(texts) == 1),
             "clube_coerente": (
-                club_coherence(term, club_slugs, club_map) if club_map is not None else ""
+                club_coherence(term, club_slugs, club_map, strict_clubs)
+                if club_map is not None else ""
             ),
         })
     return rows
@@ -299,6 +310,8 @@ def coherence_lines(
     if not any(r["clube_coerente"] for r in entities):
         return []
     values = (COHERENT_YES, COHERENT_NO, COHERENT_NO_THEME)
+    if any(r["clube_coerente"] == COHERENT_UNMAPPED for r in entities):
+        values += (COHERENT_UNMAPPED,)
     weak_counts = Counter(r["clube_coerente"] for r in entities)
     strong_counts = Counter(r["clube_coerente"] for r in strong)
     return [
@@ -306,7 +319,9 @@ def coherence_lines(
         "Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário "
         "coincide com o tema `clube` do URL do artigo; `nao` se não coincide "
         "(possível falso positivo, por exemplo uma manchete do chrome); `sem_tema` "
-        "se o URL não tem clube. Nenhuma menção é removida.\n",
+        "se o URL não tem clube. Uma entidade clube compara-se pelo próprio rótulo. "
+        "`sem_mapa`: o clube do URL não está na tabela slug → clube. Nenhuma "
+        "menção é removida.\n",
         "| clube_coerente | Pares (regra fraca) | Pares (persistência) |",
         "| --- | ---: | ---: |",
         *(f"| {v} | {weak_counts[v]} | {strong_counts[v]} |" for v in values),
@@ -321,6 +336,8 @@ def write_summary(
     chrome_fraction: float | None,
     path: Path,
     use_body: bool = False,
+    csv_name: str = "corpus_entities.csv",
+    unmapped_slugs: Counter | None = None,
 ) -> None:
     articles = list(corpus)
     with_text = [a for a, caps in corpus.items() if any(c.in_layer1 for c in caps)]
@@ -380,9 +397,16 @@ def write_summary(
         *(f"| {label} | {strong_counts[label]} | {count} |"
           for label, count in sorted(weak_counts.items(), key=lambda kv: (-strong_counts[kv[0]], -kv[1], kv[0]))),
         "",
-        "Detalhe por artigo em `output/corpus_entities.csv`. Contagens descritivas "
+        f"Detalhe por artigo em `output/{csv_name}`. Contagens descritivas "
         "desta amostra; não são uma avaliação de precisão.",
     ]
+    if unmapped_slugs:
+        lines += [
+            "\n## Clubes do URL sem correspondência na tabela slug → clube\n",
+            "Para alargar `data/processed/caminho_b_clubes_url.csv`; enquanto faltarem, "
+            "os pares destes artigos ficam `sem_mapa`.\n",
+            *_frequency_table(unmapped_slugs, "slug"),
+        ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -393,12 +417,18 @@ def run(
     club_map_path: Path | None = None,
     use_body: bool = False,
     longest_match: bool = True,
+    corpus_label: str | None = None,
 ) -> list[dict[str, str]]:
+    """Sem `corpus_label`, o corpus de 125 artigos e as saídas oficiais; com
+    uma etiqueta (ex. `por_ano`), o N-Triples desse corpus da Fase 1 e saídas
+    `output/corpus_entities_<etiqueta>*`, sem tocar nas oficiais."""
+
     root = project_root or Path(__file__).resolve().parents[2]
     if vocabulary_path is None:
         raise ValueError("É preciso indicar o vocabulário fechado (--vocabulario).")
     output = root / "output"
-    corpus = load_corpus(output / "corpus_articles.ttl", root)
+    tag = f"_{corpus_label}" if corpus_label else ""
+    corpus = load_corpus(corpus_graph_path(root, corpus_label), root)
     terms = load_vocabulary(vocabulary_path)
     if use_body:
         # Variante (c′): o corpo já exclui o chrome; capturas sem corpo deixam a Camada 1.
@@ -409,11 +439,18 @@ def run(
     rows = [
         row for article, captures in corpus.items()
         for row in analyse_article(article, captures, terms, chrome, club_map=club_map,
-                                   longest_match=longest_match)
+                                   longest_match=longest_match, strict_clubs=not corpus_label)
     ]
-    write_csv(rows, output / "corpus_entities.csv")
+    unmapped = Counter(
+        r["rotulo"] for r in rows
+        if club_map is not None and r["origem"] == ORIGIN_URL and r["categoria"] == "clube"
+        and r["rotulo"] not in club_map
+    )
+    output.mkdir(parents=True, exist_ok=True)
+    write_csv(rows, output / f"corpus_entities{tag}.csv")
     write_summary(corpus, rows, vocabulary_path, chrome_fraction,
-                  output / "corpus_entities_summary.md", use_body)
+                  output / f"corpus_entities{tag}_summary.md", use_body,
+                  csv_name=f"corpus_entities{tag}.csv", unmapped_slugs=unmapped)
     return rows
 
 
@@ -436,6 +473,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--correspondencia-simples", action="store_true",
                         help="contagem anterior a 2026-10-22: cada variante em todas as posições, "
                         "mesmo dentro de outra mais longa (por omissão, só a mais longa)")
+    parser.add_argument("--corpus", metavar="ETIQUETA",
+                        help="corpus da Fase 1 (ex. por_ano): lê "
+                        "data/processed/corpus_articles_<ETIQUETA>_triples.nt e escreve "
+                        "output/corpus_entities_<ETIQUETA>*; por omissão, o corpus de 125 artigos")
     args = parser.parse_args(argv)
     fraction = args.fracao_chrome if args.texto == "sem-chrome" else None
     if fraction is not None and not 0.0 < fraction <= 1.0:
@@ -443,9 +484,10 @@ def main(argv: list[str] | None = None) -> int:
 
     rows = run(vocabulary_path=args.vocabulario, chrome_fraction=fraction,
                club_map_path=args.clubes_url, use_body=args.texto == "corpo",
-               longest_match=not args.correspondencia_simples)
+               longest_match=not args.correspondencia_simples, corpus_label=args.corpus)
+    tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")
-    print("Saídas: output/corpus_entities.csv, output/corpus_entities_summary.md")
+    print(f"Saídas: output/corpus_entities{tag}.csv, output/corpus_entities{tag}_summary.md")
     return 0
 
 

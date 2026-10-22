@@ -4801,3 +4801,71 @@ UTF-8; com a codificação declarada, 7/7); e em todas as 20 capturas
 título da página é genérico (":.: Jornal Record :.:") e a c′ ancora o corpo
 no título — para o site de 2000–2009, o HTML é a única via medida até agora
 para isolar o corpo.
+
+## Caminho B sobre o corpus da Fase 1: leitura do grafo (implementada, não corrida; 2026-10-22)
+
+### Problema
+
+`load_corpus()` (`corpus_redundancy.py`), usado pelos Caminhos D e B e pelo
+teste de candidatos, só lia o Turtle do corpus de 125 artigos e exigia
+`sdh:contentLength` (com `int(...)`) e, para a Camada 1, `statusCode == 200`.
+O grafo do corpus da Fase 1 não tem nenhum dos dois, nem `digest` fiável (a
+TextSearch não os devolve; "RDF a partir só da Fase 1"): a leitura falhava. O
+Turtle desse corpus (2,2 milhões de triplos) também é pesado de carregar
+inteiro em `rdflib` só para tirar os poucos triplos usados.
+
+### Alterações
+
+- `load_corpus()` aceita o N-Triples apendável que o `corpus_rdf --fase1`
+  escreve (`data/processed/corpus_articles_<etiqueta>_triples.nt`), lido em
+  streaming (`W3CNTriplesParser` com um sink que só guarda os triplos usados).
+  Um artigo refeito numa repetição aparece duas vezes nesse ficheiro
+  (primeiro sem texto, depois com texto): as capturas juntam-se, não se
+  duplicam. O Turtle continua a ser lido como antes.
+- `Capture`: `digest` e `content_length` podem faltar; a Camada 1 aceita
+  `statusCode` ausente (conta o facto de haver texto). Um `statusCode`
+  registado diferente de 200 continua a excluir a captura. **Sem efeito no
+  corpus de 125 artigos**, verificado no `output/corpus_articles.ttl`
+  versionado: as 941 capturas têm `statusCode`, `contentLength` e `digest`, e
+  as 793 com texto são todas 200.
+- `Capture.html_path`: o HTML em bruto da mesma captura, se existir, procurado
+  em `data/raw/original_html/` com o nome do ficheiro de texto (a convenção
+  do `ArquivoClient`; o grafo não regista o caminho do HTML). Ainda não é
+  usado: é o encaixe para o extrator do corpo pelo contentor do HTML.
+- `corpus_entities`, `corpus_entities_rdf` e `corpus_candidate_entities`
+  ganham `--corpus ETIQUETA`: leem o N-Triples desse corpus e escrevem
+  `output/<saída>_<etiqueta>*`, sem tocar nas saídas oficiais do corpus de
+  125 artigos. `corpus_entities_rdf` ganha `--vocabulario` (tem de ser o
+  vocabulário que gerou o CSV) e obtém os `Artigo` do grafo pela mesma
+  leitura em streaming.
+- `clube_coerente`: no corpus da Fase 1 há muitos clubes no URL fora de
+  `caminho_b_clubes_url.csv`; com `--corpus`, um slug sem correspondência dá
+  `sem_mapa` em vez de erro, e o resumo lista esses slugs e o número de
+  artigos de cada um, para a tabela poder ser alargada. No corpus de 125
+  artigos o erro mantém-se. Uma entidade da categoria `clube` (vocabulário
+  alargado) compara-se pelo próprio rótulo com o clube do URL.
+- O resumo do teste de candidatos lista só os 200 primeiros; o CSV tem todos.
+
+### Escala (medida com um grafo sintético, não com o real)
+
+Um N-Triples sintético com 129 317 artigos e 1 810 438 triplos, gerado pelo
+mesmo `build_article_history_graph`, foi lido em 34 s com um pico de 370 MB
+de memória (sessão remota Linux). Os textos (~95 000 ficheiros, ~1,1 GB
+estimados) somam-se a isto; não medido.
+
+### Testes e o que não foi feito
+
+11 testes novos em `tests/test_phase1_corpus_reading.py`, com um N-Triples
+escrito como o do `corpus_rdf --fase1`: captura sem `statusCode`/
+`contentLength`/`digest` na Camada 1, `html_path` presente e ausente,
+artigo repetido no ficheiro apendável, Turtle e N-Triples a darem o mesmo
+corpus, `statusCode` 404 ainda excluído, caminhos iguais aos do
+`corpus_rdf`, `sem_mapa` e coerência de uma entidade clube, e execuções
+etiquetadas de B, do RDF de B e do teste de candidatos que não criam as
+saídas oficiais. Suite completa: **286 testes, todos a passar.**
+
+**Nada foi corrido sobre o corpus real** (os textos não estão nesta sessão).
+O Caminho D não foi adaptado: no corpus da Fase 1 cada artigo tem uma só
+captura, por isso não há redundância entre capturas a anotar. A extração do
+corpo continua a ser a c′; o extrator pelo contentor do HTML é o passo
+seguinte.

@@ -42,6 +42,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 from rdflib import RDF, Graph
+from rdflib.plugins.parsers.ntriples import W3CNTriplesParser
 
 from .article_body import extract_body
 
@@ -93,12 +94,16 @@ _SPACE_RE = re.compile(r"\s+")
 class Capture:
     article: str
     tstamp: str
-    digest: str
-    content_length: int
+    # Ausentes no grafo do corpus da Fase 1: a TextSearch não devolve
+    # `digest` fiável, `contentLength` nem `statusCode`.
+    digest: str | None
+    content_length: int | None
     status_code: int | None
     text: str | None
     # Variante (c′): tem texto, mas sem corpo de artigo localizável.
     body_missing: bool = False
+    # HTML em bruto da mesma captura, se existir no disco.
+    html_path: Path | None = None
 
     @property
     def has_text(self) -> bool:
@@ -106,7 +111,9 @@ class Capture:
 
     @property
     def in_layer1(self) -> bool:
-        return self.text is not None and self.status_code == 200 and not self.body_missing
+        # `statusCode` desconhecido (corpus da Fase 1) não exclui a captura;
+        # no corpus de 125 artigos todas as capturas o têm.
+        return self.text is not None and self.status_code in (200, None) and not self.body_missing
 
 
 def normalize_text(text: str) -> str:
@@ -254,8 +261,8 @@ def annotate_article(
             "rotulo": "",
             "limiar": "" if threshold is None else f"{threshold:g}",
             "sim_consecutiva": "",
-            "digest": capture.digest,
-            "content_length": str(capture.content_length),
+            "digest": capture.digest or "",
+            "content_length": "" if capture.content_length is None else str(capture.content_length),
             "grupo_digest": "",
         }
         if index in position_in_layer1:
@@ -288,31 +295,106 @@ def annotate_article(
 # --- Leitura do corpus ------------------------------------------------------
 
 
-def load_corpus(ttl_path: Path, project_root: Path) -> dict[str, list[Capture]]:
-    """Capturas por artigo (`originalURL`), em ordem temporal, a partir do Turtle."""
+HTML_DIR = Path("data") / "raw" / "original_html"
 
-    graph = Graph().parse(ttl_path, format="turtle")
+_CAPTURE_PREDICATES = {
+    SDH.tstamp: "tstamp",
+    SDH.digest: "digest",
+    SDH.contentLength: "content_length",
+    SDH.statusCode: "status_code",
+    SDH.temTextoExtraido: "text_node",
+}
+
+
+def corpus_graph_path(project_root: Path, label: str | None = None) -> Path:
+    """Grafo de entrada: o Turtle dos 125 artigos, ou o N-Triples de um corpus
+    etiquetado da Fase 1 (o mesmo caminho de `corpus_rdf.rdf_paths`)."""
+
+    if label is None:
+        return project_root / "output" / "corpus_articles.ttl"
+    return project_root / "data" / "processed" / f"corpus_articles_{label}_triples.nt"
+
+
+class _GraphIndex:
+    """Só os triplos que a leitura do corpus usa; serve de sink ao parser
+    N-Triples, que assim não guarda o grafo inteiro em memória."""
+
+    def __init__(self) -> None:
+        self.resources: set = set()
+        self.articles: set = set()
+        self.original_url: dict = {}
+        self.captures: dict[object, set] = defaultdict(set)
+        self.capture_fields: dict[object, dict[str, object]] = defaultdict(dict)
+        self.file_path: dict = {}
+
+    def triple(self, s, p, o) -> None:
+        if p == RDF.type:
+            if o == SDH.RecursoWeb:
+                self.resources.add(s)
+            elif o == SDH.Artigo:
+                self.articles.add(s)
+        elif p == SDH.originalURL:
+            self.original_url[s] = o
+        elif p == SDH.temCaptura:
+            # Um artigo refeito numa repetição aparece duas vezes no .nt
+            # apendável: as capturas juntam-se, não se duplicam.
+            self.captures[s].add(o)
+        elif p in _CAPTURE_PREDICATES:
+            self.capture_fields[s][_CAPTURE_PREDICATES[p]] = o
+        elif p == SDH.filePath:
+            self.file_path[s] = o
+
+
+def read_graph_index(graph_path: Path) -> _GraphIndex:
+    index = _GraphIndex()
+    if graph_path.suffix == ".nt":
+        with graph_path.open("rb") as handle:
+            W3CNTriplesParser(sink=index).parse(handle)
+    else:
+        for triple in Graph().parse(graph_path, format="turtle"):
+            index.triple(*triple)
+    return index
+
+
+def _optional_int(value: object) -> int | None:
+    return None if value is None else int(value)
+
+
+def load_corpus(graph_path: Path, project_root: Path) -> dict[str, list[Capture]]:
+    """Capturas por artigo (`originalURL`), em ordem temporal.
+
+    Lê o Turtle do corpus de 125 artigos ou, se o caminho acabar em `.nt`, o
+    N-Triples de um corpus da Fase 1, em streaming. O HTML em bruto de uma
+    captura com texto é procurado em `data/raw/original_html/` com o nome do
+    ficheiro de texto (a mesma convenção do `ArquivoClient`).
+    """
+
+    index = read_graph_index(graph_path)
     corpus: dict[str, list[Capture]] = {}
-    for web_resource in graph.subjects(RDF.type, SDH.RecursoWeb):
-        article = str(graph.value(web_resource, SDH.originalURL))
+    for web_resource in index.resources:
+        article = str(index.original_url[web_resource])
         captures = []
-        for capture in graph.objects(web_resource, SDH.temCaptura):
-            text = None
-            text_node = graph.value(capture, SDH.temTextoExtraido)
+        for capture in index.captures.get(web_resource, ()):
+            fields = index.capture_fields[capture]
+            text = html_path = None
+            text_node = fields.get("text_node")
             if text_node is not None:
-                file_path = project_root / str(graph.value(text_node, SDH.filePath))
+                file_path = project_root / str(index.file_path[text_node])
                 if not file_path.is_file():
                     raise FileNotFoundError(f"Texto referenciado no grafo em falta: {file_path}")
                 text = file_path.read_text(encoding="utf-8")
-            status = graph.value(capture, SDH.statusCode)
+                candidate = project_root / HTML_DIR / f"{file_path.stem}.html"
+                html_path = candidate if candidate.is_file() else None
+            digest = fields.get("digest")
             captures.append(
                 Capture(
                     article=article,
-                    tstamp=str(graph.value(capture, SDH.tstamp)),
-                    digest=str(graph.value(capture, SDH.digest)),
-                    content_length=int(graph.value(capture, SDH.contentLength)),
-                    status_code=None if status is None else int(status),
+                    tstamp=str(fields["tstamp"]),
+                    digest=None if digest is None else str(digest),
+                    content_length=_optional_int(fields.get("content_length")),
+                    status_code=_optional_int(fields.get("status_code")),
                     text=text,
+                    html_path=html_path,
                 )
             )
         corpus[article] = sorted(captures, key=lambda c: c.tstamp)

@@ -36,10 +36,11 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from .corpus_entities import load_vocabulary, match_tokens
-from .corpus_redundancy import Capture, load_corpus, to_body_corpus
+from .corpus_redundancy import Capture, corpus_graph_path, load_corpus, to_body_corpus
 
 CONNECTORS = frozenset({"de", "da", "do", "das", "dos", "e"})
 CSV_FIELDS = ("candidato", "artigos", "ocorrencias", "exemplo_artigo")
+SUMMARY_TOP = 200
 
 _SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 _CLAUSE_SPLIT_RE = re.compile(r"[,;:()\"'«»]+")
@@ -155,7 +156,8 @@ def write_csv(rows: list[dict[str, str]], path: Path) -> None:
 
 
 def write_summary(
-    rows: list[dict[str, str]], n_articles: int, vocabulary_path: Path, use_body: bool, path: Path
+    rows: list[dict[str, str]], n_articles: int, vocabulary_path: Path, use_body: bool, path: Path,
+    csv_name: str = "corpus_candidate_entities.csv",
 ) -> None:
     text_kind = (
         "só o corpo do artigo (variante c′)" if use_body else "texto completo, sem remoção de chrome"
@@ -175,10 +177,11 @@ def write_summary(
     ]
     lines += [
         f"| {r['candidato']} | {r['artigos']} | {r['ocorrencias']} | {r['exemplo_artigo']} |"
-        for r in rows
+        for r in rows[:SUMMARY_TOP]
     ]
     lines.append(
-        "\nDetalhe em `output/corpus_candidate_entities.csv`. Lista descritiva desta "
+        f"\nTabela limitada aos {SUMMARY_TOP} primeiros; todos em `output/{csv_name}`. "
+        "Lista descritiva desta "
         "amostra, não uma avaliação de precisão nem uma proposta de pipeline."
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -188,21 +191,25 @@ def run(
     project_root: Path | None = None,
     vocabulary_path: Path | None = None,
     use_body: bool = True,
+    corpus_label: str | None = None,
 ) -> list[dict[str, str]]:
     root = project_root or Path(__file__).resolve().parents[2]
     if vocabulary_path is None:
         raise ValueError("É preciso indicar o vocabulário fechado (--vocabulario).")
     output = root / "output"
-    corpus = load_corpus(output / "corpus_articles.ttl", root)
+    tag = f"_{corpus_label}" if corpus_label else ""
+    corpus = load_corpus(corpus_graph_path(root, corpus_label), root)
     terms = load_vocabulary(vocabulary_path)
     variants = frozenset(variant for term in terms for variant in term.variants)
     if use_body:
         corpus = to_body_corpus(corpus)
 
     rows = unseen_candidates(corpus, variants)
-    write_csv(rows, output / "corpus_candidate_entities.csv")
+    output.mkdir(parents=True, exist_ok=True)
+    write_csv(rows, output / f"corpus_candidate_entities{tag}.csv")
     write_summary(rows, len(corpus), vocabulary_path, use_body,
-                  output / "corpus_candidate_entities_summary.md")
+                  output / f"corpus_candidate_entities{tag}_summary.md",
+                  csv_name=f"corpus_candidate_entities{tag}.csv")
     return rows
 
 
@@ -215,12 +222,16 @@ def main(argv: list[str] | None = None) -> int:
                         help="CSV do vocabulário fechado de entidades (Caminho B)")
     parser.add_argument("--texto", choices=("corpo", "completo"), default="corpo",
                         help="corpo do artigo (variante c′, por omissão) ou texto completo")
+    parser.add_argument("--corpus", metavar="ETIQUETA",
+                        help="corpus da Fase 1 (ex. por_ano); por omissão, o de 125 artigos")
     args = parser.parse_args(argv)
 
-    rows = run(vocabulary_path=args.vocabulario, use_body=args.texto == "corpo")
+    rows = run(vocabulary_path=args.vocabulario, use_body=args.texto == "corpo",
+               corpus_label=args.corpus)
+    tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Candidatos distintos fora do vocabulário: {len(rows)}")
-    print("Saídas: output/corpus_candidate_entities.csv, "
-          "output/corpus_candidate_entities_summary.md")
+    print(f"Saídas: output/corpus_candidate_entities{tag}.csv, "
+          f"output/corpus_candidate_entities{tag}_summary.md")
     return 0
 
 

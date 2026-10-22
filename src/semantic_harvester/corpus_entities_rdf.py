@@ -29,8 +29,11 @@ from pathlib import Path
 
 from rdflib import RDF, RDFS, XSD, Graph, Literal, URIRef
 
+from .corpus_redundancy import corpus_graph_path, read_graph_index
 from .corpus_redundancy_rdf import file_sha256
 from .rdf_mapper import SDH, article_uri, stable_hash
+
+DEFAULT_VOCABULARY = Path("data") / "processed" / "caminho_b_vocabulario_wikidata.csv"
 
 WIKIDATA_ENTITY = "http://www.wikidata.org/entity/"
 
@@ -128,33 +131,46 @@ def build_graph(
     return graph, stats, homonym_rows
 
 
-def run(project_root: Path | None = None) -> tuple[Graph, Counter, list[str]]:
+def run(
+    project_root: Path | None = None,
+    corpus_label: str | None = None,
+    vocabulary_path: Path | None = None,
+) -> tuple[Graph, Counter, list[str]]:
+    """Sem `corpus_label`, os ficheiros oficiais do corpus de 125 artigos; com
+    uma etiqueta, `output/corpus_entities_<etiqueta>.{csv,ttl}` e o N-Triples
+    desse corpus da Fase 1. O vocabulário tem de ser o que gerou o CSV."""
+
     root = project_root or Path(__file__).resolve().parents[2]
     output = root / "output"
-    articles_ttl = output / "corpus_articles.ttl"
-    before = file_sha256(articles_ttl)
+    tag = f"_{corpus_label}" if corpus_label else ""
+    articles_graph = corpus_graph_path(root, corpus_label)
+    before = file_sha256(articles_graph)
 
-    articles_in_graph = set(
-        Graph().parse(articles_ttl, format="turtle").subjects(RDF.type, SDH.Artigo)
-    )
-    vocabulary = load_vocabulary_identity(root / "data" / "processed" / "caminho_b_vocabulario_wikidata.csv")
-    with (output / "corpus_entities.csv").open(encoding="utf-8", newline="") as handle:
+    articles_in_graph = read_graph_index(articles_graph).articles
+    vocabulary = load_vocabulary_identity(root / (vocabulary_path or DEFAULT_VOCABULARY))
+    with (output / f"corpus_entities{tag}.csv").open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
     graph, stats, homonym_rows = build_graph(rows, vocabulary, articles_in_graph)
-    (output / "corpus_entities.ttl").write_text(graph.serialize(format="turtle").rstrip("\n") + "\n", encoding="utf-8")
+    (output / f"corpus_entities{tag}.ttl").write_text(
+        graph.serialize(format="turtle").rstrip("\n") + "\n", encoding="utf-8")
 
-    if file_sha256(articles_ttl) != before:
-        raise RuntimeError("output/corpus_articles.ttl foi alterado durante a execução")
+    if file_sha256(articles_graph) != before:
+        raise RuntimeError(f"{articles_graph} foi alterado durante a execução")
     homonym_labels = sorted(r for r, (_, n) in vocabulary.items() if n > 1)
-    write_summary(stats, homonym_rows, homonym_labels, output / "corpus_entities_rdf_summary.md")
+    write_summary(stats, homonym_rows, homonym_labels,
+                  output / f"corpus_entities{tag}_rdf_summary.md", tag=tag,
+                  articles_graph=articles_graph.relative_to(root).as_posix())
     return graph, stats, homonym_rows
 
 
-def write_summary(stats: Counter, homonym_rows: list[str], homonym_labels: list[str], path: Path) -> None:
+def write_summary(
+    stats: Counter, homonym_rows: list[str], homonym_labels: list[str], path: Path,
+    tag: str = "", articles_graph: str = "output/corpus_articles.ttl",
+) -> None:
     lines = [
-        "# Caminho B em RDF (`output/corpus_entities.ttl`)\n",
-        "Gerado de `output/corpus_entities.csv` (variante c′) e do vocabulário da "
-        "Wikidata, sem pedidos à API; `output/corpus_articles.ttl` não foi alterado "
+        f"# Caminho B em RDF (`output/corpus_entities{tag}.ttl`)\n",
+        f"Gerado de `output/corpus_entities{tag}.csv` (variante c′) e do vocabulário da "
+        f"Wikidata, sem pedidos à API; `{articles_graph}` não foi alterado "
         "(checksum igual antes e depois).\n",
         f"- Triplos: {stats['triplos']}",
         f"- Linhas de tema / de menção no CSV: {stats['linhas_tema']} / {stats['linhas_mencao']}",
@@ -178,11 +194,17 @@ def write_summary(stats: Counter, homonym_rows: list[str], homonym_labels: list[
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m semantic_harvester.corpus_entities_rdf",
                                      description=__doc__.splitlines()[0])
-    parser.parse_args(argv)
-    _, stats, homonym_rows = run()
+    parser.add_argument("--corpus", metavar="ETIQUETA",
+                        help="corpus da Fase 1 (ex. por_ano); por omissão, o de 125 artigos")
+    parser.add_argument("--vocabulario", type=Path, default=DEFAULT_VOCABULARY,
+                        help="o mesmo vocabulário usado pelo corpus_entities (por omissão o "
+                        "original, dos resultados oficiais)")
+    args = parser.parse_args(argv)
+    _, stats, homonym_rows = run(corpus_label=args.corpus, vocabulary_path=args.vocabulario)
+    tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Triplos: {stats['triplos']}; temas: {stats['temas']}; entidades: {stats['entidades']}; "
           f"menções: {stats['mencoes']}; linhas com homónimos: {len(homonym_rows)}")
-    print("Saídas: output/corpus_entities.ttl, output/corpus_entities_rdf_summary.md")
+    print(f"Saídas: output/corpus_entities{tag}.ttl, output/corpus_entities{tag}_rdf_summary.md")
     return 0
 
 
