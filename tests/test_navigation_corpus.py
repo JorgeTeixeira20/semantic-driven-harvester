@@ -127,6 +127,42 @@ class NavigationCorpusTests(OfflineTestCase):
         self.assertIn("| Rafa Silva | futebol | 1 |", summary)
 
 
+class HybridVocabularyInDashboardTests(OfflineTestCase):
+    def test_other_categories_and_origin(self) -> None:
+        nt = corpus_graph_path(self.root, LABEL)
+        nt.parent.mkdir(parents=True)
+        record = {"article_id": stable_hash(MODERN), "original_url": MODERN, "tstamp": "20190301120000",
+                  "captured_at": captured_at("20190301120000"), "extracted_text_path": None,
+                  "text_download_success": False}
+        nt.write_text(build_article_history_graph([record], "Jogo na Luz", self.root).serialize(format="nt"),
+                      encoding="utf-8")
+        output = self.root / "output"
+        output.mkdir()
+        (output / f"corpus_entities_{LABEL}.csv").write_text(
+            "artigo,tipo,categoria,rotulo,origem\n"
+            f"{MODERN},entidade,estadio,Estádio do Sport Lisboa e Benfica,texto\n"
+            f"{MODERN},entidade,jogador,Rafa Silva,texto\n", encoding="utf-8")
+        (output / f"corpus_phase1_{LABEL}_captures.csv").write_text(
+            "original_url,tstamp,title,facets,queries,num_queries_matched,divergent,url_variants\n",
+            encoding="utf-8")
+        processed = self.root / "data" / "processed"
+        (processed / "hibrido.csv").write_text(
+            "tipo,categoria,rotulo,variantes,wikidata,modalidade,clubes,homonimos,origem\n"
+            "entidade,jogador,Rafa Silva,,Q1,futebol,,1,lista_fechada\n"
+            "entidade,estadio,Estádio do Sport Lisboa e Benfica,Estádio da Luz,Q100,,,1,candidato\n",
+            encoding="utf-8")
+        (processed / "clubes.csv").write_text("slug,wikidata,clube\n", encoding="utf-8")
+        target = run(self.root, LABEL, Path("data/processed/hibrido.csv"), Path("data/processed/clubes.csv"))
+        data = json.loads((target / "data.js").read_text(encoding="utf-8")
+                          .removeprefix("window.SDH_DATA = ").rstrip().rstrip(";"))
+        self.assertEqual({e["k"]: (e["c"], e["o"]) for e in data["entities"]},
+                         {"Q1": ("jogador", "lista_fechada"), "Q100": ("estadio", "candidato")})
+        summary = (target / "resumo.md").read_text(encoding="utf-8")
+        self.assertIn("| Estádio do Sport Lisboa e Benfica | estadio | 1 |", summary)
+        self.assertIn("| candidato | 1 |", summary)
+        self.assertNotIn("Estádio do Sport Lisboa e Benfica | futebol", summary)
+
+
 class SlugTests(unittest.TestCase):
     def test_slug(self) -> None:
         self.assertEqual(slug("Hóquei em Patins"), "hoquei-em-patins")

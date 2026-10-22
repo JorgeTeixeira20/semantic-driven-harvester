@@ -54,6 +54,7 @@ ERAS = (
 OTHER_ERA = "outro"
 ORIGIN_NONE, ORIGIN_FROM_URL, ORIGIN_FALLBACK = 0, 1, 2
 CLUB_CATEGORY = "clube"
+OTHER_CATEGORIES = ("treinador", "estadio", "competicao")
 
 
 def slug(text: str) -> str:
@@ -86,6 +87,7 @@ class Entity:
     categoria: str
     modalidade: str
     qid: str
+    origin: str = ""
 
 
 def entity_key(qids: str, homonyms: int, rotulo: str) -> str:
@@ -102,7 +104,7 @@ def load_vocabulary(path: Path) -> dict[str, Entity]:
         vocabulary[row["rotulo"]] = Entity(
             key=entity_key(qid, homonyms, row["rotulo"]), name=row["rotulo"],
             categoria=row["categoria"], modalidade=row.get("modalidade") or "",
-            qid=qid if homonyms == 1 else "",
+            qid=qid if homonyms == 1 else "", origin=row.get("origem") or "",
         )
     return vocabulary
 
@@ -226,7 +228,8 @@ def build_data(
         "bodies": bodies,
         "clubs": [{"k": k, "n": club_names.get(k, k)} for k in club_keys],
         "entities": [{"k": k, "n": by_key[k].name, "c": by_key[k].categoria,
-                      "m": by_key[k].modalidade, "q": by_key[k].qid} for k in entity_keys],
+                      "m": by_key[k].modalidade, "q": by_key[k].qid, "o": by_key[k].origin}
+                     for k in entity_keys],
         # [tstamp, título, URL, época, modalidades, origem, clubes, origem, entidades, corpo]
         "articles": [
             [a.tstamp, a.title, a.url, era_index[a.era], [mod_index[m] for m in a.modalidades],
@@ -258,7 +261,10 @@ def write_summary(articles: list[Article], vocabulary: dict[str, Entity],
     clubs_mentioned = Counter(k for a in articles for k in a.entities
                               if by_key[k].categoria == CLUB_CATEGORY)
     athletes = Counter(k for a in articles for k in a.entities
-                       if by_key[k].categoria != CLUB_CATEGORY)
+                       if by_key[k].categoria not in (CLUB_CATEGORY, *OTHER_CATEGORIES))
+    others = Counter(k for a in articles for k in a.entities
+                     if by_key[k].categoria in OTHER_CATEGORIES)
+    origins = Counter(by_key[k].origin for k in {k for a in articles for k in a.entities})
 
     lines = [
         f"# Resumo do protótipo `prototipo_{label}`\n",
@@ -289,6 +295,13 @@ def write_summary(articles: list[Article], vocabulary: dict[str, Entity],
         *_table(("Atleta", "Modalidade", "Artigos"),
                 [(by_key[k].name, by_key[k].modalidade, n) for k, n in athletes.most_common(20)]),
     ]
+    if others:
+        lines += ["## Treinadores, estádios e competições mais mencionados\n",
+                  *_table(("Entidade", "Categoria", "Artigos"),
+                          [(by_key[k].name, by_key[k].categoria, n) for k, n in others.most_common(20)])]
+    if any(origins):  # só com um vocabulário que tem a coluna `origem` (o híbrido)
+        lines += ["## Origem das entidades mencionadas no vocabulário\n",
+                  *_table(("Origem", "Entidades distintas"), sorted(origins.items(), key=lambda kv: -kv[1]))]
     path.write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8")
 
 

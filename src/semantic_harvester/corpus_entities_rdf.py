@@ -55,6 +55,13 @@ def load_vocabulary_identity(path: Path) -> dict[str, tuple[str, int]]:
                 for row in csv.DictReader(handle)}
 
 
+def load_vocabulary_origin(path: Path) -> dict[str, str]:
+    """rotulo → origem (`lista_fechada`, `candidato`, ...), se o vocabulário a tiver."""
+
+    with path.open(encoding="utf-8", newline="") as handle:
+        return {row["rotulo"]: row["origem"] for row in csv.DictReader(handle) if row.get("origem")}
+
+
 def entity_uri(rotulo: str, vocabulary: dict[str, tuple[str, int]]) -> URIRef:
     if rotulo not in vocabulary:
         raise ValueError(f"Entidade {rotulo!r} ausente do vocabulário")
@@ -74,6 +81,7 @@ def mencao_uri(artigo: str, rotulo: str) -> URIRef:
 
 def build_graph(
     rows: list[dict[str, str]], vocabulary: dict[str, tuple[str, int]], articles_in_graph: set,
+    origins: dict[str, str] | None = None,
 ) -> tuple[Graph, Counter, list[str]]:
     graph = Graph()
     for prefix, namespace in (("sdh", SDH), ("rdfs", RDFS), ("xsd", XSD)):
@@ -108,6 +116,9 @@ def build_graph(
         mencao = mencao_uri(row["artigo"], row["rotulo"])
         graph.add((entity, RDF.type, SDH.EntidadeMencionada))
         graph.add((entity, RDFS.label, Literal(row["rotulo"])))
+        if origins and row["rotulo"] in origins:
+            graph.add((entity, SDH.origemVocabulario,
+                       Literal(origins[row["rotulo"]], datatype=XSD.string)))
         graph.add((article, SDH.mencionaEntidade, entity))
         graph.add((article, SDH.temMencao, mencao))
         graph.add((mencao, RDF.type, SDH.Mencao))
@@ -126,6 +137,9 @@ def build_graph(
     stats["entidades"] = len(entities)
     stats["entidades_wikidata"] = sum(str(e).startswith(WIKIDATA_ENTITY) for e in entities)
     stats["entidades_fallback"] = stats["entidades"] - stats["entidades_wikidata"]
+    stats["entidades_candidato"] = len({
+        e for e in entities
+        if str(graph.value(e, SDH.origemVocabulario) or "") == "candidato"})
     stats["mencoes"] = len(set(graph.subjects(RDF.type, SDH.Mencao)))
     stats["triplos"] = len(graph)
     return graph, stats, homonym_rows
@@ -147,10 +161,12 @@ def run(
     before = file_sha256(articles_graph)
 
     articles_in_graph = read_graph_index(articles_graph).articles
-    vocabulary = load_vocabulary_identity(root / (vocabulary_path or DEFAULT_VOCABULARY))
+    vocabulary_file = root / (vocabulary_path or DEFAULT_VOCABULARY)
+    vocabulary = load_vocabulary_identity(vocabulary_file)
     with (output / f"corpus_entities{tag}.csv").open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
-    graph, stats, homonym_rows = build_graph(rows, vocabulary, articles_in_graph)
+    graph, stats, homonym_rows = build_graph(rows, vocabulary, articles_in_graph,
+                                             load_vocabulary_origin(vocabulary_file))
     (output / f"corpus_entities{tag}.ttl").write_text(
         graph.serialize(format="turtle").rstrip("\n") + "\n", encoding="utf-8")
 
@@ -178,6 +194,8 @@ def write_summary(
         f"- Nós `EntidadeMencionada`: {stats['entidades']} — {stats['entidades_wikidata']} com URI "
         f"da Wikidata, {stats['entidades_fallback']} com URI próprio (homónimos)",
         f"- Nós `Mencao`: {stats['mencoes']}",
+        *([f"- Entidades vindas da abordagem híbrida (`origemVocabulario` candidato): "
+           f"{stats['entidades_candidato']}"] if stats["entidades_candidato"] else []),
         "",
         "## Exceção: rótulos homónimos\n",
         f"Rótulos do vocabulário com mais de um QID ({len(homonym_labels)}): "

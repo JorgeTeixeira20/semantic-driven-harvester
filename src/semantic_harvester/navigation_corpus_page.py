@@ -108,6 +108,7 @@ footer { color: var(--muted); font-size: .8rem; max-width: 1180px; margin: 0 aut
     <section class="panel"><h2 id="clubsTitle">Clubes mais mencionados</h2><ul class="rank" id="topClubs"></ul></section>
     <section class="panel"><h2 id="athTitle">Atletas mais mencionados</h2><ul class="rank" id="topAth"></ul></section>
   </div>
+  <section class="panel" id="otherPanel" style="margin-top:16px" hidden><h2 id="otherTitle">Treinadores, estádios e competições mais mencionados</h2><ul class="rank" id="topOther"></ul></section>
   <div class="grid2" style="margin-top:16px">
     <section class="panel"><h2>Modalidades</h2><ul class="rank" id="mods"></ul></section>
     <section class="panel"><h2>Época do site · origem do corpo</h2><ul class="rank" id="eras"></ul><ul class="rank" id="bodies" style="margin-top:10px"></ul></section>
@@ -161,6 +162,10 @@ footer { color: var(--muted); font-size: .8rem; max-width: 1180px; margin: 0 aut
     });
     return runs.length ? "Sem nenhum artigo na recolha em: " + runs.join(", ") + "." : "";
   }
+  const OTHER = new Set(["treinador", "estadio", "competicao"]);
+  const CAT = { treinador: "treinador", estadio: "estádio", competicao: "competição", clube: "clube", jogador: "atleta" };
+  const ORIGIN = { lista_fechada: "lista fechada da Wikidata", candidato: "detetado no texto e confirmado na Wikidata (abordagem híbrida)",
+    "lista_fechada+candidato": "lista fechada da Wikidata, com uma forma nova vinda do texto" };
   const S = { ano: "", era: "", mod: "", clube: "", ent: "", q: "", sort: "desc", p: 0 };
 
   function readHash() {
@@ -242,13 +247,17 @@ footer { color: var(--muted); font-size: .8rem; max-width: 1180px; margin: 0 aut
     ec.delete(sel);
     const ents = [...ec.entries()].sort((a, b) => b[1] - a[1]);
     const isClub = e => D.entities[e].c === "clube";
+    const isOther = e => OTHER.has(D.entities[e].c);
     const co = sel >= 0 ? " (com " + D.entities[sel].n + ")" : "";
     document.getElementById("clubsTitle").textContent = "Clubes mais mencionados" + co;
     document.getElementById("athTitle").textContent = "Atletas mais mencionados" + co;
+    document.getElementById("otherTitle").textContent = "Treinadores, estádios e competições mais mencionados" + co;
     const entOn = e => D.entities[e].k === S.ent, entClick = e => set("ent", D.entities[e].k);
     rank(document.getElementById("topClubs"), ents.filter(e => isClub(e[0])).slice(0, 12), e => D.entities[e].n, entOn, entClick);
-    rank(document.getElementById("topAth"), ents.filter(e => !isClub(e[0])).slice(0, 12), e => D.entities[e].n, entOn, entClick,
+    rank(document.getElementById("topAth"), ents.filter(e => !isClub(e[0]) && !isOther(e[0])).slice(0, 12), e => D.entities[e].n, entOn, entClick,
       e => D.entities[e].m ? ` <small class="meta">${esc(D.entities[e].m)}</small>` : "");
+    rank(document.getElementById("topOther"), ents.filter(e => isOther(e[0])).slice(0, 12), e => D.entities[e].n, entOn, entClick,
+      e => ` <small class="meta">${esc(CAT[D.entities[e].c] || D.entities[e].c)}</small>`);
 
     const mc = count(filtered("mod").map(i => A[i]), r => r[MOD]);
     rank(document.getElementById("mods"), [...mc.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12),
@@ -270,7 +279,8 @@ footer { color: var(--muted); font-size: .8rem; max-width: 1180px; margin: 0 aut
     if (sel < 0) { card.hidden = true; return; }
     const e = D.entities[sel];
     card.hidden = false;
-    card.innerHTML = `<h3>${esc(e.n)}</h3><div class="meta">${esc(e.c)}${e.m ? " · " + esc(e.m) : ""} · ` +
+    card.innerHTML = `<h3>${esc(e.n)}</h3><div class="meta">${esc(CAT[e.c] || e.c)}${e.m ? " · " + esc(e.m) : ""} · ` +
+      (e.o ? `origem: ${esc(ORIGIN[e.o] || e.o)} · ` : "") +
       `${fmt(n)} artigos com os filtros atuais · ` +
       (e.q ? `<a href="https://www.wikidata.org/wiki/${esc(e.q)}" target="_blank" rel="noopener">Wikidata ${esc(e.q)}</a>`
            : "rótulo homónimo: sem QID atribuído") +
@@ -344,6 +354,7 @@ footer { color: var(--muted); font-size: .8rem; max-width: 1180px; margin: 0 aut
   document.getElementById("foot").innerHTML =
     "Semantic Driven Harvester · dados do grafo RDF da Fase 1 e do Caminho B (vocabulário da Wikidata) · cada vista é um endereço: copie-o para a guardar.";
   document.getElementById("gaps").textContent = gapText();
+  document.getElementById("otherPanel").hidden = !D.entities.some(e => OTHER.has(e.c));
   document.getElementById("entList").innerHTML = D.entities.map(e => `<option value="${esc(e.n)}"></option>`).join("");
   let timer;
   document.getElementById("q").oninput = ev => { clearTimeout(timer); timer = setTimeout(() => { S.q = ev.target.value; S.p = 0; writeHash(); }, 250); };

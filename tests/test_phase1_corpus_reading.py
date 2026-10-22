@@ -15,6 +15,7 @@ from semantic_harvester.corpus_entities import Term, club_coherence
 from semantic_harvester.corpus_rdf import rdf_paths
 from semantic_harvester.corpus_redundancy import Capture, corpus_graph_path, load_corpus
 from semantic_harvester.history_pipeline import captured_at
+from semantic_harvester.rdf_mapper import SDH
 from semantic_harvester.rdf_mapper import build_article_history_graph, stable_hash
 from tests.support import OfflineTestCase
 
@@ -171,6 +172,25 @@ class RunOnPhase1CorpusTests(Phase1Corpus):
         corpo = (self.root / "output" / f"corpus_entities_{LABEL}_corpo.csv").read_text("utf-8")
         self.assertIn(f"{old},20020101000000,html:aux", corpo)
         self.assertIn(f"{BENFICA},20190101000000,c′", corpo)
+
+    def test_hybrid_vocabulary_origin_reaches_rdf_and_stadium_has_no_coherence(self) -> None:
+        stadium_url = "https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/c.html"
+        self.write_article(stadium_url, "20210101000000", body_text("C", "O jogo foi no Estádio da Luz."))
+        hybrid = self.root / "hibrido.csv"
+        hybrid.write_text(
+            "tipo,categoria,rotulo,variantes,wikidata,modalidade,clubes,homonimos,origem\n"
+            "entidade,jogador,Rafa Silva,,Q1,futebol,Sport Lisboa e Benfica,1,lista_fechada\n"
+            "entidade,estadio,Estádio do Sport Lisboa e Benfica,Estádio da Luz,Q100,,,1,candidato\n",
+            encoding="utf-8")
+        rows = corpus_entities.run(self.root, hybrid, club_map_path=self.club_map,
+                                   use_body=True, corpus_label=LABEL)
+        (stadium,) = [r for r in rows if r["categoria"] == "estadio"]
+        self.assertEqual((stadium["artigo"], stadium["clube_coerente"]), (stadium_url, "nao_aplicavel"))
+        graph, stats, _ = corpus_entities_rdf.run(self.root, corpus_label=LABEL, vocabulary_path=hybrid)
+        origins = {str(s): str(o) for s, _, o in graph.triples((None, SDH.origemVocabulario, None))}
+        self.assertEqual(origins["http://www.wikidata.org/entity/Q100"], "candidato")
+        self.assertEqual(origins["http://www.wikidata.org/entity/Q1"], "lista_fechada")
+        self.assertEqual(stats["entidades_candidato"], 1)
 
     def test_entities_rdf_on_labelled_corpus(self) -> None:
         corpus_entities.run(self.root, self.vocab, club_map_path=self.club_map,

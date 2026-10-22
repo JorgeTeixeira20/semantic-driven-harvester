@@ -184,8 +184,14 @@ sdh:persistente a owl:DatatypeProperty ;
 
 sdh:clubeCoerente a owl:DatatypeProperty ;
     rdfs:label "clube coerente"@pt ;
-    rdfs:comment "Sinal, não filtro: 'sim' se um clube da entidade no vocabulário coincide com o tema clube do URL do artigo; 'nao' se não coincide (possível falso positivo); 'sem_tema' se o artigo não tem tema de clube no URL. Corresponde à coluna clube_coerente de corpus_entities.csv; valores possíveis são exatamente estes três literais."@pt ;
+    rdfs:comment "Sinal, não filtro: 'sim' se um clube da entidade no vocabulário (ou, para uma entidade clube, o próprio clube) coincide com o tema clube do URL do artigo; 'nao' se não coincide (possível falso positivo); 'sem_tema' se o artigo não tem tema de clube no URL; 'sem_mapa' se o clube do URL não está na tabela slug → clube (corpus da Fase 1); 'nao_aplicavel' para treinadores, estádios e competições. Corresponde à coluna clube_coerente de corpus_entities*.csv; valores possíveis são exatamente estes cinco literais."@pt ;
     rdfs:domain sdh:Mencao ;
+    rdfs:range xsd:string .
+
+sdh:origemVocabulario a owl:DatatypeProperty ;
+    rdfs:label "origem no vocabulário"@pt ;
+    rdfs:comment "De onde vem a entidade no vocabulário fechado: 'lista_fechada' (construído a partir da Wikidata), 'candidato' (nome detetado no texto e confirmado na Wikidata pela abordagem híbrida) ou 'lista_fechada+candidato' (entidade da lista com uma forma nova vinda de um candidato). Só presente quando o vocabulário usado tem a coluna origem."@pt ;
+    rdfs:domain sdh:EntidadeMencionada ;
     rdfs:range xsd:string .
 
 # --- Literais do nó Tema (para não ficar opaco) ---

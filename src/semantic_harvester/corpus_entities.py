@@ -57,7 +57,10 @@ COHERENT_YES = "sim"
 COHERENT_NO = "nao"
 COHERENT_NO_THEME = "sem_tema"
 COHERENT_UNMAPPED = "sem_mapa"
+COHERENT_NOT_APPLICABLE = "nao_aplicavel"
 CLUB_CATEGORY = "clube"
+# Categorias da abordagem híbrida sem clubes no vocabulário: não se comparam.
+NO_COHERENCE_CATEGORIES = frozenset({"treinador", "estadio", "competicao"})
 DEFAULT_CLUB_MAP = Path("data") / "processed" / "caminho_b_clubes_url.csv"
 
 _WORD_RE = re.compile(r"\w+")
@@ -127,6 +130,8 @@ def club_coherence(
     correspondência dá `sem_mapa` em vez de erro.
     """
 
+    if term.categoria in NO_COHERENCE_CATEGORIES:
+        return COHERENT_NOT_APPLICABLE
     if not article_club_slugs:
         return COHERENT_NO_THEME
     missing = [slug for slug in article_club_slugs if slug not in club_map]
@@ -329,8 +334,9 @@ def coherence_lines(
     if not any(r["clube_coerente"] for r in entities):
         return []
     values = (COHERENT_YES, COHERENT_NO, COHERENT_NO_THEME)
-    if any(r["clube_coerente"] == COHERENT_UNMAPPED for r in entities):
-        values += (COHERENT_UNMAPPED,)
+    for extra in (COHERENT_UNMAPPED, COHERENT_NOT_APPLICABLE):
+        if any(r["clube_coerente"] == extra for r in entities):
+            values += (extra,)
     weak_counts = Counter(r["clube_coerente"] for r in entities)
     strong_counts = Counter(r["clube_coerente"] for r in strong)
     return [
@@ -339,7 +345,8 @@ def coherence_lines(
         "coincide com o tema `clube` do URL do artigo; `nao` se não coincide "
         "(possível falso positivo, por exemplo uma manchete do chrome); `sem_tema` "
         "se o URL não tem clube. Uma entidade clube compara-se pelo próprio rótulo. "
-        "`sem_mapa`: o clube do URL não está na tabela slug → clube. Nenhuma "
+        "`sem_mapa`: o clube do URL não está na tabela slug → clube. "
+        "`nao_aplicavel`: treinador, estádio ou competição. Nenhuma "
         "menção é removida.\n",
         "| clube_coerente | Pares (regra fraca) | Pares (persistência) |",
         "| --- | ---: | ---: |",

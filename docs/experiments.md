@@ -5062,3 +5062,94 @@ horizontal), sem erros de JavaScript.
 
 **Ainda não gerado com os dados reais**: depende do fim da recolha e da
 corrida do Caminho B com `--corpus por_ano --texto corpo-html`.
+
+## Abordagem híbrida: candidatos confirmados na Wikidata (implementada, não corrida; 2026-10-22)
+
+### Decisões do autor
+
+Avançar com a abordagem híbrida discutida em "Candidatos a entidade fora do
+vocabulário fechado", numa versão limitada (um dia de trabalho), com:
+
+- tipos aceites: **clubes, atletas, treinadores, estádios e competições**
+  (árbitros não);
+- competições internacionais **incluídas** quando organizadas pela UEFA,
+  FIFA ou COI, pelas provas europeias e mundiais em que jogam clubes e
+  seleções portugueses;
+- mínimo de artigos para um candidato ser procurado: "2 ou 3" — fixado em
+  **3 por omissão**, com `--min-artigos 2` disponível.
+
+### Como responde às duas objeções iniciais
+
+1. *Detetar candidatos exige reconhecimento genérico*: usa-se a heurística
+   já existente (sequências capitalizadas fora do início de frase), sem NER,
+   e só para nomes repetidos em vários artigos.
+2. *Cada tipo precisa de validação própria*: a regra é explícita e igual
+   para todos — nome exato, um único item, tipo permitido, ligação a
+   Portugal. Na dúvida, o candidato fica de fora.
+
+### Regra (`src/semantic_harvester/wikidata_candidates.py`)
+
+Para cada candidato com pelo menos `--min-artigos` artigos, um pedido SPARQL
+procura itens com esse nome exato como rótulo ou nome alternativo, em pt ou
+en, e classifica-os:
+
+| Tipo (categoria) | Classe na Wikidata | Ligação a Portugal |
+| --- | --- | --- |
+| treinador | humano (`Q5`) com ocupação ⊑ treinador (`Q41583`) | nacionalidade (`P27`) Portugal, ou passagem (`P54`) / treinador de (`P6087`) equipa com país Portugal |
+| jogador | humano com ocupação ⊑ atleta (`Q2066131`) | nacionalidade Portugal, ou passagem por equipa com país Portugal |
+| clube | ⊑ clube desportivo (`Q847017`) | país (`P17`) Portugal |
+| estadio | ⊑ recinto desportivo (`Q1076486`) | país Portugal |
+| competicao | ⊑ competição desportiva (`Q13406554`), liga (`Q623109`) ou evento multidesportivo (`Q167170`) | país Portugal, ou organizador (`P664`) UEFA (`Q35572`), FIFA (`Q253414`) ou COI (`Q40970`) |
+
+Decisão por candidato (`output/wikidata_candidatos_<etiqueta>.csv`):
+`aceite` (um só item válido, novo); `variante_nova` (um só item válido que
+já está na lista fechada: o candidato era uma forma em falta);
+`ambiguo` (mais de um item válido); `fora_do_ambito` (tipo certo, sem
+ligação a Portugal); `tipo_nao_aceite`; `sem_correspondencia`;
+`falha_pedido`. Um item de vários tipos fica com o primeiro de clube,
+estádio, competição, treinador, jogador (um ex-jogador que treina fica
+treinador). **Os QIDs das classes e organizadores acima foram escritos sem
+consulta à Wikidata nesta sessão (sem acesso) e têm de ser confirmados na
+primeira execução** (por exemplo, que o Estádio da Luz, a Taça de Portugal
+e a Liga dos Campeões são aceites).
+
+Vocabulário híbrido (`data/processed/caminho_b_vocabulario_hibrido_<etiqueta>.csv`):
+a lista alargada intacta mais os confirmados, com a coluna `origem`
+(`lista_fechada`, `candidato`, `lista_fechada+candidato`). Uma entidade nova
+fica com o rótulo pt da Wikidata se tiver 2+ palavras e não for já forma de
+outra linha; senão com a forma vista no texto; todas as formas do texto
+ficam como variantes; vários candidatos do mesmo QID ficam numa linha. O
+vocabulário alargado não é alterado.
+
+### Ligações ao resto
+
+- Caminho B: corre com o vocabulário híbrido como com qualquer outro.
+  `clube_coerente` passa a `nao_aplicavel` para treinadores, estádios e
+  competições (não têm clubes no vocabulário); o comentário de
+  `sdh:clubeCoerente` na ontologia passa a listar os cinco valores
+  (incluindo `sem_mapa`, de "Caminho B sobre o corpus da Fase 1").
+- RDF: **propriedade nova** `sdh:origemVocabulario` (domínio
+  `EntidadeMencionada`, `xsd:string`), escrita só quando o vocabulário tem a
+  coluna `origem`; os outputs oficiais do corpus de 125 artigos não mudam
+  (o vocabulário original não a tem).
+- Painel: lista própria de treinadores, estádios e competições (os atletas
+  ficam só atletas); a ficha da entidade mostra a origem; `resumo.md` ganha
+  a tabela desses tipos e a das origens.
+
+### Testes e o que falta
+
+12 testes novos (10 em `tests/test_wikidata_candidates.py`, com respostas
+SPARQL simuladas: aceite, variante nova, ambíguo, fora do âmbito, tipo não
+aceite, sem correspondência, falha, mínimo de artigos, fusão de duas formas
+do mesmo estádio, vocabulário alargado intacto; 1 de RDF/coerência e 1 do
+painel), mais a sintaxe da consulta verificada pelo parser SPARQL do
+`rdflib` e a página verificada no Chromium. Suite completa: **325 testes,
+todos a passar.**
+
+**Não corrido.** Ordem prevista, na sessão local, depois da recolha:
+`corpus_entities` e `corpus_candidate_entities` com o vocabulário alargado
+(`--corpus por_ano --texto corpo-html`); `wikidata_candidates --corpus
+por_ano`; rever à mão uma amostra de ~50 aceites (descritivo); `corpus_entities`
+e `corpus_entities_rdf` com o vocabulário híbrido; `navigation_corpus` com o
+vocabulário híbrido. Para comparar "só lista fechada" com "lista fechada +
+híbrida", guardar as saídas da primeira passagem antes da segunda.

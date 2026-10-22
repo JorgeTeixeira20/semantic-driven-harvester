@@ -177,7 +177,10 @@ extrator do HTML nos esquemas antigos que ainda não têm HTML em disco
 (`noticia.aspx`, `shownews.asp`, `tn0cs.asp`, `tn1cs.asp`); corrida final,
 por esta ordem, com `--corpus por_ano`: `corpus_entities --texto corpo-html`
 com o vocabulário alargado, `corpus_entities_rdf`, `corpus_candidate_entities`
-e `navigation_corpus`. Um ensaio geral sobre uma cópia parcial foi proposto e
+e `navigation_corpus`; depois, a abordagem híbrida: `wikidata_candidates`,
+revisão manual de uma amostra e nova passagem de `corpus_entities`,
+`corpus_entities_rdf` e `navigation_corpus` com o vocabulário híbrido
+(guardando antes as saídas da primeira passagem, para comparar). Um ensaio geral sobre uma cópia parcial foi proposto e
 **adiado pelo autor** para depois da escrita. Prazo-alvo: 31 de outubro.
 **Nenhum resultado do Caminho B, dos candidatos ou do painel sobre o corpus
 alargado existe ainda**; os números do corpus alargado que existem são os da
@@ -226,11 +229,24 @@ oficiais foram regenerados.
 **Candidatos a entidade** ("Candidatos a entidade fora do vocabulário
 fechado"). Teste exploratório: sequências de palavras capitalizadas fora do
 início de frase, sem NER, que o vocabulário não cobre. **Não são ligados à
-Wikidata nem entram no RDF**; servem só para medir o que a lista fechada
-deixa escapar (limitação e trabalho futuro). A alternativa de perguntar à
-Wikidata só pelos candidatos (abordagem híbrida) foi discutida e não
-implementada: continuaria a exigir uma deteção genérica de candidatos e uma
-desambiguação por tipo de entidade.
+Wikidata nem entram no RDF**; servem para medir o que a lista fechada
+deixa escapar.
+
+**Abordagem híbrida** (decisão do autor, 2026-10-22; "Abordagem híbrida:
+candidatos confirmados na Wikidata"; implementada e testada, **não corrida**,
+porque precisa da lista de candidatos da corrida final). Os candidatos que
+aparecem em pelo menos 3 artigos (mínimo configurável) são procurados na
+Wikidata pelo nome exato; só se aceita um **único** item de um tipo
+permitido — clube, atleta, treinador, estádio, competição — e com ligação a
+Portugal (as competições também se forem da UEFA, FIFA ou COI, pelas provas
+europeias e mundiais das equipas portuguesas). Árbitros ficam de fora. Os
+aceites formam um vocabulário híbrido (lista fechada + confirmados, com a
+coluna `origem`), que alimenta o Caminho B; no RDF cada entidade leva
+`sdh:origemVocabulario` (propriedade nova da ontologia) e o painel mostra a
+origem, para comparar "só lista fechada" com "lista fechada + híbrida". As
+duas objeções iniciais ficam tratadas assim: a deteção de candidatos é a
+heurística já existente, e a desambiguação é a regra explícita de tipo,
+unicidade e ligação a Portugal.
 
 **Tema e entidade.** Tema = classificação editorial que o próprio jornal deu
 ao artigo, lida do URL (secção, modalidade, competição, clube; subclasses OWL
@@ -263,7 +279,7 @@ manual, um parágrafo por fonte na dissertação; sem implementação.
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 313 testes em vinte e dois módulos de `tests/`.
+pacote conforme o README. Existem 325 testes em vinte e três módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -298,9 +314,10 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 independente de `next_page`; lista de termos alargada).
 
 Última validação em **2026-10-22**, sessão remota Linux (Python 3.11.17),
-depois do protótipo do corpus da Fase 1 (`navigation_corpus.py`):
-`.venv/bin/python -m unittest discover -s tests` — **313 testes, todos
-passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, correções
+depois da abordagem híbrida (`wikidata_candidates.py`):
+`.venv/bin/python -m unittest discover -s tests` — **325 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, protótipo
+do corpus da Fase 1, 313 testes OK; 2026-10-22, correções
 do `html_body.py`, 306 testes OK; 2026-10-21, Python
 3.12.4 (macOS), vocabulário alargado, 275 testes OK; 2026-10-22, leitura do
 corpus da Fase 1, 286 testes OK; 2026-10-21, depois de
