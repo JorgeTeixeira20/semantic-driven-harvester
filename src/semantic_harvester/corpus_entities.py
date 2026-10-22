@@ -329,6 +329,15 @@ def coherence_lines(
     ]
 
 
+def body_source_lines(corpus: dict[str, list[Capture]]) -> list[str]:
+    sources = Counter(c.body_source for caps in corpus.values() for c in caps if c.body_source)
+    if not sources:
+        return []
+    return ["- Origem do corpo, por captura com texto: " + "; ".join(
+        f"{source} {count}" for source, count in sorted(sources.items(), key=lambda kv: (-kv[1], kv[0])))
+        + "."]
+
+
 def write_summary(
     corpus: dict[str, list[Capture]],
     rows: list[dict[str, str]],
@@ -338,6 +347,7 @@ def write_summary(
     use_body: bool = False,
     csv_name: str = "corpus_entities.csv",
     unmapped_slugs: Counter | None = None,
+    use_html: bool = False,
 ) -> None:
     articles = list(corpus)
     with_text = [a for a, caps in corpus.items() if any(c.in_layer1 for c in caps)]
@@ -357,6 +367,9 @@ def write_summary(
     weak_counts = Counter(r["rotulo"] for r in entities)
     strong_counts = Counter(r["rotulo"] for r in strong)
     chrome_text = (
+        "só o **corpo do artigo** (variante c′, `article_body.py`; com o HTML: Premium "
+        "sem corpo e, quando a c′ não encontra corpo, o contentor do HTML, "
+        "`html_body.py`; capturas sem corpo não contam)" if use_body and use_html else
         "só o **corpo do artigo** (variante c′, `article_body.py`; capturas sem corpo "
         "não contam)" if use_body else
         f"sem o chrome persistente (5-gramas em ≥ {chrome_fraction:.2f} dos artigos)".replace(".", ",", 1)
@@ -368,6 +381,7 @@ def write_summary(
         f"Vocabulário: `{vocabulary_path}`. Texto pesquisado: {chrome_text}.\n",
         f"- Artigos: {len(articles)}; com texto (Camada 1): {len(with_text)}; "
         f"com uma só captura com texto (sem proteção de persistência): {len(single)}.",
+        *body_source_lines(corpus),
         "",
         "## Temas (a partir do `originalURL`)\n",
         "| Categoria | Artigos com tema | Valores distintos |",
@@ -418,6 +432,7 @@ def run(
     use_body: bool = False,
     longest_match: bool = True,
     corpus_label: str | None = None,
+    use_html: bool = False,
 ) -> list[dict[str, str]]:
     """Sem `corpus_label`, o corpus de 125 artigos e as saídas oficiais; com
     uma etiqueta (ex. `por_ano`), o N-Triples desse corpus da Fase 1 e saídas
@@ -432,7 +447,7 @@ def run(
     terms = load_vocabulary(vocabulary_path)
     if use_body:
         # Variante (c′): o corpo já exclui o chrome; capturas sem corpo deixam a Camada 1.
-        corpus, chrome_fraction = to_body_corpus(corpus), None
+        corpus, chrome_fraction = to_body_corpus(corpus, use_html=use_html), None
     chrome = build_chrome(corpus, chrome_fraction)
     club_map = load_club_map(club_map_path) if club_map_path is not None else None
 
@@ -450,7 +465,8 @@ def run(
     write_csv(rows, output / f"corpus_entities{tag}.csv")
     write_summary(corpus, rows, vocabulary_path, chrome_fraction,
                   output / f"corpus_entities{tag}_summary.md", use_body,
-                  csv_name=f"corpus_entities{tag}.csv", unmapped_slugs=unmapped)
+                  csv_name=f"corpus_entities{tag}.csv", unmapped_slugs=unmapped,
+                  use_html=use_html)
     return rows
 
 
@@ -461,9 +477,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--vocabulario", type=Path, required=True,
                         help="CSV do vocabulário fechado de entidades")
-    parser.add_argument("--texto", choices=("corpo", "sem-chrome", "completo"), default="corpo",
-                        help="corpo do artigo (variante c′, adotada; por omissão), texto sem o "
-                        "chrome persistente (histórico) ou texto completo")
+    parser.add_argument("--texto", choices=("corpo", "corpo-html", "sem-chrome", "completo"),
+                        default="corpo",
+                        help="corpo do artigo (variante c′, adotada; por omissão); corpo-html: "
+                        "c′ e, sem corpo, o contentor do HTML, com Premium sem corpo; texto sem "
+                        "o chrome persistente (histórico) ou texto completo")
     parser.add_argument("--fracao-chrome", type=float, default=DEFAULT_CHROME_FRACTION,
                         help="com --texto sem-chrome: fração de artigos para um 5-grama ser "
                         "chrome (por omissão 0,10)")
@@ -483,7 +501,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--fracao-chrome tem de estar em ]0, 1]")
 
     rows = run(vocabulary_path=args.vocabulario, chrome_fraction=fraction,
-               club_map_path=args.clubes_url, use_body=args.texto == "corpo",
+               club_map_path=args.clubes_url, use_body=args.texto in ("corpo", "corpo-html"),
+               use_html=args.texto == "corpo-html",
                longest_match=not args.correspondencia_simples, corpus_label=args.corpus)
     tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")

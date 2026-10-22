@@ -1,0 +1,166 @@
+"""Corpo do artigo a partir do contentor do HTML em bruto.
+
+Complemento da variante c′ (`article_body.py`), segundo a decisão de
+2026-10-19 (`docs/experiments.md`, "Decisão de design (híbrido...)"): o
+HTML serve para detetar Premium e para recuperar o corpo quando a c′ não o
+encontra (por exemplo, todas as páginas `noticia.asp` de 2000–2009 medidas).
+
+Contentores medidos sobre o HTML em disco (2026-10-22), por ordem de
+tentativa — o template depende da página, não só do esquema de URL:
+`div#readerBody` (2017), `div.text_container` (2018–2024), `div.bodybox`
+(AMP) e a tag `<aux>` (`noticia.asp`; a classe do `span` à volta muda com a
+época). Dentro deles retiram-se os blocos medidos que não são corpo, e
+sobre o texto aplicam-se os 14 marcadores de chrome da c′ mais
+"Relacionadas" (blocos de chrome dentro do `bodybox` das AMP em `/detalhe/`).
+
+Codificação: UTF-8 estrito e, se falhar, latin-1 — a declaração na página
+nem sempre é fiável (2002: declarada iso-8859-1, UTF-8 em 3 de 4).
+Sem dependências fora da biblioteca padrão.
+"""
+
+from __future__ import annotations
+
+import re
+import unicodedata
+from dataclasses import dataclass
+from html.parser import HTMLParser
+
+from .article_body import find_marker, fold_same_length
+
+CONTAINERS = (
+    ("readerBody", lambda tag, ids, classes: tag == "div" and "readerBody" in ids),
+    ("text_container", lambda tag, ids, classes: tag == "div" and "text_container" in classes),
+    ("bodybox", lambda tag, ids, classes: tag == "div" and "bodybox" in classes),
+    ("aux", lambda tag, ids, classes: tag == "aux"),
+)
+SKIP_TAGS = frozenset({
+    "script", "style", "noscript", "template", "iframe", "button", "figure", "h1",
+    "amp-analytics", "amp-ad",
+})
+SKIP_CLASSES = frozenset({
+    "lerMaisCont", "autorDetalhe", "pub_inside_text", "texto_socialShare", "adbox",
+    "texto_autor", "container_assinatura", "subtitle",
+})
+SKIP_IDS = frozenset({"escondec", "relacContainer", "incontent"})
+PREMIUM_CLASSES = frozenset({"container_assinatura", "article-premium"})
+VOID_TAGS = frozenset({
+    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
+    "param", "source", "track", "wbr",
+})
+EXTRA_MARKER = re.compile(r"(?<!\w)relacionadas(?!\w)")
+
+_SPACES = re.compile(r"\s+")
+
+
+@dataclass(frozen=True)
+class HtmlBody:
+    text: str
+    found: bool
+    container: str | None
+    premium: bool
+
+
+def decode_html(raw: bytes) -> str:
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return raw.decode("latin-1")
+
+
+class _ContainerParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.stack: list[tuple[str, bool]] = []  # (tag, este elemento é ignorado)
+        self.active: list[tuple[str, int]] = []  # (contentor, profundidade de abertura)
+        self.parts: dict[str, list[list[str]]] = {name: [] for name, _ in CONTAINERS}
+        self.premium = False
+
+    def _skipping(self) -> bool:
+        return any(skip for _, skip in self.stack)
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = dict(attrs)
+        classes = set((values.get("class") or "").split())
+        ids = {values.get("id") or ""}
+        if classes & PREMIUM_CLASSES:
+            self.premium = True
+        if tag in VOID_TAGS:
+            if tag == "br":
+                self._write(" ")
+            return
+        if not self._skipping():
+            for name, matches in CONTAINERS:
+                if matches(tag, ids, classes) and not any(n == name for n, _ in self.active):
+                    if name == "aux" or not self.parts[name]:
+                        self.parts[name].append([])
+                        self.active.append((name, len(self.stack)))
+        skip = tag in SKIP_TAGS or bool(classes & SKIP_CLASSES) or bool(ids & SKIP_IDS)
+        self.stack.append((tag, skip))
+        self._write(" ")
+
+    def handle_endtag(self, tag: str) -> None:
+        # HTML antigo fecha mal as tags: fecha até à correspondente, se aberta.
+        if not any(open_tag == tag for open_tag, _ in self.stack):
+            return
+        while self.stack:
+            open_tag, _ = self.stack.pop()
+            self.active = [(n, depth) for n, depth in self.active if depth < len(self.stack)]
+            if open_tag == tag:
+                break
+        self._write(" ")
+
+    def handle_data(self, data: str) -> None:
+        if not self._skipping():
+            self._write(data)
+
+    def _write(self, data: str) -> None:
+        for name, _ in self.active:
+            self.parts[name][-1].append(data)
+
+
+def _cut_chrome(text: str) -> str:
+    folded = fold_same_length(text)
+    stops = []
+    marker = find_marker(text, folded, 0)
+    if marker is not None:
+        stops.append(marker[0])
+    for hit in EXTRA_MARKER.finditer(folded):
+        if text[hit.start()].isupper():
+            stops.append(hit.start())
+            break
+    return text[:min(stops)] if stops else text
+
+
+def extract_html_body(raw: bytes) -> HtmlBody:
+    parser = _ContainerParser()
+    parser.feed(decode_html(raw))
+    parser.close()
+    for name, _ in CONTAINERS:
+        text = " ".join("".join(part) for part in parser.parts[name])
+        text = unicodedata.normalize("NFC", _SPACES.sub(" ", text).strip())
+        text = _cut_chrome(text).strip()
+        if text:
+            return HtmlBody(text, True, name, parser.premium)
+    return HtmlBody("", False, None, parser.premium)
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+    from pathlib import Path
+
+    parser = argparse.ArgumentParser(
+        prog="python -m semantic_harvester.html_body",
+        description="Mostra o corpo extraído de ficheiros HTML (validação manual; sem rede).",
+    )
+    parser.add_argument("ficheiros", nargs="+", type=Path)
+    args = parser.parse_args(argv)
+    print("ficheiro\tcontentor\tpremium\tpalavras\tinicio")
+    for path in args.ficheiros:
+        body = extract_html_body(path.read_bytes())
+        print(f"{path.name}\t{body.container or '-'}\t{body.premium}\t"
+              f"{len(body.text.split())}\t{body.text[:120]}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

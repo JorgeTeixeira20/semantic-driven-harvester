@@ -45,6 +45,7 @@ from rdflib import RDF, Graph
 from rdflib.plugins.parsers.ntriples import W3CNTriplesParser
 
 from .article_body import extract_body
+from .html_body import extract_html_body
 
 from .rdf_mapper import SDH
 
@@ -104,6 +105,9 @@ class Capture:
     body_missing: bool = False
     # HTML em bruto da mesma captura, se existir no disco.
     html_path: Path | None = None
+    # Com o HTML ligado: de onde veio o corpo (`c′`, `html:<contentor>`) ou
+    # porque não há (`premium`, `sem_corpo`).
+    body_source: str | None = None
 
     @property
     def has_text(self) -> bool:
@@ -415,11 +419,15 @@ class SensitivityRow:
     articles_with_redundant: int
 
 
-def to_body_corpus(corpus: dict[str, list[Capture]]) -> dict[str, list[Capture]]:
+def to_body_corpus(
+    corpus: dict[str, list[Capture]], use_html: bool = False
+) -> dict[str, list[Capture]]:
     """Variante (c′): o texto de cada captura passa a ser só o corpo do artigo.
 
     Capturas com texto mas sem corpo localizável ficam `body_missing` (fora da
-    Camada 1, sem deixarem de ter texto).
+    Camada 1, sem deixarem de ter texto). Com `use_html` (decisão de
+    2026-10-19): uma captura cujo HTML marca Premium fica sem corpo; se a c′
+    não encontrar corpo, usa-se o contentor do HTML (`html_body.py`).
     """
 
     result = {}
@@ -429,10 +437,26 @@ def to_body_corpus(corpus: dict[str, list[Capture]]) -> dict[str, list[Capture]]
             if capture.text is None:
                 converted.append(capture)
                 continue
+            if use_html:
+                converted.append(_body_with_html(capture))
+                continue
             body = extract_body(capture.text)
             converted.append(replace(capture, text=body.text, body_missing=not body.found))
         result[article] = converted
     return result
+
+
+def _body_with_html(capture: Capture) -> Capture:
+    html = extract_html_body(capture.html_path.read_bytes()) if capture.html_path else None
+    if html is not None and html.premium:
+        return replace(capture, text="", body_missing=True, body_source="premium")
+    body = extract_body(capture.text or "")
+    if body.found:
+        return replace(capture, text=body.text, body_missing=False, body_source="c′")
+    if html is not None and html.found:
+        return replace(capture, text=html.text, body_missing=False,
+                       body_source=f"html:{html.container}")
+    return replace(capture, text="", body_missing=True, body_source="sem_corpo")
 
 
 def sensitivity_table(

@@ -1,0 +1,128 @@
+"""Corpo do artigo pelo contentor do HTML (`html_body.py`) e a sua ligação à
+c′ (`to_body_corpus(use_html=True)`). HTML sintético com a estrutura medida
+em 2026-10-22 (2 páginas por template), não HTML real."""
+
+from __future__ import annotations
+
+import unittest
+
+from semantic_harvester.corpus_redundancy import Capture, to_body_corpus
+from semantic_harvester.html_body import decode_html, extract_html_body
+from tests.support import OfflineTestCase
+
+READER_BODY_2017 = """<html><body><div class="article-body"><div id="readerBody">
+<p>Rafa Silva marcou dois golos.</p>
+<div id="escondec" class="lerMaisCont">Continuar a ler</div>
+<div id="restText"><p>O Benfica venceu em casa.</p></div>
+<div id="relacContainer"><a>Relacionados: outra notícia</a></div>
+<p class="autorDetalhe">Autor: Lusa</p>
+</div></div><div>Menu Sporting FC Porto</div></body></html>"""
+
+TEXT_CONTAINER_2021 = """<html><head><meta charset="utf-8"></head><body>
+<div class="text_container">Primeira linha do corpo.<br>Segunda linha.
+<div class="pub_inside_text"><script>googletag.cmd.push(1)</script>PUB</div>
+<div id="incontent">anúncio</div>Terceira linha.</div></body></html>"""
+
+BODYBOX_AMP = """<html><body><div class="bodybox"><h1>Título</h1>
+<h2 class="subtitle">Subtítulo</h2><figure class="imgDestaque"><img src="x">Foto: Créditos</figure>
+<ul class="texto_socialShare"><li>Partilhar</li></ul>
+<p>Corpo da notícia AMP.</p><div class="adbox">PUB</div>
+<span class="texto_autor">Por Jornalista</span>
+<ul class="texto_socialShare"><li>Partilhar</li></ul></div></body></html>"""
+
+BODYBOX_AMP_IN_DETALHE = """<html><body><div class="bodybox"><p>Corpo verdadeiro.</p>
+<amp-analytics><script type="application/json">{}</script></amp-analytics>
+<h3>Relacionadas</h3><a>Outra notícia</a><h3>O Record recomenda para si</h3><a>Mais</a>
+<h3>Últimas Notícias</h3><a>Ainda mais</a></div></body></html>"""
+
+
+class ExtractHtmlBodyTests(unittest.TestCase):
+    def test_reader_body_keeps_rest_text_and_drops_chrome(self) -> None:
+        body = extract_html_body(READER_BODY_2017.encode("utf-8"))
+        self.assertEqual(body.container, "readerBody")
+        self.assertEqual(body.text, "Rafa Silva marcou dois golos. O Benfica venceu em casa.")
+
+    def test_text_container_drops_ads(self) -> None:
+        body = extract_html_body(TEXT_CONTAINER_2021.encode("utf-8"))
+        self.assertEqual(body.container, "text_container")
+        self.assertEqual(body.text, "Primeira linha do corpo. Segunda linha. Terceira linha.")
+
+    def test_bodybox_drops_title_subtitle_photo_share_ads_author(self) -> None:
+        body = extract_html_body(BODYBOX_AMP.encode("utf-8"))
+        self.assertEqual(body.container, "bodybox")
+        self.assertEqual(body.text, "Corpo da notícia AMP.")
+
+    def test_chrome_blocks_inside_bodybox_are_cut(self) -> None:
+        body = extract_html_body(BODYBOX_AMP_IN_DETALHE.encode("utf-8"))
+        self.assertEqual(body.text, "Corpo verdadeiro.")
+
+    def test_aux_in_latin1_with_unclosed_tags(self) -> None:
+        html = ('<html><body><span class="v12_black"><aux>O Benfica venceu em Alvalade.'
+                '<br>João marcou.<p>Fim da notícia.</aux></span><p>Rodapé</p></body></html>')
+        body = extract_html_body(html.encode("latin-1"))
+        self.assertEqual(body.container, "aux")
+        self.assertEqual(body.text, "O Benfica venceu em Alvalade. João marcou. Fim da notícia.")
+
+    def test_utf8_bytes_with_a_wrong_iso_declaration(self) -> None:
+        html = ('<html><head><meta http-equiv="Content-Type" content="text/html; '
+                'charset=iso-8859-1"></head><body><aux>Guimarães</aux></body></html>')
+        self.assertEqual(extract_html_body(html.encode("utf-8")).text, "Guimarães")
+        self.assertEqual(decode_html("Guimarães".encode("latin-1")), "Guimarães")
+
+    def test_premium_marker_and_paywall_class_alone(self) -> None:
+        premium = '<div class="text_container">Lead.</div><div class="container_assinatura">Assine</div>'
+        self.assertTrue(extract_html_body(premium.encode()).premium)
+        self.assertTrue(extract_html_body(b'<article class="article-premium"></article>').premium)
+        self.assertFalse(extract_html_body(b'<div class="paywall text_container">Livre.</div>').premium)
+
+    def test_page_without_known_container(self) -> None:
+        body = extract_html_body(b"<html><body><div>Menu e mais nada</div></body></html>")
+        self.assertFalse(body.found)
+        self.assertIsNone(body.container)
+
+
+class BodyCorpusWithHtmlTests(OfflineTestCase):
+    def capture(self, text: str, html: str | None) -> Capture:
+        path = None
+        if html is not None:
+            path = self.root / f"{len(list(self.root.iterdir()))}.html"
+            path.write_text(html, encoding="utf-8")
+        return Capture("a", "1", None, None, None, text, html_path=path)
+
+    def convert(self, capture: Capture) -> Capture:
+        return to_body_corpus({"a": [capture]}, use_html=True)["a"][0]
+
+    def test_c_prime_body_is_kept_when_found(self) -> None:
+        text = "Título - Record - Jornal Record Menu Título O corpo pela c′."
+        result = self.convert(self.capture(text, READER_BODY_2017))
+        self.assertEqual(result.body_source, "c′")
+        self.assertEqual(result.text, "Título O corpo pela c′.")
+
+    def test_html_body_when_c_prime_finds_nothing(self) -> None:
+        html = "<html><body><aux>Corpo antigo.</aux></body></html>"
+        result = self.convert(self.capture(":.: Jornal Record :.: Corpo antigo.", html))
+        self.assertEqual(result.body_source, "html:aux")
+        self.assertEqual(result.text, "Corpo antigo.")
+        self.assertTrue(result.in_layer1)
+
+    def test_premium_has_no_body(self) -> None:
+        text = "Título - Record - Jornal Record Título Só o lead."
+        html = '<div class="text_container">Só o lead.</div><div class="container_assinatura"></div>'
+        result = self.convert(self.capture(text, html))
+        self.assertEqual(result.body_source, "premium")
+        self.assertFalse(result.in_layer1)
+
+    def test_no_body_anywhere(self) -> None:
+        result = self.convert(self.capture(":.: Jornal Record :.:", None))
+        self.assertEqual(result.body_source, "sem_corpo")
+        self.assertFalse(result.in_layer1)
+
+    def test_without_use_html_nothing_changes(self) -> None:
+        capture = self.capture(":.: Jornal Record :.:", "<aux>Corpo antigo.</aux>")
+        result = to_body_corpus({"a": [capture]})["a"][0]
+        self.assertIsNone(result.body_source)
+        self.assertTrue(result.body_missing)
+
+
+if __name__ == "__main__":
+    unittest.main()
