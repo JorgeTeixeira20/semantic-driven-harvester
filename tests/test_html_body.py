@@ -121,6 +121,42 @@ class ValidationRegressionTests(unittest.TestCase):
                          "no livro “Futebol e Rock N’Roll”, que – diz")
 
 
+NOTICIA_ASPX_2009 = """<html><head><meta charset="utf-8"></head><body><table width="980"><tr>
+<td width="180"><span class="apreto12n">Menu lateral</span></td>
+<td width="600"><table width="100%"><tr><td>
+<script>document.write('<scr'+'ipt src="pub.js"></scr'+'ipt>')</script>
+<span class="apreto12n">12-03-2009</span>
+<span class="apreto12n">Carolina Salgada disse ao juiz de instrução que não sabia de nada.<br><br>
+Segundo a ex-companheira, o processo arrasta-se.<b>"À espera do MP"</b><br><br>O caso segue.</span>
+</td></tr></table></td>
+<td width="200"><form id="votacao"><span class="apreto12n">Concorda com a decisão do juiz de
+instrução no processo Apito Dourado, tendo em conta tudo o que foi dito em tribunal até hoje
+e as declarações de todas as testemunhas ouvidas ao longo das várias sessões?</span></form></td>
+</tr></table></body></html>"""
+
+
+class NoticiaAspxTests(unittest.TestCase):
+    """noticia.aspx (2009): medição de 2026-10-22, 20 páginas, esqueleto em
+    output/html_corpo_noticia_aspx.md (fora do Git)."""
+
+    def test_longest_span_inside_the_main_column(self) -> None:
+        body = extract_html_body(NOTICIA_ASPX_2009.encode("utf-8"))
+        self.assertEqual(body.container, "apreto12n")
+        self.assertTrue(body.text.startswith("Carolina Salgada disse ao juiz"))
+        self.assertTrue(body.text.endswith("O caso segue."))
+        self.assertNotIn("Concorda", body.text)
+        self.assertNotIn("scr", body.text)
+
+    def test_span_outside_the_main_column_is_not_a_body(self) -> None:
+        html = '<table><tr><td width="200"><span class="apreto12n">Votação longa</span></td></tr></table>'
+        self.assertFalse(extract_html_body(html.encode()).found)
+
+    def test_aux_still_wins_in_noticia_asp(self) -> None:
+        html = ('<table><tr><td width="600"><span class="apreto12n"><aux>Corpo 2007.</aux>'
+                '</span></td></tr></table>')
+        self.assertEqual(extract_html_body(html.encode()).container, "aux")
+
+
 class BodyCorpusWithHtmlTests(OfflineTestCase):
     def capture(self, text: str, html: str | None) -> Capture:
         path = None

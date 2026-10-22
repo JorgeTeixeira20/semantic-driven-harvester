@@ -8,8 +8,9 @@ encontra (por exemplo, todas as páginas `noticia.asp` de 2000–2009 medidas).
 Contentores medidos sobre o HTML em disco (2026-10-22), por ordem de
 tentativa — o template depende da página, não só do esquema de URL:
 `div#readerBody` (2017), `div.text_container` (2018–2024), `div.bodybox`
-(AMP) e a tag `<aux>` (`noticia.asp`; a classe do `span` à volta muda com a
-época). Dentro deles retiram-se os blocos medidos que não são corpo, e
+(AMP), a tag `<aux>` (`noticia.asp`; a classe do `span` à volta muda com a
+época) e, em `noticia.aspx` (2009), o `span.apreto12n` dentro da coluna
+`td[width=600]`. Dentro deles retiram-se os blocos medidos que não são corpo, e
 sobre o texto aplicam-se os 14 marcadores de chrome da c′ mais
 "Relacionadas" (blocos de chrome dentro do `bodybox` das AMP em `/detalhe/`).
 
@@ -28,12 +29,17 @@ from html.parser import HTMLParser
 
 from .article_body import find_marker, fold_same_length
 
+# (nome, teste sobre a tag, ids, classes e se está dentro da coluna principal)
 CONTAINERS = (
-    ("readerBody", lambda tag, ids, classes: tag == "div" and "readerBody" in ids),
-    ("text_container", lambda tag, ids, classes: tag == "div" and "text_container" in classes),
-    ("bodybox", lambda tag, ids, classes: tag == "div" and "bodybox" in classes),
-    ("aux", lambda tag, ids, classes: tag == "aux"),
+    ("readerBody", lambda tag, ids, classes, main: tag == "div" and "readerBody" in ids),
+    ("text_container", lambda tag, ids, classes, main: tag == "div" and "text_container" in classes),
+    ("bodybox", lambda tag, ids, classes, main: tag == "div" and "bodybox" in classes),
+    ("aux", lambda tag, ids, classes, main: tag == "aux"),
+    # noticia.aspx (2009): `apreto12n` é só uma classe de tipo de letra (9 a 16 por
+    # página); o corpo é o que está dentro da coluna `td[width=600]` (a votação fica fora).
+    ("apreto12n", lambda tag, ids, classes, main: tag == "span" and "apreto12n" in classes and main),
 )
+MAIN_COLUMN_WIDTH = "600"
 SKIP_TAGS = frozenset({
     "script", "style", "noscript", "template", "iframe", "button", "figure", "h1",
     "amp-analytics", "amp-ad",
@@ -76,13 +82,14 @@ def decode_html(raw: bytes) -> str:
 class _ContainerParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
-        self.stack: list[tuple[str, bool]] = []  # (tag, este elemento é ignorado)
+        # (tag, este elemento é ignorado, é a coluna principal td[width=600])
+        self.stack: list[tuple[str, bool, bool]] = []
         self.active: list[tuple[str, int]] = []  # (contentor, profundidade de abertura)
         self.parts: dict[str, list[list[str]]] = {name: [] for name, _ in CONTAINERS}
         self.premium = False
 
     def _skipping(self) -> bool:
-        return any(skip for _, skip in self.stack)
+        return any(skip for _, skip, _ in self.stack)
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
@@ -94,21 +101,23 @@ class _ContainerParser(HTMLParser):
             if tag == "br":
                 self._write(" ")
             return
+        main_column = tag == "td" and (values.get("width") or "").strip() == MAIN_COLUMN_WIDTH
+        in_main = main_column or any(main for _, _, main in self.stack)
         if not self._skipping():
             for name, matches in CONTAINERS:
-                if matches(tag, ids, classes) and not any(n == name for n, _ in self.active):
+                if matches(tag, ids, classes, in_main) and not any(n == name for n, _ in self.active):
                     self.parts[name].append([])
                     self.active.append((name, len(self.stack)))
         skip = tag in SKIP_TAGS or bool(classes & SKIP_CLASSES) or bool(ids & SKIP_IDS)
-        self.stack.append((tag, skip))
+        self.stack.append((tag, skip, main_column))
         self._write(" ")
 
     def handle_endtag(self, tag: str) -> None:
         # HTML antigo fecha mal as tags: fecha até à correspondente, se aberta.
-        if not any(open_tag == tag for open_tag, _ in self.stack):
+        if not any(open_tag == tag for open_tag, _, _ in self.stack):
             return
         while self.stack:
-            open_tag, _ = self.stack.pop()
+            open_tag, _, _ = self.stack.pop()
             self.active = [(n, depth) for n, depth in self.active if depth < len(self.stack)]
             if open_tag == tag:
                 break
