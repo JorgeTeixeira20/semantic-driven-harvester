@@ -5222,3 +5222,52 @@ Premier League não têm rótulo pt na Wikidata: o rótulo passa a cair para o
 inglês quando falta o português (teste novo). Amostra de nomes conhecidos,
 escolhidos para testar as regras; não substitui a revisão de uma amostra dos
 aceites na corrida real. Suite completa: **327 testes, todos a passar.**
+
+### Fim da recolha do `corpus_rdf --fase1 por_ano` e os 503 do replay (2026-10-22)
+
+**Recolha concluída.** A última repetição (sem cookies, 1 pedido por
+segundo, lançada a 2026-10-21 às 20:30) processou os 30 016 artigos
+pendentes até às 14:07 de 2026-10-22, sem nenhum 400, 429 nem espera por
+erro de ligação; o Turtle final ficou escrito às 15:16
+(`output/corpus_articles_por_ano.ttl`, 2 320 109 triplos). Verificação em
+disco: 129 317 linhas no relatório (URLs distintos, 0 erros de
+mapeamento); **texto em 126 784 artigos**, sem texto em 2 533 (2 522 × 404
+e 9 × 500, reais; 1 erro de ligação e 1 timeout, artefactos); **HTML em
+117 927**, sem HTML em 11 390 (5 917 por 503, ver abaixo; 5 436 × 500,
+quase todos `noticia.asp`, reais; 24 × 404; 11 timeouts).
+
+**Os 503 do replay (artefacto).** A partir das **10:49:20** de 2026-10-22,
+quando a recolha entrou nos `shownews.asp`, o `noFrame/replay` (HTML)
+passou a responder **503 Service Unavailable** a quase todos os pedidos (~1
+800 por hora); o `textextracted` (texto) continuou a responder
+normalmente. Pedidos isolados com `curl` aos mesmos URLs, e a uma captura
+AMP de 2019 que antes respondia 200, deram também 503 (13:55 e 14:08): era
+o serviço de replay em baixo, não os URLs. Artigos que ficaram sem HTML por
+causa do 503: **5 917** — `shownews.asp` 3 554, `tn0cs.asp` 1 695 (todos),
+`tn1cs.asp` 665 (todos), `/detalhe/` 3 (lista em
+`output/.rdf_fase1_html_503.json`). Um teste de hora a hora (1 pedido)
+encontrou o replay de volta às **15:08** (HTTP 200, incluindo URLs
+`tn1cs.asp` que tinham dado 503).
+
+Repetição só do HTML desses 5 917 artigos (o texto já está em cache e não é
+pedido de novo), lançada às 15:17, depois de guardar cópias do relatório,
+do N-Triples e do Turtle (`*.pre-html503.*`, checksums iguais aos
+originais) e de retirar as 5 917 linhas do relatório.
+
+### `noticia.aspx` (2009): contentor do corpo não reconhecido (medição, 2026-10-22)
+
+Amostra de 20 capturas com HTML em disco (todas de 2009): o `html_body`
+não reconhece nenhum contentor (0 de 20) — a página não usa `<aux>`. O
+corpo está em `td[width=600] > table > tr > td > span.apreto12n` (a mesma
+classe de letra do `noticia.asp` de 2007, mas sem `<aux>` dentro), ao lado
+de uma tabela com `document.write` de publicidade: corpo com ≥ 30
+palavras nesse caminho em **15 de 20**, validado contra o texto extraído.
+`span.apreto12n` aparece em 9–16 elementos por página (é uma classe de
+letra), pelo que o caminho dentro de `td[width=600]` é o que distingue o
+corpo; noutra página o maior `span.apreto12n` é a pergunta de uma votação
+(`form#votacao`). Das outras 5: 2 são tabelas de classificação da Volta
+(sem texto corrido, 0 palavras), 3 têm 1–21 palavras nesse caminho e
+título genérico, sem corpo identificado. Codificação: 16 declaram
+`utf-8`, 4 não declaram. Esqueleto em `output/html_corpo_noticia_aspx.md`.
+Por decisão do autor, a cadeia do Caminho B não corre enquanto este
+contentor não estiver no extrator.
