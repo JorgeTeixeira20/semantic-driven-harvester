@@ -41,7 +41,7 @@ from collections import defaultdict
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from rdflib import RDF, Graph
+from rdflib import RDF, RDFS, Graph
 from rdflib.plugins.parsers.ntriples import W3CNTriplesParser
 
 from .article_body import extract_body
@@ -330,6 +330,7 @@ class _GraphIndex:
         self.captures: dict[object, set] = defaultdict(set)
         self.capture_fields: dict[object, dict[str, object]] = defaultdict(dict)
         self.file_path: dict = {}
+        self.labels: dict = {}
 
     def triple(self, s, p, o) -> None:
         if p == RDF.type:
@@ -347,6 +348,8 @@ class _GraphIndex:
             self.capture_fields[s][_CAPTURE_PREDICATES[p]] = o
         elif p == SDH.filePath:
             self.file_path[s] = o
+        elif p == RDFS.label:
+            self.labels[s] = o
 
 
 def read_graph_index(graph_path: Path) -> _GraphIndex:

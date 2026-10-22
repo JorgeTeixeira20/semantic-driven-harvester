@@ -298,6 +298,25 @@ def write_csv(rows: list[dict[str, str]], path: Path) -> None:
         writer.writerows(rows)
 
 
+BODY_SOURCE_FIELDS = ("artigo", "tstamp", "origem_corpo")
+
+
+def write_body_sources(corpus: dict[str, list[Capture]], path: Path) -> None:
+    """Por captura com texto, de onde veio o corpo pesquisado (c′, html:<contentor>,
+    premium, sem_corpo); capturas sem texto ficam `sem_texto`."""
+
+    with path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle, lineterminator="\n")
+        writer.writerow(BODY_SOURCE_FIELDS)
+        for article, captures in corpus.items():
+            for capture in captures:
+                if capture.text is None:
+                    source = "sem_texto"
+                else:
+                    source = capture.body_source or ("sem_corpo" if capture.body_missing else "c′")
+                writer.writerow((article, capture.tstamp, source))
+
+
 def _frequency_table(counter: Counter, header: str) -> list[str]:
     lines = [f"| {header} | Artigos |", "| --- | ---: |"]
     lines += [f"| {key} | {count} |" for key, count in sorted(counter.items(), key=lambda kv: (-kv[1], kv[0]))]
@@ -463,6 +482,8 @@ def run(
     )
     output.mkdir(parents=True, exist_ok=True)
     write_csv(rows, output / f"corpus_entities{tag}.csv")
+    if use_body:
+        write_body_sources(corpus, output / f"corpus_entities{tag}_corpo.csv")
     write_summary(corpus, rows, vocabulary_path, chrome_fraction,
                   output / f"corpus_entities{tag}_summary.md", use_body,
                   csv_name=f"corpus_entities{tag}.csv", unmapped_slugs=unmapped,

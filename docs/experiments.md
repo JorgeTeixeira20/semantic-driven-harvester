@@ -4990,3 +4990,75 @@ O teaser dos Premium (30 palavras em 2024, com `premium=True`) não é usado:
 no `--texto corpo-html` uma captura Premium fica sem corpo, como na decisão
 de 2026-10-19. Suite completa depois das correções: **306 testes, todos a
 passar.** Falta repetir a validação nos HTML reais com estas correções.
+
+## Protótipo principal para o corpus da Fase 1 (implementado, gerado só com dados sintéticos; 2026-10-22)
+
+### Decisões do autor
+
+- **Um protótipo principal para o corpus alargado.** O protótipo do corpus
+  de 125 artigos (`navigation_prototype.py`) fica como está: é o único
+  corpus com várias capturas por artigo, e por isso o estudo de caso da
+  profundidade temporal.
+- **A página principal é um painel, não uma lista**: 129 317 artigos numa
+  lista não são navegáveis. A lista aparece filtrada, paginada (50 por
+  página), por baixo dos resumos.
+- **Preenchimento de modalidade e clube, com a origem registada**: os URLs
+  do site de 1999–2009 não têm caminho temático (74 076 Artigos sem
+  modalidade no URL). Modalidade: pelo URL; sem ela, pelos termos de
+  pesquisa de modalidade que encontraram o artigo na Fase 1. Clube: pelo
+  URL; sem ele, pelos clubes mencionados no texto (vocabulário alargado).
+  Na página, os valores preenchidos assim aparecem marcados ("termo de
+  pesquisa", "no texto").
+
+### Implementação
+
+- `navigation_corpus.py` lê, sem rede: o N-Triples do corpus da Fase 1 em
+  streaming (URL, título do `Artigo`, captura, texto); as saídas etiquetadas
+  do Caminho B (`corpus_entities_por_ano.csv` e o novo
+  `corpus_entities_por_ano_corpo.csv`, com a origem do corpo por captura,
+  escrito pelo `corpus_entities` sempre que pesquisa o corpo); o
+  vocabulário (QID, categoria, modalidade); a tabela slug → clube (com QID);
+  e o CSV de capturas da Fase 1 (termos de pesquisa por URL, juntando
+  variantes por `normalize_for_grouping`). **Não usa SPARQL**, ao contrário
+  do protótipo de 125 artigos: carregar 2,2 milhões de triplos em `rdflib`
+  só para os consultar seria lento e pesado; os dados vêm do mesmo grafo,
+  lido em streaming.
+- Clubes e entidades identificados pelo QID quando o rótulo não é
+  homónimo: o clube do URL (pela tabela) e o mesmo clube mencionado no texto
+  são o mesmo filtro. Rótulos homónimos ficam `h:<rótulo>`, sem QID.
+- Época do site pelo esquema de URL: 1999–2000 (`tn0cs`/`tn1cs`),
+  2000–2009 (`noticia.asp`, `shownews.asp`, `noticia.aspx`), 2017–2024
+  (`/detalhe/`, `/amp/`).
+- Saída em `output/prototipo_<etiqueta>/`: `index.html` (página única, sem
+  dependências nem servidor; CSS e JavaScript embutidos), `data.js` (uma
+  linha compacta por artigo, carregada por `<script>` para funcionar em
+  `file://`) e `resumo.md` (tabelas para as conclusões: artigos por ano e com
+  entidade, origem do corpo por época, modalidades, clubes e atletas mais
+  mencionados, origem do preenchimento).
+- A página: indicadores, artigos por ano (com a lacuna escrita por extenso),
+  clubes e atletas mais mencionados (com uma entidade escolhida, passam a ser
+  as co-menções), modalidades, época do site e origem do corpo — cada resumo
+  calculado com todos os filtros menos o seu, e clicável para filtrar;
+  filtros por ano, época, modalidade, clube, entidade e pesquisa no título
+  (sem acentos nem maiúsculas); ficha da entidade com ligação à Wikidata;
+  cada artigo ligado à sua captura no Arquivo.pt
+  (`https://arquivo.pt/wayback/<tstamp>/<URL>`). O estado fica no endereço
+  (`#entidade=Q131499&ano=2019`). Modo escuro e telemóvel.
+
+### Verificação
+
+7 testes offline em `tests/test_navigation_corpus.py` (ordem e título dos
+artigos, época, modalidade pelo URL e pelo termo — a partir da variante
+`http://` e do termo acentuado —, clube pelo URL e pelo texto com o mesmo QID,
+slug sem mapa, entidades por QID, origem do corpo, página e resumo). Suite
+completa: **313 testes, todos a passar.**
+
+No Chromium (sessão remota), com 129 317 artigos sintéticos (`data.js` de
+20 MB): carregamento em 1–2 s, cada filtro em ~130 ms; filtros, pesquisa,
+paginação, ligações diretas por endereço (incluindo um homónimo e uma
+modalidade inexistente, que dá 0), ficha de entidade, títulos com HTML
+escapado, modo escuro e largura de telemóvel (390 px, sem scroll
+horizontal), sem erros de JavaScript.
+
+**Ainda não gerado com os dados reais**: depende do fim da recolha e da
+corrida do Caminho B com `--corpus por_ano --texto corpo-html`.

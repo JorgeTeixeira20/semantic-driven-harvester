@@ -68,6 +68,10 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
 - `navigation_prototype.py`: protótipo de navegação — corre `queries/*.rq`
   (SPARQL, `rdflib`) sobre o Turtle do corpus e gera HTML estático em
   `output/prototipo/`; sem rede nem servidor.
+- `navigation_corpus.py` (+ `navigation_corpus_page.py`, a página): protótipo
+  principal do corpus da Fase 1 — painel com filtros e entidades em
+  `output/prototipo_<etiqueta>/`, a partir do N-Triples e das saídas
+  etiquetadas do Caminho B; sem rede nem servidor.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -118,6 +122,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_body [--vocabulario CSV]` | Sem rede; lê o Turtle, os textos e a amostra rotulada; grava `output/corpus_body_*`. |
 | `python -m semantic_harvester.corpus_redundancy_rdf` / `corpus_entities_rdf [--corpus ETIQUETA --vocabulario CSV]` | Sem rede; leem os CSV oficiais de D/B (e o vocabulário); gravam `output/corpus_redundancy.ttl` / `output/corpus_entities.ttl`; não alteram `corpus_articles.ttl`. `corpus_entities_rdf --corpus por_ano` lê `output/corpus_entities_por_ano.csv` (o vocabulário tem de ser o mesmo) e grava `output/corpus_entities_por_ano.ttl`. |
 | `python -m semantic_harvester.navigation_prototype` | Sem rede; lê `output/corpus_articles.ttl` e `queries/`; regenera `output/prototipo/`. |
+| `python -m semantic_harvester.navigation_corpus [--corpus por_ano] [--vocabulario CSV]` | Sem rede; depois do `corpus_entities --corpus por_ano --texto corpo-html`; lê o N-Triples, `output/corpus_entities_por_ano{,_corpo}.csv`, o vocabulário, a tabela de clubes e `output/corpus_phase1_por_ano_captures.csv`; gera `output/prototipo_por_ano/` (`index.html`, `data.js`, `resumo.md`). |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.

@@ -168,6 +168,9 @@ class RunOnPhase1CorpusTests(Phase1Corpus):
         self.assertIn((old, "Rafa Silva"), {(r["artigo"], r["rotulo"]) for r in rows})
         summary = (self.root / "output" / f"corpus_entities_{LABEL}_summary.md").read_text("utf-8")
         self.assertIn("html:aux 1", summary)
+        corpo = (self.root / "output" / f"corpus_entities_{LABEL}_corpo.csv").read_text("utf-8")
+        self.assertIn(f"{old},20020101000000,html:aux", corpo)
+        self.assertIn(f"{BENFICA},20190101000000,c′", corpo)
 
     def test_entities_rdf_on_labelled_corpus(self) -> None:
         corpus_entities.run(self.root, self.vocab, club_map_path=self.club_map,

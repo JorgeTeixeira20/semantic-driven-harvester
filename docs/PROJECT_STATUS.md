@@ -165,7 +165,7 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 306 testes em vinte e um módulos de `tests/`.
+pacote conforme o README. Existem 313 testes em vinte e dois módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -200,9 +200,10 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 independente de `next_page`; lista de termos alargada).
 
 Última validação em **2026-10-22**, sessão remota Linux (Python 3.11.17),
-depois das correções da validação do `html_body.py` em HTML real:
-`.venv/bin/python -m unittest discover -s tests` — **306 testes, todos
-passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-21, Python
+depois do protótipo do corpus da Fase 1 (`navigation_corpus.py`):
+`.venv/bin/python -m unittest discover -s tests` — **313 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, correções
+do `html_body.py`, 306 testes OK; 2026-10-21, Python
 3.12.4 (macOS), vocabulário alargado, 275 testes OK; 2026-10-22, leitura do
 corpus da Fase 1, 286 testes OK; 2026-10-21, depois de
 juntar o ramo do teste de candidatos, 253 testes OK; 2026-10-21, sessão
@@ -600,6 +601,19 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    artigo mostra Temas/Entidades, e há páginas novas `temas.html`/
    `entidades.html`. Sem esses ficheiros, gera-se só com o Caminho A, como
    antes.
+
+   **Protótipo principal para o corpus da Fase 1 (129 317 Artigos;
+   implementado, gerado só com dados sintéticos, 2026-10-22;**
+   `navigation_corpus.py`, `docs/experiments.md`): painel numa só página
+   (`output/prototipo_por_ano/index.html`, sem servidor) com indicadores,
+   artigos por ano, clubes/atletas mais mencionados, modalidades, época do
+   site e origem do corpo — todos reativos aos filtros (ano, época,
+   modalidade, clube, entidade, pesquisa no título), com a lista paginada dos
+   artigos e uma ficha por entidade (QID da Wikidata). O estado fica no
+   endereço, por isso cada vista é uma ligação. Modalidade e clube são
+   preenchidos pelo URL e, sem ele, pelo termo de pesquisa ou pelo texto,
+   com a origem assinalada. O protótipo do corpus de 125 artigos fica como
+   está (estudo de caso da profundidade temporal).
 
 **Trabalho relacionado consultado:** *Major Minors* (Martins & Costa, Prémio
 Arquivo.pt 2021, também referido no RPD) deduplica apenas por título exato
