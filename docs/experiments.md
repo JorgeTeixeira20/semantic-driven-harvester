@@ -5293,5 +5293,20 @@ ter prioridade (nas `noticia.asp` de 2007 o `<aux>` está dentro de um
 `span.apreto12n`). Sem mínimo de palavras: as tabelas de classificação dão os
 nomes que contêm. 3 testes novos com um esqueleto sintético (votação fora da
 coluna, `span` de data curto, publicidade em `document.write`, prioridade do
-`<aux>`). Suite completa: **330 testes, todos a passar.** Falta validar nas 20
-páginas reais com `python -m semantic_harvester.html_body`.
+`<aux>`). Suite completa: **330 testes, todos a passar.**
+
+**Validação nas 20 páginas reais** (sessão local, sem alterar código; saída
+em `output/html_body_validacao_noticia_aspx.tsv`, fora do Git): nas 15 com
+texto corrido, contentor `apreto12n` e o corpo certo (76 a 451 palavras; as
+primeiras e as últimas 8 palavras estão no texto extraído em todas), sem a
+votação, a data ou a publicidade, e sem corpo a mais nem a menos. As 3 sem
+corpo identificado dão 1, 16 e 21 palavras ("Quadro", uma ligação para um
+PDF; duas galerias que acabam em "Veja aqui as imagens!"). As 2 tabelas de
+classificação da Volta saem **vazias**: os nomes estão na coluna
+`td[width=600]`, mas fora de qualquer `span.apreto12n`.
+
+**Decisão (2026-10-22): as tabelas de classificação não são tratadas.** São
+2 de 20 páginas, sem texto corrido, e os nomes são equipas de ciclismo em
+maiúsculas, que não estão no vocabulário; ficam como limitação. No mesmo
+dia, o `shownews.asp` (2000–2001) foi medido com o HTML recuperado depois do
+503: `<aux>` em 20 de 20, sem contentor novo.
