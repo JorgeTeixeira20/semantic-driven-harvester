@@ -37,7 +37,7 @@ class Phase1Corpus(OfflineTestCase):
     artigo, mapeado pelo mesmo `build_article_history_graph`, sem os campos que
     a TextSearch não devolve."""
 
-    def write_article(self, url: str, tstamp: str, text: str | None, html: bool = False) -> None:
+    def write_article(self, url: str, tstamp: str, text: str | None, html: bool | str = False) -> None:
         stem = f"{tstamp}_{hashlib.sha256(url.encode('utf-8')).hexdigest()[:16]}"
         relative = None
         if text is not None:
@@ -48,7 +48,7 @@ class Phase1Corpus(OfflineTestCase):
         if html:
             html_path = self.root / "data" / "raw" / "original_html" / f"{stem}.html"
             html_path.parent.mkdir(parents=True, exist_ok=True)
-            html_path.write_text("<html></html>", encoding="utf-8")
+            html_path.write_text(html if isinstance(html, str) else "<html></html>", encoding="utf-8")
         record = {
             "article_id": stable_hash(url), "original_url": url, "tstamp": tstamp,
             "captured_at": captured_at(tstamp), "title": "t",
@@ -156,6 +156,18 @@ class RunOnPhase1CorpusTests(Phase1Corpus):
         summary = (output / f"corpus_entities_{LABEL}_summary.md").read_text("utf-8")
         self.assertIn("| academico-de-viseu | 1 |", summary)
         self.assertIn(f"`output/corpus_entities_{LABEL}.csv`", summary)
+
+    def test_old_article_found_only_through_the_html_container(self) -> None:
+        old = "https://www.record.pt/noticia.asp?id=2"
+        self.write_article(old, "20020101000000", ":.: Jornal Record :.: Rafa Silva marcou.",
+                           html="<html><body><aux>Rafa Silva marcou.</aux></body></html>")
+        without = corpus_entities.run(self.root, self.vocab, use_body=True, corpus_label=LABEL)
+        self.assertNotIn(old, {r["artigo"] for r in without})
+        rows = corpus_entities.run(self.root, self.vocab, use_body=True, corpus_label=LABEL,
+                                   use_html=True)
+        self.assertIn((old, "Rafa Silva"), {(r["artigo"], r["rotulo"]) for r in rows})
+        summary = (self.root / "output" / f"corpus_entities_{LABEL}_summary.md").read_text("utf-8")
+        self.assertIn("html:aux 1", summary)
 
     def test_entities_rdf_on_labelled_corpus(self) -> None:
         corpus_entities.run(self.root, self.vocab, club_map_path=self.club_map,

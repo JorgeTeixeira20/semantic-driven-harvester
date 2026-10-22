@@ -192,6 +192,7 @@ def run(
     vocabulary_path: Path | None = None,
     use_body: bool = True,
     corpus_label: str | None = None,
+    use_html: bool = False,
 ) -> list[dict[str, str]]:
     root = project_root or Path(__file__).resolve().parents[2]
     if vocabulary_path is None:
@@ -202,7 +203,7 @@ def run(
     terms = load_vocabulary(vocabulary_path)
     variants = frozenset(variant for term in terms for variant in term.variants)
     if use_body:
-        corpus = to_body_corpus(corpus)
+        corpus = to_body_corpus(corpus, use_html=use_html)
 
     rows = unseen_candidates(corpus, variants)
     output.mkdir(parents=True, exist_ok=True)
@@ -220,13 +221,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--vocabulario", type=Path, required=True,
                         help="CSV do vocabulário fechado de entidades (Caminho B)")
-    parser.add_argument("--texto", choices=("corpo", "completo"), default="corpo",
-                        help="corpo do artigo (variante c′, por omissão) ou texto completo")
+    parser.add_argument("--texto", choices=("corpo", "corpo-html", "completo"), default="corpo",
+                        help="corpo do artigo (variante c′, por omissão); corpo-html: c′ e, "
+                        "sem corpo, o contentor do HTML, com Premium sem corpo; ou texto completo")
     parser.add_argument("--corpus", metavar="ETIQUETA",
                         help="corpus da Fase 1 (ex. por_ano); por omissão, o de 125 artigos")
     args = parser.parse_args(argv)
 
-    rows = run(vocabulary_path=args.vocabulario, use_body=args.texto == "corpo",
+    rows = run(vocabulary_path=args.vocabulario, use_body=args.texto != "completo",
+               use_html=args.texto == "corpo-html",
                corpus_label=args.corpus)
     tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Candidatos distintos fora do vocabulário: {len(rows)}")

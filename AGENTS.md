@@ -58,6 +58,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   altera o vocabulário original; raw em `data/raw/wikidata/alargado/`.
 - `article_body.py`: corpo do artigo entre o título e 14 marcadores literais
   de chrome (variante c′, adotada em D e B); sem dependências.
+- `html_body.py`: corpo do artigo pelo contentor do HTML em bruto
+  (`readerBody`, `text_container`, `bodybox`, `<aux>`) e deteção de Premium;
+  complemento da c′ com `--texto corpo-html`; sem dependências.
 - `corpus_body.py`: avaliação da variante (c′) contra D e B, sem rede.
 - `corpus_redundancy_rdf.py`, `corpus_entities_rdf.py`: RDF dos Caminhos D e
   B a partir dos CSV oficiais, em Turtle separado do grafo do corpus (que não
@@ -107,8 +110,9 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
 | `python -m semantic_harvester.corpus_redundancy [--limiar X] [--texto corpo\|completo]` | Sem rede; lê `output/corpus_articles.ttl` e `data/raw/texts/`; grava `output/corpus_redundancy*`; não altera grafo nem raw; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.corpus_chrome --so-distribuicao \| --fracao F [--n 5]` | Sem rede; lê o Turtle, `data/raw/texts/` e a amostra rotulada; grava `output/corpus_chrome_*`. |
-| `python -m semantic_harvester.corpus_entities --vocabulario CSV [--texto corpo\|sem-chrome\|completo] [--correspondencia-simples] [--corpus ETIQUETA]` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`; por omissão só o corpo do artigo (c′). Com `--corpus por_ano`, lê `data/processed/corpus_articles_por_ano_triples.nt` em streaming e grava `output/corpus_entities_por_ano*`, sem tocar nos oficiais. |
-| `python -m semantic_harvester.corpus_candidate_entities --vocabulario CSV [--texto corpo\|completo] [--corpus ETIQUETA]` | Sem rede; lê o Turtle e `data/raw/texts/`; teste exploratório (candidatos fora do vocabulário fechado, sem NER); grava `output/corpus_candidate_entities*`; por omissão só o corpo do artigo (c′). |
+| `python -m semantic_harvester.corpus_entities --vocabulario CSV [--texto corpo\|corpo-html\|sem-chrome\|completo] [--correspondencia-simples] [--corpus ETIQUETA]` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`; por omissão só o corpo do artigo (c′). Com `--corpus por_ano`, lê `data/processed/corpus_articles_por_ano_triples.nt` em streaming e grava `output/corpus_entities_por_ano*`, sem tocar nos oficiais. `corpo-html`: c′ e, sem corpo, o contentor do HTML de `data/raw/original_html/`; Premium sem corpo. |
+| `python -m semantic_harvester.html_body FICHEIRO.html...` | Sem rede; mostra contentor, Premium, palavras e início do corpo extraído de cada HTML (validação manual). |
+| `python -m semantic_harvester.corpus_candidate_entities --vocabulario CSV [--texto corpo\|corpo-html\|completo] [--corpus ETIQUETA]` | Sem rede; lê o Turtle e `data/raw/texts/`; teste exploratório (candidatos fora do vocabulário fechado, sem NER); grava `output/corpus_candidate_entities*`; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.wikidata_vocabulary` | Rede (28 pedidos SPARQL à Wikidata); grava raw em `data/raw/wikidata/` e `data/processed/caminho_b_vocabulario_wikidata.csv`. |
 | `python -m semantic_harvester.wikidata_vocabulary_alargado [--reutilizar-raw]` | Rede (~115 pedidos SPARQL à Wikidata, um de cada vez); grava raw em `data/raw/wikidata/alargado/`, `data/processed/caminho_b_vocabulario_wikidata_alargado.csv` e `output/wikidata_vocabulario_alargado.md`; com `--reutilizar-raw` só pede o que mudou. |
 | `python -m semantic_harvester.corpus_body [--vocabulario CSV]` | Sem rede; lê o Turtle, os textos e a amostra rotulada; grava `output/corpus_body_*`. |

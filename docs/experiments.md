@@ -4869,3 +4869,80 @@ O Caminho D não foi adaptado: no corpus da Fase 1 cada artigo tem uma só
 captura, por isso não há redundância entre capturas a anotar. A extração do
 corpo continua a ser a c′; o extrator pelo contentor do HTML é o passo
 seguinte.
+
+## Corpo do artigo pelo contentor do HTML (implementado, validado só com HTML sintético; 2026-10-22)
+
+### Medição de partida (sessão local, sem rede, HTML já em disco)
+
+20 capturas por esquema, esqueletos em `output/html_corpo_templates.md` (fora
+do Git). Contentor do corpo: `div.article-body > div#readerBody` em
+`/detalhe/` 2017 (4/4); `div.text_container` em `/detalhe/` 2018–2024
+(12/16: 2 são páginas AMP dentro de `/detalhe/` — o template depende da
+página, não só do esquema de URL — e 2 são Premium, sem corpo, o resultado
+certo); `div.bodybox` em `/amp/` 2018–2020 (19/20; a falha é uma
+fotogaleria de 27 palavras); a tag `<aux>` em `noticia.asp` 2002–2007
+(19/19; a captura de 2001 não tem texto para validar). **A c′ não encontra
+corpo em nenhuma das 20 `noticia.asp`**: para o site de 2000–2009 o HTML é a
+única via medida. Por medir: `noticia.aspx`, `shownews.asp`, `tn0cs.asp` e
+`tn1cs.asp` (ainda sem HTML em disco).
+
+Codificação: em 2017–2024, `<meta charset="utf-8">` e bytes UTF-8; em
+`noticia.asp` a declaração (`iso-8859-1`, ou nenhuma) nem sempre é fiável —
+em 2002, UTF-8 em 3 de 4 páginas declaradas `iso-8859-1`; 2006–2007 latin-1.
+
+### Implementação (`src/semantic_harvester/html_body.py`)
+
+Segue a decisão de 2026-10-19 ("Decisão de design (híbrido, não
+substituição da heurística)"): a c′ continua a ser o método principal; o
+HTML serve para (1) detetar Premium e (2) recuperar o corpo quando a c′ não
+o encontra.
+
+- Contentores tentados por ordem, em qualquer esquema de URL:
+  `div#readerBody`, `div.text_container`, `div.bodybox`, `<aux>` (todas as
+  `<aux>` da página, pela tag e não pela classe do `span`, que muda com a
+  época).
+- Dentro do contentor retiram-se os blocos medidos que não são corpo:
+  `script`, `style`, `noscript`, `iframe`, `button`, `amp-analytics`,
+  `amp-ad`, `figure` (foto e crédito), `h1`, `h2.subtitle`;
+  `div#escondec.lerMaisCont` ("Continuar a ler"), `div#relacContainer`,
+  `p.autorDetalhe`; `div.pub_inside_text`, `div#incontent`;
+  `ul.texto_socialShare`, `div.adbox`, `span.texto_autor`,
+  `div.container_assinatura`. `div#restText` (o resto do corpo de 2017)
+  fica.
+- Sobre o texto do contentor aplicam-se os 14 marcadores de chrome da c′,
+  mais "Relacionadas" (blocos de chrome dentro do `bodybox` das AMP em
+  `/detalhe/`: "Relacionadas", "O Record recomenda para si", "Últimas
+  Notícias").
+- Premium: classe `container_assinatura` ou `article-premium` em qualquer
+  ponto da página (a classe `paywall` aparece também em artigos gratuitos e
+  não conta).
+- Codificação: UTF-8 estrito e, se falhar, latin-1.
+- HTML mal fechado (site antigo): uma tag de fecho fecha tudo até à
+  correspondente, se estiver aberta; senão é ignorada.
+
+Ligação ao Caminho B e ao teste de candidatos: `--texto corpo-html`
+(`to_body_corpus(use_html=True)`). Por captura com texto: Premium no HTML →
+sem corpo (`premium`); senão a c′ (`c′`); se a c′ não encontrar corpo, o
+contentor do HTML (`html:<contentor>`); senão `sem_corpo`. O resumo do B
+conta capturas por origem do corpo. Sem `corpo-html` nada muda, incluindo
+os resultados oficiais. O HTML só é encontrado para capturas com texto (o
+caminho do HTML deriva do nome do ficheiro de texto).
+
+`python -m semantic_harvester.html_body FICHEIROS...` mostra, por ficheiro,
+contentor, Premium, número de palavras e início do corpo — para validar nos
+HTML reais.
+
+### Testes e o que não foi feito
+
+14 testes novos (13 em `tests/test_html_body.py`, 1 em
+`tests/test_phase1_corpus_reading.py`), com HTML **sintético** que imita a
+estrutura medida: cada template e os seus blocos a retirar, cortes de chrome
+no `bodybox`, `<aux>` em latin-1 com tags por fechar, UTF-8 com declaração
+`iso-8859-1` errada, Premium e `paywall`, página sem contentor, a ordem
+c′ → HTML → sem corpo, e uma notícia `noticia.asp` em que a entidade só é
+encontrada pelo HTML. Suite completa: **300 testes, todos a passar.**
+
+**Não validado em HTML real** (não está nesta sessão): falta correr o
+comando acima sobre as amostras da medição e comparar com os esqueletos.
+Os esquemas `noticia.aspx`, `shownews.asp`, `tn0cs.asp` e `tn1cs.asp` não
+foram medidos; se tiverem outro contentor, a lista tem de crescer.
