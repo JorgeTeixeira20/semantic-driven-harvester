@@ -5416,3 +5416,29 @@ com 129 317 linhas e 0 erros de mapeamento; 2 320 151 triplos
 **123 844 com HTML** (sem HTML: 5 436 × 500, quase todos `noticia.asp`; 24 ×
 404; 11 timeouts; 2 casos por explicar). Cópias anteriores guardadas com o
 sufixo `pre-html503`.
+
+**Limiar do `wikidata_candidates` no corpus alargado (2026-10-23).** O
+`corpus_candidate_entities --corpus por_ano --texto corpo-html` (vocabulário
+alargado) deu 220 933 candidatos. Contagem por limiar de artigos, com a
+estimativa a ~2,5 s por candidato:
+
+| Limiar | Candidatos | Estimativa |
+| --- | ---: | ---: |
+| ≥ 3 | 36 168 | 25,1 h |
+| ≥ 5 | 19 357 | 13,4 h |
+| ≥ 10 | 9 473 | 6,6 h |
+| ≥ 20 | 4 535 | 3,1 h |
+| ≥ 50 | 1 586 | 1,1 h |
+
+Regra do autor: o menor limiar com no máximo ~3 000 candidatos (≈ 2 h) →
+**`--min-artigos 50`**. A primeira tentativa arrancou por engano com o limiar
+por omissão (3): correu 9 h 36 min (20:36–06:12, ~3,4 s por candidato real),
+gravou em `data/raw/wikidata/candidatos_por_ano/` as respostas dos primeiros
+10 065 candidatos e foi interrompida antes de escrever qualquer saída. Como o
+CSV de candidatos está ordenado por artigos (decrescente) e os ficheiros são
+numerados pela posição na lista filtrada, os 1 586 candidatos ≥ 50 têm os
+mesmos números; a corrida com `--min-artigos 50 --reutilizar` usou só as
+respostas gravadas (consultas idênticas, verificadas) e levou 1,5 s, sem
+falhas: 574 aceites, 39 variantes novas, 92 ambíguos, 316 tipo não aceite,
+565 sem correspondência. As respostas cobrem também por inteiro os limiares
+≥ 20 e ≥ 10, se o autor os quiser comparar sem rede.
