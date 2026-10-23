@@ -176,17 +176,22 @@ texto e 123 844 com HTML ("Fim da recolha do corpus alargado"). O extrator do
 corpo cobre todos os esquemas de URL (contentores do `noticia.aspx` e do site
 de 1999–2000 acrescentados e validados em 2026-10-22). A cadeia completa
 (Caminho B, RDF, candidatos, abordagem híbrida com ≥ 10 artigos, painel)
-**correu uma vez** (2026-10-22/23), mas **os seus números de entidades não
-servem para a tese**: o topo estava dominado por erros ("Nem", "Carlos",
-"Ricardo"; competições e épocas mal ligadas na abordagem híbrida), e os três
-clubes mais mencionados ficavam sem QID. As correções estão implementadas
-("Correções depois da primeira corrida da cadeia no corpus alargado") e a
-cadeia **tem de ser corrida de novo**; até lá, os únicos números finais do
-corpus alargado são os da descoberta, da classificação, da recolha e da
-origem do corpo (esta não muda com as correções). Decisão do autor: se a
-nova amostra da abordagem híbrida continuar com muitos erros, ela entra na
-tese como **experiência com análise de erros**, não nos resultados
-principais. Prazo-alvo: 31 de outubro.
+correu duas vezes. Os números de entidades da **primeira** corrida
+(2026-10-22/23) **não servem para a tese**: o topo estava dominado por erros
+("Nem", "Carlos", "Ricardo"; épocas mal ligadas na abordagem híbrida). Os
+números **finais** são os da **segunda corrida** (2026-10-23, depois das
+correções; "Segunda corrida da cadeia, depois das correções"): 88 467 Artigos
+(68,4 %) com ≥ 1 entidade só com a lista fechada; 102 372 (79,2 %) com a
+abordagem híbrida; 2 918 entidades novas aceites; 0 slugs de clube sem mapa.
+**Amostra de 50 aceites da abordagem híbrida** (avaliada pela sessão local):
+42 certas, 3 erradas, 5 duvidosas (precisão estimada 84 %; intervalo de
+Wilson a 95 % de cerca de 71 %–92 %, por a amostra ser pequena); 3 das 42
+certas têm o tipo discutível. **Decisão** (critério do autor de 2026-10-23:
+"se continuar com muitos erros, entra como experiência"): os erros caíram e
+são poucos, por isso a abordagem híbrida entra nos **resultados principais**
+como segunda passagem, comparada com a lista fechada (a base), **com** a
+análise de erros (amostra, tipos discutíveis, "Nem" em início de frase,
+"Speedway 2. Ekstraliga", Liga NOS e Taça CTT sem entidade). Prazo-alvo: 31 de outubro.
 
 **Feedback do orientador.** Ontologia em RDF/OWL com subclasses de `Tema`:
 **feito** (2026-10-18, "Âmbito da ontologia OWL"). Embeddings: **não usados**
