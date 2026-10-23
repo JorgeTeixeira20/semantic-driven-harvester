@@ -5725,6 +5725,8 @@ por_ano --min-artigos 10 --reutilizar` (sem rede, com o raw em
 as decisões, os resumos, o relatório, os tempos e o `resumo.md` dos dois
 painéis.
 
+**Teste do painel da passagem 2 (página de `b70b929`, Chrome headless, 2026-10-23):** pronto em 0,83 s; sem filtro, 129 317 notícias; pesquisa "Braga" → "A mostrar 1 909 notícias de: título com “Braga”" (hash `q=Braga`); o separador Estatísticas mostra a vista filtrada (10 clubes no ranking, 26 anos no gráfico; hash `q=Braga&vista=estatisticas`) e ao voltar a Notícias o filtro mantém-se; 1 erro na consola, um 404 que não se repetiu numa segunda abertura (muito provavelmente o `favicon.ico` pedido ao servidor local; o teste serviu uma cópia do painel por `http://127.0.0.1`, porque o Chrome headless não lê `file://` dentro da Secretária). Captura com a pesquisa "Braga": `output/prototipo_captura.png`. Lançar o Chrome a partir da sessão do agente fez o processo perder o acesso à pasta Secretária (permissão do macOS), por isso o teste não se repete daí.
+
 ### Painel reorganizado depois do feedback do autor (2026-10-23)
 
 Feedback do autor ao painel final: cores certas (vermelho, preto e cinzento,
