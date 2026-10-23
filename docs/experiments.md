@@ -5676,3 +5676,51 @@ aceite: a Liga NOS e a Taça CTT não entram como entidade (a Wikidata tem-nas
 pelo nome oficial, "Primeira Liga" e "Taça da Liga"); as competições do URL
 continuam a ser temas. Os 16 ficheiros da pesquisa feita nesta corrida ficam
 no raw, sem uso. Testes: 350 OK.
+
+### Segunda corrida da cadeia, depois das correções (2026-10-23, 09:17 → 11:07)
+
+Com as correções `81e46e3` e `3d6bf30` (a pesquisa já não corre depois de um
+item recusado; o ano da fundação não recusa clubes) e a tabela de clubes com
+os 49 slugs (`2c9e032`, `73e4e2a`; o passo 1a leu a tabela já completa:
+0 linhas `sem_mapa`, eram 42 547). Primeira tentativa do passo 2 (antes de
+`3d6bf30`): parada pela verificação do raw, porque fez 8 pedidos novos de
+pesquisa depois de itens recusados (Liga NOS, Taça CTT, Federação de
+Ginástica de Portugal, Critério do Dauphiné, II Jogos Europeus, Giro de
+Itália, The Last Dance, CFR Cluj); os 16 ficheiros ficam no raw, sem uso.
+Com `3d6bf30`: **0 pedidos novos** (34 550 ficheiros antes e depois), CFR
+Cluj aceite (Q205998), os outros com `item_rejeitado` pelo nome exato.
+
+Tabela de resumo, amostra de 50 aceites revista à mão e detalhe em
+`output/cadeia_por_ano_relatorio.md` (no Git). Números principais: artigos
+com pelo menos uma entidade 68,4 % (lista fechada) e 79,2 % (com a abordagem
+híbrida); 2 918 aceites + variantes (333 pela pesquisa), 1 243
+`forma_rejeitada`, 498 `item_rejeitado`, 164 ambíguos; "Nem" / "Carlos" /
+"Ricardo" em 1 467 / 1 / 0 artigos (eram 8 066 / 6 486 / 5 015); 0 slugs sem
+mapa; Benfica, Sporting e Braga com QID no RDF. Amostra de 50 aceites: 42
+certas (3 com tipo discutível ou errado), 3 erradas (Rúben Ribeiro → um
+cavaleiro brasileiro; The Athletic → um estádio; Luís Torres → um
+futebolista do Belize), 5 duvidosas. Erro que continua no topo: "Speedway 2.
+Ekstraliga" (2 462 artigos), a partir de "I Liga" pelo nome exato.
+
+**Ficheiros fora do Git** (grandes demais ou gerados de novo sem rede):
+
+| Ficheiro | Tamanho | Gerado por |
+| --- | ---: | --- |
+| `output/corpus_entities_por_ano.csv` (passagem 2) | 143,7 MB | `python -m semantic_harvester.corpus_entities --corpus por_ano --texto corpo-html --vocabulario data/processed/caminho_b_vocabulario_hibrido_por_ano.csv` |
+| `output/corpus_entities_por_ano_corpo.csv` | 15,9 MB | o mesmo comando (igual nas duas passagens) |
+| `output/corpus_entities_por_ano.ttl` (passagem 2) | 414,2 MB | `python -m semantic_harvester.corpus_entities_rdf --corpus por_ano --vocabulario data/processed/caminho_b_vocabulario_hibrido_por_ano.csv` (depois do anterior) |
+| `output/prototipo_por_ano/data.js` (passagem 2) | 31,2 MB | `python -m semantic_harvester.navigation_corpus --corpus por_ano --vocabulario data/processed/caminho_b_vocabulario_hibrido_por_ano.csv` |
+| `output/caminho_b_por_ano_passagem1/corpus_entities_por_ano.csv` | 103,3 MB | `corpus_entities` como acima, com `--vocabulario data/processed/caminho_b_vocabulario_wikidata_alargado.csv` |
+| `output/caminho_b_por_ano_passagem1/corpus_entities_por_ano.ttl` | 285,5 MB | `corpus_entities_rdf --corpus por_ano --vocabulario data/processed/caminho_b_vocabulario_wikidata_alargado.csv` |
+| `output/caminho_b_por_ano_passagem1/prototipo_por_ano/data.js` | 29,4 MB | `navigation_corpus --corpus por_ano --vocabulario data/processed/caminho_b_vocabulario_wikidata_alargado.csv` |
+| `output/corpus_candidate_entities_por_ano.csv` | 29,2 MB | `python -m semantic_harvester.corpus_candidate_entities --corpus por_ano --texto corpo-html --vocabulario data/processed/caminho_b_vocabulario_wikidata_alargado.csv` |
+
+Todos leem `data/processed/corpus_articles_por_ano_triples.nt` (851,8 MB,
+também fora do Git, gerado por `corpus_rdf --fase1 por_ano`) e o raw em
+`data/raw/`; a passagem 1 copia-se para `output/caminho_b_por_ano_passagem1/`
+antes da passagem 2, porque os nomes das saídas são os mesmos. O vocabulário
+híbrido vem de `python -m semantic_harvester.wikidata_candidates --corpus
+por_ano --min-artigos 10 --reutilizar` (sem rede, com o raw em
+`data/raw/wikidata/candidatos_por_ano/`). No Git ficam o vocabulário híbrido,
+as decisões, os resumos, o relatório, os tempos e o `resumo.md` dos dois
+painéis.
