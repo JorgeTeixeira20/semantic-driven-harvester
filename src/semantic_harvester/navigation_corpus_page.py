@@ -71,7 +71,7 @@ h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: 
 .panel { padding: 14px; margin-bottom: 16px; min-width: 0; }
 .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
 .grid2 > .panel { margin-bottom: 0; }
-.years { display: flex; align-items: flex-end; gap: 2px; height: 120px; overflow-x: auto; }
+.years { display: flex; align-items: flex-end; gap: 2px; height: 90px; overflow-x: auto; }
 .ycol { flex: 1 0 9px; display: flex; flex-direction: column; justify-content: flex-end;
   align-items: stretch; height: 100%; cursor: pointer; border: 0; background: none; padding: 0; }
 .ycol i { display: block; background: var(--bar); border-radius: 2px 2px 0 0; min-height: 1px; }
@@ -146,6 +146,12 @@ footer p { margin: 8px 0; }
 </div></div>
 <main class="wrap">
   <section class="panel card" id="card" hidden style="margin-top:16px"></section>
+  <section class="panel" style="margin:16px 0 0">
+    <h2>Notícias por ano (clique num ano para filtrar)</h2>
+    <div class="years" id="years"></div>
+    <div class="ylabels" id="ylabels"></div>
+    <p class="note" id="gaps"></p>
+  </section>
   <nav class="tabs" role="tablist">
     <button class="tab" id="tabList" role="tab" data-v="">Notícias</button>
     <button class="tab" id="tabStats" role="tab" data-v="estatisticas">Estatísticas</button>
@@ -156,12 +162,6 @@ footer p { margin: 8px 0; }
   </section>
   <section id="viewStats" hidden>
     <div class="kpis" id="kpis"></div>
-    <section class="panel">
-      <h2>Notícias por ano (clique num ano para filtrar)</h2>
-      <div class="years" id="years"></div>
-      <div class="ylabels" id="ylabels"></div>
-      <p class="note" id="gaps"></p>
-    </section>
     <div class="grid2">
       <section class="panel"><h2 id="clubsTitle"></h2><ul class="rank" id="topClubs"></ul></section>
       <section class="panel"><h2 id="athTitle"></h2><ul class="rank" id="topAth"></ul></section>
@@ -302,6 +302,7 @@ footer p { margin: 8px 0; }
     document.getElementById("viewList").hidden = !!S.v;
     document.getElementById("viewStats").hidden = !S.v;
     renderCard(sel, rows.length);
+    renderYears();
     renderFilters(rows);
     renderContext(rows.length);
     if (S.v) renderStats(rows, sel); else renderList(idx);
@@ -317,7 +318,6 @@ footer p { margin: 8px 0; }
       [fmt(new Set(rows.flatMap(r => r[ENT])).size), "atletas, clubes e outras entidades"],
       [rows.length ? Math.round(100 * withEnt / rows.length) + "%" : "—", "das notícias com pelo menos uma"],
     ].map(([b, s]) => `<div class="kpi"><b>${b}</b><span>${s}</span></div>`).join("");
-    renderYears();
     const ec = count(rows, r => r[ENT]);
     ec.delete(sel);
     const ents = [...ec.entries()].sort((a, b) => b[1] - a[1]);

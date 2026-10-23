@@ -5751,3 +5751,8 @@ dados, o `data.js` e os endereços antigos não mudam):
 
 Verificado com Playwright (Chromium) num `data.js` sintético de 30 000
 notícias: sem erros na consola, sem scroll horizontal a 390 px.
+
+Ajuste pedido pelo autor (2026-10-23): o gráfico de notícias por ano volta a
+estar sempre visível, entre a barra de filtros e os separadores (clicar num
+ano filtra; clicar de novo retira o filtro). Os dois campos de pesquisa
+(título e entidade) ficam separados, por decisão do autor, por agora.
