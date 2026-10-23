@@ -5471,3 +5471,111 @@ Vocabulário híbrido: 8 331 linhas com ≥ 50, **10 825 com ≥ 10** (alargado:
 `data/processed/caminho_b_vocabulario_hibrido_por_ano_min50.csv` e
 `output/caminho_b_por_ano_hibrido_min50_3a/` (o 3a com esse vocabulário).
 A segunda passagem (3a, 3b, 3c) corre com o vocabulário do ≥ 10.
+
+## Correções depois da primeira corrida da cadeia no corpus alargado (2026-10-23)
+
+### A primeira corrida (2026-10-22, 18:34 → 2026-10-23, 08:48)
+
+Na sessão local, pela ordem combinada (relatório completo em
+`output/cadeia_por_ano_relatorio.md`, fora do Git). Tempos e memória máxima:
+`corpus_entities` 41 min (1,93 GB) e 50 min com o vocabulário híbrido;
+`corpus_entities_rdf` 10 min e 58 min (2,36 GB) com o híbrido;
+`corpus_candidate_entities` 1 h 09 min; `navigation_corpus` < 1 min
+(`data.js` com 29,7 e 31,8 MB). O `wikidata_candidates` arrancou com o
+limiar de 3 artigos (36 168 candidatos; ~25 h estimadas) antes de os
+candidatos terem sido contados e foi interrompido ao fim de 9 h 36 min; as
+10 065 respostas guardadas cobriam o limiar de 10 artigos (9 473
+candidatos), que foi o usado, sem novos pedidos (secção anterior, commit
+`0259a8a`).
+
+**Origem do corpo (não muda com as correções abaixo).** A tabela por
+esquema está no relatório; a cópia recebida por mensagem chegou truncada,
+por isso aqui ficam só as linhas legíveis: `noticia.asp` (33 773 artigos) —
+`<aux>` 27 500, sem corpo 5 206 (sobretudo os 500 do HTML), sem texto 1 016,
+c′ 28; `shownews.asp` (8 410) — `<aux>` 8 284; `tn0cs.asp` (1 695) — `td480`
+1 690, sem corpo 5. Ou seja, no site de 1999–2009 o corpo vem quase todo do
+HTML: sem o extrator do HTML, essa época ficava quase sem corpo. **Os totais
+por origem têm de ser tirados do relatório
+(`output/cadeia_por_ano_relatorio.md`) antes de entrarem na tese.**
+
+**Números de entidades desta corrida: não usar.** Artigos com pelo menos uma
+entidade: 70,9 % (lista fechada) e 80,6 % (com a abordagem híbrida), mas o
+topo das entidades mostrou erros graves:
+
+1. **Lista fechada, nomes de uma palavra**: "Nem" (8 066 artigos), "Carlos"
+   (6 486) e "Ricardo" (5 015) eram jogadores contados a partir da palavra
+   "nem" e de nomes próprios comuns (a procura ignora maiúsculas).
+2. **Abordagem híbrida, ligações erradas** (3 222 aceites + 122 variantes
+   novas; 747 pela pesquisa): pedaços de frase como candidatos ("A Liga" →
+   Campeonato Lituano, 8 842 artigos; "O Sp"; "FIM DA"; "DE MARÇO" → um
+   jogador; "QUARTOS DE FINAL"); a pesquisa aceitava rótulos que não
+   começam pelo candidato ("I Liga" → um campeonato de speedway; "Rio de
+   Janeiro" → um aeroporto como estádio); épocas e edições em vez da
+   competição ("Liga NOS" → "Liga NOS de 2016–17"; "FC Porto E" → "2014–15
+   F.C. Porto season"; "Taça UEFA" → "Copa da UEFA de 2006-07"); e
+   federações como clube ("Federação Portuguesa" → Federação de Ginástica).
+   Numa amostra de 30 aceites com 10 a 49 artigos, "Vuelta O" e "Nacional E"
+   estavam errados e "Ribéry" como treinador e "Crans Montana" como estádio
+   eram duvidosos; as restantes pareciam certas.
+3. **Clubes do URL sem mapa**: 49 slugs em 10 823 artigos (Rio Ave, Santa
+   Clara, Famalicão…), que no painel apareciam separados do mesmo clube
+   mencionado no texto.
+4. **Os três clubes mais mencionados sem QID** (achado ao corrigir o 3):
+   Benfica, Sporting e Braga estão no vocabulário alargado como "homónimos"
+   (vários QIDs com o mesmo rótulo — o clube de futebol, o multidesportivo,
+   etc.), e por isso ficavam com URI próprio, sem ligação à Wikidata, no RDF
+   e no painel.
+
+### Correções (decisão do autor: "não faz sentido avançar sem elas")
+
+1. **Nomes de pessoas de uma palavra** (`corpus_entities.py`): (a) só contam
+   se estiverem com maiúscula no texto original ("Nem" sim, "nem" não);
+   (b) um nome de uma palavra que é a primeira palavra de formas de 2+
+   palavras de pelo menos 2 outras pessoas do vocabulário é um nome próprio
+   comum e não conta sozinho ("Carlos", "Ricardo"; "Jardel" e "Derlei"
+   ficam). Medido no próprio vocabulário, sem lista manual. Por omissão;
+   `--sem-regras-nomes` repõe a contagem anterior, e a avaliação histórica
+   da c′ (`corpus_body.py`) fixa-a, para os números publicados se manterem.
+   Limitação: um "Nem" em início de frase ainda conta.
+2. **Abordagem híbrida** (`wikidata_candidates.py`), aplicada às respostas já
+   guardadas, **sem mudar a consulta** (para não repetir pedidos):
+   (a) candidatos que são pedaços de frase não são consultados (decisão
+   `forma_rejeitada`): todos em maiúsculas, a começar por artigo ou
+   preposição, ou a acabar numa letra solta — a numeração das respostas
+   guardadas não muda; (b) um resultado da pesquisa só é aceite se o rótulo
+   (pt ou en) começar pelo candidato ("Liga dos Campeões da UEFA" continua);
+   (c) itens com um ano no rótulo (épocas, edições) não são aceites, salvo se
+   o candidato também tiver um número ("Euro 2004"); (d) federações não são
+   aceites. Os itens recusados por (b)–(d) dão a decisão nova
+   `item_rejeitado`.
+3. **Tabela de clubes** (`club_url_map.py`, novo): sugere, para cada slug
+   sem mapa, o clube de futebol do vocabulário alargado cujo nome tem as
+   palavras do slug pela mesma ordem (uma letra antes de `--` é uma inicial:
+   `v--setubal` → Vitória de Setúbal), preferindo o nome exato e o clube
+   principal à equipa B; só a equipa B ou vários clubes → `ambiguo`, para
+   revisão. Com `--aplicar`, acrescenta as sugestões únicas à tabela.
+   Verificado com o vocabulário real: Rio Ave, Santa Clara, Vitória de
+   Setúbal, Paços de Ferreira, Belenenses, Boavista, Nacional, Académica,
+   União de Leiria e os grandes ficam com o clube certo.
+4. **QID principal de um clube "homónimo"** (`corpus_entities_rdf.py`,
+   `navigation_corpus.py`): um clube com vários QIDs fica com o único que
+   está na tabela de clubes do URL (Benfica Q131499, Sporting Q75729, Braga
+   Q75684); se houver zero ou mais de um, continua sem QID. No painel, o
+   clube do URL e o mesmo clube no texto passam a ser o mesmo filtro.
+
+14 testes novos (regras dos nomes, pedaços de frase, pesquisa, épocas,
+federações, numeração estável das respostas, sugestões de clubes, QID
+principal). Suite completa: **350 testes, todos a passar.** Os outputs
+oficiais do corpus de 125 artigos não mudam com as correções 2–4 (o
+vocabulário original só tem jogadores e não tem coluna de origem); a 1 tem de
+ser comparada nesse corpus antes de se regenerarem os oficiais.
+
+### O que falta
+
+Correr de novo, na sessão local: `club_url_map` (rever e aplicar);
+comparação da correção 1 no corpus de 125 artigos; primeira passagem;
+`wikidata_candidates --min-artigos 10 --reutilizar`; segunda passagem;
+painel. Rever uma nova amostra de aceites da abordagem híbrida: **se
+continuar com muitos erros, a abordagem híbrida entra na tese como
+experiência com análise de erros (esta secção é parte dessa análise), não
+nos resultados principais** (decisão do autor, 2026-10-23).

@@ -10,8 +10,9 @@ from pathlib import Path
 
 from semantic_harvester.corpus_entities import load_vocabulary
 from semantic_harvester.wikidata_candidates import (
-    ACCEPTED, AMBIGUOUS, FAILED, NEW_VARIANT, NO_MATCH, OUT_OF_SCOPE, WRONG_TYPE,
-    candidate_query, decide, parse_matches, run,
+    ACCEPTED, AMBIGUOUS, BAD_FORM, FAILED, NEW_VARIANT, NO_MATCH, OUT_OF_SCOPE, REJECTED_ITEM,
+    WRONG_TYPE,
+    candidate_query, decide, form_problem, parse_matches, run,
 )
 from semantic_harvester.wikidata_vocabulary_alargado import CachingClient
 from tests.support import OfflineTestCase
@@ -126,11 +127,51 @@ class DecideTests(unittest.TestCase):
         self.assertEqual(decide("Sport Lisboa Benfica", 4, m, {"Q131499"}).decision, NEW_VARIANT)
 
 
+class Corrections20261023Tests(unittest.TestCase):
+    """Erros vistos no topo do corpus alargado (relatório da cadeia, 2026-10-23)."""
+
+    def test_sentence_fragments_are_not_candidates(self) -> None:
+        for candidate in ("A Liga", "O Sp", "FIM DA", "DE MARÇO", "QUARTOS DE FINAL",
+                          "Nacional E", "Vuelta O", "Grupo B", "FC Porto V"):
+            with self.subTest(candidate=candidate):
+                self.assertIsNotNone(form_problem(candidate))
+        for candidate in ("Liga dos Campeões", "Real Madrid", "Estádio da Luz", "FC Porto",
+                          "Jorge Jesus", "II Liga", "Euro 2004"):
+            with self.subTest(candidate=candidate):
+                self.assertIsNone(form_problem(candidate))
+
+    def test_search_needs_a_label_starting_with_the_candidate(self) -> None:
+        lithuanian = parse_matches([binding("Q1", "Campeonato Lituano de Futebol", "competicao", False, 30)])
+        self.assertEqual(decide("I Liga", 9, lithuanian, set(), method="pesquisa").decision, REJECTED_ITEM)
+        airport = parse_matches([binding("Q2", "Aeroporto Internacional do Rio de Janeiro", "estadio", False)])
+        self.assertEqual(decide("Rio de Janeiro", 9, airport, set(), method="pesquisa").decision,
+                         REJECTED_ITEM)
+        champions = parse_matches([binding("Q18756", "Liga dos Campeões da UEFA", "competicao", True, 90)])
+        self.assertEqual(decide("Liga dos Campeões", 9, champions, set(), method="pesquisa").decision,
+                         ACCEPTED)
+
+    def test_seasons_editions_and_federations_are_rejected(self) -> None:
+        season = parse_matches([binding("Q3", "Liga NOS de 2016–17", "competicao", True, 20)])
+        self.assertEqual(decide("Liga NOS", 9, season, set()).decision, REJECTED_ITEM)
+        club_season = {**binding("Q4", kind="competicao", pt=True),
+                       "labelEn": {"type": "literal", "value": "2014–15 F.C. Porto season"}}
+        self.assertEqual(decide("FC Porto", 9, parse_matches([club_season]), set()).decision, REJECTED_ITEM)
+        federation = parse_matches([binding("Q5", "Federação de Ginástica de Portugal", "clube", True)])
+        self.assertEqual(decide("Federação Portuguesa", 9, federation, set()).decision, REJECTED_ITEM)
+        with_year = parse_matches([binding("Q6", "Euro 2004", "competicao", True)])
+        self.assertEqual(decide("Euro 2004", 9, with_year, set()).decision, ACCEPTED)
+
+    def test_the_real_competition_wins_over_its_season(self) -> None:
+        both = parse_matches([binding("Q7", "Taça UEFA", "competicao", True, 40),
+                              binding("Q8", "Copa da UEFA de 2006-07", "competicao", True, 50)])
+        self.assertEqual(decide("Taça UEFA", 9, both, set()).qid, "Q7")
+
+
 class RunTests(OfflineTestCase):
     def setUp(self) -> None:
         super().setUp()
         (self.root / "output").mkdir()
-        rows = [("Estádio da Luz", 12), ("Estádio do Sport Lisboa e Benfica", 4),
+        rows = [("A Liga", 40), ("Estádio da Luz", 12), ("Estádio do Sport Lisboa e Benfica", 4),
                 ("Liga dos Campeões", 30), ("Sport Lisboa Benfica", 5),
                 ("Real Madrid", 20), ("Notícias Recentes", 50), ("Falha Rede", 3),
                 ("Raro Demais", 2)]
@@ -148,6 +189,7 @@ class RunTests(OfflineTestCase):
         self.before = vocab.read_bytes()
         self.vocab = vocab
         self.session = FakeSession({
+            "A Liga": [binding("Q999", "Campeonato Lituano de Futebol", "competicao", False)],
             "Estádio da Luz": [binding("Q100", "Estádio do Sport Lisboa e Benfica", "estadio", True)],
             "Estádio do Sport Lisboa e Benfica": [binding("Q100", "Estádio do Sport Lisboa e Benfica", "estadio", True)],
             "Liga dos Campeões": [binding("Q102000", "Liga dos Campeões")],  # desambiguação
@@ -165,6 +207,10 @@ class RunTests(OfflineTestCase):
 
     def test_min_articles_and_decisions(self) -> None:
         self.assertNotIn("Raro Demais", self.session.asked)
+        self.assertNotIn("A Liga", self.session.asked)
+        self.assertEqual(self.decisions.pop("A Liga").decision, BAD_FORM)
+        # A numeração das respostas guardadas não muda: "Estádio da Luz" continua a ser o 2.º.
+        self.assertTrue((self.root / "raw" / "candidato_00002.json").is_file())
         self.assertEqual({c: d.decision for c, d in self.decisions.items()}, {
             "Estádio da Luz": ACCEPTED, "Estádio do Sport Lisboa e Benfica": ACCEPTED,
             "Liga dos Campeões": ACCEPTED, "Sport Lisboa Benfica": NEW_VARIANT,
@@ -196,7 +242,7 @@ class RunTests(OfflineTestCase):
 
     def test_decisions_csv_and_raw(self) -> None:
         with (self.root / "output" / "wikidata_candidatos_por_ano.csv").open(encoding="utf-8") as h:
-            self.assertEqual(len(list(csv.DictReader(h))), 7)
+            self.assertEqual(len(list(csv.DictReader(h))), 8)
         self.assertTrue(any((self.root / "raw").glob("candidato_*.json")))
 
 

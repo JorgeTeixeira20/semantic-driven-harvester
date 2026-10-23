@@ -47,12 +47,42 @@ TEMA_SUBCLASS_BY_CATEGORY = {
 }
 
 
-def load_vocabulary_identity(path: Path) -> dict[str, tuple[str, int]]:
+DEFAULT_CLUB_MAP = Path("data") / "processed" / "caminho_b_clubes_url.csv"
+
+
+def url_club_qids(path: Path) -> set[str]:
+    """QIDs da tabela slug → clube (os clubes de futebol a que o Record se refere)."""
+
+    if not path.is_file():
+        return set()
+    with path.open(encoding="utf-8", newline="") as handle:
+        return {row["wikidata"] for row in csv.DictReader(handle) if row.get("wikidata")}
+
+
+def primary_qid(row: dict[str, str], club_qids: set[str]) -> str | None:
+    """Um clube com vários QIDs no mesmo rótulo (o de futebol, o multidesportivo…)
+    fica com o único que está na tabela de clubes do URL; senão, nenhum.
+
+    Correção de 2026-10-23: Benfica, Sporting e Braga eram "homónimos" e
+    ficavam sem QID no RDF e no painel.
+    """
+
+    if row.get("categoria") != "clube":
+        return None
+    found = [q for q in (row.get("wikidata") or "").split("|") if q in club_qids]
+    return found[0] if len(found) == 1 else None
+
+
+def load_vocabulary_identity(path: Path, club_qids: set[str] | None = None) -> dict[str, tuple[str, int]]:
     """rotulo → (QIDs separados por `|`, nº de homónimos)."""
 
+    identity = {}
     with path.open(encoding="utf-8", newline="") as handle:
-        return {row["rotulo"]: (row["wikidata"], int(row["homonimos"]))
-                for row in csv.DictReader(handle)}
+        for row in csv.DictReader(handle):
+            qids, homonyms = row["wikidata"], int(row["homonimos"])
+            primary = primary_qid(row, club_qids or set()) if homonyms > 1 else None
+            identity[row["rotulo"]] = (primary, 1) if primary else (qids, homonyms)
+    return identity
 
 
 def load_vocabulary_origin(path: Path) -> dict[str, str]:
@@ -162,7 +192,7 @@ def run(
 
     articles_in_graph = read_graph_index(articles_graph).articles
     vocabulary_file = root / (vocabulary_path or DEFAULT_VOCABULARY)
-    vocabulary = load_vocabulary_identity(vocabulary_file)
+    vocabulary = load_vocabulary_identity(vocabulary_file, url_club_qids(root / DEFAULT_CLUB_MAP))
     with (output / f"corpus_entities{tag}.csv").open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
     graph, stats, homonym_rows = build_graph(rows, vocabulary, articles_in_graph,

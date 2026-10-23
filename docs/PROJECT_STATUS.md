@@ -170,21 +170,23 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 detalhe (secções de `docs/experiments.md`, salvo indicação). Nenhum número
 abaixo é novo: vêm dessas secções.
 
-**Estado.** A recolha de texto e HTML do corpus alargado (`corpus_rdf --fase1
-por_ano`, 129 317 Artigos de 1999–2024) ainda corre numa sessão local (às
-02:48 de 2026-10-22: 110 441 concluídos). Depois dela: medir e validar o
-extrator do HTML nos esquemas antigos que ainda não têm HTML em disco
-(`noticia.aspx`, `shownews.asp`, `tn0cs.asp`, `tn1cs.asp`); corrida final,
-por esta ordem, com `--corpus por_ano`: `corpus_entities --texto corpo-html`
-com o vocabulário alargado, `corpus_entities_rdf`, `corpus_candidate_entities`
-e `navigation_corpus`; depois, a abordagem híbrida: `wikidata_candidates`,
-revisão manual de uma amostra e nova passagem de `corpus_entities`,
-`corpus_entities_rdf` e `navigation_corpus` com o vocabulário híbrido
-(guardando antes as saídas da primeira passagem, para comparar). Um ensaio geral sobre uma cópia parcial foi proposto e
-**adiado pelo autor** para depois da escrita. Prazo-alvo: 31 de outubro.
-**Nenhum resultado do Caminho B, dos candidatos ou do painel sobre o corpus
-alargado existe ainda**; os números do corpus alargado que existem são os da
-descoberta, da classificação e da recolha.
+**Estado (atualizado em 2026-10-23).** A recolha do corpus alargado está
+**terminada** (2026-10-22, 18:26): 129 317 Artigos de 1999–2024, 126 798 com
+texto e 123 844 com HTML ("Fim da recolha do corpus alargado"). O extrator do
+corpo cobre todos os esquemas de URL (contentores do `noticia.aspx` e do site
+de 1999–2000 acrescentados e validados em 2026-10-22). A cadeia completa
+(Caminho B, RDF, candidatos, abordagem híbrida com ≥ 10 artigos, painel)
+**correu uma vez** (2026-10-22/23), mas **os seus números de entidades não
+servem para a tese**: o topo estava dominado por erros ("Nem", "Carlos",
+"Ricardo"; competições e épocas mal ligadas na abordagem híbrida), e os três
+clubes mais mencionados ficavam sem QID. As correções estão implementadas
+("Correções depois da primeira corrida da cadeia no corpus alargado") e a
+cadeia **tem de ser corrida de novo**; até lá, os únicos números finais do
+corpus alargado são os da descoberta, da classificação, da recolha e da
+origem do corpo (esta não muda com as correções). Decisão do autor: se a
+nova amostra da abordagem híbrida continuar com muitos erros, ela entra na
+tese como **experiência com análise de erros**, não nos resultados
+principais. Prazo-alvo: 31 de outubro.
 
 **Feedback do orientador.** Ontologia em RDF/OWL com subclasses de `Tema`:
 **feito** (2026-10-18, "Âmbito da ontologia OWL"). Embeddings: **não usados**
@@ -287,7 +289,7 @@ manual, um parágrafo por fonte na dissertação; sem implementação.
 ## Testes existentes
 
 Suite completa: `python -m unittest discover -s tests -v`, após instalação do
-pacote conforme o README. Existem 336 testes em vinte e três módulos de `tests/`.
+pacote conforme o README. Existem 350 testes em vinte e quatro módulos de `tests/`.
 Cobrem processamento TextSearch/versionHistory, paginação (incluindo a não
 dependência de `estimated_nr_results` como condição de paragem, corrigida em
 2026-09-18), metadados do manifesto, IDs, `article_id` comum, ontologia,
@@ -321,10 +323,11 @@ incluindo que `TEXT_POLICY_ALL` nunca pede HTML) e a Fase 1 alargada
 (`test_corpus_phase1.py`: paragem só por página incompleta/vazia,
 independente de `next_page`; lista de termos alargada).
 
-Última validação em **2026-10-22**, sessão remota Linux (Python 3.11.17),
-depois da segunda revisão da assinatura no site de 1999–2000:
-`.venv/bin/python -m unittest discover -s tests` — **336 testes, todos
-passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, primeira
+Última validação em **2026-10-23**, sessão remota Linux (Python 3.11.17),
+depois das correções à primeira corrida da cadeia no corpus alargado:
+`.venv/bin/python -m unittest discover -s tests` — **350 testes, todos
+passaram (`OK`)**, sem chamadas à API real. (Anterior: 2026-10-22, segunda
+revisão da assinatura, 336 testes OK; 2026-10-22, primeira
 revisão da assinatura, 335 testes OK; 2026-10-22, contentor
 do site de 1999–2000, 333 testes OK; 2026-10-22, contentor
 do `noticia.aspx`, 330 testes OK; 2026-10-22, rótulo

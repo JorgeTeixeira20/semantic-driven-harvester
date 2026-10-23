@@ -35,6 +35,7 @@ from pathlib import Path
 
 from .corpus_classification import article_url_scheme
 from .corpus_entities import ORIGIN_TEXT, ORIGIN_URL, fold
+from .corpus_entities_rdf import primary_qid, url_club_qids
 from .corpus_phase1 import MODALIDADES
 from .corpus_redundancy import corpus_graph_path, read_graph_index
 from .navigation_corpus_page import PAGE
@@ -94,13 +95,16 @@ def entity_key(qids: str, homonyms: int, rotulo: str) -> str:
     return qids if homonyms == 1 and qids else f"h:{rotulo}"
 
 
-def load_vocabulary(path: Path) -> dict[str, Entity]:
+def load_vocabulary(path: Path, club_qids: set[str] | None = None) -> dict[str, Entity]:
     with path.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
     vocabulary = {}
     for row in rows:
         homonyms = int(row.get("homonimos") or 1)
         qid = row.get("wikidata") or ""
+        primary = primary_qid(row, club_qids or set()) if homonyms > 1 else None
+        if primary:  # clube "homónimo" com o QID de futebol na tabela de clubes
+            qid, homonyms = primary, 1
         vocabulary[row["rotulo"]] = Entity(
             key=entity_key(qid, homonyms, row["rotulo"]), name=row["rotulo"],
             categoria=row["categoria"], modalidade=row.get("modalidade") or "",
@@ -313,8 +317,9 @@ def run(
 ) -> Path:
     root = project_root or Path(__file__).resolve().parents[2]
     output = root / "output"
-    vocabulary = load_vocabulary(root / (vocabulary_path or DEFAULT_VOCABULARY))
-    club_map = load_club_map(root / (club_map_path or DEFAULT_CLUB_MAP))
+    club_map_file = root / (club_map_path or DEFAULT_CLUB_MAP)
+    vocabulary = load_vocabulary(root / (vocabulary_path or DEFAULT_VOCABULARY), url_club_qids(club_map_file))
+    club_map = load_club_map(club_map_file)
     discovery = load_discovery_modalidades(output / f"corpus_phase1_{label}_captures.csv")
     articles, club_names = build_articles(
         corpus_graph_path(root, label), output / f"corpus_entities_{label}.csv",

@@ -42,7 +42,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from .corpus_entities import match_tokens
+import re
+
+from .corpus_entities import fold, match_tokens
 from .wikidata_vocabulary_alargado import CachingClient
 
 PORTUGAL = "Q45"
@@ -70,6 +72,8 @@ OUT_OF_SCOPE = "fora_do_ambito"
 WRONG_TYPE = "tipo_nao_aceite"
 NO_MATCH = "sem_correspondencia"
 FAILED = "falha_pedido"
+BAD_FORM = "forma_rejeitada"
+REJECTED_ITEM = "item_rejeitado"
 DECISION_FIELDS = ("candidato", "artigos", "decisao", "categoria", "wikidata",
                    "rotulo_wikidata", "portugal", "metodo", "desempate", "itens_encontrados")
 METHOD_EXACT = "nome_exato"
@@ -120,10 +124,50 @@ def candidate_query(name: str, search: bool = False) -> str:
     )
 
 
+# Correções de 2026-10-23 (docs/experiments.md), aplicadas às respostas já
+# guardadas, sem mudar a consulta: pedaços de frase não são consultados; a
+# pesquisa só vale se o rótulo começar pelo candidato; épocas/edições (ano no
+# rótulo) e federações não são a entidade procurada.
+LEADING_WORDS = frozenset({
+    "a", "o", "as", "os", "um", "uma", "uns", "umas", "no", "na", "nos", "nas", "do", "da",
+    "dos", "das", "de", "e", "em", "ao", "aos", "pelo", "pela", "pelos", "pelas", "num",
+    "numa", "para", "com", "por", "fim",
+})
+_YEAR = re.compile(r"(?<!\d)(19|20)\d{2}(?!\d)")
+FEDERATION_PREFIXES = ("federa", "associacao de futebol")
+
+
+def form_problem(candidate: str) -> str | None:
+    """Porque é que o candidato é um pedaço de frase, ou None."""
+
+    letters = [c for c in candidate if c.isalpha()]
+    if letters and all(c.isupper() for c in letters):
+        return "maiusculas"  # títulos e cabeçalhos: "QUARTOS DE FINAL", "FIM DA"
+    words = [fold(w).strip(".,;:") for w in candidate.split()]
+    if not words or words[0] in LEADING_WORDS:
+        return "comeca_por_artigo"  # "A Liga", "O Sp"
+    if len(words[-1]) == 1:
+        return "acaba_em_letra"  # "Nacional E", "Vuelta O", "Grupo B"
+    return None
+
+
+def _wrong_item(match: "Match", candidate: str, method: str) -> bool:
+    labels = [fold(label) for label in match.labels]
+    if any(label.startswith(FEDERATION_PREFIXES) for label in labels):
+        return True
+    if not any(ch.isdigit() for ch in candidate) and any(_YEAR.search(label) for label in labels):
+        return True  # "Liga NOS de 2016–17", "2014–15 F.C. Porto season"
+    if method == METHOD_SEARCH:
+        wanted = fold(candidate)
+        return not any(label.startswith(wanted) for label in labels)
+    return False
+
+
 @dataclass
 class Match:
     qid: str
     label: str = ""
+    labels: set[str] = field(default_factory=set)
     links: int = 0
     kinds_in_scope: set[str] = field(default_factory=set)
     kinds_out_of_scope: set[str] = field(default_factory=set)
@@ -138,6 +182,9 @@ def parse_matches(bindings: list[dict[str, Any]]) -> dict[str, Match]:
     for b in bindings:
         qid = b["item"]["value"].rsplit("/", 1)[-1]
         match = matches.setdefault(qid, Match(qid))
+        for key in ("label", "labelEn"):
+            if key in b:
+                match.labels.add(b[key]["value"])
         if "label" in b:
             match.label = b["label"]["value"]
         elif "labelEn" in b and not match.label:
@@ -169,9 +216,14 @@ def decide(candidate: str, articles: int, matches: dict[str, Match],
            known_qids: set[str], only_portugal: bool = False,
            method: str = METHOD_EXACT) -> Decision:
     valid = {qid: m for qid, m in matches.items()
-             if (m.kinds_in_scope if only_portugal else m.kinds)}
+             if (m.kinds_in_scope if only_portugal else m.kinds)
+             and not _wrong_item(m, candidate, method)}
     if not valid:
-        if any(m.kinds_out_of_scope for m in matches.values()):
+        typed = [m for m in matches.values() if m.kinds]
+        if typed and all(_wrong_item(m, candidate, method) for m in typed):
+            # Época/edição, federação ou, na pesquisa, rótulo que não começa pelo candidato.
+            return Decision(candidate, articles, REJECTED_ITEM, found=len(matches), method=method)
+        if only_portugal and any(m.kinds_out_of_scope for m in typed):
             return Decision(candidate, articles, OUT_OF_SCOPE, found=len(matches), method=method)
         return Decision(candidate, articles, WRONG_TYPE if matches else NO_MATCH,
                         found=len(matches), method=method)
@@ -270,6 +322,11 @@ def run(
     client = client or CachingClient(root / "data" / "raw" / "wikidata" / f"candidatos_{label}", reuse=reuse)
     decisions = []
     for i, (candidate, articles) in enumerate(candidates, start=1):
+        # A numeração não muda (as respostas guardadas são por posição); um
+        # pedaço de frase só não é consultado.
+        if form_problem(candidate):
+            decisions.append(Decision(candidate, articles, BAD_FORM, method=form_problem(candidate)))
+            continue
         decision = None
         for method, suffix, search in ((METHOD_EXACT, "", False), (METHOD_SEARCH, "_pesquisa", True)):
             failures_before = len(client.failures)
@@ -280,7 +337,7 @@ def run(
             decision = decide(candidate, articles, parse_matches(bindings), known_qids,
                               only_portugal, method)
             # A pesquisa (mais larga) só quando o nome exato não deu nenhum item válido.
-            if decision.decision not in (NO_MATCH, WRONG_TYPE, OUT_OF_SCOPE):
+            if decision.decision not in (NO_MATCH, WRONG_TYPE, OUT_OF_SCOPE, REJECTED_ITEM):
                 break
         decisions.append(decision)
 

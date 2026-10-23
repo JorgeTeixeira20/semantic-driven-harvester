@@ -144,8 +144,48 @@ def club_coherence(
     return COHERENT_YES if own & article_clubs else COHERENT_NO
 
 
+# Nomes de pessoas: um nome de uma só palavra precisa de maiúscula no texto e
+# não pode ser um nome próprio comum (correções de 2026-10-23, docs/experiments.md).
+PERSON_CATEGORIES = frozenset({"jogador", "atleta", "treinador"})
+FIRST_NAME_MIN_OTHERS = 2
+
+
+def drop_first_name_variants(
+    terms: list[Term], min_others: int = FIRST_NAME_MIN_OTHERS,
+) -> tuple[list[Term], list[str]]:
+    """Retira as formas de uma palavra de pessoas que são nomes próprios comuns.
+
+    Um nome de uma palavra ("Carlos", "Ricardo") é comum se for a primeira
+    palavra de formas de 2+ palavras de pelo menos `min_others` *outras*
+    pessoas do vocabulário. Medido no próprio vocabulário, sem lista manual:
+    "Jardel" ou "Derlei" ficam. Devolve os termos e as formas retiradas.
+    """
+
+    owners: dict[str, set[str]] = defaultdict(set)
+    for term in terms:
+        if term.categoria in PERSON_CATEGORIES:
+            for variant in term.variants:
+                if len(variant) > 1:
+                    owners[variant[0]].add(term.rotulo)
+    dropped: list[str] = []
+    result = []
+    for term in terms:
+        if term.categoria not in PERSON_CATEGORIES:
+            result.append(term)
+            continue
+        kept = []
+        for variant in term.variants:
+            if len(variant) == 1 and len(owners[variant[0]] - {term.rotulo}) >= min_others:
+                dropped.append(variant[0])
+            else:
+                kept.append(variant)
+        result.append(Term(term.tipo, term.categoria, term.rotulo, tuple(kept), term.clubs))
+    return result, sorted(set(dropped))
+
+
 def count_mentions(
-    segments: list[list[str]], terms: list[Term], longest_match: bool = True
+    segments: list[list[str]], terms: list[Term], longest_match: bool = True,
+    caps: list[list[bool]] | None = None,
 ) -> Counter[str]:
     """Ocorrências de cada termo (por rótulo) em segmentos de palavras já normalizadas.
 
@@ -158,28 +198,39 @@ def count_mentions(
 
     Não há correspondências entre segmentos: um bloco de chrome removido não
     junta as palavras que estavam de um lado e do outro.
+
+    Com `caps` (para cada palavra, se começava por maiúscula no texto
+    original), uma forma de uma só palavra de uma pessoa só conta em
+    maiúscula: "Nem" é o jogador, "nem" não.
     """
 
     # Índice pela primeira palavra: cada texto é percorrido uma só vez.
-    index: dict[str, list[tuple[tuple[str, ...], str]]] = defaultdict(list)
+    index: dict[str, list[tuple[tuple[str, ...], str, bool]]] = defaultdict(list)
     for term in terms:
         for variant in term.variants:
-            index[variant[0]].append((variant, term.rotulo))
+            needs_caps = len(variant) == 1 and term.categoria in PERSON_CATEGORIES
+            index[variant[0]].append((variant, term.rotulo, needs_caps))
+
+    def ok(s: int, i: int, variant: tuple[str, ...], needs_caps: bool, segment: list[str]) -> bool:
+        if tuple(segment[i:i + len(variant)]) != variant:
+            return False
+        return not (needs_caps and caps is not None and not caps[s][i])
+
     counts: Counter[str] = Counter()
     if not longest_match:
-        for segment in segments:
+        for s, segment in enumerate(segments):
             for i, word in enumerate(segment):
-                for variant, label in index.get(word, ()):
-                    if tuple(segment[i:i + len(variant)]) == variant:
+                for variant, label, needs_caps in index.get(word, ()):
+                    if ok(s, i, variant, needs_caps, segment):
                         counts[label] += 1
         return counts
-    for segment in segments:
+    for s, segment in enumerate(segments):
         i = 0
         while i < len(segment):
             matches = [
                 (len(variant), label)
-                for variant, label in index.get(segment[i], ())
-                if tuple(segment[i:i + len(variant)]) == variant
+                for variant, label, needs_caps in index.get(segment[i], ())
+                if ok(s, i, variant, needs_caps, segment)
             ]
             if not matches:
                 i += 1
@@ -191,21 +242,38 @@ def count_mentions(
     return counts
 
 
+def segments_with_caps(
+    text: str, chrome: set[tuple[str, ...]] | None, n: int = DEFAULT_N
+) -> tuple[list[list[str]], list[list[bool]]]:
+    """Palavras normalizadas, partidas onde havia chrome, e se cada uma começava
+    por maiúscula no texto original."""
+
+    words = tokens(text)
+    originals = _WORD_RE.findall(unicodedata.normalize("NFC", text))
+    if len(originals) != len(words):  # caso raro (minúscula com outro comprimento)
+        originals = [w.upper() for w in words]
+    covered = chrome_coverage(words, chrome, n) if chrome else [False] * len(words)
+    segments: list[list[str]] = [[]]
+    caps: list[list[bool]] = [[]]
+    for word, original, hit in zip(words, originals, covered):
+        if hit:
+            if segments[-1]:
+                segments.append([])
+                caps.append([])
+        else:
+            folded = match_tokens(word)
+            segments[-1].extend(folded)
+            caps[-1].extend([original[:1].isupper()] * len(folded))
+    pairs = [(s, c) for s, c in zip(segments, caps) if s]
+    return [s for s, _ in pairs], [c for _, c in pairs]
+
+
 def text_segments(
     text: str, chrome: set[tuple[str, ...]] | None, n: int = DEFAULT_N
 ) -> list[list[str]]:
     """Palavras normalizadas para comparação, partidas onde havia chrome."""
 
-    words = tokens(text)
-    covered = chrome_coverage(words, chrome, n) if chrome else [False] * len(words)
-    segments: list[list[str]] = [[]]
-    for word, hit in zip(words, covered):
-        if hit:
-            if segments[-1]:
-                segments.append([])
-        else:
-            segments[-1].extend(match_tokens(word))
-    return [segment for segment in segments if segment]
+    return segments_with_caps(text, chrome, n)[0]
 
 
 # --- Temas a partir do URL ----------------------------------------------------
@@ -248,6 +316,7 @@ def analyse_article(
     club_map: dict[str, str] | None = None,
     longest_match: bool = True,
     strict_clubs: bool = True,
+    name_rules: bool = True,
 ) -> list[dict[str, str]]:
     themes = themes_from_url(article)
     club_slugs = [value for categoria, value in themes if categoria == "clube"]
@@ -262,7 +331,11 @@ def analyse_article(
     ]
 
     texts = [c.text or "" for c in captures if c.in_layer1]
-    per_capture = [count_mentions(text_segments(t, chrome, n), terms, longest_match) for t in texts]
+    per_capture = []
+    for text in texts:
+        segments, caps = segments_with_caps(text, chrome, n)
+        per_capture.append(count_mentions(segments, terms, longest_match,
+                                          caps if name_rules else None))
     by_label = {term.rotulo: term for term in terms}
     present = sorted({label for counts in per_capture for label in counts})
     for label in present:
@@ -374,6 +447,7 @@ def write_summary(
     csv_name: str = "corpus_entities.csv",
     unmapped_slugs: Counter | None = None,
     use_html: bool = False,
+    dropped_names: list[str] | None = None,
 ) -> None:
     articles = list(corpus)
     with_text = [a for a, caps in corpus.items() if any(c.in_layer1 for c in caps)]
@@ -408,6 +482,12 @@ def write_summary(
         f"- Artigos: {len(articles)}; com texto (Camada 1): {len(with_text)}; "
         f"com uma só captura com texto (sem proteção de persistência): {len(single)}.",
         *body_source_lines(corpus),
+        *([] if dropped_names is None else [
+            "- Regras dos nomes de pessoas (2026-10-23): um nome de uma só palavra só "
+            "conta com maiúscula no texto; nomes próprios comuns (primeira palavra de "
+            f"2+ outras pessoas do vocabulário) não contam sozinhos — {len(dropped_names)} "
+            "retirados" + (": " + ", ".join(dropped_names[:30]) + ("…" if len(dropped_names) > 30 else "")
+                           if dropped_names else "") + "."]),
         "",
         "## Temas (a partir do `originalURL`)\n",
         "| Categoria | Artigos com tema | Valores distintos |",
@@ -459,6 +539,7 @@ def run(
     longest_match: bool = True,
     corpus_label: str | None = None,
     use_html: bool = False,
+    name_rules: bool = True,
 ) -> list[dict[str, str]]:
     """Sem `corpus_label`, o corpus de 125 artigos e as saídas oficiais; com
     uma etiqueta (ex. `por_ano`), o N-Triples desse corpus da Fase 1 e saídas
@@ -471,6 +552,9 @@ def run(
     tag = f"_{corpus_label}" if corpus_label else ""
     corpus = load_corpus(corpus_graph_path(root, corpus_label), root)
     terms = load_vocabulary(vocabulary_path)
+    dropped_names: list[str] = []
+    if name_rules:
+        terms, dropped_names = drop_first_name_variants(terms)
     if use_body:
         # Variante (c′): o corpo já exclui o chrome; capturas sem corpo deixam a Camada 1.
         corpus, chrome_fraction = to_body_corpus(corpus, use_html=use_html), None
@@ -480,7 +564,8 @@ def run(
     rows = [
         row for article, captures in corpus.items()
         for row in analyse_article(article, captures, terms, chrome, club_map=club_map,
-                                   longest_match=longest_match, strict_clubs=not corpus_label)
+                                   longest_match=longest_match, strict_clubs=not corpus_label,
+                                   name_rules=name_rules)
     ]
     unmapped = Counter(
         r["rotulo"] for r in rows
@@ -494,7 +579,7 @@ def run(
     write_summary(corpus, rows, vocabulary_path, chrome_fraction,
                   output / f"corpus_entities{tag}_summary.md", use_body,
                   csv_name=f"corpus_entities{tag}.csv", unmapped_slugs=unmapped,
-                  use_html=use_html)
+                  use_html=use_html, dropped_names=dropped_names if name_rules else None)
     return rows
 
 
@@ -519,6 +604,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--correspondencia-simples", action="store_true",
                         help="contagem anterior a 2026-10-22: cada variante em todas as posições, "
                         "mesmo dentro de outra mais longa (por omissão, só a mais longa)")
+    parser.add_argument("--sem-regras-nomes", action="store_true",
+                        help="contagem anterior a 2026-10-23: nomes de pessoas de uma palavra "
+                        "sem exigir maiúscula e sem retirar nomes próprios comuns")
     parser.add_argument("--corpus", metavar="ETIQUETA",
                         help="corpus da Fase 1 (ex. por_ano): lê "
                         "data/processed/corpus_articles_<ETIQUETA>_triples.nt e escreve "
@@ -531,7 +619,8 @@ def main(argv: list[str] | None = None) -> int:
     rows = run(vocabulary_path=args.vocabulario, chrome_fraction=fraction,
                club_map_path=args.clubes_url, use_body=args.texto in ("corpo", "corpo-html"),
                use_html=args.texto == "corpo-html",
-               longest_match=not args.correspondencia_simples, corpus_label=args.corpus)
+               longest_match=not args.correspondencia_simples, corpus_label=args.corpus,
+               name_rules=not args.sem_regras_nomes)
     tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")
     print(f"Saídas: output/corpus_entities{tag}.csv, output/corpus_entities{tag}_summary.md")

@@ -8,8 +8,8 @@ from rdflib import RDF, XSD, Graph, Literal
 
 from semantic_harvester.corpus_chrome import ngrams, tokens
 from semantic_harvester.corpus_entities import (
-    Term, analyse_article, club_coherence, count_mentions, fold, load_vocabulary,
-    match_tokens, run, text_segments, themes_from_url,
+    Term, analyse_article, club_coherence, count_mentions, drop_first_name_variants, fold,
+    load_vocabulary, match_tokens, run, segments_with_caps, text_segments, themes_from_url,
 )
 from semantic_harvester.corpus_redundancy import Capture
 from semantic_harvester.rdf_mapper import (
@@ -97,6 +97,45 @@ class CountMentionsTests(unittest.TestCase):
                                 [term("Danilo Luiz da Silva", "Danilo", "Danilo Luiz")],
                                 longest_match=True)
         self.assertEqual(counts["Danilo Luiz da Silva"], 2)
+
+
+class NameRulesTests(unittest.TestCase):
+    """Correção de 2026-10-23: "Nem", "Carlos" e "Ricardo" dominavam o topo do
+    corpus alargado (a palavra "nem" e nomes próprios contados como jogadores)."""
+
+    def test_one_word_person_needs_capital_letter(self) -> None:
+        segments, caps = segments_with_caps("Nem marcou, nem o guarda-redes viu. O Nem voltou.", None)
+        counts = count_mentions(segments, [term("Nem", categoria="jogador")], caps=caps)
+        self.assertEqual(counts["Nem"], 2)
+
+    def test_without_caps_old_count(self) -> None:
+        segments = text_segments("nem o guarda-redes viu", None)
+        self.assertEqual(count_mentions(segments, [term("Nem", categoria="jogador")])["Nem"], 1)
+
+    def test_clubs_and_multiword_names_do_not_need_capitals(self) -> None:
+        segments, caps = segments_with_caps("o benfica e bruno fernandes", None)
+        counts = count_mentions(segments, [term("Benfica", categoria="clube"),
+                                           term("Bruno Fernandes", categoria="jogador")], caps=caps)
+        self.assertEqual((counts["Benfica"], counts["Bruno Fernandes"]), (1, 1))
+
+    def test_common_first_names_are_dropped(self) -> None:
+        terms = [term("Carlos", categoria="jogador"), term("Carlos Martins", categoria="jogador"),
+                 term("Carlos Fernandes", categoria="treinador"), term("Jardel", categoria="jogador"),
+                 term("Jardel Silva", categoria="jogador")]
+        kept, dropped = drop_first_name_variants(terms)
+        self.assertEqual(dropped, ["carlos"])
+        by_label = {t.rotulo: t for t in kept}
+        self.assertEqual(by_label["Carlos"].variants, ())
+        self.assertEqual(by_label["Jardel"].variants, (("jardel",),))  # só 1 outra pessoa
+        self.assertEqual(by_label["Carlos Martins"].variants, (("carlos", "martins"),))
+
+    def test_analyse_article_applies_caps_unless_disabled(self) -> None:
+        captures = [capture("1", "Não marcou nem assistiu.")]
+        terms = [term("Nem", categoria="jogador")]
+        with_rules = [r for r in analyse_article(ARTICLE, captures, terms, None) if r["origem"] == "texto"]
+        without = [r for r in analyse_article(ARTICLE, captures, terms, None, name_rules=False)
+                   if r["origem"] == "texto"]
+        self.assertEqual((len(with_rules), len(without)), (0, 1))
 
 
 class TextSegmentsTests(unittest.TestCase):

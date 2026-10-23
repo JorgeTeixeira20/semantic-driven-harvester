@@ -68,6 +68,8 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
 - `navigation_prototype.py`: protótipo de navegação — corre `queries/*.rq`
   (SPARQL, `rdflib`) sobre o Turtle do corpus e gera HTML estático em
   `output/prototipo/`; sem rede nem servidor.
+- `club_url_map.py`: sugestões para a tabela slug do URL → clube (QID), a partir
+  do vocabulário alargado; sem rede.
 - `wikidata_candidates.py`: abordagem híbrida — confirma na Wikidata (nome
   exato, tipo, ligação a Portugal) os candidatos frequentes e escreve o
   vocabulário híbrido; rede (SPARQL), raw em `data/raw/wikidata/candidatos_<etiqueta>/`.
@@ -117,7 +119,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
 | `python -m semantic_harvester.corpus_redundancy [--limiar X] [--texto corpo\|completo]` | Sem rede; lê `output/corpus_articles.ttl` e `data/raw/texts/`; grava `output/corpus_redundancy*`; não altera grafo nem raw; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.corpus_chrome --so-distribuicao \| --fracao F [--n 5]` | Sem rede; lê o Turtle, `data/raw/texts/` e a amostra rotulada; grava `output/corpus_chrome_*`. |
-| `python -m semantic_harvester.corpus_entities --vocabulario CSV [--texto corpo\|corpo-html\|sem-chrome\|completo] [--correspondencia-simples] [--corpus ETIQUETA]` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`; por omissão só o corpo do artigo (c′). Com `--corpus por_ano`, lê `data/processed/corpus_articles_por_ano_triples.nt` em streaming e grava `output/corpus_entities_por_ano*`, sem tocar nos oficiais. `corpo-html`: c′ e, sem corpo, o contentor do HTML de `data/raw/original_html/`; Premium sem corpo. |
+| `python -m semantic_harvester.corpus_entities --vocabulario CSV [--texto corpo\|corpo-html\|sem-chrome\|completo] [--correspondencia-simples] [--sem-regras-nomes] [--corpus ETIQUETA]` | Sem rede; lê o Turtle e `data/raw/texts/`; grava `output/corpus_entities*`; por omissão só o corpo do artigo (c′). Com `--corpus por_ano`, lê `data/processed/corpus_articles_por_ano_triples.nt` em streaming e grava `output/corpus_entities_por_ano*`, sem tocar nos oficiais. `corpo-html`: c′ e, sem corpo, o contentor do HTML de `data/raw/original_html/`; Premium sem corpo. |
 | `python -m semantic_harvester.html_body FICHEIRO.html...` | Sem rede; mostra contentor, Premium, palavras e início do corpo extraído de cada HTML (validação manual). |
 | `python -m semantic_harvester.corpus_candidate_entities --vocabulario CSV [--texto corpo\|corpo-html\|completo] [--corpus ETIQUETA]` | Sem rede; lê o Turtle e `data/raw/texts/`; teste exploratório (candidatos fora do vocabulário fechado, sem NER); grava `output/corpus_candidate_entities*`; por omissão só o corpo do artigo (c′). |
 | `python -m semantic_harvester.wikidata_vocabulary` | Rede (28 pedidos SPARQL à Wikidata); grava raw em `data/raw/wikidata/` e `data/processed/caminho_b_vocabulario_wikidata.csv`. |
@@ -125,6 +127,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.corpus_body [--vocabulario CSV]` | Sem rede; lê o Turtle, os textos e a amostra rotulada; grava `output/corpus_body_*`. |
 | `python -m semantic_harvester.corpus_redundancy_rdf` / `corpus_entities_rdf [--corpus ETIQUETA --vocabulario CSV]` | Sem rede; leem os CSV oficiais de D/B (e o vocabulário); gravam `output/corpus_redundancy.ttl` / `output/corpus_entities.ttl`; não alteram `corpus_articles.ttl`. `corpus_entities_rdf --corpus por_ano` lê `output/corpus_entities_por_ano.csv` (o vocabulário tem de ser o mesmo) e grava `output/corpus_entities_por_ano.ttl`. |
 | `python -m semantic_harvester.navigation_prototype` | Sem rede; lê `output/corpus_articles.ttl` e `queries/`; regenera `output/prototipo/`. |
+| `python -m semantic_harvester.club_url_map [--corpus por_ano] [--aplicar]` | Sem rede; sugere o clube (QID) de cada slug de clube do URL sem mapa, a partir dos clubes do vocabulário alargado; grava `output/clubes_url_sugestao_por_ano.csv`; com `--aplicar`, acrescenta as sugestões únicas a `data/processed/caminho_b_clubes_url.csv`. |
 | `python -m semantic_harvester.wikidata_candidates [--corpus por_ano] [--min-artigos 3] [--so-portugal] [--reutilizar]` | Rede (um pedido SPARQL por candidato, à Wikidata); depois do `corpus_candidate_entities --corpus por_ano`; grava `output/wikidata_candidatos_por_ano.csv` e `data/processed/caminho_b_vocabulario_hibrido_por_ano.csv`, sem tocar no vocabulário alargado. |
 | `python -m semantic_harvester.navigation_corpus [--corpus por_ano] [--vocabulario CSV]` | Sem rede; depois do `corpus_entities --corpus por_ano --texto corpo-html`; lê o N-Triples, `output/corpus_entities_por_ano{,_corpo}.csv`, o vocabulário, a tabela de clubes e `output/corpus_phase1_por_ano_captures.csv`; gera `output/prototipo_por_ano/` (`index.html`, `data.js`, `resumo.md`). |
 
