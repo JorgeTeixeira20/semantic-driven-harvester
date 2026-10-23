@@ -127,7 +127,8 @@ def candidate_query(name: str, search: bool = False) -> str:
 # Correções de 2026-10-23 (docs/experiments.md), aplicadas às respostas já
 # guardadas, sem mudar a consulta: pedaços de frase não são consultados; a
 # pesquisa só vale se o rótulo começar pelo candidato; épocas/edições (ano no
-# rótulo) e federações não são a entidade procurada.
+# rótulo, exceto clubes, cujo nome traz o ano da fundação) e federações não
+# são a entidade procurada.
 LEADING_WORDS = frozenset({
     "a", "o", "as", "os", "um", "uma", "uns", "umas", "no", "na", "nos", "nas", "do", "da",
     "dos", "das", "de", "e", "em", "ao", "aos", "pelo", "pela", "pelos", "pelas", "num",
@@ -155,8 +156,9 @@ def _wrong_item(match: "Match", candidate: str, method: str) -> bool:
     labels = [fold(label) for label in match.labels]
     if any(label.startswith(FEDERATION_PREFIXES) for label in labels):
         return True
-    if not any(ch.isdigit() for ch in candidate) and any(_YEAR.search(label) for label in labels):
-        return True  # "Liga NOS de 2016–17", "2014–15 F.C. Porto season"
+    if ("clube" not in match.kinds and not any(ch.isdigit() for ch in candidate)
+            and any(_YEAR.search(label) for label in labels)):
+        return True  # "Liga NOS de 2016–17", mas não "Fotbal Club CFR 1907 Cluj"
     if method == METHOD_SEARCH:
         wanted = fold(candidate)
         return not any(label.startswith(wanted) for label in labels)
@@ -336,8 +338,10 @@ def run(
                 break
             decision = decide(candidate, articles, parse_matches(bindings), known_qids,
                               only_portugal, method)
-            # A pesquisa (mais larga) só quando o nome exato não deu nenhum item válido.
-            if decision.decision not in (NO_MATCH, WRONG_TYPE, OUT_OF_SCOPE, REJECTED_ITEM):
+            # A pesquisa (mais larga) só quando o nome exato não deu nenhum item
+            # do tipo certo; um item recusado (época, federação) não a faz correr,
+            # como antes das correções (sem pedidos novos às respostas guardadas).
+            if decision.decision not in (NO_MATCH, WRONG_TYPE, OUT_OF_SCOPE):
                 break
         decisions.append(decision)
 

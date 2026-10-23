@@ -160,6 +160,8 @@ class Corrections20261023Tests(unittest.TestCase):
         self.assertEqual(decide("Federação Portuguesa", 9, federation, set()).decision, REJECTED_ITEM)
         with_year = parse_matches([binding("Q6", "Euro 2004", "competicao", True)])
         self.assertEqual(decide("Euro 2004", 9, with_year, set()).decision, ACCEPTED)
+        founded = parse_matches([binding("Q9", "Fotbal Club CFR 1907 Cluj", "clube", False)])
+        self.assertEqual(decide("CFR Cluj", 9, founded, set()).decision, ACCEPTED)
 
     def test_the_real_competition_wins_over_its_season(self) -> None:
         both = parse_matches([binding("Q7", "Taça UEFA", "competicao", True, 40),
@@ -174,7 +176,7 @@ class RunTests(OfflineTestCase):
         rows = [("A Liga", 40), ("Estádio da Luz", 12), ("Estádio do Sport Lisboa e Benfica", 4),
                 ("Liga dos Campeões", 30), ("Sport Lisboa Benfica", 5),
                 ("Real Madrid", 20), ("Notícias Recentes", 50), ("Falha Rede", 3),
-                ("Raro Demais", 2)]
+                ("Raro Demais", 2), ("Liga NOS", 60)]
         with (self.root / "output" / "corpus_candidate_entities_por_ano.csv").open(
                 "w", encoding="utf-8", newline="") as handle:
             writer = csv.writer(handle)
@@ -198,6 +200,7 @@ class RunTests(OfflineTestCase):
             "Notícias Recentes": [],
             "Falha Rede": None,
             "Raro Demais": [],
+            "Liga NOS": [binding("Q3", "Liga NOS de 2016–17", "competicao", True, 20)],
         }, search={
             "Liga dos Campeões": [binding("Q101", "Liga dos Campeões da UEFA", "competicao", True, 80),
                                   binding("Q103", "Liga dos Campeões da AFC", "competicao", False, 20)],
@@ -215,6 +218,7 @@ class RunTests(OfflineTestCase):
             "Estádio da Luz": ACCEPTED, "Estádio do Sport Lisboa e Benfica": ACCEPTED,
             "Liga dos Campeões": ACCEPTED, "Sport Lisboa Benfica": NEW_VARIANT,
             "Real Madrid": ACCEPTED, "Notícias Recentes": NO_MATCH, "Falha Rede": FAILED,
+            "Liga NOS": REJECTED_ITEM,
         })
         champions = self.decisions["Liga dos Campeões"]
         self.assertEqual((champions.qid, champions.method, champions.tie),
@@ -222,6 +226,8 @@ class RunTests(OfflineTestCase):
         # A pesquisa só quando o nome exato não dá nenhum item válido.
         self.assertNotIn(("pesquisa", "Estádio da Luz"), self.session.asked)
         self.assertIn(("pesquisa", "Notícias Recentes"), self.session.asked)
+        # Nem quando o nome exato só deu itens recusados (época): sem pedidos novos.
+        self.assertNotIn(("pesquisa", "Liga NOS"), self.session.asked)
 
     def test_hybrid_vocabulary(self) -> None:
         self.assertEqual(self.vocab.read_bytes(), self.before)
@@ -242,7 +248,7 @@ class RunTests(OfflineTestCase):
 
     def test_decisions_csv_and_raw(self) -> None:
         with (self.root / "output" / "wikidata_candidatos_por_ano.csv").open(encoding="utf-8") as h:
-            self.assertEqual(len(list(csv.DictReader(h))), 8)
+            self.assertEqual(len(list(csv.DictReader(h))), 9)
         self.assertTrue(any((self.root / "raw").glob("candidato_*.json")))
 
 

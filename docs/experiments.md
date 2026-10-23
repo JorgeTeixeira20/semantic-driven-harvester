@@ -5638,3 +5638,41 @@ Wikidata.
 09:25:41, com o passo 1a (`corpus_entities`, passagem 1) a correr desde as
 09:17:34; o 1a lê a tabela depois de carregar o corpus, e o resumo do 1a
 mostra se a leitura foi antes ou depois (slugs sem mapa).
+
+### Segunda correção do `wikidata_candidates` (2026-10-23, depois da passagem 1)
+
+A cadeia corrigida parou no passo 2 (como previsto quando há pedidos novos):
+com as regras de 2026-10-23, 8 candidatos cujo item exato passou a ser
+recusado (`item_rejeitado`) foram à pesquisa, que nunca tinha sido feita
+para eles. Resultado relatado pela sessão local (sem mudança de código):
+
+| N.º | Candidato (artigos) | Antes | Com a 1.ª correção |
+| ---: | --- | --- | --- |
+| 11 | Liga NOS (3 660) | aceite → Liga NOS de 2016–17 | item_rejeitado (pesquisa) |
+| 142 | Taça CTT (351) | aceite → Taça da Liga de 2015–16 | item_rejeitado (pesquisa) |
+| 1858 | Federação de Ginástica de Portugal (43) | aceite | item_rejeitado (pesquisa) |
+| 2701 | Critério do Dauphiné (30) | ambíguo | item_rejeitado (pesquisa) |
+| 2791 | II Jogos Europeus (29) | ambíguo | item_rejeitado (pesquisa) |
+| 4647 | Giro de Itália (19) | aceite → Giro d'Italia de 2015 | aceite (pesquisa) → Giro de Itália Feminino |
+| 5542 | The Last Dance (16) | aceite → Temporada 1997-98 dos Chicago Bulls | item_rejeitado (pesquisa) |
+| 6683 | CFR Cluj (13) | aceite → Fotbal Club CFR 1907 Cluj | aceite (pesquisa) → jogo CFR Cluj v Astra Giurgiu |
+
+Dois erros novos: o CFR Cluj perdeu o item certo (o ano da fundação no nome
+do clube ativou a regra das épocas) e a pesquisa trouxe itens errados (um
+jogo; a prova feminina). Correção:
+
+- a regra do ano no rótulo **não se aplica a itens do tipo clube** (o nome
+  traz o ano da fundação: "Fotbal Club CFR 1907 Cluj");
+- a pesquisa **só corre quando o nome exato não deu nenhum item do tipo
+  certo** (`sem_correspondencia`, `tipo_nao_aceite`, `fora_do_ambito`), como
+  antes das correções; um item recusado pela regra (época, federação) dá
+  `item_rejeitado` sem pesquisa. Assim a corrida usa só respostas já
+  guardadas.
+
+Esperado com as respostas guardadas: CFR Cluj volta a aceite (clube);
+Liga NOS, Taça CTT, Federação, Critério do Dauphiné, II Jogos Europeus, Giro
+de Itália e The Last Dance ficam `item_rejeitado` pelo nome exato. Limitação
+aceite: a Liga NOS e a Taça CTT não entram como entidade (a Wikidata tem-nas
+pelo nome oficial, "Primeira Liga" e "Taça da Liga"); as competições do URL
+continuam a ser temas. Os 16 ficheiros da pesquisa feita nesta corrida ficam
+no raw, sem uso. Testes: 350 OK.
