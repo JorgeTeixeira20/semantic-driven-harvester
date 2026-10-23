@@ -5442,3 +5442,32 @@ respostas gravadas (consultas idênticas, verificadas) e levou 1,5 s, sem
 falhas: 574 aceites, 39 variantes novas, 92 ambíguos, 316 tipo não aceite,
 565 sem correspondência. As respostas cobrem também por inteiro os limiares
 ≥ 20 e ≥ 10, se o autor os quiser comparar sem rede.
+
+**Escolha final do limiar: ≥ 10 artigos (2026-10-23).** Cronologia: a cadeia
+foi lançada a 2026-10-22 às 18:34 com `--min-artigos 3` (o valor por
+omissão), antes de os candidatos terem sido contados; o passo 2 arrancou às
+20:36 e foi interrompido a 2026-10-23 às 06:12, com as respostas dos
+primeiros 10 065 candidatos guardadas em `data/raw/wikidata/candidatos_por_ano/`
+(contagens por limiar na tabela acima). Correu-se primeiro o ≥ 50 (regra dos
+~3 000 candidatos) e o 3a com esse vocabulário; o 3b foi interrompido às 06:59.
+Como as respostas do ≥ 10 já estavam pagas (9 473 candidatos, todos dentro
+dos 10 065), o autor escolheu **`--min-artigos 10 --reutilizar`**: 4,7 s, 69 MB,
+**nenhum pedido novo** (34 534 ficheiros no raw antes e depois, nenhum
+alterado), 0 falhas. Os 1 586 candidatos ≥ 50 têm exatamente a mesma decisão
+nas duas corridas.
+
+| Decisão | ≥ 50 | ≥ 10 | só 10–49 artigos |
+| --- | ---: | ---: | ---: |
+| aceite | 574 | 3 222 | 2 648 |
+| variante_nova | 39 | 122 | 83 |
+| ambiguo | 92 | 374 | 282 |
+| tipo_nao_aceite | 316 | 1 545 | 1 229 |
+| sem_correspondencia | 565 | 4 210 | 3 645 |
+| **total** | **1 586** | **9 473** | **7 887** |
+
+Vocabulário híbrido: 8 331 linhas com ≥ 50, **10 825 com ≥ 10** (alargado:
+7 780). As saídas do ≥ 50 ficam para comparação em
+`output/wikidata_candidatos_por_ano_min50.csv`,
+`data/processed/caminho_b_vocabulario_hibrido_por_ano_min50.csv` e
+`output/caminho_b_por_ano_hibrido_min50_3a/` (o 3a com esse vocabulário).
+A segunda passagem (3a, 3b, 3c) corre com o vocabulário do ≥ 10.
