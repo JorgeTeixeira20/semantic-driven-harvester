@@ -192,6 +192,11 @@ principais. Prazo-alvo: 31 de outubro.
 **feito** (2026-10-18, "Âmbito da ontologia OWL"). Embeddings: **não usados**
 (decisão do autor, 2026-10-22; ver Caminho D acima). Reduções de âmbito face
 ao RPD: ficam como trabalho futuro, justificadas como tal na dissertação.
+Ensaio do painel com utilizadores: **adiado para depois da escrita** (decisão
+do autor, 2026-10-22); se não houver tempo, fica como trabalho futuro. Contacto
+com o Arquivo.pt sobre os erros 400/503: **não feito** (decisão do autor); os
+erros e a solução (renovar a sessão, nova recolha do HTML) estão no
+`experiments.md`.
 
 **Corpus alargado e profundidade temporal.** Uma captura por artigo (a mais
 antiga conhecida); o Caminho D (redundância entre capturas) **não se aplica**
