@@ -5724,3 +5724,30 @@ por_ano --min-artigos 10 --reutilizar` (sem rede, com o raw em
 `data/raw/wikidata/candidatos_por_ano/`). No Git ficam o vocabulário híbrido,
 as decisões, os resumos, o relatório, os tempos e o `resumo.md` dos dois
 painéis.
+
+### Painel reorganizado depois do feedback do autor (2026-10-23)
+
+Feedback do autor ao painel final: cores certas (vermelho, preto e cinzento,
+como o Arquivo.pt), mas informação a mais à entrada (era preciso descer 3–4
+ecrãs para chegar ao Explorar); não se percebia que, com uma pesquisa, os
+números de cima passavam a ser só dessa pesquisa; "Época do site" e "origem
+do corpo" (`c′`, `html:…`) não se entendem; filtros soltos e modalidades a
+sair da caixa. Mudanças em `navigation_corpus_page.py` (sem dependências; os
+dados, o `data.js` e os endereços antigos não mudam):
+
+- pesquisa no título e campo de entidade no topo, num cabeçalho escuro;
+- barra fixa com os filtros (ano, modalidade e clube, com contagens) e uma
+  frase que diz o que está a ser mostrado ("A mostrar 3 810 notícias de:
+  título com “Braga” ×", com "Limpar tudo");
+- dois separadores: **Notícias** (a lista, por omissão) e **Estatísticas**
+  (números, gráfico por ano e os 10 mais mencionados, com "nestas notícias"
+  no título quando há filtros); a vista fica no endereço (`vista=estatisticas`);
+- versão do site e origem do texto saem do ecrã principal para "Sobre os
+  dados", com nomes simples ("Site atual (2017–2024)", "Texto completo
+  (recuperado da página guardada)", "Notícia Premium (texto pago, não
+  incluído)"); na lista, só uma etiqueta "Premium" ou "só título";
+- o filtro pela versão do site deixa de estar na barra (continua a funcionar
+  pelo endereço e por "Sobre os dados").
+
+Verificado com Playwright (Chromium) num `data.js` sintético de 30 000
+notícias: sem erros na consola, sem scroll horizontal a 390 px.
