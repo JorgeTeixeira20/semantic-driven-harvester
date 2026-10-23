@@ -5604,3 +5604,37 @@ Os oficiais (`output/corpus_entities.csv`, `_summary.md`,
 `corpus_entities.ttl`, `corpus_entities_rdf_summary.md`) foram regenerados
 com as regras; o resumo também traz o texto atual da explicação de
 `clube_coerente` (mudança de redação do código, sem efeito nos números).
+
+### Tabela de clubes do URL: sugestões do `club_url_map` e 11 linhas manuais (2026-10-23)
+
+O `club_url_map --corpus por_ano` encontrou 49 slugs sem mapa (10 823
+artigos): 38 `unico`, 6 `ambiguo` e 5 `sem`. As 38 sugestões únicas foram
+revistas e aplicadas com `--aplicar` (commit `2c9e032`). As restantes 11
+foram acrescentadas à mão, com os QIDs e os rótulos do vocabulário alargado
+(verificados um a um):
+
+| Slug | Artigos | Clube | QID | Porque não veio do `club_url_map` |
+| --- | ---: | --- | --- | --- |
+| benfica-b | 174 | Sport Lisboa e Benfica B | Q7387221 | equipa B: a regra de segurança marca "só a equipa B" como ambígua |
+| fc-porto-b | 90 | Futebol Clube do Porto B | Q5423714 | equipa B |
+| sporting-b | 59 | Sporting Clube de Portugal B | Q3494112 | equipa B (e "sporting" também é o Braga) |
+| v--guimaraes-b | 32 | Vitória Sport Clube B | Q17518847 | equipa B |
+| sp--braga-b | 31 | Sporting Clube de Braga B | Q7387158 | equipa B |
+| atletico | 9 | Atlético Clube de Portugal | Q757422 | "atletico" também casa com o Casa Pia Atlético Clube |
+| sp--covilha | 222 | Sporting Clube da Covilhã | Q1891367 | abreviatura "sp" não reconhecida |
+| ac-viseu | 158 | Académico Viseu Futebol Club | Q2410944 | abreviatura "ac" não reconhecida |
+| ac--viseu | 17 | Académico Viseu Futebol Club | Q2410944 | abreviatura "ac" não reconhecida |
+| lnk-vilaverdense | 4 | Vilaverdense Futebol Clube | Q7930110 | abreviatura "lnk" (Länk) não reconhecida |
+| ud-oliveirense | 155 | União Desportiva Oliveirense | Q2061414 | dois itens com o nome; confirmado na Wikidata (2026-10-23): Q2061414 é clube de futebol (P31 Q476028, desporto futebol); Q93816864 é a equipa de basquetebol (P31 Q13393265) |
+
+Com estas linhas, os 49 slugs ficam todos mapeados (tabela com 59 linhas).
+**Limitação conhecida:** `felgueiras` (Q1387110, Futebol Clube de
+Felgueiras) e `e--amadora` (Q838134, Clube de Futebol Estrela da Amadora)
+apontam para o clube histórico; os dois clubes foram refundados, e artigos
+recentes desses slugs referem-se ao clube atual, que é outro item da
+Wikidata.
+
+**Momento da alteração na segunda corrida:** as 11 linhas foram escritas às
+09:25:41, com o passo 1a (`corpus_entities`, passagem 1) a correr desde as
+09:17:34; o 1a lê a tabela depois de carregar o corpus, e o resumo do 1a
+mostra se a leitura foi antes ou depois (slugs sem mapa).
