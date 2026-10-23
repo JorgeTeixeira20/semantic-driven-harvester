@@ -5,9 +5,7 @@
 
 <urn:semantic-driven-harvester:prototype:article/0392f9aa444cbd33e0577ee31367c1139ee72053ca34af8eca3213a1d380db06> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
 
-<urn:semantic-driven-harvester:prototype:article/0b3e73421b36d86b168185dc5ea9c16c0606df17935364463e66ad2ade30b001> sdh:mencionaEntidade wd:Q376394 ;
-    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/c86dcabf0dccd88647714e5a63c6f0c2dc1aed32764c277d11b2bfe5f00b9694> ;
-    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+<urn:semantic-driven-harvester:prototype:article/0b3e73421b36d86b168185dc5ea9c16c0606df17935364463e66ad2ade30b001> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
         <urn:semantic-driven-harvester:prototype:tema/602c04a7b4447c2bf68c391c33b4f35fe16351cd4ceb85d68b9dbafd1a1599ba> .
 
 <urn:semantic-driven-harvester:prototype:article/106e4a38dd41578c9e34290816f7ac9a97e4cdb98108a7c7b172eaeec76549fd> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1> .
@@ -155,9 +153,7 @@
 
 <urn:semantic-driven-harvester:prototype:article/46ef93ba9168fde6ab7c0f349abbd89b4da9a1bdf1d7ca7894dc3c57d706170c> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/73729e0d10a92ccf677b9ccb5cfc2f9a79d8c18ec269907bf18e308ee3aff539> .
 
-<urn:semantic-driven-harvester:prototype:article/476503eb19ac7d2054e4cbe7c606ffd6ea9bf174c53ea3981c5d4069e5b5a55c> sdh:mencionaEntidade wd:Q1991022 ;
-    sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/87d0dcab5c6099d16b3f3c9fb5e4956d15ebd8f97c99e4fc5191560786b25a30> ;
-    sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
+<urn:semantic-driven-harvester:prototype:article/476503eb19ac7d2054e4cbe7c606ffd6ea9bf174c53ea3981c5d4069e5b5a55c> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/09bdff641b6b6d3fc38eb55eaffd4ed4388c5f9f41bd8734cf21c190061a344a>,
         <urn:semantic-driven-harvester:prototype:tema/602c04a7b4447c2bf68c391c33b4f35fe16351cd4ceb85d68b9dbafd1a1599ba> .
 
 <urn:semantic-driven-harvester:prototype:article/48d2bef2ee2f7c24e0e9e67447f302ddf068d4a52eb13a0185ef1439e2b23e72> sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
@@ -433,10 +429,8 @@
     sdh:temTema <urn:semantic-driven-harvester:prototype:tema/a38b30f9c43a3f9de70b52829fb5b31c9735c596c043921e615564bd58ad07de> .
 
 <urn:semantic-driven-harvester:prototype:article/b74c8c7ed751cdb0cdffd92fa642cf49dc29995342d33342ba4393b68b1f25c1> sdh:mencionaEntidade wd:Q2724855,
-        wd:Q437329,
         wd:Q766289 ;
     sdh:temMencao <urn:semantic-driven-harvester:prototype:mencao/0f14509d7bb414e52cbc63a1d5c085f1c2671a4c17ae358ec2c1e2df13840c34>,
-        <urn:semantic-driven-harvester:prototype:mencao/6ec5ef79d88979e695cc7f3ea49fb67487bf4eecc0a431e2db00ec602669ffa8>,
         <urn:semantic-driven-harvester:prototype:mencao/f3bae964bb5840d6326daaf6ddae0c7b773d0e84a9f0c5f6a098cbc4de16bb8b> ;
     sdh:temTema <urn:semantic-driven-harvester:prototype:tema/0393c93efc226cff6a1baec5218fa343a8b21940663dc39cfa1d5028fb8857c1>,
         <urn:semantic-driven-harvester:prototype:tema/9ba5381b4ff184d17abc9935304220cf8e23b39b5712986e130e2ecfbd6afbd9> .
@@ -1096,14 +1090,6 @@
     sdh:persistente true ;
     sdh:sobreEntidade wd:Q38217836 .
 
-<urn:semantic-driven-harvester:prototype:mencao/6ec5ef79d88979e695cc7f3ea49fb67487bf4eecc0a431e2db00ec602669ffa8> a sdh:Mencao ;
-    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
-    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
-    sdh:clubeCoerente "sem_tema"^^xsd:string ;
-    sdh:ocorrencias "3"^^xsd:nonNegativeInteger ;
-    sdh:persistente true ;
-    sdh:sobreEntidade wd:Q437329 .
-
 <urn:semantic-driven-harvester:prototype:mencao/71a28351af33808d97c93bec19e9fe5edebb926b8b42fe2c057bfbbe3b1a3f2a> a sdh:Mencao ;
     sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
     sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
@@ -1188,7 +1174,7 @@
     sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
     sdh:capturasComTexto "4"^^xsd:nonNegativeInteger ;
     sdh:clubeCoerente "nao"^^xsd:string ;
-    sdh:ocorrencias "24"^^xsd:nonNegativeInteger ;
+    sdh:ocorrencias "20"^^xsd:nonNegativeInteger ;
     sdh:persistente true ;
     sdh:sobreEntidade wd:Q485697 .
 
@@ -1207,14 +1193,6 @@
     sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
     sdh:persistente false ;
     sdh:sobreEntidade wd:Q1925465 .
-
-<urn:semantic-driven-harvester:prototype:mencao/87d0dcab5c6099d16b3f3c9fb5e4956d15ebd8f97c99e4fc5191560786b25a30> a sdh:Mencao ;
-    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
-    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
-    sdh:clubeCoerente "sem_tema"^^xsd:string ;
-    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
-    sdh:persistente true ;
-    sdh:sobreEntidade wd:Q1991022 .
 
 <urn:semantic-driven-harvester:prototype:mencao/8e91a70541ae46a6151160b5f978e1b0f79d8bbbd2fe2bb137c3c706fd1d8fe5> a sdh:Mencao ;
     sdh:capturasComMencao "2"^^xsd:nonNegativeInteger ;
@@ -1359,14 +1337,6 @@
     sdh:ocorrencias "2"^^xsd:nonNegativeInteger ;
     sdh:persistente true ;
     sdh:sobreEntidade wd:Q485697 .
-
-<urn:semantic-driven-harvester:prototype:mencao/c86dcabf0dccd88647714e5a63c6f0c2dc1aed32764c277d11b2bfe5f00b9694> a sdh:Mencao ;
-    sdh:capturasComMencao "1"^^xsd:nonNegativeInteger ;
-    sdh:capturasComTexto "1"^^xsd:nonNegativeInteger ;
-    sdh:clubeCoerente "sem_tema"^^xsd:string ;
-    sdh:ocorrencias "1"^^xsd:nonNegativeInteger ;
-    sdh:persistente true ;
-    sdh:sobreEntidade wd:Q376394 .
 
 <urn:semantic-driven-harvester:prototype:mencao/cf08ca4fb373a96d3837aab451576cd26b42c2a7f284ce12b40948e7864becf5> a sdh:Mencao ;
     sdh:capturasComMencao "4"^^xsd:nonNegativeInteger ;
@@ -1784,9 +1754,6 @@ wd:Q188241 a sdh:EntidadeMencionada ;
 wd:Q19282169 a sdh:EntidadeMencionada ;
     rdfs:label "Diogo Gonçalves" .
 
-wd:Q1991022 a sdh:EntidadeMencionada ;
-    rdfs:label "Judilson Mamadu Tuncará Gomes" .
-
 wd:Q19968627 a sdh:EntidadeMencionada ;
     rdfs:label "Yony Andrés González Copete" .
 
@@ -1817,17 +1784,11 @@ wd:Q318383 a sdh:EntidadeMencionada ;
 wd:Q3329570 a sdh:EntidadeMencionada ;
     rdfs:label "Alan Ruiz" .
 
-wd:Q376394 a sdh:EntidadeMencionada ;
-    rdfs:label "Rodrigo Moreno Machado" .
-
 wd:Q38217836 a sdh:EntidadeMencionada ;
     rdfs:label "Diogo Queirós" .
 
 wd:Q3909869 a sdh:EntidadeMencionada ;
     rdfs:label "Edinaldo Gomes Pereira" .
-
-wd:Q437329 a sdh:EntidadeMencionada ;
-    rdfs:label "Danilo Luiz da Silva" .
 
 wd:Q4760001 a sdh:EntidadeMencionada ;
     rdfs:label "André Micael" .

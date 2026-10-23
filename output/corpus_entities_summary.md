@@ -3,6 +3,7 @@
 Sem pedidos à API; não altera o grafo nem o raw. Anotação por artigo. Vocabulário: `data/processed/caminho_b_vocabulario_wikidata.csv`. Texto pesquisado: só o **corpo do artigo** (variante c′, `article_body.py`; capturas sem corpo não contam).
 
 - Artigos: 125; com texto (Camada 1): 121; com uma só captura com texto (sem proteção de persistência): 37.
+- Regras dos nomes de pessoas (2026-10-23): um nome de uma só palavra só conta com maiúscula no texto; nomes próprios comuns (primeira palavra de 2+ outras pessoas do vocabulário) não contam sozinhos — 4 retirados: adilson, danilo, gustavo, rodrigo.
 
 ## Temas (a partir do `originalURL`)
 
@@ -56,19 +57,19 @@ Sem pedidos à API; não altera o grafo nem o raw. Anotação por artigo. Vocabu
 
 ## Entidades mencionadas (vocabulário fechado, no texto)
 
-- Artigos com pelo menos uma entidade, regra de persistência (todas as capturas com texto): 58
-- Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): 60
-- Pares artigo–entidade: 118 pela regra fraca, 112 pela regra de persistência; destes, 31 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
+- Artigos com pelo menos uma entidade, regra de persistência (todas as capturas com texto): 56
+- Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): 58
+- Pares artigo–entidade: 115 pela regra fraca, 109 pela regra de persistência; destes, 28 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
 
 ### Coerência de clube (sinal, não filtro)
 
-Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coincide com o tema `clube` do URL do artigo; `nao` se não coincide (possível falso positivo, por exemplo uma manchete do chrome); `sem_tema` se o URL não tem clube. Nenhuma menção é removida.
+Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coincide com o tema `clube` do URL do artigo; `nao` se não coincide (possível falso positivo, por exemplo uma manchete do chrome); `sem_tema` se o URL não tem clube. Uma entidade clube compara-se pelo próprio rótulo. `sem_mapa`: o clube do URL não está na tabela slug → clube. `nao_aplicavel`: treinador, estádio ou competição. Nenhuma menção é removida.
 
 | clube_coerente | Pares (regra fraca) | Pares (persistência) |
 | --- | ---: | ---: |
 | sim | 34 | 34 |
 | nao | 16 | 16 |
-| sem_tema | 68 | 62 |
+| sem_tema | 65 | 59 |
 
 | Entidade | Artigos (persistência) | Artigos (≥ 1 captura) |
 | --- | ---: | ---: |
@@ -104,7 +105,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Carraça | 1 | 1 |
 | Casemiro | 1 | 1 |
 | Cristian Ponde | 1 | 1 |
-| Danilo Luiz da Silva | 1 | 1 |
 | Danilo Luís Hélio Pereira | 1 | 1 |
 | David Martins Simão | 1 | 1 |
 | Diogo Gonçalves | 1 | 1 |
@@ -125,7 +125,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Hélder Postiga | 1 | 1 |
 | Jonathan Silva | 1 | 1 |
 | João Mário | 1 | 1 |
-| Judilson Mamadu Tuncará Gomes | 1 | 1 |
 | Júlio César Oliveira Martins | 1 | 1 |
 | Luisão | 1 | 1 |
 | Luís Pinto | 1 | 1 |
@@ -141,7 +140,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Renato Sanches | 1 | 1 |
 | Ricardo Costa | 1 | 1 |
 | Ricardo Quaresma | 1 | 1 |
-| Rodrigo Moreno Machado | 1 | 1 |
 | Rodrigo Pinho | 1 | 1 |
 | Romário Baldé | 1 | 1 |
 | Rui Daniel Morais Gomes | 1 | 1 |

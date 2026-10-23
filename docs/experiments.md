@@ -5579,3 +5579,28 @@ painel. Rever uma nova amostra de aceites da abordagem híbrida: **se
 continuar com muitos erros, a abordagem híbrida entra na tese como
 experiência com análise de erros (esta secção é parte dessa análise), não
 nos resultados principais** (decisão do autor, 2026-10-23).
+
+### Correção 1 no corpus de 125 artigos (comparação e regeneração dos oficiais, 2026-10-23)
+
+O Caminho B oficial (`corpus_entities --vocabulario
+data/processed/caminho_b_vocabulario_wikidata.csv`, c′) correu numa pasta
+temporária com e sem `--sem-regras-nomes`. Sem as regras, o CSV é **igual ao
+oficial anterior** (a tabela de clubes com os 38 slugs novos não muda nada
+neste corpus). Com as regras, mudam 4 linhas, **todas falsos positivos
+retirados**:
+
+| Artigo | Entidade | Antes → depois | Contexto no corpo |
+| --- | --- | --- | --- |
+| `…/danilo-nova-zelandia-tem-bons-argumentos…` | Danilo Luiz da Silva | 1 linha → retirada | "Danilo" é o Danilo Pereira, que continua contado pela forma completa |
+| `…/yahima-sente-se-vitima-de-xenofobia` | Judilson Mamadu Tuncará Gomes (variante "Pelé") | 1 linha → retirada | "cor de **pele**" |
+| `…/telma-monteiro-foi-7-no-grande-premio-de-zagreb` | Rodrigo Moreno Machado | 1 linha → retirada | "**Rodrigo** Lopes", judoca |
+| `…/zanga-de-joao-felix-com-pepe-ficou-no-relvado` | Pepe | 24 → 20 ocorrências (o artigo continua) | "pepe" em minúsculas na lista de temas |
+
+Nomes próprios comuns retirados pelo vocabulário: adilson, danilo, gustavo,
+rodrigo. Efeito nos oficiais: pares artigo–entidade 118 → 115 (regra fraca)
+e 112 → 109 (persistência); artigos com pelo menos uma entidade 60 → 58 e
+58 → 56; RDF 1 734 → 1 701 triplos, 82 → 79 entidades, 118 → 115 menções.
+Os oficiais (`output/corpus_entities.csv`, `_summary.md`,
+`corpus_entities.ttl`, `corpus_entities_rdf_summary.md`) foram regenerados
+com as regras; o resumo também traz o texto atual da explicação de
+`clube_coerente` (mudança de redação do código, sem efeito nos números).
