@@ -73,6 +73,10 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
 - `wikidata_candidates.py`: abordagem híbrida — confirma na Wikidata (nome
   exato, tipo, ligação a Portugal) os candidatos frequentes e escreve o
   vocabulário híbrido; rede (SPARQL), raw em `data/raw/wikidata/candidatos_<etiqueta>/`.
+- `corpus_completo.py`: corpus `completo` = `por_ano` + `xl` (extensão a 2010–2016,
+  `record.xl.pt`; plano em `docs/plano_extensao_xl_2010_2016.md`) — junta, sem rede
+  e sem alterar os dois corpora, os N-Triples, os CSV de capturas e a classificação,
+  com cada artigo uma vez (captura mais antiga).
 - `navigation_corpus.py` (+ `navigation_corpus_page.py`, a página): protótipo
   principal do corpus da Fase 1 — painel com filtros e entidades em
   `output/prototipo_<etiqueta>/`, a partir do N-Triples e das saídas
@@ -113,7 +117,9 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.api_diagnostics_site_volume` | Rede; 9 pedidos; grava raw e relatórios. |
 | `python -m semantic_harvester.corpus_phase1` | Rede; ~26 pedidos (Fase 1 do Caminho A); grava raw e relatórios. |
 | `python -m semantic_harvester.corpus_phase2` | Rede; ~159+ pedidos (Fase 2 do Caminho A, um artigo de cada vez); execução longa; retoma automaticamente se interrompida. |
-| `python -m semantic_harvester.corpus_classification` | Sem rede; lê os CSV das Fases 1–2 e classifica Artigo/redirecionamento (passo 6). |
+| `python -m semantic_harvester.corpus_classification [--label ETIQUETA] [--excluir-multimedia]` | Sem rede; lê os CSV das Fases 1–2 e classifica Artigo/redirecionamento (passo 6). `--excluir-multimedia` (usado no `xl`) tira `/multimedia/` e `/galerias/`. |
+| `python -m semantic_harvester.corpus_phase1 --rebuild-offline [--label ETIQUETA]` | Sem rede; refaz `output/corpus_phase1_<etiqueta>_*` a partir do raw em `data/raw/corpus_queries/<etiqueta>/` (por omissão `por_ano`; `xl` = descoberta de `record.xl.pt` 2010–2016, ligação simbólica para `lacuna_xl_2010_2016/`). |
+| `python -m semantic_harvester.corpus_completo` | Sem rede; junta `por_ano` e `xl` em `data/processed/corpus_articles_completo_triples.nt`, `output/corpus_phase1_completo_captures.csv` e `output/corpus_classification_completo.csv`; não altera os de origem. |
 | `python -m semantic_harvester.corpus_text_retry` | Rede (até 324 capturas, várias tentativas cada); resumível por captura; grava textos em `data/raw/texts/` e `output/corpus_text_retry_report.csv`. |
 | `python -m semantic_harvester.corpus_rdf --rebuild-offline [--check-only]` | Sem rede; reconstrói o grafo dos artigos retidos a partir do raw e da cache de textos, verifica e só então substitui os outputs. |
 | `python -m semantic_harvester.corpus_rdf` | Rede só para textos (~centenas de pedidos); lê o raw de version_history já preservado; grava `output/corpus_articles.ttl` e relatórios. |
