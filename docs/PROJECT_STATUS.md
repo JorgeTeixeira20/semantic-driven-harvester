@@ -282,6 +282,12 @@ principal é o do corpus alargado: painel numa só página com resumos
 reativos aos filtros, lista paginada, fichas de entidade e estado no
 endereço; lê o grafo em streaming, **sem SPARQL**, por causa do tamanho
 ("Protótipo principal para o corpus da Fase 1").
+Página da notícia (texto extraído com as entidades clicáveis, lista de
+entidades ao lado, ligação ao Arquivo.pt): **adiada para depois do rascunho
+da tese** (decisão do autor, 2026-10-24). Estudo feito: ~1–1,5 dias; um
+ficheiro de texto por notícia carregado a pedido (~126 mil ficheiros);
+entidades marcadas no texto pelos nomes já conhecidos da notícia, sem voltar
+a correr o `corpus_entities`.
 
 **Contributos sobre o Arquivo.pt.** Os "400 Bad Request" ao fim de muitos
 pedidos vinham do acumular de cookies das páginas antigas, reencaminhados
