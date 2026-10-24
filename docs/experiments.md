@@ -5833,3 +5833,181 @@ apanha. Por confirmar com o CDX do Arquivo.pt, contando capturas de
 `record.pt/*` e de `record.xl.pt/*` em 2010–2016. Até lá, a redação da tese
 deve dizer só que a ausência é da estratégia de pesquisa (TextSearch com
 `siteSearch=record.pt`), não do arquivo.
+
+**Atualização:** a hipótese confirmou-se; ver a secção seguinte (CDX e
+descoberta com `siteSearch=record.xl.pt`).
+
+## Lacuna de 2010–2016
+
+Consulta ao CDX do Arquivo.pt (2026-10-24), só leitura, sem alterar dados nem
+código. Objetivo: ver se há capturas de notícias do Record entre 2010 e 2016
+(nenhum Artigo do corpus alargado tem captura mais antiga nesse intervalo).
+
+**Método.** `https://arquivo.pt/wayback/cdx?url=<domínio>/*&from=<ano>&to=<ano+1>&limit=3000&output=json`,
+um pedido por domínio e ano (28 pedidos, 3 s de pausa). Contam-se as linhas
+devolvidas e, dentro delas, as de `status=200` e `mime` HTML.
+
+**Limites da consulta (leitura obrigatória).**
+- O CDX devolve por ordem de `urlkey` e o `limit` corta o resultado: com 3000
+  linhas, a contagem é só das **primeiras 3000 por ordem de URL**, não o total
+  do ano. As células com 3000 são, portanto, mínimos e podem esconder todos os
+  URLs que vêm depois (por exemplo `/futebol/...`).
+- `filter=status:200` fez o servidor ultrapassar o tempo (100 s) e `page` não
+  paginou, por isso não foi possível filtrar nem paginar no servidor.
+- `www.record.pt/*` e `record.pt/*` deram resultados idênticos (mesma chave
+  `pt,record)/`), tal como `www.record.xl.pt/*` e `record.xl.pt/*`; por isso a
+  tabela junta cada par.
+
+**Resultados** (linhas devolvidas / das quais 200 HTML; `≥` = limite atingido).
+
+| Ano | record.pt (= www) | record.xl.pt (= www) |
+| --- | --- | --- |
+| 2010 | ≥ 3000 / 0 (todas 301) | ≥ 3000 / 2235 |
+| 2011 | ≥ 3000 / 0 (todas 301) | ≥ 3000 / 1893 |
+| 2012 | 2438 / 0 (301 e 302) | ≥ 3000 / 1816 |
+| 2013 | 1716 / 0 (302) | ≥ 3000 / 2083 |
+| 2014 | 2745 / 0 (302) | ≥ 3000 / 1484 |
+| 2015 | 2698 / 0 (302 e 301) | ≥ 3000 / 738 |
+| 2016 | ≥ 3000 / 540 | ≥ 3000 / 378 |
+
+**URLs de exemplo.** Não se encontraram URLs que pareçam notícias do Record
+em nenhuma célula; o que existe é:
+- `record.pt` 2010–2015: só redirecionamentos (URLs curtos do tipo
+  `http://record.pt/680603`, 301/302), sem página 200.
+- `record.pt` 2016: as 540 capturas 200 são de 5 URLs distintos, todos a
+  página inicial (`http://www.record.pt/`, `https://www.record.pt/`,
+  `…//`, `…/?v1&v1`); 2065 linhas são 404.
+- `record.xl.pt` 2010: `http://www.record.xl.pt/1.15384615385`,
+  `…/2.14285714286`, `…/2.17647058824` (URLs numéricos de aspeto de
+  artefacto, não notícias).
+- `record.xl.pt` 2011: `…/2011/calendario/default.aspx`,
+  `…/2011/calendario/emdireto/default.aspx?id_game=25101&id_post=527496`,
+  `…/2011/calendario/vermais.aspx` (calendário/jogos em direto).
+- `record.xl.pt` 2012–2014: páginas `…/<GUID>/default.aspx`
+  (por exemplo `…/036a23bc-0fd7-4258-9a8e-3e2337bead54/default.aspx`) e
+  `…/2013/calendario/…`; não verificado se alguma GUID é uma notícia.
+- `record.xl.pt` 2015–2016: as capturas 200 são de 1–2 URLs distintos
+  (`http://www.record.xl.pt/`, `…/0.2.9`); o resto é 404 (2212 em 2015,
+  1897 em 2016) e 301.
+
+**Leitura.** Dentro da janela observada, `record.pt` não tem páginas 200
+antes de 2016 (só redirecionamentos) e `record.xl.pt` tem muitas capturas 200
+em 2010–2014 mas de calendário e páginas por GUID, não de notícias
+identificáveis; em 2015–2016 só a página inicial. Isto é consistente com a
+lacuna 2010–2016 do corpus, mas **não a prova**: a amostra são as primeiras
+3000 linhas por URL e um estudo completo exigiria prefixos de caminho mais
+estreitos (por exemplo `record.pt/futebol/*`) ou paginação que o CDX não
+ofereceu. Os URLs de exemplo da lista acima não foram abertos para confirmar
+o conteúdo.
+
+### Consulta por prefixos de caminho (2026-10-24, 14:49 → 14:52)
+
+Só leitura, sem recolher notícias nem alterar o corpus. CDX com
+`limit=500` por pedido (2010, 2012, 2014) e abertura de capturas no replay do
+Arquivo.pt para ver o conteúdo. **Aviso sobre `to`:** com `from=2010&to=2011` o
+CDX devolveu também capturas de 2011 (e `to=2014` capturas de 2015), por isso a
+janela por "ano" desta secção e da tabela anterior se estende ao ano seguinte;
+a contagem por ano de captura só está certa onde se diz que foi separada pelo
+`timestamp`.
+
+| Caso | Notícias? | Contagem (URLs distintos entre as linhas 200) | Exemplos |
+| --- | --- | --- | --- |
+| `record.xl.pt/Futebol/*` | **Não** (páginas de secção/hub) | 18 (2010), 14 (2012), 8 (2014), de 500 linhas cada (limite atingido) | `…/Futebol/Arbitragem/apito_dourado/default.aspx`, `…/futebol/arbitragem/default.aspx`, `…/futebol/arbitragem.html` |
+| `record.xl.pt/Modalidades/*` | **Não** (hubs) | 31 (2010), 14 (2012), 7 (2014), de 500 linhas cada | `…/modalidades/andebol/default.aspx`, `…/modalidades/andebol.html`, `…/modalidades/0.0` |
+| `record.xl.pt/interior.aspx*` (`content_id`) | **Sim** | ver abaixo | `…/interior.aspx?content_id=128957`, `…/interior.aspx?content_id=129150`, `…/interior.aspx?content_id=258215` |
+| `record.pt/interior.aspx*` e `record.xl.pt/*content_id*` | inconclusivo | pedidos sem resposta no tempo (75 s), 0 linhas | — |
+
+**`interior.aspx?content_id=` é o site antigo do Record e tem notícias em
+2010–2014.** Pedido único `from=2010&to=2016`, `limit=5000` (640 linhas, abaixo
+do limite, logo completo para esse prefixo), só linhas 200, por ano do
+`timestamp`:
+
+| Ano de captura | Capturas 200 | URLs distintos |
+| --- | --- | --- |
+| 2010 | 346 | 319 |
+| 2011 | 165 | 63 |
+| 2012 | 71 | 13 |
+| 2013 | 45 | 34 |
+| 2014 | 5 | 5 |
+| 2015 | 3 | 1 |
+
+Abri 3 capturas (replay): `20100809211242 …content_id=128957` (título "César
+Peixoto: «Era neste clube que queria jogar»"), `20120127041247
+…content_id=129150` ("César Peixoto: «Estou aqui com orgulho»") e
+`20141023022410 …content_id=258215` ("Dos Santos: «Podia ter tido mais
+oportunidades»"): três notícias, com menu e rodapé do site. Em 2010 há centenas
+de notícias capturadas, que cai para dezenas em 2011–2013 e quase nada em 2014.
+Este esquema de URL (`interior.aspx?content_id=`) é o do site antigo já
+tratado no corpus (campo "épocas do site" do painel); os números acima são só
+deste prefixo no domínio `record.xl.pt`, sem confirmar quantas destas notícias
+o corpus já tem.
+
+**URLs com GUID.** Nas 3000 primeiras linhas de `record.xl.pt/*` de 2010 há 0
+URLs com GUID (417 numéricos tipo `/1.0`, 1818 outros: calendário, página
+inicial). Os GUID aparecem em 2012–2013; abri 3 de 2013
+(`…/036a23bc-0fd7-4258-9a8e-3e2337bead54/default.aspx`, `…/04931a92-…`,
+`…/087b5312-…`): são a **capa do jornal do dia** ("Jornal Record", edição de 13
+de setembro, 17 de agosto, 22 de setembro de 2013; `NewsGen/Edição/RECORD/Jornal
+Record/Capas`), não notícias.
+
+**Conclusão parcial.** A lacuna 2010–2016 do corpus não é falta de notícias no
+arquivo: `record.xl.pt/interior.aspx?content_id=` tem notícias capturadas em
+2010–2014 (com maior peso em 2010). Falta medir em que medida o corpus as
+cobre; ver a medição seguinte.
+
+### Descoberta da Fase 1 com `siteSearch=record.xl.pt`, 2010–2016 (2026-10-24)
+
+Medição **sem recolha**: só a pesquisa TextSearch; não se descarregou texto nem
+HTML e o corpus não foi tocado. Mesmos 108 termos de `corpus_phase1.TERMS`
+(39 modalidades, 57 clubes, 5 atletas, 7 competições), mesma divisão por ano
+(`year_bounds`, 6 páginas de 50 por termo e ano, sem `next_page`), sem
+repetições, mas com `SITE_SEARCH="record.xl.pt"` e anos 2010–2016. Corrida por
+um script fora do repositório (`collect_term_year` com a constante trocada);
+raw em `data/raw/corpus_queries/lacuna_xl_2010_2016/` (4 192 ficheiros, fora do
+Git), 5 940 s (~99 min), sem erros. 200 509 itens recebidos; todos de
+`record.xl.pt`.
+
+**Teto.** 94, 74, 75, 91, 87, 91 e 100 dos 108 termos (2010 → 2016) chegaram às
+300 respostas (o máximo de 6 páginas), por isso **os números por ano são
+mínimos**, não o total publicado.
+
+**"Cara de notícia"** (heurística de URL, não verificada abrindo as páginas;
+as de 2010–2014 já tinham sido confirmadas em 3 aberturas, acima): `interior.aspx`
+ou `interior_premium.aspx` com `content_id`; `noticia.aspx?id=`; e
+`/detalhe/<slug>.html`. Excluídos: `multimedia/`, `galerias/`, `api/`,
+`imprimir.asp`, `tag.aspx`, `canal.aspx`, `emdireto/`, `jed/`, `jogo_vida/` e
+todo o resto (hubs, jogadores, etc.).
+
+| Ano | `originalURL` distintos | Com cara de notícia | % | Forma do URL |
+| --- | --- | --- | --- | --- |
+| 2010 | 19 227 | 13 713 | 71 | `interior.aspx?content_id=` 8 006; `noticia.aspx?id=` 5 707 |
+| 2011 | 14 699 | 9 121 | 62 | `interior.aspx?content_id=` |
+| 2012 | 12 916 | 6 364 | 49 | `interior.aspx?content_id=` |
+| 2013 | 14 980 | 9 640 | 64 | `interior.aspx?content_id=` |
+| 2014 | 14 045 | 8 593 | 61 | `interior.aspx?content_id=` |
+| 2015 | 15 976 | 9 594 | 60 | `interior*.aspx` 4 245; `/detalhe/…html` 5 349 |
+| 2016 | 17 074 | 11 647 | 68 | `/detalhe/…html` |
+
+União: 103 178 `originalURL` distintos, **66 696 com cara de notícia**. Um mesmo
+`content_id` pode ter mais de um URL (os `content_id` distintos são ligeiramente
+menos que os URLs: por exemplo 12 824 em 2010 para o `interior`/`noticia`), e o
+mesmo URL pode aparecer em vários anos; não se deduplicou entre anos nem se
+comparou com o corpus atual.
+
+**Exemplos** (um por forma de URL):
+- 2010: `https://record.xl.pt/futebol/nacional/liga_honra/belenenses/interior.aspx?content_id=462145`;
+  `https://record.xl.pt/noticia.aspx?id=7fff5ec1-bd5c-41d9-99d1-7ad1d227d5dc&idcanal=00002477-0000-0000-0000-000000002477`
+- 2013: `https://record.xl.pt/futebol/nacional/futebol_praia/interior.aspx?content_id=843716`
+- 2015: `https://record.xl.pt/futebol/nacional/1a-liga/sporting/detalhe/processo-a-carrillo-pode-ser-arquivado-988041.html`
+- 2016: `https://record.xl.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/luis-ribeiro-de-regresso-ao-sporting.html`
+
+**Conclusão.** A lacuna de 2010–2016 do corpus é de **cobertura da pesquisa, não
+de falta de notícias no Arquivo.pt**: o corpus usa `siteSearch=record.pt` e o
+Record publicava nesses anos em `record.xl.pt`. Com `record.xl.pt` aparecem, só
+nesta descoberta e com teto, dezenas de milhares de URLs de aspeto de notícia em
+cada ano. As ressalvas: a heurística é só de URL (inclui artigos Premium, que o
+corpo extraído pode não ter), os números são mínimos por causa do teto, e a
+passagem de `record.pt` para `/detalhe/` mostra três esquemas de URL
+(`interior.aspx`, `noticia.aspx`, `/detalhe/`), todos já previstos no extrator
+do corpo. Decidir se se alarga o corpus a estes anos é do autor: esta medição
+não o faz.
