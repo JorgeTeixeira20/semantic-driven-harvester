@@ -6148,9 +6148,10 @@ AJAX, `premium_article_box.aspx`, classe `centercontentPremium`); as três
 classes passam a `PREMIUM_CLASSES`, e o artigo Premium fica sem corpo, como
 no `por_ano`. 4 testes novos (HTML sintético dos três templates e do Premium).
 
-Resultado sobre os mesmos ~3 000 artigos (1 405 `interior.aspx` normais e 325
-Premium): **corpo em 1 241 de 1 405 normais (88 %)** e **325 de 325 Premium
-marcados como Premium** (antes 116 sem marca). Os 164 normais sem corpo: 92 de
+Resultado sobre os mesmos ~3 000 artigos (1 560 `interior.aspx` normais e 316
+Premium com HTML): **corpo em 1 396 de 1 560 normais (89,5 %)** e **316 de 316
+Premium marcados como Premium** (116 dos quais, de 2014–2015, sem marca antes
+de `centercontentPremium`). Os 164 normais sem corpo: 92 de
 `fora_campo/cine_estreias` e `cine_record` (fichas de filmes, outro template),
 31 `fora_campo`, 26 `entrevistas` e 15 outros; ficam registados como
 limitação, sem terceira iteração. Validação à mão em 21 artigos de 2010 a 2015
