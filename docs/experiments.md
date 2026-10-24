@@ -5758,3 +5758,78 @@ Ajuste pedido pelo autor (2026-10-23): o gráfico de notícias por ano volta a
 estar sempre visível, entre a barra de filtros e os separadores (clicar num
 ano filtra; clicar de novo retira o filtro). Os dois campos de pesquisa
 (título e entidade) ficam separados, por decisão do autor, por agora.
+
+## Trabalho relacionado: Politiquices (Prémio Arquivo.pt 2021) (registo de 2026-10-24)
+
+Projeto de David S. Batista, 2.º prémio do Prémio Arquivo.pt 2021 (3 000 €).
+Analisa **títulos** de notícias preservadas no Arquivo.pt (e do Público) para
+extrair relações de apoio e oposição entre personalidades políticas; cada
+personalidade é ligada à sua entrada na Wikidata, que acrescenta partido,
+cargos e fotografia. O grafo de relações está publicado em dados.gov.pt
+(CC BY 4.0).
+
+Referência (formato do autor):
+
+```
+politiquices2021:
+  type: Web
+  title: "Prémio Arquivo.pt 2021 elegeu os vencedores"
+  author:
+    - name: "Fundação para a Ciência e a Tecnologia"
+  date: 2021-06-28
+  url: "https://www.fct.pt/media/noticias/premio-arquivo-pt-2021-elegeu-os-vencedores"
+```
+
+**Verificado no código público** (`github.com/politiquices/webapp`; o README de
+`github.com/davidsbatista/politiquices` remete para a organização):
+
+- uma cópia local de uma **parte da Wikidata** (`wikidata_org.ttl`) e o grafo
+  do projeto (`politiquices.ttl`) servidos num **servidor SPARQL (Fuseki)**; a
+  aplicação web (Flask) faz consultas SPARQL ao vivo, filtrando por ser humano
+  (`wdt:P31 wd:Q5`) e por partido (`wdt:P102`);
+- uma **tabela manual QID → nome usado na imprensa**
+  (`shorter_names_mapping.json`: Q57398 → "Cavaco Silva", Q57615 → "Passos
+  Coelho", Q15849 → "Durão Barroso"…), porque o rótulo da Wikidata é o nome
+  completo e os títulos usam o nome curto.
+
+**Não verificado** (o código da extração não está nos repositórios
+consultados; o site, o arquivo.pt e a FCT não estavam acessíveis desta
+sessão): o reconhecimento das pessoas no título, a procura de candidatos num
+índice só de políticos e a expansão de apelidos pelo texto da notícia. Não
+citar sem confirmar no artigo ou na apresentação do autor (vídeos do Prémio e
+do "Café com o Arquivo.pt", 22.ª sessão).
+
+**Relação com este trabalho:**
+
+- mesmo princípio de **lista fechada tirada da Wikidata** (o vocabulário do
+  Caminho B); os dois projetos chegam à mesma solução para limitar erros de
+  ligação;
+- escolha diferente na consulta: o Politiquices usa **servidor SPARQL** ao vivo;
+  o painel do corpus alargado usa uma **vista estática pré-calculada** do grafo,
+  sem servidor ("Protótipo principal para o corpus da Fase 1"), e o protótipo de
+  125 artigos usa SPARQL em memória;
+- **trabalho futuro** sugerido por ele: (1) tabela manual dos nomes usados pela
+  imprensa para as 100–200 pessoas mais mencionadas ("Pauleta", "Jardel"),
+  complementar às variantes da Wikidata; (2) expandir menções curtas pelo nome
+  completo no mesmo texto ("Rafa" → "Rafa Silva"), que também ajudaria a
+  escolher entre homónimos (hoje sem QID).
+
+## Lacuna de 2010–2016: o que está provado e o que falta (registo de 2026-10-24)
+
+**Provado** (secções "Teste de blocos temporais" e "Fase 1 ano a ano"): com
+`siteSearch=record.pt`, o índice da **TextSearch** quase não devolve capturas
+de 2011–2016 (365 em 6 anos para 108 termos, 324 delas em 2015; sondas com
+datas de 14 dígitos deram 0 para Benfica e V. Guimarães). Não é efeito do
+teto de páginas nem da forma de pedir.
+
+**Não provado:** que o Arquivo.pt não tenha notícias do Record nesse período.
+Nunca se consultou o índice de capturas (CDX), que lista o que está guardado
+independentemente da pesquisa de texto.
+
+**Hipótese a verificar:** nesse período o Record pode ter publicado num
+domínio diferente (por exemplo `record.xl.pt`, como outros títulos do mesmo
+grupo, como o `cmjornal.xl.pt`), que a pesquisa com `siteSearch=record.pt` não
+apanha. Por confirmar com o CDX do Arquivo.pt, contando capturas de
+`record.pt/*` e de `record.xl.pt/*` em 2010–2016. Até lá, a redação da tese
+deve dizer só que a ausência é da estratégia de pesquisa (TextSearch com
+`siteSearch=record.pt`), não do arquivo.
