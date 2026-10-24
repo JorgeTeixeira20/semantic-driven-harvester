@@ -5758,3 +5758,66 @@ Ajuste pedido pelo autor (2026-10-23): o gráfico de notícias por ano volta a
 estar sempre visível, entre a barra de filtros e os separadores (clicar num
 ano filtra; clicar de novo retira o filtro). Os dois campos de pesquisa
 (título e entidade) ficam separados, por decisão do autor, por agora.
+
+## Lacuna de 2010–2016
+
+Consulta ao CDX do Arquivo.pt (2026-10-24), só leitura, sem alterar dados nem
+código. Objetivo: ver se há capturas de notícias do Record entre 2010 e 2016
+(nenhum Artigo do corpus alargado tem captura mais antiga nesse intervalo).
+
+**Método.** `https://arquivo.pt/wayback/cdx?url=<domínio>/*&from=<ano>&to=<ano+1>&limit=3000&output=json`,
+um pedido por domínio e ano (28 pedidos, 3 s de pausa). Contam-se as linhas
+devolvidas e, dentro delas, as de `status=200` e `mime` HTML.
+
+**Limites da consulta (leitura obrigatória).**
+- O CDX devolve por ordem de `urlkey` e o `limit` corta o resultado: com 3000
+  linhas, a contagem é só das **primeiras 3000 por ordem de URL**, não o total
+  do ano. As células com 3000 são, portanto, mínimos e podem esconder todos os
+  URLs que vêm depois (por exemplo `/futebol/...`).
+- `filter=status:200` fez o servidor ultrapassar o tempo (100 s) e `page` não
+  paginou, por isso não foi possível filtrar nem paginar no servidor.
+- `www.record.pt/*` e `record.pt/*` deram resultados idênticos (mesma chave
+  `pt,record)/`), tal como `www.record.xl.pt/*` e `record.xl.pt/*`; por isso a
+  tabela junta cada par.
+
+**Resultados** (linhas devolvidas / das quais 200 HTML; `≥` = limite atingido).
+
+| Ano | record.pt (= www) | record.xl.pt (= www) |
+| --- | --- | --- |
+| 2010 | ≥ 3000 / 0 (todas 301) | ≥ 3000 / 2235 |
+| 2011 | ≥ 3000 / 0 (todas 301) | ≥ 3000 / 1893 |
+| 2012 | 2438 / 0 (301 e 302) | ≥ 3000 / 1816 |
+| 2013 | 1716 / 0 (302) | ≥ 3000 / 2083 |
+| 2014 | 2745 / 0 (302) | ≥ 3000 / 1484 |
+| 2015 | 2698 / 0 (302 e 301) | ≥ 3000 / 738 |
+| 2016 | ≥ 3000 / 540 | ≥ 3000 / 378 |
+
+**URLs de exemplo.** Não se encontraram URLs que pareçam notícias do Record
+em nenhuma célula; o que existe é:
+- `record.pt` 2010–2015: só redirecionamentos (URLs curtos do tipo
+  `http://record.pt/680603`, 301/302), sem página 200.
+- `record.pt` 2016: as 540 capturas 200 são de 5 URLs distintos, todos a
+  página inicial (`http://www.record.pt/`, `https://www.record.pt/`,
+  `…//`, `…/?v1&v1`); 2065 linhas são 404.
+- `record.xl.pt` 2010: `http://www.record.xl.pt/1.15384615385`,
+  `…/2.14285714286`, `…/2.17647058824` (URLs numéricos de aspeto de
+  artefacto, não notícias).
+- `record.xl.pt` 2011: `…/2011/calendario/default.aspx`,
+  `…/2011/calendario/emdireto/default.aspx?id_game=25101&id_post=527496`,
+  `…/2011/calendario/vermais.aspx` (calendário/jogos em direto).
+- `record.xl.pt` 2012–2014: páginas `…/<GUID>/default.aspx`
+  (por exemplo `…/036a23bc-0fd7-4258-9a8e-3e2337bead54/default.aspx`) e
+  `…/2013/calendario/…`; não verificado se alguma GUID é uma notícia.
+- `record.xl.pt` 2015–2016: as capturas 200 são de 1–2 URLs distintos
+  (`http://www.record.xl.pt/`, `…/0.2.9`); o resto é 404 (2212 em 2015,
+  1897 em 2016) e 301.
+
+**Leitura.** Dentro da janela observada, `record.pt` não tem páginas 200
+antes de 2016 (só redirecionamentos) e `record.xl.pt` tem muitas capturas 200
+em 2010–2014 mas de calendário e páginas por GUID, não de notícias
+identificáveis; em 2015–2016 só a página inicial. Isto é consistente com a
+lacuna 2010–2016 do corpus, mas **não a prova**: a amostra são as primeiras
+3000 linhas por URL e um estudo completo exigiria prefixos de caminho mais
+estreitos (por exemplo `record.pt/futebol/*`) ou paginação que o CDX não
+ofereceu. Os URLs de exemplo da lista acima não foram abertos para confirmar
+o conteúdo.
