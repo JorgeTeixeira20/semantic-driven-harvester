@@ -5876,3 +5876,60 @@ Record/Capas`), não notícias.
 arquivo: `record.xl.pt/interior.aspx?content_id=` tem notícias capturadas em
 2010–2014 (com maior peso em 2010). Falta medir em que medida o corpus as
 cobre; ver a medição seguinte.
+
+### Descoberta da Fase 1 com `siteSearch=record.xl.pt`, 2010–2016 (2026-10-24)
+
+Medição **sem recolha**: só a pesquisa TextSearch; não se descarregou texto nem
+HTML e o corpus não foi tocado. Mesmos 108 termos de `corpus_phase1.TERMS`
+(39 modalidades, 57 clubes, 5 atletas, 7 competições), mesma divisão por ano
+(`year_bounds`, 6 páginas de 50 por termo e ano, sem `next_page`), sem
+repetições, mas com `SITE_SEARCH="record.xl.pt"` e anos 2010–2016. Corrida por
+um script fora do repositório (`collect_term_year` com a constante trocada);
+raw em `data/raw/corpus_queries/lacuna_xl_2010_2016/` (4 192 ficheiros, fora do
+Git), 5 940 s (~99 min), sem erros. 200 509 itens recebidos; todos de
+`record.xl.pt`.
+
+**Teto.** 94, 74, 75, 91, 87, 91 e 100 dos 108 termos (2010 → 2016) chegaram às
+300 respostas (o máximo de 6 páginas), por isso **os números por ano são
+mínimos**, não o total publicado.
+
+**"Cara de notícia"** (heurística de URL, não verificada abrindo as páginas;
+as de 2010–2014 já tinham sido confirmadas em 3 aberturas, acima): `interior.aspx`
+ou `interior_premium.aspx` com `content_id`; `noticia.aspx?id=`; e
+`/detalhe/<slug>.html`. Excluídos: `multimedia/`, `galerias/`, `api/`,
+`imprimir.asp`, `tag.aspx`, `canal.aspx`, `emdireto/`, `jed/`, `jogo_vida/` e
+todo o resto (hubs, jogadores, etc.).
+
+| Ano | `originalURL` distintos | Com cara de notícia | % | Forma do URL |
+| --- | --- | --- | --- | --- |
+| 2010 | 19 227 | 13 713 | 71 | `interior.aspx?content_id=` 8 006; `noticia.aspx?id=` 5 707 |
+| 2011 | 14 699 | 9 121 | 62 | `interior.aspx?content_id=` |
+| 2012 | 12 916 | 6 364 | 49 | `interior.aspx?content_id=` |
+| 2013 | 14 980 | 9 640 | 64 | `interior.aspx?content_id=` |
+| 2014 | 14 045 | 8 593 | 61 | `interior.aspx?content_id=` |
+| 2015 | 15 976 | 9 594 | 60 | `interior*.aspx` 4 245; `/detalhe/…html` 5 349 |
+| 2016 | 17 074 | 11 647 | 68 | `/detalhe/…html` |
+
+União: 103 178 `originalURL` distintos, **66 696 com cara de notícia**. Um mesmo
+`content_id` pode ter mais de um URL (os `content_id` distintos são ligeiramente
+menos que os URLs: por exemplo 12 824 em 2010 para o `interior`/`noticia`), e o
+mesmo URL pode aparecer em vários anos; não se deduplicou entre anos nem se
+comparou com o corpus atual.
+
+**Exemplos** (um por forma de URL):
+- 2010: `https://record.xl.pt/futebol/nacional/liga_honra/belenenses/interior.aspx?content_id=462145`;
+  `https://record.xl.pt/noticia.aspx?id=7fff5ec1-bd5c-41d9-99d1-7ad1d227d5dc&idcanal=00002477-0000-0000-0000-000000002477`
+- 2013: `https://record.xl.pt/futebol/nacional/futebol_praia/interior.aspx?content_id=843716`
+- 2015: `https://record.xl.pt/futebol/nacional/1a-liga/sporting/detalhe/processo-a-carrillo-pode-ser-arquivado-988041.html`
+- 2016: `https://record.xl.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/luis-ribeiro-de-regresso-ao-sporting.html`
+
+**Conclusão.** A lacuna de 2010–2016 do corpus é de **cobertura da pesquisa, não
+de falta de notícias no Arquivo.pt**: o corpus usa `siteSearch=record.pt` e o
+Record publicava nesses anos em `record.xl.pt`. Com `record.xl.pt` aparecem, só
+nesta descoberta e com teto, dezenas de milhares de URLs de aspeto de notícia em
+cada ano. As ressalvas: a heurística é só de URL (inclui artigos Premium, que o
+corpo extraído pode não ter), os números são mínimos por causa do teto, e a
+passagem de `record.pt` para `/detalhe/` mostra três esquemas de URL
+(`interior.aspx`, `noticia.aspx`, `/detalhe/`), todos já previstos no extrator
+do corpo. Decidir se se alarga o corpus a estes anos é do autor: esta medição
+não o faz.
