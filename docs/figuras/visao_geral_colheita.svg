@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="958" viewBox="0 0 820 958">
+<rect width="820" height="958" fill="#FFFFFF"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#8A8A8A"/></marker></defs>
+<text x="360.0" y="48" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#222">Visão geral do processo de colheita</text>
+<text x="360.0" y="74" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" fill="#6B6B6B">Esquema conceptual simplificado</text>
+<rect x="80" y="110" width="560" height="62" rx="10" fill="#EEF3FA" stroke="#B9CBE4" stroke-width="1.4"/>
+<circle cx="114" cy="141.0" r="15" fill="#4A6FA5"/>
+<text x="114" y="146.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">1</text>
+<text x="146" y="137" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Pesquisa no Arquivo.pt</text>
+<text x="146" y="156" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#5E5E5E">API de pesquisa de texto</text>
+<line x1="360.0" y1="175" x2="360.0" y2="197" stroke="#8A8A8A" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="80" y="202" width="560" height="62" rx="10" fill="#EEF3FA" stroke="#B9CBE4" stroke-width="1.4"/>
+<circle cx="114" cy="233.0" r="15" fill="#4A6FA5"/>
+<text x="114" y="238.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">2</text>
+<text x="146" y="239.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Recolha e armazenamento dos resultados</text>
+<line x1="360.0" y1="267" x2="360.0" y2="289" stroke="#8A8A8A" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="80" y="294" width="560" height="62" rx="10" fill="#EEF6F0" stroke="#B8D8C1" stroke-width="1.4"/>
+<circle cx="114" cy="325.0" r="15" fill="#4E8A5F"/>
+<text x="114" y="330.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">3</text>
+<text x="146" y="321" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Normalização dos URLs</text>
+<text x="146" y="340" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#5E5E5E">identificação de recursos equivalentes</text>
+<line x1="360.0" y1="359" x2="360.0" y2="381" stroke="#8A8A8A" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="80" y="386" width="560" height="62" rx="10" fill="#EEF6F0" stroke="#B8D8C1" stroke-width="1.4"/>
+<circle cx="114" cy="417.0" r="15" fill="#4E8A5F"/>
+<text x="114" y="422.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">4</text>
+<text x="146" y="413" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Consolidação dos resultados</text>
+<text x="146" y="432" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#5E5E5E">agregação de recursos de diferentes pesquisas</text>
+<line x1="360.0" y1="451" x2="360.0" y2="473" stroke="#8A8A8A" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="80" y="478" width="560" height="62" rx="10" fill="#EEF6F0" stroke="#B8D8C1" stroke-width="1.4"/>
+<circle cx="114" cy="509.0" r="15" fill="#4E8A5F"/>
+<text x="114" y="514.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">5</text>
+<text x="146" y="505" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Classificação dos recursos</text>
+<text x="146" y="524" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#5E5E5E">artigos jornalísticos vs. outras páginas</text>
+<line x1="360.0" y1="543" x2="360.0" y2="565" stroke="#8A8A8A" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="80" y="570" width="560" height="62" rx="10" fill="#FBF4E8" stroke="#E6CFA3" stroke-width="1.4"/>
+<circle cx="114" cy="601.0" r="15" fill="#A9772E"/>
+<text x="114" y="606.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">6</text>
+<text x="146" y="597" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Recuperação dos conteúdos</text>
+<text x="146" y="616" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#5E5E5E">texto extraído e HTML arquivado</text>
+<line x1="360.0" y1="635" x2="360.0" y2="657" stroke="#8A8A8A" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="80" y="662" width="560" height="62" rx="10" fill="#FBF4E8" stroke="#E6CFA3" stroke-width="1.4"/>
+<circle cx="114" cy="693.0" r="15" fill="#A9772E"/>
+<text x="114" y="698.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">7</text>
+<text x="146" y="689" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Identificação do corpo editorial</text>
+<text x="146" y="708" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#5E5E5E">exclusão de menus, publicidade e elementos auxiliares</text>
+<line x1="360.0" y1="727" x2="360.0" y2="749" stroke="#8A8A8A" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="80" y="754" width="560" height="62" rx="10" fill="#FBF4E8" stroke="#E6CFA3" stroke-width="1.4"/>
+<circle cx="114" cy="785.0" r="15" fill="#A9772E"/>
+<text x="114" y="790.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">8</text>
+<text x="146" y="791.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Dados preparados para representação semântica</text>
+<line x1="360.0" y1="819" x2="360.0" y2="841" stroke="#8A8A8A" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="80" y="846" width="560" height="62" rx="10" fill="#F3EFF8" stroke="#CDBFE0" stroke-width="1.4" stroke-dasharray="5 4"/>
+<circle cx="114" cy="877.0" r="15" fill="#6F5A9A"/>
+<text x="114" y="882.0" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#FFF">9</text>
+<text x="146" y="873" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#222">Representação semântica</text>
+<text x="146" y="892" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#5E5E5E">apresentada no capítulo seguinte</text>
+<path d="M656,116 H662 V258 H656" fill="none" stroke="#B9CBE4" stroke-width="2"/>
+<text x="674" y="192.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#4A6FA5">Descoberta</text>
+<path d="M656,300 H662 V534 H656" fill="none" stroke="#B8D8C1" stroke-width="2"/>
+<text x="674" y="422.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#4E8A5F">Consolidação</text>
+<path d="M656,576 H662 V810 H656" fill="none" stroke="#E6CFA3" stroke-width="2"/>
+<text x="674" y="698.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#A9772E">Conteúdo</text>
+<path d="M656,852 H662 V902 H656" fill="none" stroke="#CDBFE0" stroke-width="2"/>
+<text x="674" y="882.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#6F5A9A">Semântica</text>
+</svg>
