@@ -6011,3 +6011,109 @@ passagem de `record.pt` para `/detalhe/` mostra três esquemas de URL
 (`interior.aspx`, `noticia.aspx`, `/detalhe/`), todos já previstos no extrator
 do corpo. Decidir se se alarga o corpus a estes anos é do autor: esta medição
 não o faz.
+
+## Extensão do corpus a 2010–2016 (`record.xl.pt`)
+
+Execução do plano `docs/plano_extensao_xl_2010_2016.md` (2026-10-24, sessão
+local macOS, Python 3.12). Os números do corpus `por_ano` continuam a ser os
+oficiais; esta extensão produz as etiquetas novas `xl` (só `record.xl.pt`
+2010–2016) e `completo` (`por_ano` + `xl`). Nada do `por_ano` é alterado.
+
+**Passo 0.** Início 17:08. Suite antes de começar: 350 testes OK.
+
+### Passo 1 — Descoberta (sem pedidos novos)
+
+Reutiliza o raw da medição ("Descoberta da Fase 1 com `siteSearch=record.xl.pt`",
+4 192 ficheiros em `data/raw/corpus_queries/lacuna_xl_2010_2016/`). Para o
+`corpus_rdf` e o painel o encontrarem pela etiqueta, `data/raw/corpus_queries/xl`
+é uma ligação simbólica para essa pasta (o raw não é copiado nem alterado).
+`corpus_phase1` ganhou `--label` (só com `--rebuild-offline`; teste novo):
+
+```
+python -m semantic_harvester.corpus_phase1 --rebuild-offline --label xl
+```
+
+Resultado (4 s): 156 569 capturas únicas, 103 178 `originalURL` exatos,
+**103 101 recursos** depois de juntar 77 variantes. Ficheiros (não
+versionados): `output/corpus_phase1_xl_captures.csv` (31 MB),
+`..._per_term.csv`, `..._aggregation.md` (2,7 MB).
+
+### Passo 2 — Identidade dos URLs entre `record.pt` e `record.xl.pt`
+
+`url_identity.same_site_host()`: `record.pt`, `www.record.pt`, `record.xl.pt` e
+`www.record.xl.pt` contam como o mesmo host em `normalize_for_grouping()` e em
+`corpus_classification.canonical_key()` (os outros subdomínios, como
+`liga.record.pt`, não; caminhos diferentes continuam diferentes). Só serve para
+comparar: os identificadores (SHA-256) continuam a vir do `originalURL`
+canónico. 3 testes novos (`SameSiteHostTests`).
+
+**O `por_ano` não muda.** `classify_corpus()` sobre
+`output/corpus_phase1_por_ano_captures.csv`, em memória, dá 164 373 linhas
+**iguais às oficiais** de `output/corpus_classification_por_ano.csv` (os hosts do
+`por_ano` são `record.pt` e subdomínios; nenhum `www.` nem `record.xl.pt`).
+Por isso a alteração aplica-se sem opção nova. Repetido depois de cada
+alteração à classificação (passo 3).
+
+### Passo 3 — Classificação do `xl`
+
+Esquemas de URL novos em `ARTICLE_URL_SCHEMES`:
+`interior_premium.aspx?content_id` (artigo Premium de 2012–2015; fica sem corpo,
+como o Premium do site atual) e `interior*.aspx` deixa de ser Artigo nas
+secções `/multimedia/` e `/galerias/` (galerias de fotos/vídeos/infografias).
+Os esquemas `interior.aspx?content_id`, `noticia.aspx?id` e `/detalhe/` já
+existiam. Calendários, jogos em direto, GUID, capas, `imprimir.asp`, `tag.aspx`
+e os URLs numéricos ficam fora (não seguem nenhum esquema). `python -m
+semantic_harvester.corpus_classification --label xl --excluir-multimedia`.
+
+**Amostra de validação** (140 páginas arquivadas abertas no replay; 20 por ano
+da captura mais antiga, semente 20261024, sorteio entre os Artigos): **136
+certas (97,1 %)**. Por ano: 2010–2014 20/20 em cada; 2015 19/20; 2016 17/20.
+As 4 erradas são páginas `/multimedia/…/detalhe/` (3 vídeos e 1 fotogaleria,
+2015–2016) que a regra `/detalhe/` aceitava. **Decisão (regra 4, a mais
+conservadora):** nova opção `--excluir-multimedia`, ligada só para `xl` (o
+`por_ano` fica como está; as páginas `/multimedia/…/detalhe/` do `por_ano`
+continuam Artigos). As 4 passam a excluídas; as 136 restantes estavam todas
+certas, sem repetir a amostra. A precisão só mede os Artigos retidos; a
+revocação (artigos legítimos excluídos) não foi medida. Notas: os Artigos de
+`jogo_vida/` e `fora_campo/` (cultura, celebridades) ficam como Artigos (são
+texto editorial do jornal, mas fora do desporto); as páginas Premium são
+Artigos sem corpo.
+
+Resultado (`output/corpus_classification_xl_summary.md`): 103 101 recursos,
+**72 044 Artigos**; excluídos: `/sabermais/` 444, URL fora dos esquemas
+16 141, vídeos/fotogalerias 14 472.
+
+| Esquema | Artigos (antes de `--excluir-multimedia`) |
+| --- | ---: |
+| `interior.aspx?content_id` | 42 122 |
+| `/detalhe/` | 21 683 |
+| `noticia.aspx?id` | 5 568 |
+| `interior_premium.aspx?content_id` | 4 980 |
+
+Por ano da captura mais antiga (74 353 Artigos antes da exclusão):
+2010 14 080; 2011 9 323; 2012 6 803; 2013 9 612; 2014 8 634; 2015 10 775;
+2016 15 126.
+
+**Sobreposição com o `por_ano`:** 1 078 artigos estão nos dois corpora (mesma
+chave de agrupamento), 926 com a captura mais antiga no `xl` (o `por_ano` só
+apanhou uma posterior, de 2017–2018) e 152 com a mais antiga no `por_ano`. Em
+`completo` ficam uma vez, com a mais antiga (passo 6).
+
+### Passo 6 (parte) — Época do site no painel
+
+`navigation_corpus.ERAS`: "2000–2009" → **"2000–2015 (ASP.NET)"** (agora inclui
+`interior.aspx`/`interior_premium.aspx`/`noticia.aspx` de 2010–2015) e
+"2017–2024" → **"2015–2024"** (`/detalhe/` desde 2015 no `xl`). Os rótulos
+da página mudam em conformidade ("Site de 2000 a 2015 (ASP.NET)", "Site atual
+(2015–2024)"). Altera só o rótulo do painel do `por_ano`, se for regenerado;
+nenhum dado muda. Testes: `test_era_from_url_scheme` alargado.
+
+### Passo 4 — Recuperação dos conteúdos (em curso)
+
+`nohup caffeinate -i python -m semantic_harvester.corpus_rdf --fase1 xl >
+output/rdf_xl.log`, início 2026-10-24 17:17, 72 044 Artigos, uma captura por
+artigo (a mais antiga), 1 pedido por segundo (a mesma configuração do
+`por_ano`: sessão renovada nos 400, pausa nos erros de ligação). Ritmo
+medido nos primeiros 10 artigos: ~1,9 s por artigo (texto + HTML), ou seja
+~38 h no total. Retomável pelo relatório `output/corpus_rdf_xl_report.csv`.
+Antes: 127 592 textos e 124 105 HTML em disco.

@@ -22,8 +22,9 @@ seguintes se verificar:
    redirecionamento arquivada.
 3. O URL não segue nenhum dos esquemas de página de artigo
    (`ARTICLE_URL_SCHEMES`): `/detalhe/` ou `/amp/` no caminho (site atual),
-   `interior.aspx?content_id=` (site antigo; o `=` aparece também codificado,
-   `content_id/x3d`), `tn0cs.asp?nid=`/`tn1cs.asp?nid=` (1999–2000) ou
+   `interior.aspx?content_id=` e `interior_premium.aspx?content_id=` (site
+   antigo, exceto as secções `/multimedia/` e `/galerias/`; o `=` aparece
+   também codificado, `content_id/x3d`), `tn0cs.asp?nid=`/`tn1cs.asp?nid=` (1999–2000) ou
    `noticia.asp?id=`, `shownews.asp?id=`, `noticia.aspx?id=` (2000–2009).
 
 O sinal 3 substitui o anterior "mais de 100 capturas na Fase 2"
@@ -40,12 +41,13 @@ from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from .url_identity import has_tracking_params, strip_scheme, without_tracking
+from .url_identity import has_tracking_params, same_site_host, strip_scheme, without_tracking
 
 REASON_ARTIGO = "artigo"
 REASON_SABERMAIS = "sabermais"
 REASON_OBJECT_MOVED = "object_moved"
 REASON_URL_NOT_ARTICLE = "url_nao_artigo"
+REASON_MULTIMEDIA = "multimedia"
 
 
 def _query_starts(path_end: str, *prefixes: str):
@@ -54,11 +56,31 @@ def _query_starts(path_end: str, *prefixes: str):
     return matches
 
 
+# Secções do site antigo de 2010–2015 (`record.xl.pt`) cujo `interior.aspx` é
+# galeria de fotos/vídeos ou infografia, não artigo de texto (extensão a
+# 2010–2016, `docs/experiments.md`). Só vale para os esquemas `interior*.aspx`:
+# o `/detalhe/` do site atual não é afetado.
+_NOT_TEXT_SECTIONS = ("/multimedia/", "/galerias/")
+
+
+def _old_interior(page: str, *prefixes: str):
+    def matches(path: str, query: str) -> bool:
+        return (
+            path.endswith(page)
+            and query.startswith(prefixes)
+            and not any(section in path for section in _NOT_TEXT_SECTIONS)
+        )
+    return matches
+
+
 # (nome, teste sobre o caminho e a query em minúsculas)
 ARTICLE_URL_SCHEMES = (
     ("detalhe", lambda path, query: "/detalhe/" in path),
     ("amp", lambda path, query: "/amp/" in path),
-    ("interior.aspx?content_id", _query_starts("/interior.aspx", "content_id=", "content_id/x3d")),
+    ("interior.aspx?content_id", _old_interior("/interior.aspx", "content_id=", "content_id/x3d")),
+    # Artigo Premium do site de 2010–2015: existe, mas sem corpo (como o Premium do atual).
+    ("interior_premium.aspx?content_id",
+     _old_interior("/interior_premium.aspx", "content_id=", "content_id/x3d")),
     ("tn0cs.asp?nid", _query_starts("/tn0cs.asp", "nid=")),
     ("tn1cs.asp?nid", _query_starts("/tn1cs.asp", "nid=")),
     # Site de 2000–2009 (2026-10-20, decisão do autor; docs/experiments.md).
@@ -87,9 +109,10 @@ class ClassificationResult:
 
 
 def canonical_key(url: str) -> str:
-    """Chave de agrupamento: sem esquema e sem parâmetros de rastreio."""
+    """Chave de agrupamento: sem esquema, sem parâmetros de rastreio e com os quatro
+    hosts do mesmo site (`record.pt`, `record.xl.pt`, com ou sem `www.`) como um só."""
 
-    return strip_scheme(without_tracking(url))
+    return same_site_host(strip_scheme(without_tracking(url)))
 
 
 def choose_canonical_url(urls: list[str], captures_by_url: dict[str, int] | None = None) -> str:
@@ -114,12 +137,19 @@ def group_captures(urls: list[str], captures_by_url: dict[str, int]) -> int:
     return sum(by_scheme_free.values())
 
 
-def classify(original_url: str, title: str | None, captures: int = 0) -> ClassificationResult:
+def classify(
+    original_url: str, title: str | None, captures: int = 0, exclude_multimedia: bool = False
+) -> ClassificationResult:
+    """Com `exclude_multimedia`, páginas de `/multimedia/` e `/galerias/` (vídeos,
+    fotogalerias) não são artigos, mesmo com `/detalhe/` (só no corpus `xl`)."""
+
     path = urlsplit(original_url).path
     normalized_title = (title or "").strip().lower()
 
     if "/sabermais/" in path:
         reason = REASON_SABERMAIS
+    elif exclude_multimedia and any(section in path.lower() for section in _NOT_TEXT_SECTIONS):
+        reason = REASON_MULTIMEDIA
     elif normalized_title.startswith("object moved"):
         reason = REASON_OBJECT_MOVED
     elif article_url_scheme(original_url) is None:
@@ -163,7 +193,7 @@ def load_phase1_capture_counts(captures_csv: Path) -> dict[str, int]:
     return {url: len(values) for url, values in tstamps.items()}
 
 
-def classify_corpus(captures_csv: Path) -> list[ClassificationResult]:
+def classify_corpus(captures_csv: Path, exclude_multimedia: bool = False) -> list[ClassificationResult]:
     phase1 = load_phase1_titles(captures_csv)
     captures_by_url = load_phase1_capture_counts(captures_csv)
 
@@ -175,7 +205,7 @@ def classify_corpus(captures_csv: Path) -> list[ClassificationResult]:
     for urls in groups.values():
         chosen = choose_canonical_url(urls, captures_by_url)
         title = phase1[chosen]["title"]
-        result = classify(chosen, title, group_captures(urls, captures_by_url))
+        result = classify(chosen, title, group_captures(urls, captures_by_url), exclude_multimedia)
         variants = "|".join(sorted(url for url in urls if url != chosen))
         results.append(replace(result, variantes=variants))
 
@@ -212,6 +242,7 @@ def write_summary_markdown(
     sabermais = by_reason.get(REASON_SABERMAIS, [])
     moved = by_reason.get(REASON_OBJECT_MOVED, [])
     not_article = by_reason.get(REASON_URL_NOT_ARTICLE, [])
+    multimedia = by_reason.get(REASON_MULTIMEDIA, [])
     schemes = Counter(article_url_scheme(r.original_url) for r in artigos)
 
     lines = [
@@ -227,6 +258,7 @@ def write_summary_markdown(
         f"- Excluídos — `/sabermais/`: {len(sabermais)}",
         f"- Excluídos — `Object moved`: {len(moved)}",
         f"- Excluídos — URL fora dos esquemas de artigo: {len(not_article)}",
+        f"- Excluídos — vídeos/fotogalerias (`--excluir-multimedia`): {len(multimedia)}",
         "\n## Artigos por esquema de URL\n",
         "| Esquema | Artigos |",
         "| --- | ---: |",
@@ -259,6 +291,7 @@ def run_classification(
     project_root: Path | None = None,
     captures_csv: Path | None = None,
     label: str = "por_ano",
+    exclude_multimedia: bool = False,
 ) -> list[ClassificationResult]:
     """Classifica a Fase 1 `label`; escreve `output/corpus_classification_<label>.*`.
 
@@ -271,7 +304,7 @@ def run_classification(
     captures_csv = captures_csv or root / "output" / f"corpus_phase1_{label}_captures.csv"
     csv_path = root / "output" / f"corpus_classification_{label}.csv"
 
-    results = classify_corpus(captures_csv)
+    results = classify_corpus(captures_csv, exclude_multimedia)
 
     write_csv(results, csv_path)
     write_summary_markdown(
@@ -286,8 +319,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--label", default="por_ano",
                         help="Fase 1 a classificar (output/corpus_phase1_<label>_captures.csv)")
     parser.add_argument("--captures-csv", type=Path, help="CSV de capturas explícito")
+    parser.add_argument("--excluir-multimedia", action="store_true",
+                        help="não classificar como Artigo as páginas de /multimedia/ e /galerias/ "
+                        "(vídeos, fotogalerias; usado no corpus xl; o por_ano fica como está)")
     args = parser.parse_args(argv)
-    results = run_classification(captures_csv=args.captures_csv, label=args.label)
+    results = run_classification(
+        captures_csv=args.captures_csv, label=args.label,
+        exclude_multimedia=args.excluir_multimedia)
     artigos = [r for r in results if r.is_artigo]
     print(f"Recursos distintos: {len(results)}")
     print(f"Classificados como Artigo: {len(artigos)}")

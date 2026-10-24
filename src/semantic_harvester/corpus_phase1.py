@@ -490,13 +490,14 @@ def write_outputs(
     root: Path,
     stats: list[TermRunStats],
     records: list[tuple[str, str, dict[str, Any]]],
+    label: str = RUN_LABEL,
 ) -> tuple[list[TermRunStats], dict[tuple[str, str], CaptureRecord], list[tuple[str, str]]]:
     captures, divergent_keys = aggregate(records, representative_urls(records))
 
-    write_term_stats_csv(stats, root / "output" / f"corpus_phase1_{RUN_LABEL}_per_term.csv")
-    write_captures_csv(captures, root / "output" / f"corpus_phase1_{RUN_LABEL}_captures.csv")
+    write_term_stats_csv(stats, root / "output" / f"corpus_phase1_{label}_per_term.csv")
+    write_captures_csv(captures, root / "output" / f"corpus_phase1_{label}_captures.csv")
     write_aggregation_markdown(
-        stats, captures, divergent_keys, root / "output" / f"corpus_phase1_{RUN_LABEL}_aggregation.md"
+        stats, captures, divergent_keys, root / "output" / f"corpus_phase1_{label}_aggregation.md"
     )
     return stats, captures, divergent_keys
 
@@ -547,22 +548,24 @@ def records_from_raw(
     return stats, records
 
 
-def rebuild_offline(project_root: Path | None = None) -> tuple[
+def rebuild_offline(project_root: Path | None = None, label: str = RUN_LABEL) -> tuple[
     list[TermRunStats], dict[tuple[str, str], CaptureRecord], list[tuple[str, str]]
 ]:
-    """Refaz os relatórios desta execução a partir do raw, com URLs normalizados.
+    """Refaz os relatórios de uma execução (`label`) a partir do raw, com URLs normalizados.
 
     O CSV de capturas anterior é preservado como `.pre-normalizacao.csv`
-    (uma vez; não é reescrito em reconstruções seguintes).
+    (uma vez; não é reescrito em reconstruções seguintes). Com outra
+    `label` (ex.: `xl`, a descoberta de `record.xl.pt` de 2010–2016), lê
+    `data/raw/corpus_queries/<label>/` e escreve `output/corpus_phase1_<label>_*`.
     """
 
     root = project_root or Path(__file__).resolve().parents[2]
-    captures_csv = root / "output" / f"corpus_phase1_{RUN_LABEL}_captures.csv"
+    captures_csv = root / "output" / f"corpus_phase1_{label}_captures.csv"
     backup = captures_csv.with_suffix(".pre-normalizacao.csv")
     if captures_csv.is_file() and not backup.exists():
         captures_csv.rename(backup)
-    stats, records = records_from_raw(root / "data" / "raw" / "corpus_queries" / RUN_LABEL)
-    return write_outputs(root, stats, records)
+    stats, records = records_from_raw(root / "data" / "raw" / "corpus_queries" / label)
+    return write_outputs(root, stats, records, label)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -571,11 +574,19 @@ def main(argv: list[str] | None = None) -> int:
         "--rebuild-offline", action="store_true",
         help="refaz os relatórios a partir do raw já em disco, sem pedidos à API",
     )
+    parser.add_argument(
+        "--label", default=RUN_LABEL,
+        help="com --rebuild-offline: execução a refazer (raw em data/raw/corpus_queries/<label>/)",
+    )
     args = parser.parse_args(argv)
+    if args.label != RUN_LABEL and not args.rebuild_offline:
+        parser.error("--label só faz sentido com --rebuild-offline")
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     try:
-        stats, captures, divergent_keys = rebuild_offline() if args.rebuild_offline else run_phase1()
+        stats, captures, divergent_keys = (
+            rebuild_offline(label=args.label) if args.rebuild_offline else run_phase1()
+        )
     except (requests.RequestException, RuntimeError, OSError, ValueError) as exc:
         LOGGER.error("A Fase 1 falhou: %s", exc)
         return 1
@@ -588,9 +599,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"N (artigos únicos, URL normalizado): {len(articles)} "
           f"({len(exact) - len(articles)} variantes juntadas)")
     print(f"Divergências: {len(divergent_keys)}")
-    print(f"Relatórios: output/corpus_phase1_{RUN_LABEL}_per_term.csv, "
-          f"output/corpus_phase1_{RUN_LABEL}_captures.csv, "
-          f"output/corpus_phase1_{RUN_LABEL}_aggregation.md")
+    label = args.label
+    print(f"Relatórios: output/corpus_phase1_{label}_per_term.csv, "
+          f"output/corpus_phase1_{label}_captures.csv, "
+          f"output/corpus_phase1_{label}_aggregation.md")
     return 0
 
 

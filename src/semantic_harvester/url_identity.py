@@ -52,15 +52,33 @@ def strip_scheme(url: str) -> str:
     return url.split("://", 1)[-1]
 
 
+# `record.pt` e `record.xl.pt` (com ou sem `www.`) são o mesmo site do Record em
+# épocas diferentes: o mesmo `interior.aspx?content_id=N` nos dois é o mesmo
+# artigo (plano da extensão a 2010–2016, `docs/plano_extensao_xl_2010_2016.md`).
+# Os outros subdomínios (`liga.record.pt`, ...) são sites diferentes.
+SAME_SITE_HOSTS = frozenset({"record.pt", "www.record.pt", "record.xl.pt", "www.record.xl.pt"})
+SITE_HOST = "record.pt"
+
+
+def same_site_host(scheme_free_url: str) -> str:
+    """Troca o host por `record.pt` se for um dos quatro do mesmo site; só para comparar."""
+
+    host, sep, rest = scheme_free_url.partition("/")
+    if host.lower() in SAME_SITE_HOSTS:
+        return SITE_HOST + sep + rest
+    return scheme_free_url
+
+
 def normalize_for_grouping(url: str) -> str:
     """Remove esquema, parâmetros de rastreio, barras repetidas e uma barra final.
 
-    Usado só para decidir se dois URLs são a mesma página modulo variação
+    Os hosts `record.pt`, `www.record.pt`, `record.xl.pt` e `www.record.xl.pt`
+    contam como o mesmo. Usado só para decidir se dois URLs são a mesma página modulo variação
     cosmética — nunca para gerar identificadores (esses continuam a usar o
     `originalURL` canónico tal como veio da descoberta/classificação).
     """
 
-    head, _, query = strip_scheme(url).partition("?")
+    head, _, query = same_site_host(strip_scheme(url)).partition("?")
     collapsed = re.sub(r"/{2,}", "/", head).rstrip("/")
     query = strip_tracking_params(query)
     return f"{collapsed}?{query}" if query else collapsed

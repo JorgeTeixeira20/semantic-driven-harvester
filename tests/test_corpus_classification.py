@@ -5,9 +5,10 @@ import unittest
 from pathlib import Path
 
 from semantic_harvester.corpus_classification import (
-    REASON_ARTIGO, REASON_OBJECT_MOVED, REASON_SABERMAIS, REASON_URL_NOT_ARTICLE,
+    REASON_ARTIGO, REASON_MULTIMEDIA, REASON_OBJECT_MOVED, REASON_SABERMAIS, REASON_URL_NOT_ARTICLE,
     article_url_scheme, canonical_key, classify, classify_corpus, run_classification,
 )
+from semantic_harvester.url_identity import normalize_for_grouping
 from tests.support import OfflineTestCase
 
 PHASE1_FIELDS = (
@@ -41,6 +42,17 @@ class ArticleUrlSchemeTests(unittest.TestCase):
                     "http://www.record.pt/Futebol/interior.aspx?content_id/x3d730429"):
             self.assertEqual(article_url_scheme(url), "interior.aspx?content_id")
         self.assertIsNone(article_url_scheme("http://www.record.pt/interior.aspx?other=1"))
+
+    def test_old_site_2010_2015_premium_is_an_article_but_galleries_are_not(self) -> None:
+        self.assertEqual(
+            article_url_scheme("https://record.xl.pt/futebol/nacional/1a_liga/sporting/interior_premium.aspx?content_id=924976"),
+            "interior_premium.aspx?content_id")
+        for url in ("https://record.xl.pt/multimedia/fotos/interior.aspx?content_id=1",
+                    "https://record.xl.pt/galerias/videos/interior.aspx?content_id=1",
+                    "https://record.xl.pt/multimedia/videos/interior_premium.aspx?content_id=1"):
+            self.assertIsNone(article_url_scheme(url), url)
+        # O /detalhe/ do site atual não é afetado por esta exclusão.
+        self.assertEqual(article_url_scheme("https://www.record.pt/multimedia/detalhe/x"), "detalhe")
 
     def test_1999_2000_site_tn0cs_tn1cs(self) -> None:
         self.assertEqual(article_url_scheme("https://record.pt/tn0cs.asp?nid=40907"), "tn0cs.asp?nid")
@@ -166,6 +178,58 @@ class TrackingParameterTests(OfflineTestCase):
         # Canónico: o URL real com mais capturas; capturas somadas; a outra forma como variante.
         self.assertEqual((merged.original_url, merged.captures, merged.variantes), (b, 4, a))
         self.assertTrue(all(r.is_artigo for r in results))
+
+
+class ExcludeMultimediaTests(unittest.TestCase):
+    VIDEO = "https://record.xl.pt/multimedia/videos/detalhe/lewandowski-provoca-benfica.html"
+    TEXT = "https://record.xl.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/carrillo-assinou-ate-2021.html"
+
+    def test_default_keeps_multimedia_detalhe_as_artigo(self) -> None:
+        self.assertTrue(classify(self.VIDEO, "Vídeos").is_artigo)
+
+    def test_option_excludes_videos_and_galleries_only(self) -> None:
+        video = classify(self.VIDEO, "Vídeos", exclude_multimedia=True)
+        self.assertEqual((video.is_artigo, video.reason), (False, REASON_MULTIMEDIA))
+        gallery = classify("https://record.xl.pt/galerias/fotos/detalhe/x.html", "x", exclude_multimedia=True)
+        self.assertEqual(gallery.reason, REASON_MULTIMEDIA)
+        self.assertTrue(classify(self.TEXT, "Carrillo", exclude_multimedia=True).is_artigo)
+
+
+
+class SameSiteHostTests(OfflineTestCase):
+    """`record.pt` e `record.xl.pt` (com ou sem `www.`) são o mesmo site; outros
+    subdomínios e caminhos diferentes continuam diferentes."""
+
+    PATH = "/futebol/nacional/liga_honra/belenenses/interior.aspx?content_id=462145"
+
+    def test_the_four_hosts_give_the_same_key(self) -> None:
+        keys = {
+            canonical_key(f"{scheme}://{host}{self.PATH}")
+            for scheme in ("http", "https")
+            for host in ("record.pt", "www.record.pt", "record.xl.pt", "www.record.xl.pt")
+        }
+        self.assertEqual(len(keys), 1)
+
+    def test_other_hosts_and_other_paths_stay_apart(self) -> None:
+        base = canonical_key("https://record.xl.pt" + self.PATH)
+        self.assertNotEqual(base, canonical_key("https://liga.record.pt" + self.PATH))
+        self.assertNotEqual(base, canonical_key("https://record.xl.pt/outro" + self.PATH))
+        self.assertNotEqual(base, canonical_key("https://record.xl.pt" + self.PATH + "1"))
+        self.assertEqual(normalize_for_grouping("https://www.record.xl.pt/a/?ref=x"),
+                         normalize_for_grouping("http://record.pt/a"))
+        self.assertNotEqual(normalize_for_grouping("https://record.pt.exemplo.com/a"),
+                            normalize_for_grouping("https://record.pt/a"))
+
+    def test_host_variants_merge_into_one_recurso(self) -> None:
+        captures_csv = self.root / "captures.csv"
+        a = "https://record.xl.pt" + self.PATH
+        b = "https://www.record.pt" + self.PATH
+        write_csv(captures_csv, PHASE1_FIELDS, [phase1_row(a, "Exemplo"), phase1_row(b, "Exemplo")])
+
+        (result,) = classify_corpus(captures_csv)
+
+        self.assertTrue(result.is_artigo)
+        self.assertEqual(sorted([result.original_url, result.variantes]), sorted([a, b]))
 
 
 if __name__ == "__main__":

@@ -218,8 +218,8 @@ footer p { margin: 8px 0; }
   const ORIGIN = { lista_fechada: "lista fechada da Wikidata", candidato: "detetado no texto e confirmado na Wikidata (abordagem híbrida)",
     "lista_fechada+candidato": "lista fechada da Wikidata, com uma forma nova vinda do texto" };
   const S = { ano: "", era: "", mod: "", clube: "", ent: "", q: "", sort: "desc", p: 0, v: "" };
-  const ERA_LABEL = { "1999–2000": "Primeiro site (1999–2000)", "2000–2009": "Site de 2000 a 2009",
-    "2017–2024": "Site atual (2017–2024)", outro: "Outras páginas" };
+  const ERA_LABEL = { "1999–2000": "Primeiro site (1999–2000)", "2000–2015 (ASP.NET)": "Site de 2000 a 2015 (ASP.NET)",
+    "2015–2024": "Site atual (2015–2024)", outro: "Outras páginas" };
   const eraLabel = e => ERA_LABEL[e] || e;
   function bodyLabel(b) {
     if (b === "c′") return "Texto completo";

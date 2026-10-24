@@ -86,9 +86,17 @@ class NavigationCorpusTests(OfflineTestCase):
     def test_era_from_url_scheme(self) -> None:
         eras = self.data["eras"]
         self.assertEqual(eras[self.rows[OLDEST][3]], "1999–2000")
-        self.assertEqual(eras[self.rows[OLD][3]], "2000–2009")
-        self.assertEqual(eras[self.rows[MODERN][3]], "2017–2024")
+        self.assertEqual(eras[self.rows[OLD][3]], "2000–2015 (ASP.NET)")
+        self.assertEqual(eras[self.rows[MODERN][3]], "2015–2024")
         self.assertEqual(era_of("https://www.record.pt/sabermais/x"), "outro")
+        # Esquemas de record.xl.pt (2010–2016): ASP.NET até 2015, /detalhe/ desde 2015.
+        for url in ("https://record.xl.pt/futebol/nacional/1a_liga/sporting/interior.aspx?content_id=1",
+                    "https://record.xl.pt/futebol/nacional/1a_liga/sporting/interior_premium.aspx?content_id=1",
+                    "https://record.xl.pt/noticia.aspx?id=3&idcanal=2"):
+            self.assertEqual(era_of(url), "2000–2015 (ASP.NET)", url)
+        self.assertEqual(
+            era_of("https://record.xl.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/x.html"),
+            "2015–2024")
 
     def test_modalidade_from_url_then_search_term(self) -> None:
         mods = self.data["modalidades"]

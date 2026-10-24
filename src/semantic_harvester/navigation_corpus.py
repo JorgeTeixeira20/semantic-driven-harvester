@@ -47,10 +47,17 @@ DEFAULT_VOCABULARY = Path("data") / "processed" / "caminho_b_vocabulario_wikidat
 DEFAULT_CLUB_MAP = Path("data") / "processed" / "caminho_b_clubes_url.csv"
 WAYBACK = "https://arquivo.pt/wayback/"
 
+# Épocas do site pelo esquema do URL. Os esquemas ASP.NET (`interior.aspx`,
+# `noticia.aspx`) vão de 2000 a 2015 e o `/detalhe/` começa em 2015 (corpus
+# `xl`, `record.xl.pt`), por isso os nomes descrevem o esquema e os anos
+# observados, sem afirmar fronteiras exatas (extensão a 2010–2016).
 ERAS = (
     ("1999–2000", {"tn0cs.asp?nid", "tn1cs.asp?nid"}),
-    ("2000–2009", {"noticia.asp?id", "shownews.asp?id", "noticia.aspx?id", "interior.aspx?content_id"}),
-    ("2017–2024", {"detalhe", "amp"}),
+    ("2000–2015 (ASP.NET)", {
+        "noticia.asp?id", "shownews.asp?id", "noticia.aspx?id",
+        "interior.aspx?content_id", "interior_premium.aspx?content_id",
+    }),
+    ("2015–2024", {"detalhe", "amp"}),
 )
 OTHER_ERA = "outro"
 ORIGIN_NONE, ORIGIN_FROM_URL, ORIGIN_FALLBACK = 0, 1, 2

@@ -206,6 +206,21 @@ class RebuildOfflineTests(OfflineTestCase):
         self.assertIn("`originalURL` distintos tal como vieram da API: 3", summary)
         self.assertIn("(2 variantes juntadas)", summary)
 
+    def test_rebuild_with_another_label_reads_and_writes_only_that_label(self) -> None:
+        raw_dir = self.root / "data" / "raw" / "corpus_queries" / "xl"
+        raw_dir.mkdir(parents=True)
+        (raw_dir / "clube_benfica_2012_rep1_offset-0000.json").write_bytes(
+            page([hit(BASE, "1")], next_page=None))
+        (self.root / "output").mkdir()
+
+        stats, captures, _ = rebuild_offline(self.root, label="xl")
+
+        self.assertEqual({url for url, _ in captures}, {BASE})
+        self.assertEqual([(r.year, r.results_received) for r in stats], [(2012, 1)])
+        output = self.root / "output"
+        self.assertTrue((output / "corpus_phase1_xl_captures.csv").is_file())
+        self.assertFalse((output / f"corpus_phase1_{LABEL}_captures.csv").exists())
+
     def test_unknown_term_in_raw_fails(self) -> None:
         self.write_raw("clube_desconhecido_2017_rep1_offset-0000.json", [])
         with self.assertRaises(ValueError):
