@@ -5821,3 +5821,58 @@ lacuna 2010–2016 do corpus, mas **não a prova**: a amostra são as primeiras
 estreitos (por exemplo `record.pt/futebol/*`) ou paginação que o CDX não
 ofereceu. Os URLs de exemplo da lista acima não foram abertos para confirmar
 o conteúdo.
+
+### Consulta por prefixos de caminho (2026-10-24, 14:49 → 14:52)
+
+Só leitura, sem recolher notícias nem alterar o corpus. CDX com
+`limit=500` por pedido (2010, 2012, 2014) e abertura de capturas no replay do
+Arquivo.pt para ver o conteúdo. **Aviso sobre `to`:** com `from=2010&to=2011` o
+CDX devolveu também capturas de 2011 (e `to=2014` capturas de 2015), por isso a
+janela por "ano" desta secção e da tabela anterior se estende ao ano seguinte;
+a contagem por ano de captura só está certa onde se diz que foi separada pelo
+`timestamp`.
+
+| Caso | Notícias? | Contagem (URLs distintos entre as linhas 200) | Exemplos |
+| --- | --- | --- | --- |
+| `record.xl.pt/Futebol/*` | **Não** (páginas de secção/hub) | 18 (2010), 14 (2012), 8 (2014), de 500 linhas cada (limite atingido) | `…/Futebol/Arbitragem/apito_dourado/default.aspx`, `…/futebol/arbitragem/default.aspx`, `…/futebol/arbitragem.html` |
+| `record.xl.pt/Modalidades/*` | **Não** (hubs) | 31 (2010), 14 (2012), 7 (2014), de 500 linhas cada | `…/modalidades/andebol/default.aspx`, `…/modalidades/andebol.html`, `…/modalidades/0.0` |
+| `record.xl.pt/interior.aspx*` (`content_id`) | **Sim** | ver abaixo | `…/interior.aspx?content_id=128957`, `…/interior.aspx?content_id=129150`, `…/interior.aspx?content_id=258215` |
+| `record.pt/interior.aspx*` e `record.xl.pt/*content_id*` | inconclusivo | pedidos sem resposta no tempo (75 s), 0 linhas | — |
+
+**`interior.aspx?content_id=` é o site antigo do Record e tem notícias em
+2010–2014.** Pedido único `from=2010&to=2016`, `limit=5000` (640 linhas, abaixo
+do limite, logo completo para esse prefixo), só linhas 200, por ano do
+`timestamp`:
+
+| Ano de captura | Capturas 200 | URLs distintos |
+| --- | --- | --- |
+| 2010 | 346 | 319 |
+| 2011 | 165 | 63 |
+| 2012 | 71 | 13 |
+| 2013 | 45 | 34 |
+| 2014 | 5 | 5 |
+| 2015 | 3 | 1 |
+
+Abri 3 capturas (replay): `20100809211242 …content_id=128957` (título "César
+Peixoto: «Era neste clube que queria jogar»"), `20120127041247
+…content_id=129150` ("César Peixoto: «Estou aqui com orgulho»") e
+`20141023022410 …content_id=258215` ("Dos Santos: «Podia ter tido mais
+oportunidades»"): três notícias, com menu e rodapé do site. Em 2010 há centenas
+de notícias capturadas, que cai para dezenas em 2011–2013 e quase nada em 2014.
+Este esquema de URL (`interior.aspx?content_id=`) é o do site antigo já
+tratado no corpus (campo "épocas do site" do painel); os números acima são só
+deste prefixo no domínio `record.xl.pt`, sem confirmar quantas destas notícias
+o corpus já tem.
+
+**URLs com GUID.** Nas 3000 primeiras linhas de `record.xl.pt/*` de 2010 há 0
+URLs com GUID (417 numéricos tipo `/1.0`, 1818 outros: calendário, página
+inicial). Os GUID aparecem em 2012–2013; abri 3 de 2013
+(`…/036a23bc-0fd7-4258-9a8e-3e2337bead54/default.aspx`, `…/04931a92-…`,
+`…/087b5312-…`): são a **capa do jornal do dia** ("Jornal Record", edição de 13
+de setembro, 17 de agosto, 22 de setembro de 2013; `NewsGen/Edição/RECORD/Jornal
+Record/Capas`), não notícias.
+
+**Conclusão parcial.** A lacuna 2010–2016 do corpus não é falta de notícias no
+arquivo: `record.xl.pt/interior.aspx?content_id=` tem notícias capturadas em
+2010–2014 (com maior peso em 2010). Falta medir em que medida o corpus as
+cobre; ver a medição seguinte.
