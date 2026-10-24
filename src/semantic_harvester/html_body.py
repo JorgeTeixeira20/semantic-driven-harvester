@@ -43,6 +43,15 @@ CONTAINERS = (
     # tn0cs/tn1cs.asp (1999–2000): só tabelas e <font>, sem classes; a coluna
     # td[width=480] tem antetítulo, título, lead, corpo e data (ver OLD_SITE_SKIP).
     ("td480", lambda tag, ids, classes, attrs, main: tag == "td" and _attr(attrs, "width") == "480"),
+    # interior.aspx de record.xl.pt (2010–2015; extensão a 2010–2016): `div.newsBody`
+    # no template de 2010–2012 e `div.texto` (dentro de `div.maincontain`) no de
+    # 2013–2015. Por último: `texto` é um nome genérico.
+    ("newsBody", lambda tag, ids, classes, attrs, main: tag == "div" and "newsBody" in classes),
+    # Template de 2010 sem `newsBody` (por exemplo as páginas `/arquivo/`): o texto está
+    # nos `<p>` diretos da caixa de texto.
+    ("areaGeralNoticiasTextBox",
+     lambda tag, ids, classes, attrs, main: tag == "div" and "areaGeralNoticiasTextBox" in classes),
+    ("texto", lambda tag, ids, classes, attrs, main: tag == "div" and "texto" in classes),
 )
 MAIN_COLUMN_WIDTH = "600"
 # Dentro do td480: título (size 6), data (size 0) e antetítulo (size 2 com cor)
@@ -97,12 +106,24 @@ SKIP_CLASSES = frozenset({
     "relacionadas", "comentarBtn", "detalheAds", "pub",
 })
 SKIP_IDS = frozenset({"escondec", "relacContainer", "incontent"})
-PREMIUM_CLASSES = frozenset({"container_assinatura", "article-premium"})
+# `nasslog`/`pnass1s`: bloco "Para ler este artigo na íntegra assine o Record
+# Premium" das `interior_premium.aspx` de 2012–2015 (o `div.texto` só traz o lead);
+# `centercontentPremium`: o mesmo template em 2014–2015, em que o corpo vem por
+# AJAX (`premium_article_box.aspx`) e não está no HTML.
+PREMIUM_CLASSES = frozenset({
+    "container_assinatura", "article-premium", "nasslog", "pnass1s", "centercontentPremium",
+})
 VOID_TAGS = frozenset({
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta",
     "param", "source", "track", "wbr",
 })
 EXTRA_MARKER = re.compile(r"(?<!\w)relacionadas(?!\w)")
+# Rodapé do texto nas `interior*.aspx` de 2010–2015 ("Siga-nos no Facebook e no Twitter .").
+SIGA_NOS = re.compile(r"siga-nos no facebook", re.IGNORECASE)
+# Rodapé do template de 2010 ("( Fora de Campo ) Gostou desta notícia? Votação: 0 …"): corta-se
+# também a etiqueta de secções entre parênteses que o antecede.
+GOSTOU = re.compile(r"gostou desta notícia", re.IGNORECASE)
+_TRAILING_SECTIONS = re.compile(r"\s*\(\s*[^()]{1,80}\)\s*$")
 
 _SPACES = re.compile(r"\s+")
 
@@ -192,6 +213,13 @@ def _cut_chrome(text: str) -> str:
         if text[hit.start()].isupper():
             stops.append(hit.start())
             break
+    hit = SIGA_NOS.search(text)
+    if hit is not None:
+        stops.append(hit.start())
+    hit = GOSTOU.search(text)
+    if hit is not None:
+        # A etiqueta de secções ("( Fora de Campo )") sai com o rodapé; os outros cortes não a têm.
+        stops.append(len(_TRAILING_SECTIONS.sub("", text[:hit.start()]).rstrip()))
     return text[:min(stops)] if stops else text
 
 

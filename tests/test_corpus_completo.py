@@ -111,6 +111,17 @@ class CompletoTests(OfflineTestCase):
         build(self.root)
         self.assertEqual([p.read_bytes() for p in paths], before)
 
+    def test_xl_articles_no_longer_retained_by_the_classification_are_dropped(self) -> None:
+        cover = "https://record.xl.pt/capas/detalhe/4-de-dezembro-de-2015.html"
+        nt = self.root / "data/processed/corpus_articles_xl_triples.nt"
+        nt.write_text(nt.read_text("utf-8") + triples(cover, "20151204181109"), encoding="utf-8")
+
+        stats = build(self.root)
+
+        text = (self.root / "data/processed/corpus_articles_completo_triples.nt").read_text("utf-8")
+        self.assertNotIn(stable_hash(cover), text)
+        self.assertEqual(stats["triplos_retirados_xl"], 4 + 4)
+
     def test_oldest_tstamps_and_copy_helpers(self) -> None:
         nt = self.root / "a.nt"
         nt.write_text(triples(ONLY_PT, "20180101000000") + triples(ONLY_PT, "20160101000000"), encoding="utf-8")

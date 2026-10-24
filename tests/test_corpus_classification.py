@@ -192,6 +192,8 @@ class ExcludeMultimediaTests(unittest.TestCase):
         self.assertEqual((video.is_artigo, video.reason), (False, REASON_MULTIMEDIA))
         gallery = classify("https://record.xl.pt/galerias/fotos/detalhe/x.html", "x", exclude_multimedia=True)
         self.assertEqual(gallery.reason, REASON_MULTIMEDIA)
+        cover = classify("https://record.xl.pt/capas/detalhe/4-de-dezembro-de-2015.html", "x", exclude_multimedia=True)
+        self.assertEqual(cover.reason, REASON_MULTIMEDIA)
         self.assertTrue(classify(self.TEXT, "Carrillo", exclude_multimedia=True).is_artigo)
 
 

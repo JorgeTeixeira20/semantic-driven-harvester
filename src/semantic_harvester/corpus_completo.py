@@ -97,13 +97,22 @@ def resolve_overlap(
     return drop, tally
 
 
-def copy_triples(source: Path, target_handle, drop: set[str]) -> tuple[int, int]:
-    """Acrescenta o N-Triples sem as linhas dos artigos retirados; devolve (escritas, retiradas)."""
+def copy_triples(
+    source: Path, target_handle, drop: set[str], allowed: set[str] | None = None
+) -> tuple[int, int]:
+    """Acrescenta o N-Triples sem as linhas dos artigos retirados; devolve (escritas, retiradas).
+
+    Com `allowed`, também se retiram as linhas de qualquer artigo que não esteja nele
+    (por exemplo, artigos recolhidos antes de a classificação do `xl` os excluir).
+    """
 
     written = removed = 0
     with source.open(encoding="utf-8") as handle:
         for line in handle:
-            if drop and any(token in drop for token in HASH.findall(line)):
+            tokens = HASH.findall(line)
+            if (drop and any(token in drop for token in tokens)) or (
+                allowed is not None and any(token not in allowed for token in tokens)
+            ):
                 removed += 1
                 continue
             target_handle.write(line)
@@ -152,9 +161,13 @@ def build(root: Path) -> dict[str, int]:
 
     out["triples"].parent.mkdir(parents=True, exist_ok=True)
     stats: dict[str, int] = {"sobreposicao": len(overlap)}
+    # O `xl` foi recolhido com uma classificação anterior à exclusão de `/capas/`:
+    # só ficam os artigos que a classificação final do `xl` ainda retém.
+    allowed = {"por_ano": None, "xl": set(keys["xl"].values())}
     with out["triples"].open("w", encoding="utf-8") as handle:
         for label in SOURCES:
-            written, removed = copy_triples(paths[label]["triples"], handle, drop[label])
+            written, removed = copy_triples(
+                paths[label]["triples"], handle, drop[label], allowed[label])
             stats[f"triplos_{label}"] = written
             stats[f"triplos_retirados_{label}"] = removed
     stats["fica_por_ano"] = len(drop["xl"])

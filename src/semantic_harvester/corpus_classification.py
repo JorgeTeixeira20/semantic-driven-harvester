@@ -56,11 +56,11 @@ def _query_starts(path_end: str, *prefixes: str):
     return matches
 
 
-# Secções do site antigo de 2010–2015 (`record.xl.pt`) cujo `interior.aspx` é
-# galeria de fotos/vídeos ou infografia, não artigo de texto (extensão a
-# 2010–2016, `docs/experiments.md`). Só vale para os esquemas `interior*.aspx`:
-# o `/detalhe/` do site atual não é afetado.
-_NOT_TEXT_SECTIONS = ("/multimedia/", "/galerias/")
+# Secções de `record.xl.pt` (2010–2016) que são galeria de fotos/vídeos, infografia
+# ou imagem da capa do jornal, não artigo de texto (extensão a 2010–2016,
+# `docs/experiments.md`). Nos esquemas `interior*.aspx` valem sempre; no `/detalhe/`
+# só com `exclude_multimedia` (opção `--excluir-multimedia`, usada no `xl`).
+_NOT_TEXT_SECTIONS = ("/multimedia/", "/galerias/", "/capas/")
 
 
 def _old_interior(page: str, *prefixes: str):

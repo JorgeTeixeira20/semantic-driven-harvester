@@ -6117,3 +6117,54 @@ artigo (a mais antiga), 1 pedido por segundo (a mesma configuração do
 medido nos primeiros 10 artigos: ~1,9 s por artigo (texto + HTML), ou seja
 ~38 h no total. Retomável pelo relatório `output/corpus_rdf_xl_report.csv`.
 Antes: 127 592 textos e 124 105 HTML em disco.
+
+### Passo 5 — Corpo editorial do `xl` (extrator; medição antecipada, 2026-10-24 19:05)
+
+Com ~3 000 artigos do `xl` já recolhidos (a recolha é por ordem alfabética do
+URL, por isso `arquivo/`, `balancos/`, `entrevistas/`, `especial/`,
+`fora_campo/`, `futebol/`; não é uma amostra equilibrada por ano), correu-se
+`corpus_entities --corpus xl --texto corpo-html`: das 1 560 `interior.aspx` só
+**1 tinha corpo** (c′ não encontra o corpo: os marcadores de chrome são os do
+site atual; nenhum contentor do `html_body.py` existia nestes HTML). Fração sem
+corpo ≫ 10 %, por isso aplicou-se o passo (uma iteração, de duas permitidas).
+
+HTML de `interior.aspx` abertos (3 por ano de 2010 a 2015) e localizado o
+corpo contra o texto extraído: **três templates** em `record.xl.pt`:
+
+| Template | Anos | Contentor do corpo |
+| --- | --- | --- |
+| 1 | 2010–2012 | `div.newsBody` (dentro de `areaGeralNoticiasTextBox`) |
+| 1b | 2010 (`/arquivo/` e outros) | `div.areaGeralNoticiasTextBox` com `<p>` diretos, sem `newsBody` |
+| 2 | 2012–2015 | `div.texto` (dentro de `div.maincontain`) |
+
+`html_body.CONTAINERS` ganha `newsBody`, `areaGeralNoticiasTextBox` e `texto`
+(por esta ordem, no fim, porque `texto` é um nome genérico). Rodapés cortados
+no texto: "Siga-nos no Facebook e no Twitter" (templates 1 e 2) e "( etiqueta de
+secções ) Gostou desta notícia? Votação: …" (template 1b, com a etiqueta
+entre parênteses). **Premium:** `interior_premium.aspx` só traz o lead (2012–2013,
+`div.texto` seguido de "Para ler este artigo na íntegra assine o Record
+Premium", classes `nasslog`/`pnass1s`) ou nem isso (2014–2015: o corpo vem por
+AJAX, `premium_article_box.aspx`, classe `centercontentPremium`); as três
+classes passam a `PREMIUM_CLASSES`, e o artigo Premium fica sem corpo, como
+no `por_ano`. 4 testes novos (HTML sintético dos três templates e do Premium).
+
+Resultado sobre os mesmos ~3 000 artigos (1 405 `interior.aspx` normais e 325
+Premium): **corpo em 1 241 de 1 405 normais (88 %)** e **325 de 325 Premium
+marcados como Premium** (antes 116 sem marca). Os 164 normais sem corpo: 92 de
+`fora_campo/cine_estreias` e `cine_record` (fichas de filmes, outro template),
+31 `fora_campo`, 26 `entrevistas` e 15 outros; ficam registados como
+limitação, sem terceira iteração. Validação à mão em 21 artigos de 2010 a 2015
+(início e fim do corpo): o corpo começa na primeira frase da notícia e acaba na
+última, sem menus, comentários, "ler mais" nem assinatura; um caso de `newsBody`
+é uma lista de nomeações de árbitros (texto legítimo).
+
+**O `por_ano` não muda.** Dos 7 034 artigos do `por_ano` sem corpo, 2 076 têm
+HTML em disco (os outros 4 958 não têm HTML): o extrator novo não encontra corpo
+em nenhum (0 de 2 076), por isso os contentores novos não alteram o `por_ano`.
+
+**Classificação (ajuste).** A mesma medição mostrou 229 `/capas/detalhe/` (imagem
+da capa do dia, sem texto) classificados como Artigo; `/capas/` passa a ser
+excluído com `--excluir-multimedia`/nos `interior*.aspx` (Artigos do `xl`:
+72 044 → **71 815**). A recolha do passo 4 arrancou com a lista de 72 044; as 229
+capas são recolhidas mas retiradas na junção em `completo` (`corpus_completo`
+só mantém do `xl` os artigos que a classificação final retém).

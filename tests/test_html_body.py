@@ -169,6 +169,55 @@ réu da noite.<p>Este é, de resto, o segundo penálti da época.<p>CARLOS OLIVE
 </table></td><td width="120"><font size="2">Menu</font></td></tr></table></body></html></form>"""
 
 
+INTERIOR_2010 = """<html><body><div class="areaEsquerdaNoticiasContent">
+<div class="areaGeralNoticiasTextBox preto11v2"><p>A árbitra foi nomeada para o jogo.</p>
+<p>Dirigiu a final em Singapura.</p> ( Arbitragem , Futebol ) <div>Gostou desta notícia? Votação: 0
+Algum erro na notícia? Envie-nos a correcção.</div></div></div><div>Menu</div></body></html>"""
+
+INTERIOR_2011 = """<html><body><div class="areaGeralNoticiasTextBox"><div class="newsBody">
+<p>O euro bateu mínimos de 15 meses.</p><p>Valia 1,28 dólares.</p>
+<p>Siga-nos no Facebook e no Twitter .</p></div></div><div>Partilhar: Menu</div></body></html>"""
+
+INTERIOR_2013 = """<html><body><div class="maincontain"><div class="titulo">Título da notícia</div>
+<div class="sub">Antetítulo</div><div class="texto">O Presidente defendeu a coesão.
+<script>x()</script><p>Segundo parágrafo.</p>Siga-nos no Facebook e no Twitter . Veja aqui o pdf</div>
+<div class="socialtxt tags">Tags: Política</div></div></body></html>"""
+
+INTERIOR_PREMIUM_2013 = """<html><body><div class="maincontain"><div class="titulo">Entrevista</div>
+<div class="texto">Só o lead da entrevista. Para ler este artigo na íntegra assine o Record Premium.
+<div class="nasslog">A partir de €3,59</div></div></div></body></html>"""
+
+INTERIOR_PREMIUM_2014 = """<html><body><div class="centercontentPremium"><div class="maincontain">
+<div class="titulo">Balanço</div></div></div></body></html>"""
+
+
+class InteriorAspx2010To2015Tests(unittest.TestCase):
+    """`interior.aspx` e `interior_premium.aspx` de record.xl.pt (2010–2015); HTML sintético
+    com os três templates medidos em 2026-10-24 (extensão do corpus a 2010–2016)."""
+
+    def test_2010_text_box_without_news_body_cuts_the_footer_and_the_section_label(self) -> None:
+        body = extract_html_body(INTERIOR_2010.encode("utf-8"))
+        self.assertEqual(body.container, "areaGeralNoticiasTextBox")
+        self.assertEqual(body.text, "A árbitra foi nomeada para o jogo. Dirigiu a final em Singapura.")
+
+    def test_news_body_wins_over_the_text_box_and_drops_the_facebook_footer(self) -> None:
+        body = extract_html_body(INTERIOR_2011.encode("utf-8"))
+        self.assertEqual(body.container, "newsBody")
+        self.assertEqual(body.text, "O euro bateu mínimos de 15 meses. Valia 1,28 dólares.")
+
+    def test_2013_texto_div_without_title_tags_script_or_footer(self) -> None:
+        body = extract_html_body(INTERIOR_2013.encode("utf-8"))
+        self.assertEqual(body.container, "texto")
+        self.assertEqual(body.text, "O Presidente defendeu a coesão. Segundo parágrafo.")
+        self.assertFalse(body.premium)
+
+    def test_premium_pages_are_flagged_by_the_login_block_or_the_premium_centre(self) -> None:
+        self.assertTrue(extract_html_body(INTERIOR_PREMIUM_2013.encode("utf-8")).premium)
+        premium_2014 = extract_html_body(INTERIOR_PREMIUM_2014.encode("utf-8"))
+        self.assertTrue(premium_2014.premium)
+        self.assertFalse(premium_2014.found)
+
+
 class OldSite1999Tests(unittest.TestCase):
     """tn0cs/tn1cs.asp (1999–2000): medição de 2026-10-22, 40 páginas, esqueletos
     em output/html_corpo_tn0cs.md e output/html_corpo_tn1cs.md (fora do Git)."""
