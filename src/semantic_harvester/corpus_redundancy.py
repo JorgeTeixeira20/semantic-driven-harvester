@@ -47,7 +47,7 @@ from rdflib.plugins.parsers.ntriples import W3CNTriplesParser
 from .article_body import extract_body
 from .html_body import extract_html_body
 
-from .rdf_mapper import SDH
+from .rdf_mapper import SDH, article_uri
 
 SENSITIVITY_THRESHOLDS = (0.50, 0.60, 0.70, 0.80, 0.85, 0.90, 0.95, 0.99, 1.00)
 
@@ -367,13 +367,16 @@ def _optional_int(value: object) -> int | None:
     return None if value is None else int(value)
 
 
-def load_corpus(graph_path: Path, project_root: Path) -> dict[str, list[Capture]]:
+def load_corpus(
+    graph_path: Path, project_root: Path, titles: dict[str, str] | None = None
+) -> dict[str, list[Capture]]:
     """Capturas por artigo (`originalURL`), em ordem temporal.
 
     Lê o Turtle do corpus de 125 artigos ou, se o caminho acabar em `.nt`, o
     N-Triples de um corpus da Fase 1, em streaming. O HTML em bruto de uma
     captura com texto é procurado em `data/raw/original_html/` com o nome do
-    ficheiro de texto (a mesma convenção do `ArquivoClient`).
+    ficheiro de texto (a mesma convenção do `ArquivoClient`). Com `titles`,
+    preenche-o com o título (`rdfs:label`) de cada artigo.
     """
 
     index = read_graph_index(graph_path)
@@ -405,6 +408,8 @@ def load_corpus(graph_path: Path, project_root: Path) -> dict[str, list[Capture]
                 )
             )
         corpus[article] = sorted(captures, key=lambda c: c.tstamp)
+        if titles is not None:
+            titles[article] = str(index.labels.get(article_uri(article), "") or "")
     return dict(sorted(corpus.items()))
 
 

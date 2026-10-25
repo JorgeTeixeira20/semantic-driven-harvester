@@ -12,13 +12,15 @@ Dados, sem rede e sem alterar nada:
   lido em streaming): URL, título do `Artigo`, captura e se há texto;
 - o Caminho B (`output/corpus_entities_<etiqueta>.csv` e `_corpo.csv`): temas
   pelo URL, entidades no texto e origem do corpo;
-- o vocabulário (QID, categoria, modalidade), a tabela slug → clube e o CSV
-  da Fase 1 (termos de pesquisa que encontraram cada URL).
+- o vocabulário (QID, categoria, modalidade) e a tabela slug → clube.
 
-Preenchimento, sempre com a origem registada (decisão do autor, 2026-10-22):
-modalidade pelo URL e, sem ela, pelos termos de pesquisa de modalidade que
-encontraram o artigo; clube pelo URL e, sem ele, pelos clubes mencionados no
-texto. Os URLs do site de 1999–2009 não têm caminho temático.
+Preenchimento, sempre com a origem registada: modalidade **só pelo URL**, com
+os sinónimos juntos (`MODALIDADE_ALIASES`); clube pelo URL e, sem ele, pelos
+clubes mencionados no texto. Os URLs do site de 1999–2009 não têm caminho
+temático. A modalidade pelo termo de pesquisa (decisão de 2026-10-22) foi
+retirada em 2026-10-25: a TextSearch encontra o termo no menu do site, e o
+termo estava no título ou no corpo em só 6 de 100 artigos ("Diagnóstico de
+falhas no painel", `docs/experiments.md`).
 
 Também escreve `resumo.md`, com as tabelas para as conclusões.
 """
@@ -36,11 +38,9 @@ from pathlib import Path
 from .corpus_classification import article_url_scheme
 from .corpus_entities import ORIGIN_TEXT, ORIGIN_URL, fold
 from .corpus_entities_rdf import primary_qid, url_club_qids
-from .corpus_phase1 import MODALIDADES
 from .corpus_redundancy import corpus_graph_path, read_graph_index
 from .navigation_corpus_page import PAGE
 from .rdf_mapper import article_uri
-from .url_identity import normalize_for_grouping
 
 DEFAULT_LABEL = "por_ano"
 DEFAULT_VOCABULARY = Path("data") / "processed" / "caminho_b_vocabulario_wikidata_alargado.csv"
@@ -61,6 +61,13 @@ ERAS = (
 )
 OTHER_ERA = "outro"
 ORIGIN_NONE, ORIGIN_FROM_URL, ORIGIN_FALLBACK = 0, 1, 2
+# A mesma modalidade com nomes diferentes no URL (diagnóstico de 2026-10-25):
+# a grafia inglesa e os subtemas de aventura.
+MODALIDADE_ALIASES = {
+    "rugby": "raguebi",
+    "aventura-em-mocambique": "aventura",
+    "record-pela-patagonia": "aventura",
+}
 CLUB_CATEGORY = "clube"
 OTHER_CATEGORIES = ("treinador", "estadio", "competicao")
 
@@ -128,22 +135,6 @@ def load_club_map(path: Path) -> dict[str, tuple[str, str]]:
                 for row in csv.DictReader(handle)}
 
 
-def load_discovery_modalidades(captures_csv: Path) -> dict[str, set[str]]:
-    """URL agrupado → modalidades dos termos de pesquisa que o encontraram."""
-
-    terms = {fold(t): slug(t) for t in MODALIDADES}
-    found: dict[str, set[str]] = defaultdict(set)
-    with captures_csv.open(encoding="utf-8", newline="") as handle:
-        for row in csv.DictReader(handle):
-            mods = {terms[fold(q)] for q in row["queries"].split(";") if fold(q) in terms}
-            if mods:
-                key = normalize_for_grouping(row["original_url"])
-                found[key] |= mods
-                for variant in filter(None, (row.get("url_variants") or "").split(";")):
-                    found[normalize_for_grouping(variant)] |= mods
-    return found
-
-
 def load_body_sources(path: Path) -> dict[str, str]:
     if not path.is_file():
         return {}
@@ -160,7 +151,6 @@ def build_articles(
     body_csv: Path,
     vocabulary: dict[str, Entity],
     club_map: dict[str, tuple[str, str]],
-    discovery: dict[str, set[str]],
 ) -> tuple[list[Article], dict[str, str]]:
     """Artigos com o preenchimento feito, e nome de cada chave de clube."""
 
@@ -191,12 +181,9 @@ def build_articles(
             era=era_of(url), body=bodies.get(url, "c′" if has_text else "sem_texto"),
         )
 
-        url_mods = themes[url].get("modalidade", [])
+        url_mods = {MODALIDADE_ALIASES.get(m, m) for m in themes[url].get("modalidade", [])}
         if url_mods:
-            article.modalidades, article.modalidade_origin = sorted(set(url_mods)), ORIGIN_FROM_URL
-        elif discovery.get(normalize_for_grouping(url)):
-            article.modalidades = sorted(discovery[normalize_for_grouping(url)])
-            article.modalidade_origin = ORIGIN_FALLBACK
+            article.modalidades, article.modalidade_origin = sorted(url_mods), ORIGIN_FROM_URL
 
         entities = [vocabulary[r] for r in mentions.get(url, []) if r in vocabulary]
         article.entities = sorted({e.key for e in entities})
@@ -285,8 +272,8 @@ def write_summary(articles: list[Article], vocabulary: dict[str, Entity],
         "da descoberta (300 resultados por termo e ano).\n",
         f"- Artigos: {len(articles)}",
         f"- Com pelo menos uma entidade: {sum(1 for a in articles if a.entities)}",
-        f"- Modalidade pelo URL / pelo termo de pesquisa / nenhuma: "
-        f"{mod_origin[ORIGIN_FROM_URL]} / {mod_origin[ORIGIN_FALLBACK]} / {mod_origin[ORIGIN_NONE]}",
+        f"- Modalidade pelo URL / nenhuma: "
+        f"{mod_origin[ORIGIN_FROM_URL]} / {mod_origin[ORIGIN_NONE]}",
         f"- Clube pelo URL / pelo texto / nenhum: "
         f"{club_origin[ORIGIN_FROM_URL]} / {club_origin[ORIGIN_FALLBACK]} / {club_origin[ORIGIN_NONE]}",
         "",
@@ -297,7 +284,7 @@ def write_summary(articles: list[Article], vocabulary: dict[str, Entity],
         *_table(("Época", *bodies),
                 [(e, *(body_by_era[(e, b)] for b in bodies)) for e in eras
                  if any(body_by_era[(e, b)] for b in bodies)]),
-        "## Modalidades (pelo URL ou pelo termo de pesquisa)\n",
+        "## Modalidades (pelo URL)\n",
         *_table(("Modalidade", "Artigos"), mod_counts.most_common()),
         "## Clubes mais mencionados no texto\n",
         *_table(("Clube", "Artigos"),
@@ -327,10 +314,9 @@ def run(
     club_map_file = root / (club_map_path or DEFAULT_CLUB_MAP)
     vocabulary = load_vocabulary(root / (vocabulary_path or DEFAULT_VOCABULARY), url_club_qids(club_map_file))
     club_map = load_club_map(club_map_file)
-    discovery = load_discovery_modalidades(output / f"corpus_phase1_{label}_captures.csv")
     articles, club_names = build_articles(
         corpus_graph_path(root, label), output / f"corpus_entities_{label}.csv",
-        output / f"corpus_entities_{label}_corpo.csv", vocabulary, club_map, discovery,
+        output / f"corpus_entities_{label}_corpo.csv", vocabulary, club_map,
     )
     target = output / f"prototipo_{label}"
     target.mkdir(parents=True, exist_ok=True)

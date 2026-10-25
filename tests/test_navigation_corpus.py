@@ -98,13 +98,14 @@ class NavigationCorpusTests(OfflineTestCase):
             era_of("https://record.xl.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/x.html"),
             "2015–2024")
 
-    def test_modalidade_from_url_then_search_term(self) -> None:
+    def test_modalidade_only_from_url(self) -> None:
         mods = self.data["modalidades"]
         self.assertEqual(([mods[i] for i in self.rows[MODERN][4]], self.rows[MODERN][5]),
                          (["futebol"], ORIGIN_FROM_URL))
-        # O CSV da Fase 1 tem a variante http:// do URL e o termo com acento.
-        self.assertEqual(([mods[i] for i in self.rows[OLD][4]], self.rows[OLD][5]),
-                         (["hoquei-em-patins"], ORIGIN_FALLBACK))
+        # O termo de pesquisa ("hóquei em patins") já não dá modalidade (2026-10-25):
+        # a TextSearch encontra-o no menu do site.
+        self.assertEqual((self.rows[OLD][4], self.rows[OLD][5]), ([], ORIGIN_NONE))
+        self.assertNotIn("hoquei-em-patins", mods)
         self.assertEqual((self.rows[OLDEST][4], self.rows[OLDEST][5]), ([], ORIGIN_NONE))
 
     def test_club_from_url_then_text_share_the_qid(self) -> None:
@@ -129,7 +130,7 @@ class NavigationCorpusTests(OfflineTestCase):
         self.assertIn('<script src="data.js"></script>', page)
         summary = (self.target / "resumo.md").read_text(encoding="utf-8")
         self.assertIn("- Artigos: 4", summary)
-        self.assertIn("- Modalidade pelo URL / pelo termo de pesquisa / nenhuma: 1 / 1 / 2", summary)
+        self.assertIn("- Modalidade pelo URL / nenhuma: 1 / 3", summary)
         self.assertIn("- Clube pelo URL / pelo texto / nenhum: 2 / 1 / 1", summary)
         self.assertIn("| Sport Lisboa e Benfica | 1 |", summary)
         self.assertIn("| Rafa Silva | futebol | 1 |", summary)

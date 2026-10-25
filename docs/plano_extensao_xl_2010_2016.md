@@ -133,6 +133,12 @@ O agrupamento atual (`url_identity.normalize_for_grouping`,
 
 ### 8. Cadeia (Caminho B, híbrida, painel) para `completo`
 
+**Atualização de 2026-10-25:** antes do passo 8, juntar as correções do
+diagnóstico (`docs/experiments.md`, "Correções depois do diagnóstico") e
+correr a cadeia **duas vezes**, ambas com `--sem-repetidas` nos passos 1a e
+3a: uma para `por_ano` (terceira corrida; os números da tese passam a ser
+estes) e outra para `completo`. Seguir a avaliação descrita nessa secção.
+
 Os mesmos passos e opções da segunda corrida do `por_ano`, com
 `--corpus completo`:
 

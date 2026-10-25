@@ -6372,3 +6372,79 @@ pelas tabelas de 2001–2002: não é a precisão por entidade.
 4. 40,9 % dos artigos contêm pelo menos uma frase repetida em ≥ 20 artigos
    (rodapé, comentários, Premium, tabelas).
 Nenhuma correcção foi feita; nenhum ficheiro do `por_ano` foi alterado.
+
+## Correções depois do diagnóstico (2026-10-25)
+
+Implementadas sobre o "Diagnóstico de falhas no painel" (secção anterior).
+Testes offline em `tests/test_boilerplate.py` (14 testes; suite completa OK).
+Ainda **não corridas sobre dados reais**: os números da segunda corrida do
+`por_ano` deixam de ser os finais quando a terceira corrida for feita.
+
+### 1. Modalidade só pelo URL (`navigation_corpus.py`)
+
+- Retirada a modalidade pelo termo de pesquisa ("provável", decisão de
+  2026-10-22): o termo estava no título ou no corpo em 6 de 100 artigos; a
+  TextSearch encontra-o no menu do site. Um artigo sem modalidade no URL fica
+  **sem modalidade** (preferível a uma modalidade errada). Esperado: ~32 635
+  artigos do `por_ano` passam de "pelo termo" a "sem modalidade".
+- Sinónimos no URL juntos (`MODALIDADE_ALIASES`): `rugby` → `raguebi`;
+  `aventura-em-mocambique` e `record-pela-patagonia` → `aventura`.
+  `desportos-de-combate` fica separado de `judo` e `mma` (inclusão, não
+  sinonímia).
+- Só afeta o painel; não muda o Caminho B nem o RDF.
+
+### 2. Tabela lateral no `<aux>` (`html_body.py`)
+
+Uma `<aux>` com pelo menos 20 palavras em que pelo menos 25 % são números é
+uma tabela (classificação, marcadores) e não entra no corpo
+(`looks_like_table`). A tabela de 2001/02 tem cerca de 50 % de números; um
+relato com resultados, minutos e assistência fica muito abaixo de 25 %
+(teste). As outras `<aux>` da página continuam a contar. Uma página que só
+tem a tabela fica **sem corpo** (esperado: boa parte dos ~4 600 artigos de
+2001–2002 com título genérico ":.: Jornal Record :.:").
+
+### 3. Texto repetido e manchetes de outras notícias (`boilerplate.py`, `corpus_entities --sem-repetidas`)
+
+Precaução do autor: uma frase repetida não é automaticamente chrome (uma
+citação, um resultado ou um comunicado repetem-se legitimamente); combinar a
+frequência com outros sinais e corrigir os falsos positivos **sem**
+introduzir falsos negativos. Desenho:
+
+- **Frase repetida** (mesma segmentação do diagnóstico): retirada só se
+  aparecer em **≥ 20 artigos e em ≥ 3 meses diferentes**. Sinal temporal:
+  uma citação ou um resultado repetem-se em notícias do mesmo acontecimento,
+  perto no tempo; um rodapé, um aviso Premium ou um widget repetem-se ao longo
+  de meses. As frases em ≥ 20 artigos mas em menos de 3 meses ficam
+  **protegidas** e listadas.
+- **Manchete de outra notícia** dentro do corpo (listas de "mais notícias"):
+  sequência igual ao título de **outro** artigo do corpus, com **≥ 6
+  palavras**, que **não continua numa palavra minúscula** (numa lista, a
+  manchete seguinte começa por maiúscula; "Benfica vence o FC Porto por 2-1"
+  numa frase da notícia fica). O título do próprio artigo nunca conta.
+- Os trechos retirados **partem** o texto: as palavras dos dois lados não se
+  juntam numa menção.
+- Só para a procura de entidades (`corpus_entities`, passos 1a e 3a). O
+  corpo, o RDF dos artigos e o `corpus_candidate_entities` (1b) não mudam;
+  limitação: candidatos vindos de texto repetido continuam a poder aparecer,
+  mas só entram com ≥ 10 artigos e confirmação na Wikidata.
+- Saídas: `output/corpus_entities<tag>_repetidas.csv` (frase, artigos,
+  meses, retirada sim/não) e um parágrafo no `_summary.md` com as contagens
+  (frases retiradas e protegidas, trechos por motivo, capturas afetadas).
+
+Os outros sinais propostos pelo autor (posição no HTML, repetição dentro do
+mesmo modelo de página) não foram implementados: a posição só existe para os
+corpos vindos do HTML, e o sinal temporal mais o título de outro artigo já
+cobrem os casos do diagnóstico. Ficam como alternativa se a avaliação mostrar
+falsos negativos.
+
+### Avaliação a fazer na terceira corrida (sessão local)
+
+1. **Falsos negativos da limpeza:** 40 trechos retirados ao acaso (20 frases
+   repetidas e 20 manchetes), lidos no contexto: quantos eram texto da notícia?
+   E as 20 frases protegidas mais frequentes: deviam ter sido retiradas?
+2. **Precisão das menções:** repetir o ponto 5 do diagnóstico (40 pares
+   artigo–entidade, nova semente) sobre a terceira corrida, para comparar com
+   23/40 (57,5 %).
+3. **Top 30 das entidades:** quantos erros evidentes (antes: Hugo Henrique,
+   Derlei, Mantorras e os clubes de 2001/02 no topo).
+4. **Origem do corpo:** quantos artigos `html:aux` passam a sem corpo.

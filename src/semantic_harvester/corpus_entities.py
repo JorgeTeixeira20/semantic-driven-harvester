@@ -42,6 +42,8 @@ from .corpus_chrome import (
     DEFAULT_N, article_frequency, chrome_coverage, chrome_ngrams, layer1_tokens,
     tokens,
 )
+from .boilerplate import Boilerplate
+from .boilerplate import build as build_boilerplate
 from .corpus_redundancy import Capture, corpus_graph_path, load_corpus, to_body_corpus
 
 DEFAULT_CHROME_FRACTION = 0.10
@@ -317,6 +319,8 @@ def analyse_article(
     longest_match: bool = True,
     strict_clubs: bool = True,
     name_rules: bool = True,
+    boilerplate: Boilerplate | None = None,
+    removed: Counter | None = None,
 ) -> list[dict[str, str]]:
     themes = themes_from_url(article)
     club_slugs = [value for categoria, value in themes if categoria == "clube"]
@@ -333,7 +337,20 @@ def analyse_article(
     texts = [c.text or "" for c in captures if c.in_layer1]
     per_capture = []
     for text in texts:
-        segments, caps = segments_with_caps(text, chrome, n)
+        if boilerplate is not None:
+            # Sem frases repetidas nem manchetes de outras notícias; os trechos
+            # retirados partem o texto (as palavras dos dois lados não se juntam).
+            pieces, reasons = boilerplate.split(text, article)
+            if removed is not None:
+                removed.update(reasons)
+                removed.update(["artigos_com_trechos"] if reasons else [])
+            segments, caps = [], []
+            for piece in pieces:
+                piece_segments, piece_caps = segments_with_caps(piece, chrome, n)
+                segments += piece_segments
+                caps += piece_caps
+        else:
+            segments, caps = segments_with_caps(text, chrome, n)
         per_capture.append(count_mentions(segments, terms, longest_match,
                                           caps if name_rules else None))
     by_label = {term.rotulo: term for term in terms}
@@ -540,6 +557,7 @@ def run(
     corpus_label: str | None = None,
     use_html: bool = False,
     name_rules: bool = True,
+    drop_repeated: bool = False,
 ) -> list[dict[str, str]]:
     """Sem `corpus_label`, o corpus de 125 artigos e as saídas oficiais; com
     uma etiqueta (ex. `por_ano`), o N-Triples desse corpus da Fase 1 e saídas
@@ -550,7 +568,8 @@ def run(
         raise ValueError("É preciso indicar o vocabulário fechado (--vocabulario).")
     output = root / "output"
     tag = f"_{corpus_label}" if corpus_label else ""
-    corpus = load_corpus(corpus_graph_path(root, corpus_label), root)
+    titles: dict[str, str] = {}
+    corpus = load_corpus(corpus_graph_path(root, corpus_label), root, titles)
     terms = load_vocabulary(vocabulary_path)
     dropped_names: list[str] = []
     if name_rules:
@@ -560,12 +579,21 @@ def run(
         corpus, chrome_fraction = to_body_corpus(corpus, use_html=use_html), None
     chrome = build_chrome(corpus, chrome_fraction)
     club_map = load_club_map(club_map_path) if club_map_path is not None else None
+    boilerplate = None
+    removed: Counter = Counter()
+    if drop_repeated:
+        boilerplate = build_boilerplate(
+            {article: [(c.tstamp, c.text or "") for c in captures if c.in_layer1]
+             for article, captures in corpus.items()},
+            titles,
+        )
 
     rows = [
         row for article, captures in corpus.items()
         for row in analyse_article(article, captures, terms, chrome, club_map=club_map,
                                    longest_match=longest_match, strict_clubs=not corpus_label,
-                                   name_rules=name_rules)
+                                   name_rules=name_rules, boilerplate=boilerplate,
+                                   removed=removed)
     ]
     unmapped = Counter(
         r["rotulo"] for r in rows
@@ -580,7 +608,41 @@ def run(
                   output / f"corpus_entities{tag}_summary.md", use_body,
                   csv_name=f"corpus_entities{tag}.csv", unmapped_slugs=unmapped,
                   use_html=use_html, dropped_names=dropped_names if name_rules else None)
+    if boilerplate is not None:
+        write_repeated(boilerplate, removed, output / f"corpus_entities{tag}_repetidas.csv",
+                       output / f"corpus_entities{tag}_summary.md")
     return rows
+
+
+REPEATED_FIELDS = ("frase", "artigos", "meses", "retirada")
+
+
+def write_repeated(boilerplate: Boilerplate, removed: Counter, csv_path: Path,
+                   summary_path: Path) -> None:
+    """Frases em ≥ 20 artigos (retiradas ou protegidas por estarem em poucos
+    meses), para a avaliação dos falsos negativos; e as contagens no resumo."""
+
+    with csv_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle, lineterminator="\n")
+        writer.writerow(REPEATED_FIELDS)
+        for key, (articles, months) in sorted(boilerplate.sentence_stats.items(),
+                                             key=lambda kv: (-kv[1][0], kv[0])):
+            writer.writerow((key, articles, months, "sim" if key in boilerplate.repeated else "nao"))
+    protected = len(boilerplate.sentence_stats) - len(boilerplate.repeated)
+    lines = [
+        "",
+        "## Texto repetido retirado antes da procura (`--sem-repetidas`)",
+        "",
+        f"- Frases em ≥ 20 artigos: {len(boilerplate.sentence_stats)}; retiradas (≥ 3 meses): "
+        f"{len(boilerplate.repeated)}; protegidas (menos de 3 meses): {protected}",
+        f"- Trechos retirados: frases repetidas {removed['frase_repetida']}, manchetes de "
+        f"outras notícias {removed['manchete']}; capturas com algum trecho retirado: "
+        f"{removed['artigos_com_trechos']}",
+        f"- Lista: `{csv_path.name}`",
+        "",
+    ]
+    with summary_path.open("a", encoding="utf-8") as handle:
+        handle.write("\n".join(lines))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -611,6 +673,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="corpus da Fase 1 (ex. por_ano): lê "
                         "data/processed/corpus_articles_<ETIQUETA>_triples.nt e escreve "
                         "output/corpus_entities_<ETIQUETA>*; por omissão, o corpus de 125 artigos")
+    parser.add_argument("--sem-repetidas", action="store_true",
+                        help="não procura entidades em frases repetidas (≥ 20 artigos e ≥ 3 "
+                        "meses) nem em manchetes de outras notícias dentro do corpo "
+                        "(diagnóstico de 2026-10-25)")
     args = parser.parse_args(argv)
     fraction = args.fracao_chrome if args.texto == "sem-chrome" else None
     if fraction is not None and not 0.0 < fraction <= 1.0:
@@ -620,7 +686,7 @@ def main(argv: list[str] | None = None) -> int:
                club_map_path=args.clubes_url, use_body=args.texto in ("corpo", "corpo-html"),
                use_html=args.texto == "corpo-html",
                longest_match=not args.correspondencia_simples, corpus_label=args.corpus,
-               name_rules=not args.sem_regras_nomes)
+               name_rules=not args.sem_regras_nomes, drop_repeated=args.sem_repetidas)
     tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")
     print(f"Saídas: output/corpus_entities{tag}.csv, output/corpus_entities{tag}_summary.md")

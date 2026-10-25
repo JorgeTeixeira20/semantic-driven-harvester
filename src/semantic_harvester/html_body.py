@@ -228,6 +228,23 @@ def _clean(parts: list[str]) -> str:
     return _cut_chrome(text).strip()
 
 
+# Diagnóstico de 2026-10-25: nas `noticia.asp` de 2001–2002, uma `<aux>` é a
+# tabela de classificação e marcadores da barra lateral ("1 Jardel (Sporting) 42
+# 2 Derlei (U. Leiria) 21 …"), a mesma em milhares de páginas. Uma `<aux>` com
+# pelo menos 20 palavras em que ≥ 25 % são números não é corpo. O texto de uma
+# notícia, mesmo um relato com resultados, fica muito abaixo disso.
+TABLE_MIN_WORDS = 20
+TABLE_NUMBER_SHARE = 0.25
+_TOKEN = re.compile(r"\w+")
+
+
+def looks_like_table(text: str) -> bool:
+    tokens = _TOKEN.findall(text)
+    if len(tokens) < TABLE_MIN_WORDS:
+        return False
+    return sum(t.isdigit() for t in tokens) / len(tokens) >= TABLE_NUMBER_SHARE
+
+
 def extract_html_body(raw: bytes) -> HtmlBody:
     parser = _ContainerParser()
     parser.feed(decode_html(raw))
@@ -235,7 +252,7 @@ def extract_html_body(raw: bytes) -> HtmlBody:
     for name, _ in CONTAINERS:
         occurrences = [_clean(part) for part in parser.parts[name]]
         if name == "aux":
-            text = " ".join(t for t in occurrences if t)
+            text = " ".join(t for t in occurrences if t and not looks_like_table(t))
         elif name == "td480":
             text = strip_signature(max(occurrences, key=len, default=""))
         else:
