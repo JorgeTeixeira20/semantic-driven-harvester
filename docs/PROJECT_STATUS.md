@@ -166,6 +166,9 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 
 ### Para a escrita da tese: decisões e estado em 2026-10-22
 
+**Antes de rever um capítulo:** ler `docs/notas_para_escrita.md` — observações que têm de
+aparecer no texto (discussão, limitações, trabalho relacionado), com a fonte de cada uma.
+
 Índice das decisões tomadas entre 2026-10-21 e 2026-10-22, com o sítio do
 detalhe (secções de `docs/experiments.md`, salvo indicação). Nenhum número
 abaixo é novo: vêm dessas secções.

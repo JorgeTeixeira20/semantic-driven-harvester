@@ -6639,3 +6639,28 @@ redação:
 Alternativa não implementada (trabalho futuro): inferir a modalidade dos artigos
 antigos pelas entidades mencionadas (a modalidade do atleta ou do clube no
 vocabulário), com a origem assinalada.
+
+## Trabalho relacionado: Major Minors (Prémio Arquivo.pt 2021) (registo de 2026-10-26)
+
+1.º prémio do Prémio Arquivo.pt 2021 (10 000 €), de Paulo Martins e Leandro Costa
+(Universidade do Minho; orientação de José Carlos Ramalho). Artigo: "Major Minors
+— Ontological representation of minorities by newspapers", SLATE 2021, OASIcs
+vol. 94, DOI 10.4230/OASIcs.SLATE.2021.3.
+
+**O que se confirmou** (notícias do prémio da FCT/FCCN e da Universidade do Minho;
+resumo do artigo; página do projeto em dados.gov.pt, por pesquisa — os sites de
+origem não estavam acessíveis desta sessão): recortes de notícias do **Público**
+recolhidos pelo **Arquivo.pt** (cerca de 1996/2001–2019, conforme a fonte);
+identificação de artigos que se referem a **8 grupos minoritários** (refugiados,
+mulheres, homossexuais, migrantes, entre outros) e cruzamento com **19 entidades**,
+com as listas de entidades sobretudo em dicionários Python; representação numa
+**ontologia OWL/RDF** (`minors.ttl` e `publico.ttl`) num triplestore.
+
+**Não verificado:** o método exato de identificação (palavras-chave, regras ou
+outro); não foi encontrada avaliação publicada da identificação.
+
+**Relação com este trabalho:** mesma família de método (listas/dicionários e
+ontologia), sem ligação documentada à Wikidata; esta dissertação usa uma lista
+fechada tirada da Wikidata (QIDs no RDF), a abordagem híbrida, e avaliação
+documentada (precisão, cobertura, concordância). Notas para a redação em
+`docs/notas_para_escrita.md`.
