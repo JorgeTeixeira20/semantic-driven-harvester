@@ -6639,3 +6639,51 @@ redação:
 Alternativa não implementada (trabalho futuro): inferir a modalidade dos artigos
 antigos pelas entidades mencionadas (a modalidade do atleta ou do clube no
 vocabulário), com a origem assinalada.
+
+## Precisão e cobertura em 30 notícias anotadas
+
+Protocolo: `docs/protocolo_cobertura_30.md`. A amostra (30 Artigos do `por_ano`, semente
+20261026, 15 de 1999–2009 e 15 de 2017–2024) foi sorteada e guardada em
+`data/processed/amostra_cobertura_30.csv` **antes** de anotar (commit `c00ef3e`); a anotação da
+sessão está em `data/processed/anotacao_cobertura_30.csv` (246 entidades distintas; commit
+`0f80db5`), feita **antes** de olhar para o CSV de entidades do sistema. Os resultados da
+comparação seguem na parte final desta secção, depois da quarta corrida.
+
+### Concordância com a anotação do autor (5 primeiras notícias)
+
+O autor anotou por conta própria as 5 primeiras notícias da lista, sem ver a anotação da sessão,
+nas páginas na versão `noFrame`.
+
+| # | Notícia | Entidades do autor | Entidades da sessão | Em comum |
+| ---: | --- | ---: | ---: | ---: |
+| 1 | `noticia.asp?id=147943` (2002) | 0 ("página sem notícia") | 8 | 0 |
+| 2 | `noticia.asp?id=707970` (2006) | 2 | 2 | 2 |
+| 3 | `shownews.asp?id=87713` (2001) | 2 | 2 | 2 |
+| 4 | `noticia.asp?id=159987` (2002) | 16 | 16 | 16 |
+| 5 | `noticia.asp?id=774643` (2008) | 11 | 11 | 11 |
+| | **Total** | 31 | 39 | **31 de 39 distintas (79,5 %)** |
+
+Nas quatro notícias em que ambos encontrámos texto, a concordância é **total (31 de 31, 100 %)**,
+incluindo o que cada um deixou de fora (a sessão e o autor excluíram Federação, dirigentes,
+jornalistas, "Selecção de Malta"; "Restelo" como sinónimo do clube e "Leixões" só no caminho de
+navegação não contam em nenhuma das duas). A única diferença é a nº 1.
+
+**A nº 1 (diferença a resolver pelo autor).** O autor viu "só o marcador lateral da jornada 27" e
+anotou 0; a sessão anotou 8 entidades (Vitória de Guimarães, Boavista, Marítimo, Flamarion,
+Adelino, Augusto Inácio, Rabarivony, I Liga). Verificação feita agora na versão `noFrame`
+(`https://arquivo.pt/noFrame/replay/20020320052246/https://record.pt/noticia.asp?id=147943&idcanal=18`,
+HTTP 200, 89 662 bytes): o texto **está no HTML, em marcação normal e visível** (cabeçalho
+"BRASILEIROS SEM LIMITAÇÕES" em `<font size=3>`, título "Flamarion e Adelino regressaram" em
+`<font size=5 color=#FF0000>` e parágrafos em `<p>`, a seguir ao cabeçalho "GUIMARÃES" e depois do
+marcador lateral e da classificação) e a versão `id_` (original) tem as mesmas 826 palavras. Peço ao
+autor que reabra a nº 1 e confirme; com a nº 1 anotada como a sessão, a concordância das 5 notícias é
+**39 de 39**.
+
+**Confirmação de que nenhuma página com notícia foi marcada como "sem notícia".** Só duas das
+30 ficaram sem entidades: a **nº 8** (`noticia.asp?id=142002`, 2002): a captura arquivada **é** uma
+página de erro (HTTP 500 "Internal Server Error", 532 bytes, tanto no `noFrame` como no `id_`); e a
+**nº 25** (`/liga-nos/detalhe/dez-craques-a-seguir.html`, 2017): artigo Premium; o `noFrame` tem o
+título, o resumo ("A ter em atenção") e listas de outras notícias, mas **não o corpo** (sem
+`articleBody`, nem as marcas de assinante do site, nem os nomes dos "dez craques" fora de
+manchetes de outras notícias). A nº 5 (que o autor viu vazia com a moldura) foi anotada a partir do
+texto: 11 entidades, iguais às do autor.
