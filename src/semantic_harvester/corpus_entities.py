@@ -619,8 +619,9 @@ REPEATED_FIELDS = ("frase", "artigos", "meses", "retirada")
 
 def write_repeated(boilerplate: Boilerplate, removed: Counter, csv_path: Path,
                    summary_path: Path) -> None:
-    """Frases em ≥ 20 artigos (retiradas ou protegidas por estarem em poucos
-    meses), para a avaliação dos falsos negativos; e as contagens no resumo."""
+    """Frases em ≥ 20 artigos (retiradas, ou protegidas por estarem em poucos
+    meses ou serem linhas de ficha de jogo), para a avaliação dos falsos
+    negativos; e as contagens no resumo."""
 
     with csv_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle, lineterminator="\n")
@@ -633,8 +634,9 @@ def write_repeated(boilerplate: Boilerplate, removed: Counter, csv_path: Path,
         "",
         "## Texto repetido retirado antes da procura (`--sem-repetidas`)",
         "",
-        f"- Frases em ≥ 20 artigos: {len(boilerplate.sentence_stats)}; retiradas (≥ 3 meses): "
-        f"{len(boilerplate.repeated)}; protegidas (menos de 3 meses): {protected}",
+        f"- Frases em ≥ 20 artigos: {len(boilerplate.sentence_stats)}; retiradas (≥ 3 meses, "
+        f"ou ≥ 100 artigos): {len(boilerplate.repeated)}; protegidas (poucos meses, ou ficha "
+        f"de jogo): {protected}",
         f"- Trechos retirados: frases repetidas {removed['frase_repetida']}, manchetes de "
         f"outras notícias {removed['manchete']}; capturas com algum trecho retirado: "
         f"{removed['artigos_com_trechos']}",
@@ -675,7 +677,7 @@ def main(argv: list[str] | None = None) -> int:
                         "output/corpus_entities_<ETIQUETA>*; por omissão, o corpus de 125 artigos")
     parser.add_argument("--sem-repetidas", action="store_true",
                         help="não procura entidades em frases repetidas (≥ 20 artigos e ≥ 3 "
-                        "meses) nem em manchetes de outras notícias dentro do corpo "
+                        "meses, ou ≥ 100 artigos; nunca linhas de ficha de jogo) nem em manchetes de outras notícias dentro do corpo "
                         "(diagnóstico de 2026-10-25)")
     args = parser.parse_args(argv)
     fraction = args.fracao_chrome if args.texto == "sem-chrome" else None

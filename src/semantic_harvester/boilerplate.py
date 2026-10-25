@@ -10,14 +10,23 @@ dois tipos de trechos, que o Caminho B deixa de ler:
    retirada só se aparecer em pelo menos `MIN_ARTICLES` artigos **e** em
    pelo menos `MIN_MONTHS` meses diferentes: uma citação ou um resultado
    repetem-se em notícias do mesmo acontecimento, perto no tempo; um rodapé,
-   um aviso de Premium ou um widget repetem-se ao longo de meses.
+   um aviso de Premium ou um widget repetem-se ao longo de meses. Revisão de
+   2026-10-25 (avaliação da terceira corrida): uma frase em pelo menos
+   `MIN_ARTICLES_ANY_TIME` artigos sai mesmo em poucos meses (as tabelas de
+   2001/02 foram capturadas numa janela curta); e as linhas de ficha de jogo
+   ("Treinador: …", "Jogo disputado no Estádio …", "Assistência: …") nunca
+   saem, porque são texto da notícia que se repete por o treinador ou o
+   estádio serem os mesmos.
 2. **Manchetes de outras notícias** dentro do corpo (listas de "mais
    notícias"): uma sequência de palavras igual ao título de *outro* artigo do
    corpus, com pelo menos `MIN_TITLE_WORDS` palavras, que **não continua**
    numa palavra minúscula (numa lista de manchetes, a seguinte começa por
    maiúscula; "Benfica vence o FC Porto por 2-1" numa frase da notícia não é
    retirado). O título do próprio artigo nunca conta, mesmo que outro artigo
-   tenha o mesmo título.
+   tenha o mesmo título; os títulos comparam-se **sem o sufixo do site**
+   ("… - Futebol - Jornal Record"), e um trecho no início do corpo nunca sai
+   (82 % dos trechos retirados na terceira corrida eram o título do próprio
+   artigo, guardado com sufixo, repetido no início do corpo).
 
 Os trechos retirados partem o texto: as palavras de um lado e do outro não se
 juntam numa menção. Sem rede; tudo calculado sobre o corpo já extraído.
@@ -32,6 +41,13 @@ from dataclasses import dataclass, field
 
 MIN_ARTICLES = 20
 MIN_MONTHS = 3
+MIN_ARTICLES_ANY_TIME = 100
+# Início (palavras normalizadas) das linhas de ficha de jogo, que nunca saem.
+MATCH_SHEET_PREFIXES = (
+    "treinador", "treinadores", "arbitro", "arbitros", "assistencia", "jogo disputado",
+    "jogo no estadio", "jogo realizado", "estadio", "suplentes", "suplentes nao utilizados",
+    "golos", "marcadores", "ao intervalo", "disciplina", "substituicoes", "cartoes",
+)
 MIN_SENTENCE_WORDS = 3
 MIN_TITLE_WORDS = 6
 
@@ -66,6 +82,19 @@ def sentence_key(sentence: str) -> str | None:
     return " ".join(tokens) if len(tokens) >= MIN_SENTENCE_WORDS else None
 
 
+def is_match_sheet(key: str) -> bool:
+    return any(key == p or key.startswith(p + " ") for p in MATCH_SHEET_PREFIXES)
+
+
+_TITLE_SUFFIX = re.compile(r"\s+[-–|]\s+.*\brecord\b.*$", re.IGNORECASE)
+
+
+def title_words(title: str) -> tuple[str, ...]:
+    """Palavras do título sem o sufixo do site ("… - Futebol - Jornal Record")."""
+
+    return tuple(words(_TITLE_SUFFIX.sub("", unicodedata.normalize("NFC", title))))
+
+
 def _continues_lowercase(text: str, matches: list[re.Match], after: int) -> bool:
     """A palavra a seguir ao trecho existe, vem logo a seguir (sem pontuação) e é minúscula."""
 
@@ -90,7 +119,7 @@ class Boilerplate:
                  if sentence_key(text[a:b]) in self.repeated]
         matches = list(_WORD_RE.finditer(text))
         folded = [_fold_word(m.group()) for m in matches]
-        i = 0
+        i = 1  # o início do corpo nunca sai (é onde o título do próprio artigo se repete)
         while i < len(folded) - 1:
             best = 0
             for title, owners in self.titles.get((folded[i], folded[i + 1]), ()):
@@ -155,12 +184,12 @@ def build(
         if n >= min_articles:
             months = len(months_of.get(key, ())) or 1
             result.sentence_stats[key] = (n, months)
-            if months >= min_months:
+            if (months >= min_months or n >= MIN_ARTICLES_ANY_TIME) and not is_match_sheet(key):
                 result.repeated.add(key)
 
     own: dict[tuple[str, ...], set[str]] = {}
     for article, title in titles.items():
-        tokens = tuple(words(title))
+        tokens = title_words(title)
         if len(tokens) >= MIN_TITLE_WORDS:
             own.setdefault(tokens, set()).add(article)
     for tokens, owners in own.items():

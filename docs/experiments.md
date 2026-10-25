@@ -6560,3 +6560,31 @@ traz o corpo). Os outros contentores não mudam.
    ("Treinador:", "Árbitro:", "Assistência:", "Jogo …").
 4. **Falsos positivos de nome** (crédito "Foto:", apelido de outra pessoa, "Seleção
    Nacional", comentários de leitores) ficam fora desta correção.
+
+## Segunda revisão da limpeza de texto repetido (2026-10-25, depois da terceira corrida)
+
+Implementa as propostas 1–3 de "O que corrigir" da terceira corrida
+(`boilerplate.py`; 4 testes novos em `tests/test_boilerplate.py`, suite OK).
+A proposta 4 (falsos positivos de nome: crédito "Foto:", apelidos, "Seleção
+Nacional", comentários de leitores) **não** é tratada: fica na análise de erros.
+
+1. **Frases muito frequentes saem mesmo em poucos meses:** uma frase em
+   **≥ 100 artigos** é retirada sem a condição dos 3 meses. Caso medido: as 20
+   frases protegidas mais frequentes eram as tabelas de 2001/02 (359–584
+   artigos), capturadas numa janela curta. Uma citação ou um resultado em 100
+   ou mais artigos em menos de 3 meses não é plausível.
+2. **Manchetes:** os títulos comparam-se **sem o sufixo do site** (tudo a
+   partir de " - "/" – "/" | " quando o resto contém "Record": "… - Futebol -
+   Jornal Record"), e **o início do corpo nunca sai** (a procura de manchetes
+   começa na 2.ª palavra). Caso medido: 5 316 dos 6 496 trechos "manchete"
+   (82 %) eram o título do próprio artigo, guardado com sufixo e repetido no
+   início do corpo.
+3. **Linhas de ficha de jogo nunca saem:** frases que começam por "Treinador",
+   "Árbitro", "Assistência", "Jogo disputado", "Jogo no Estádio", "Estádio",
+   "Suplentes", "Golos", "Marcadores", "Ao intervalo", "Disciplina",
+   "Substituições", "Cartões" (`MATCH_SHEET_PREFIXES`). Caso medido: 4 dos 20
+   trechos de frase repetida retirados eram destas linhas (3 com entidade).
+
+Na lista `corpus_entities<tag>_repetidas.csv`, "retirada = nao" passa a
+incluir as linhas de ficha de jogo. Avaliação a repetir na quarta corrida: os
+mesmos pontos 1–3 da terceira (falsos negativos, 40 pares, top 30).

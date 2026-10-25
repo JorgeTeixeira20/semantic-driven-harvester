@@ -7,7 +7,7 @@ from __future__ import annotations
 import unittest
 from collections import Counter
 
-from semantic_harvester.boilerplate import build, sentence_spans
+from semantic_harvester.boilerplate import build, sentence_spans, title_words
 from semantic_harvester.corpus_entities import Term, analyse_article, match_tokens
 from semantic_harvester.corpus_redundancy import Capture
 from semantic_harvester.html_body import extract_html_body, looks_like_table
@@ -59,6 +59,24 @@ class RepeatedSentenceTests(unittest.TestCase):
                                                                      "201904", "201905", "201906")})
         self.assertEqual(build(bodies, {}).repeated, set())  # 18 artigos
 
+    def test_very_frequent_sentence_is_removed_even_in_few_months(self) -> None:
+        # As tabelas de 2001/02 foram capturadas numa janela curta (terceira corrida).
+        line = "Ferreira 46 9 Hugo Henrique (V. Setubal) 16 5 Gaucho (Maritimo) 15"
+        bodies = corpus({"200205": [f"Notícia {i}. {line}" for i in range(100)]})
+        result = build(bodies, {})
+        self.assertTrue(result.repeated)  # a linha parte-se em duas "frases" em "V. Setubal"
+        self.assertNotIn("Hugo", " ".join(result.pieces(f"Notícia nova. {line}", "x")))
+
+    def test_match_sheet_lines_are_never_removed(self) -> None:
+        # Texto da notícia que se repete por o treinador ou o estádio serem os mesmos.
+        lines = ("Treinador: Sérgio Vieira.", "Jogo disputado no Estádio 25 de Abril, em Penafiel.",
+                 "Assistência: cerca de 2.000 espectadores.")
+        bodies = corpus({m: [f"Relato {m} {i}. " + " ".join(lines) for i in range(40)]
+                         for m in ("201801", "201805", "201809")})
+        result = build(bodies, {})
+        self.assertEqual(result.repeated, set())
+        self.assertEqual(len(result.sentence_stats), 3)  # medidas e protegidas
+
     def test_sentence_spans_cut_at_final_punctuation(self) -> None:
         text = "Primeira frase. Segunda frase! 3 golos marcados."
         self.assertEqual([text[a:b] for a, b in sentence_spans(text)],
@@ -86,6 +104,23 @@ class HeadlineTests(unittest.TestCase):
     def test_title_continuing_in_lowercase_is_part_of_the_text(self) -> None:
         text = "Maradona elogia jogadores do Benfica na Argentina durante uma entrevista."
         self.assertEqual(self.result.split(text, "proprio")[1], [])
+
+    def test_site_suffix_is_not_part_of_the_title(self) -> None:
+        self.assertEqual(title_words("Benfica vence o FC Porto no clássico - Futebol - Jornal Record"),
+                         ("benfica", "vence", "o", "fc", "porto", "no", "classico"))
+        self.assertEqual(title_words("Sporting-Benfica: 2-1"), ("sporting", "benfica", "2", "1"))
+
+    def test_own_title_with_suffix_repeated_in_the_body_is_kept(self) -> None:
+        # Terceira corrida: o título guardado tem sufixo; um duplicado sem sufixo de outro
+        # artigo fazia o início do corpo passar por "manchete de outra notícia".
+        result = build({}, {
+            "proprio": "Benfica vence o FC Porto no clássico de domingo - Futebol - Jornal Record",
+            "duplicado": "Benfica vence o FC Porto no clássico de domingo",
+        })
+        text = "Benfica vence o FC Porto no clássico de domingo Golos de Rafa e Pizzi."
+        self.assertEqual(result.split(text, "proprio")[1], [])
+        # E um terceiro artigo com o mesmo título no início do corpo também o mantém.
+        self.assertEqual(result.split(text, "terceiro")[1], [])
 
     def test_short_titles_are_ignored(self) -> None:
         self.assertEqual(build({}, {"curto": "Benfica vence FC Porto"}).titles, {})
