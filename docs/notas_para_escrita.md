@@ -82,3 +82,13 @@ em 2026-10-26: os valores atuais conferem com o `experiments.md`.
 | Ontologia (`ontologia.typ`) | Identificação e Enriquecimento Semântico (por escrever) | — | quarta corrida: artigos com ≥ 1 entidade, entidades aceites na híbrida, precisão (40 pares), precisão e cobertura (30 notícias), concordância |
 | Protótipo (por escrever) | — | — | quarta corrida: modalidades (com e sem), top de entidades, tamanho do `data.js`; completo: anos |
 | Avaliação (por escrever) | — | — | quarta corrida e 30 notícias |
+
+## Perguntas de investigação (decididas em 2026-10-26)
+
+Ficam no fim da secção "Problema de Investigação" da Introdução, antes dos Objetivos:
+QI1 (características do Arquivo.pt que condicionam a recolha), QI2 (isolar o conteúdo
+editorial e identificar entidades, e com que qualidade), QI3 (como uma ontologia organiza
+os conteúdos preservando a proveniência e suportando a exploração). **A revisitar:** nas
+Conclusões, uma subsecção "Resposta às questões de investigação"; na Avaliação, indicar que
+resultado responde a cada pergunta (QI1 → capítulo do Arquivo.pt; QI2 → precisão e cobertura;
+QI3 → ontologia e protótipo).
