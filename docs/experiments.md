@@ -6698,7 +6698,7 @@ da revisão).
 
 **Natureza da divergência:** foi de **leitura da página**, não de critério. A notícia da nº 1 estava
 no HTML, abaixo do marcador lateral da jornada, e a página renderizada parecia só ter o marcador. Em
-nenhuma das 40 entidades das outras quatro notícias houve diferença de critério (âmbito, sinónimos,
+nenhuma das 31 entidades das outras quatro notícias houve diferença de critério (âmbito, sinónimos,
 o que conta como entidade). Na nº 1 e na nº 16 a notícia só estava acessível pelo HTML (pela moldura
 ou pela página renderizada parecia vazia).
 
