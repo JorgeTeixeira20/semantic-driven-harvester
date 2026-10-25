@@ -60,3 +60,25 @@ Cada nota indica a fonte; os números vêm só dessas fontes.
 8. **Ordem c′ antes do HTML** na extração do corpo: escolha medida (HTML mais
    limpo em 25 e pior em 12 dos 37 casos de discordância), não esquecimento.
    Fonte: `experiments.md`, "Corpo do artigo pelo contentor do HTML".
+
+## Números a atualizar quando forem finais
+
+Os números finais dependem de duas coisas ainda em curso: a **quarta corrida** do
+`por_ano` (números do Caminho B e do painel) e a decisão sobre o corpus **completo**
+(`por_ano` + 2010–2016 de `record.xl.pt`; muda o número de artigos, os anos e a
+lacuna). Quando estiverem fechados, voltar a cada um destes sítios. Verificado
+em 2026-10-26: os valores atuais conferem com o `experiments.md`.
+
+| Capítulo (ficheiro) | Secção | O que está escrito agora | Depende de |
+| --- | --- | --- | --- |
+| Introdução (`introducao.typ`) | Contributos da Dissertação | "[N] artigos do Record entre 1999 e 2024" (por preencher) | completo |
+| Arquivo.pt (`arquivopt.typ`) | Caracterização dos Conteúdos Arquivados | "129 317 artigos", "entre 1999 e 2024" | completo |
+| Arquivo.pt | Caracterização dos Conteúdos Arquivados | "não foram identificados artigos … entre 2010 e 2016" + frase sobre a estratégia de pesquisa | completo; acrescentar a explicação do domínio `record.xl.pt` (nota 6) em qualquer caso |
+| Arquivo.pt | Caracterização dos Conteúdos Arquivados | "126 798 possuem texto extraído", "123 844 possuem HTML" | completo |
+| Arquivo.pt | Limitações e Desafios | lista de códigos HTTP "404, 429, 503" | rever: o `experiments.md` regista também 500 (HTML) e os 400 por acumulação de cookies, já resolvidos |
+| Motor de colheita (`motorcolheita.typ`) | Estratégia de Pesquisa e Recolha | "108 termos (39/57/5/7)", "826 mil URLs" | não muda; se o completo entrar, acrescentar a pesquisa com `siteSearch=record.xl.pt` |
+| Motor de colheita | Extração e Processamento | origem do corpo (c′ / HTML / sem corpo) — ainda sem números | quarta corrida (a correção da tabela do `<aux>` mudou `html:aux` e `sem_corpo`) |
+| Motor de colheita | Tratamento da Redundância | "121 artigos … 112 com uma versão" | não muda (corpus de 125 artigos) |
+| Ontologia (`ontologia.typ`) | Identificação e Enriquecimento Semântico (por escrever) | — | quarta corrida: artigos com ≥ 1 entidade, entidades aceites na híbrida, precisão (40 pares), precisão e cobertura (30 notícias), concordância |
+| Protótipo (por escrever) | — | — | quarta corrida: modalidades (com e sem), top de entidades, tamanho do `data.js`; completo: anos |
+| Avaliação (por escrever) | — | — | quarta corrida e 30 notícias |
