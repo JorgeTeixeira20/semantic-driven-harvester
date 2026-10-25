@@ -6169,3 +6169,206 @@ excluído com `--excluir-multimedia`/nos `interior*.aspx` (Artigos do `xl`:
 72 044 → **71 815**). A recolha do passo 4 arrancou com a lista de 72 044; as 229
 capas são recolhidas mas retiradas na junção em `completo` (`corpus_completo`
 só mantém do `xl` os artigos que a classificação final retém).
+
+## Diagnóstico de falhas no painel
+
+Diagnóstico só de leitura sobre o `por_ano` (2026-10-25), sem alterar código nem
+dados, a pedido do autor, antes do passo 8 da extensão a 2010–2016. Scripts
+fora do repositório (`scratchpad`); entrada: `output/prototipo_por_ano/data.js`
+(a modalidade e a origem que o painel mostra), `output/corpus_entities_por_ano.csv`
+(passagem 2, híbrida), o vocabulário híbrido e o corpo de cada artigo
+recalculado como na cadeia (`corpo-html`: c′, depois o contentor do HTML;
+**0 diferenças** face à origem do corpo oficial nos 129 317 artigos).
+
+### 1. Modalidades (43; 129 317 artigos)
+
+Sem modalidade: 41 441; modalidade pelo URL: 55 241 artigos; pelo termo de
+pesquisa: 32 635. A origem é por artigo (se o URL traz modalidade, só essa;
+senão, os termos que o encontraram).
+
+| Modalidade | Artigos | Pelo URL | Pelo termo |
+| --- | ---: | ---: | ---: |
+| futebol | 39 261 | 36 869 | 2 392 |
+| andebol | 3 567 | 1 558 | 2 009 |
+| ciclismo | 3 524 | 1 359 | 2 165 |
+| atletismo | 3 515 | 1 359 | 2 156 |
+| basquetebol | 3 387 | 1 491 | 1 896 |
+| tenis | 3 308 | 1 088 | 2 220 |
+| voleibol | 3 190 | 1 317 | 1 873 |
+| hoquei-em-patins | 3 098 | 1 522 | 1 576 |
+| motores | 2 928 | 1 077 | 1 851 |
+| golfe | 2 893 | 807 | 2 086 |
+| natacao | 2 811 | 481 | 2 330 |
+| judo | 2 798 | 601 | 2 197 |
+| tenis-de-mesa | 2 662 | 329 | 2 333 |
+| vela | 2 514 | 109 | 2 405 |
+| tiro | 2 456 | 6 | 2 450 |
+| canoagem | 2 447 | 508 | 1 939 |
+| jogos-olimpicos | 2 307 | 931 | 1 376 |
+| ginastica | 2 285 | 172 | 2 113 |
+| xadrez | 2 106 | 2 | 2 104 |
+| surf | 2 050 | 1 470 | 580 |
+| triatlo | 2 017 | 262 | 1 755 |
+| jogos-europeus | 1 922 | 128 | 1 794 |
+| aventura | 1 758 | 3 | 1 755 |
+| remo | 1 729 | 78 | 1 651 |
+| esgrima | 1 695 | 4 | 1 691 |
+| badminton | 1 691 | 45 | 1 646 |
+| nfl | 1 176 | 121 | 1 055 |
+| desportos-de-combate | 1 097 | 637 | 460 |
+| orientacao | 973 | 118 | 855 |
+| padel | 948 | 171 | 777 |
+| desporto-adaptado | 932 | 3 | 929 |
+| polo-aquatico | 928 | 1 | 927 |
+| desportos-de-inverno | 873 | 3 | 870 |
+| snooker | 826 | 25 | 801 |
+| desportos-radicais | 813 | 78 | 735 |
+| mma | 700 | 7 | 693 |
+| desporto-escolar | 508 | 40 | 468 |
+| **rugby** | 495 | 0 | 495 |
+| **raguebi** | 274 | 274 | 0 |
+| desporto-universitario | 263 | 179 | 84 |
+| aventura-em-mocambique | 4 | 4 | 0 |
+| outras | 3 | 3 | 0 |
+| record-pela-patagonia | 1 | 1 | 0 |
+
+**Pares que parecem sinónimos:** `rugby` (só pelo termo) e `raguebi` (só pelo
+URL) são o mesmo desporto, repartido em duas entradas; `aventura`,
+`aventura-em-mocambique` e `record-pela-patagonia` (subtemas de aventura, no
+URL); `desportos-de-combate` contém `judo` e `mma` (relação de inclusão, não
+sinonímia). Para as modalidades que não são futebol, 60–99 % dos artigos têm a
+modalidade só pelo termo de pesquisa (`tiro` 2 450 de 2 456, `xadrez` 2 104 de
+2 106).
+
+### 2. Modalidade "provável" (do termo de pesquisa)
+
+20 artigos ao acaso por modalidade (semente 20261025), só artigos com a modalidade
+pelo termo; o termo procurado sem acentos e como palavra inteira no título ou no
+corpo.
+
+| Modalidade (artigos pelo termo) | Termo no título | Só no corpo | Em nenhum | Sem corpo (dos 20) |
+| --- | ---: | ---: | ---: | ---: |
+| judo (2 197) | 0 | 2 | **18** | 6 |
+| desporto-universitario (84) | 0 | 0 | **20** | 0 |
+| tiro (2 450) | 0 | 2 | **18** | 2 |
+| xadrez (2 104) | 1 | 0 | **19** | 3 |
+| vela (2 405) | 0 | 1 | **19** | 3 |
+
+Em 5 modalidades, o termo aparece no título ou no corpo em 6 dos 100 artigos.
+Os "em nenhum" são artigos de futebol, páginas genéricas ("Record", ":.: Jornal
+Record :.:") ou artigos sem corpo; o termo que os encontrou está no menu do site
+(a lista de modalidades), que a TextSearch indexa e o corpo já não traz. A
+modalidade pelo termo **não** é evidência de que o artigo trate dessa
+modalidade.
+
+### 3. Hugo Henrique (4 646 artigos)
+
+Distribuição por ano: 2001 1 903, 2002 2 697, 1999–2000 36, 2004–2007 8, 2017 2.
+5 artigos ao acaso (semente 20261025), todos de 2002 (`noticia.asp`, corpo
+`html:aux`, 156–217 palavras, título genérico ":.: Jornal Record :.:"):
+
+| Artigo | Origem do corpo | Contexto da menção (≈200 caracteres) |
+| --- | --- | --- |
+| `noticia.asp?id=165733` (2002-06-15) | `html:aux` | "…Campeonato 2001/02 1 Jardel (Sporting) 42 2 Derlei (U. Leiria) 21 3 Fary (Beira-Mar) 18 4 Hugo Henrique (V. Setúbal) 16 5 Gaúcho (Marítimo) 15…" |
+| `noticia.asp?id=164010` (2002-05-31) | `html:aux` | idem |
+| `noticia.asp?id=154985` (2002-04-13) | `html:aux` | "…3 Fary (Beira-Mar) 15 4 Leonardo (P. Ferreira) e Hugo Henrique (V. Setúbal) 13 5 Simão (Benfica) 11 Jornada 32…" |
+| `noticia.asp?id=152154` (2002-04-17) | `html:aux` | "…4 Hugo Henrique (V. Setúbal) 14 5 Leonardo (P. Ferreira) 13 Jornada 33 Domingo, 28…" |
+| `noticia.asp?id=166312` (2002-06-19) | `html:aux` | "…4 Hugo Henrique (V. Setúbal) 16 5 Gaúcho (Marítimo) 15 Campeonato 2001/02 1 SPORTING 75…" |
+
+**A menção não está na notícia: está na tabela de marcadores/classificação da
+barra lateral.** O `<aux>` das `noticia.asp` de 2001–2002 apanha esse widget
+(a mesma tabela em milhares de artigos) e não o corpo da notícia.
+
+### 4. Frases repetidas
+
+Corpos divididos em frases (`.`, `!`, `?`, `…` seguidos de maiúscula/dígito),
+normalizadas (sem acentos, só palavras), com 3 ou mais palavras, contadas uma
+vez por artigo. 1 058 180 frases distintas; **842 aparecem em 20 ou mais
+artigos**; **52 903 artigos (40,9 %)** têm pelo menos uma.
+
+| # | Artigos | Frase |
+| ---: | ---: | --- |
+| 1 | 35 622 | Caso não esteja registado no site do Record, efectue o seu registo gratuito. |
+| 2 | 5 292 | O meu email O meu nome Comentários Destinatários: (para vários endereços usar ; e espaço) Enviar Para poder guardar esta notícia deverá efec… |
+| 3 | 4 635 | Siga o nosso canal de WhatsApp e fique a par das principais notícias. |
+| 4 | 2 408 | × Funcionalidade exclusiva para assinantes Record Premium Assine para partilhar E usufrua de todas as vantagens de ser assinante A carregar… |
+| 5 | 2 317 | Mais informação na edição impressa de Record |
+| 6 | 1 979 | A carregar o vídeo ... |
+| 7 | 1 930 | Setúbal 38 13 Gil Vicente 38 14 S. |
+| 8 | 1 930 | Ferreira 46 9 V. |
+| 9 | 1 725 | Deixe o seu comentário Para poder guardar esta notícia deverá efectuar login. |
+| 10 | 1 721 | Clara 37 15 Varzim 32 16 Salgueiros 30 17 Farense 28 18 Alverca 27 Campeonato 2001/02 1 Jardel (Sporting) 42 2 Derlei (U. |
+| 11 | 1 721 | Leiria) 21 3 Fary (Beira-Mar) 18 4 Hugo Henrique (V. |
+| 12 | 1 721 | Leiria 55 8 P. |
+| 13 | 1 721 | Braga 42 11 Beira-Mar 39 12 V. |
+| 14 | 1 721 | Guimarães 42 10 Sp. |
+| 15 | 1 540 | Clara 37 15 Varzim 32 16 Salgueiros 30 17 Farense 28 18 Alverca 27 Campeonato 2001/02 1 SPORTING 75 2 Boavista 70 3 FC Porto 68 4 Benfica 63… |
+| 16 | 1 540 | Setúbal) 16 5 Gaúcho (Marítimo) 15 Campeonato 2001/02 1 SPORTING 75 2 Boavista 70 3 FC Porto 68… |
+| 17 | 1 540 | Campeonato 2001/02 1 SPORTING 75 2 Boavista 70 3 FC Porto 68 4 Benfica 63 5 Belenenses 57 6 Marítimo 56 7 U. |
+| 18 | 1 540 | Clara 37 15 Varzim 32 16 Salgueiros 30 17 Farense 28 18 Alverca 27 |
+| 19 | 1 155 | Ferreira), Hugo Henrique (V. |
+| 20 | 1 149 | Deixe o seu comentário PUB |
+
+Os números 1–6, 9 e 20 são rodapé/comentários/Premium do site actual; os
+7–8, 10–19 são **a tabela de classificação e marcadores de 2001/02**, cortada
+em "frases" nos pontos das abreviaturas ("V. Setúbal", "S. Clara").
+
+**Impacto nas 30 entidades mais mencionadas** (passagem 2): refeita a
+deteção (mesmo vocabulário híbrido e mesmas regras) sobre o corpo sem as
+frases em 20 ou mais artigos, e contados os artigos que deixam de ter a menção
+(a deteção sobre o corpo inteiro reproduz o CSV: 0 artigos sem menção).
+
+| Entidade | Artigos | Ficam sem a menção | % |
+| --- | ---: | ---: | ---: |
+| Hugo Henrique | 4 646 | 4 564 | 98,2 |
+| Derlei | 4 452 | 4 047 | 90,9 |
+| Pedro Mantorras | 2 496 | 1 886 | 75,6 |
+| Sport Clube Beira-Mar | 6 364 | 4 655 | 73,1 |
+| Sporting Clube Farense | 7 135 | 4 636 | 65,0 |
+| União Desportiva de Leiria | 7 596 | 4 856 | 63,9 |
+| Varzim Sport Club | 7 344 | 4 536 | 61,8 |
+| Gil Vicente Futebol Clube | 8 388 | 4 733 | 56,4 |
+| Vitória Futebol Clube | 8 917 | 4 699 | 52,7 |
+| Club Sport Marítimo | 9 895 | 4 696 | 47,5 |
+| Clube de Futebol Os Belenenses | 10 290 | 4 647 | 45,2 |
+| Sporting Clube de Braga | 11 442 | 4 753 | 41,5 |
+| Futebol Clube do Porto | 23 840 | 4 755 | 19,9 |
+| Sporting Clube de Portugal | 27 960 | 4 655 | 16,6 |
+| Sport Lisboa e Benfica | 30 996 | 4 672 | 15,1 |
+| Jogos Olímpicos | 3 356 | 79 | 2,4 |
+| Rio Ave / Académica / Estoril / J. C. Rodrigues da Costa / Real Madrid | 3 909–4 163 | 45–89 | 1,3–2,1 |
+| Cristiano Ronaldo, Man. United, Moreirense | 2 618–4 086 | 13–36 | 0,5–0,9 |
+| Taça de Portugal, Liga dos Campeões, Leixões, Paços de Ferreira, Feirense, Speedway 2. Ekstraliga | 2 462–8 084 | 0 | 0,0 |
+
+Cada clube perde ~4 600–4 850 artigos: são os **mesmos ~4 600 artigos de
+2001–2002** (`noticia.asp` com a tabela de 2001/02 no `<aux>`). Os 10 clubes e
+jogadores de 1.ª Liga de então (Beira-Mar, Farense, Leiria, Varzim, Gil
+Vicente, …, Hugo Henrique, Derlei, Mantorras) são quase só tabela.
+
+### 5. Precisão das menções (40 pares artigo–entidade ao acaso)
+
+Sobre os 671 788 pares (artigo, entidade) do CSV (semente 20261026), contexto
+de ~340 caracteres lido à mão; **sim** = a menção está no texto da notícia e é
+a entidade; **não** = a menção está num widget, num destaque/menu ou é falso
+positivo; **duvidoso** = identidade incerta.
+
+| Resultado | Pares | Quais |
+| --- | ---: | --- |
+| **sim** | 23 | #1 Nuno Santos, #2 Real Madrid, #3 Beira-Mar (de passagem), #4 Taça da Liga, #8 Premier League, #11 Al Nassr, #12 Leixões, #14 Tozé Marreco, #15 FC Porto, #16 João Ribeiro, #17 Nadal, #20 Pedro Sá, #23 Vitória FC, #24 Figo, #25 Real Madrid, #26 Sporting, #27 Rui Vitória, #30 Ana Monteiro, #31 Real Madrid, #34 Heidfeld, #35 Paire, #37 Bruno Lamas, #40 Ruben Ribeiro |
+| **não** | 15 | 8 tabelas de classificação/jogos de 2001–2002 no `<aux>` (#5 Derlei, #9 Vitória FC, #19 e #22 Varzim, #28 Gil Vicente, #29 FC Porto, #33 e #39 Marítimo); 5 manchetes de destaque dentro do corpo c′ (#6 Artur Futre, #13 Maradona, #18 e #21 e #38: Real Madrid/Benfica em listas de "mais notícias"); 2 falsos positivos (#32 "Nem" conjunção; #36 "San Diego Sockers" ← "San Diego") |
+| **duvidoso** | 2 | #7 João Veloso (escalão de formação, identidade não verificável), #10 "Campeonato Nacional" (genérico) |
+
+Precisão da amostra: **23 de 40 (57,5 %) certas**; 15 erradas (37,5 %); 2
+duvidosas. Amostra de 40 pares de um conjunto dominado por clubes grandes e
+pelas tabelas de 2001–2002: não é a precisão por entidade.
+
+### Resumo
+
+1. A modalidade pelo termo de pesquisa é quase sempre ruído (6 de 100).
+2. O corpo `html:aux` das `noticia.asp` de 2001–2002 é a tabela lateral, não a
+   notícia; produz ~4 600 artigos com clubes e jogadores falsos.
+3. As manchetes de destaque dentro do corpo c′ (listas de notícias) geram
+   menções em 2017–2023.
+4. 40,9 % dos artigos contêm pelo menos uma frase repetida em ≥ 20 artigos
+   (rodapé, comentários, Premium, tabelas).
+Nenhuma correcção foi feita; nenhum ficheiro do `por_ano` foi alterado.
