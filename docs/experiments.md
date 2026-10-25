@@ -6448,3 +6448,115 @@ falsos negativos.
 3. **Top 30 das entidades:** quantos erros evidentes (antes: Hugo Henrique,
    Derlei, Mantorras e os clubes de 2001/02 no topo).
 4. **Origem do corpo:** quantos artigos `html:aux` passam a sem corpo.
+
+## Terceira corrida do `por_ano` e avaliação das correções (2026-10-25)
+
+**Os números da tese passam a ser os desta corrida** (decisão do autor, 2026-10-25),
+sobre a segunda. Mesmos passos da segunda corrida (1a, 1b rdf, 1d painel, 2 Wikidata,
+3a, 3b, 3c), com `--sem-repetidas` em 1a e 3a e o código das "Correções depois do
+diagnóstico" (`aa4d0f4`); 382 testes OK antes de correr. Início 14:12, fim 16:01 (1 h 49
+min); copiados antes os outputs da segunda para `output/segunda_corrida_por_ano/` (fora do
+Git) e os da passagem 1 desta corrida para `output/caminho_b_por_ano_terceira_passagem1/`.
+Sem pedidos novos à Wikidata: o vocabulário híbrido, as decisões do `wikidata_candidates` e
+a tabela de clubes ficaram **byte a byte iguais** (`cmp`). O `corpus_candidate_entities`
+(1b) não foi repetido, como na segunda corrida (limitação: os candidatos vêm do corpo da
+segunda corrida, antes da correção da tabela do `<aux>`). Tempos (relatório em
+`output/cadeia_por_ano_terceira_relatorio.md`): 1a 45 min 30 s, 1b 4 min 34 s, 1d 44 s,
+2 4,7 s, 3a 45 min 30 s, 3b 11 min 37 s, 3c 44 s; memória máxima 2,3 GB.
+
+### Segunda corrida vs terceira
+
+| Medida | Segunda | Terceira |
+| --- | ---: | ---: |
+| Artigos | 129 317 | 129 317 |
+| Artigos com ≥ 1 entidade, passagem 1 (lista fechada) | 88 467 (68,4 %) | 84 934 (65,7 %) |
+| Artigos com ≥ 1 entidade, passagem 2 (híbrida) | 102 372 (79,2 %) | 98 891 (76,5 %) |
+| Pares artigo–entidade, passagem 2 | 671 788 | 609 567 |
+| Entidades distintas, passagem 2 | 7 078 | 7 075 |
+| Entidades aceites do `wikidata_candidates` | 2 918 | 2 918 (igual) |
+| Modalidades no painel | 43 | 40 |
+| Artigos sem modalidade | 41 441 | 74 076 |
+| Modalidade pelo URL / pelo termo de pesquisa | 55 241 / 32 635 | 55 241 / 0 |
+| Corpo `html:aux` / `html:apreto12n` / `sem_corpo` | 35 860 / 1 994 / 7 034 | 32 165 / 2 339 / 10 384 |
+| Trechos retirados (frases repetidas / manchetes) | — | 66 871 / 6 496 em 50 259 capturas |
+| Frases em ≥ 20 artigos (retiradas / protegidas) | — | 387 (298 / 89) |
+| Precisão das menções (40 pares ao acaso) | 23 sim, 15 não, 2 duvidosos (57,5 %) | **29 sim, 10 não, 1 duvidoso (72,5 %)** |
+| Erros evidentes nas 30 entidades mais mencionadas | 1 ("Speedway 2. Ekstraliga") + o topo de 2001/02 | 2 + resíduo de 2001/02 (abaixo) |
+
+Top 10 de entidades (artigos): segunda — Benfica 30 996, Sporting 27 960, FC Porto 23 840,
+Braga 11 442, Belenenses 10 290, Marítimo 9 895, Vitória FC 8 917, Gil Vicente 8 388, Taça
+de Portugal 8 084, U. Leiria 7 596. Terceira — Benfica 27 879, Sporting 24 326, FC Porto
+20 041, Taça de Portugal 8 058, Belenenses 7 199, Braga 7 120, Marítimo 6 236, Vitória FC
+5 040, Liga dos Campeões 4 900, Rio Ave 4 104. Já não estão no topo Hugo Henrique, Derlei
+nem Mantorras.
+
+Modalidades: `rugby` deixa de existir (os 495 eram só pelo termo; `raguebi` fica com 274),
+`aventura-em-mocambique` e `record-pela-patagonia` desaparecem (`aventura`: 1 758 → 8);
+`futebol` 39 261 → 36 869. 57,3 % dos artigos ficam sem modalidade (era 32,0 %).
+
+### 1. Falsos negativos da limpeza (40 trechos retirados + 20 frases protegidas)
+
+Trechos retirados ao acaso (semente 20261027; 20 frases repetidas de 66 871, 20 manchetes
+de 6 496), lidos no contexto:
+
+| Tipo | Era chrome ou widget (certo) | Era texto da notícia (falso negativo) |
+| --- | ---: | ---: |
+| Frase repetida (20) | **16** (13 rodapé/comentários/Premium/cookies/vídeo; 2 assinaturas "Autor: …"; 1 aviso de cookies) | **4**: "Treinador: Sérgio Vieira.", "Jogo disputado no Estádio 25 de Abril, em Penafiel.", "Jogo no Estádio de São Luís, em Faro.", "Assistência: cerca de 2.000 espectadores." (linhas dos relatos de jogo; 3 têm entidade: treinador, dois estádios) |
+| Manchete (20) | **1** (cabeçalho numa página "Capas") | **19**: 18 são o **título do próprio artigo** repetido no início do corpo (o título guardado tem o sufixo "- Secção - Jornal Record", por isso o "título de outro artigo" que coincide é um duplicado sem sufixo); 1 é uma linha de resultados ("Benfica B-Sporting B, 0-0") |
+
+Contando todo o corpus (reconstituição fiel: 66 871 e 6 496 trechos): **5 316 dos 6 496
+trechos "manchete" (82 %) são o título do próprio artigo**, não manchetes de outras
+notícias. O efeito nas entidades é pequeno (a menção do título costuma repetir-se no
+primeiro parágrafo), mas a regra não faz o que descreve; ver abaixo "O que corrigir".
+
+**As 20 frases protegidas mais frequentes** (≥ 20 artigos em menos de 3 meses): são **as 20
+tabelas de 2001/02** (classificação, marcadores, jornada com resultados e jogos), por
+exemplo "setubal derlei leiria fary beira mar 3 2 neca e marcao…" (513 artigos),
+"ferreira hugo henrique v" (584), "jornada 6 domingo 23 beira mar salgueiros fc porto v"
+(359). **Deviam ter sido retiradas: 20 de 20.** As páginas de 2001/02 foram capturadas
+numa janela estreita de meses, o que a regra "≥ 3 meses" trata como citação/resultado.
+
+### 2. Precisão das menções (40 pares ao acaso; semente 20261027; passagem 2)
+
+| Resultado | Pares | Quais |
+| --- | ---: | --- |
+| **sim** | **29** | menção no texto da notícia, incluindo escalações e relatos |
+| **não** | **10** | 1 tabela de jornada de 2001/02 ainda no corpo (#30 Marítimo); 2 manchetes de outras notícias dentro do corpo (#11 David Luiz, #29 Sérgio Conceição); 1 menu de competições (#35 Copa das Confederações); 1 comentário de leitor no fim do corpo (#19 Beira-Mar); 5 falsos positivos de nome: #18 "Seleção Nacional" → Seleção de Guernsey, #21 "Foto: Bruno Colaço" (crédito do fotógrafo), #23 "Moreno" (de Érick Moreno) → João Miguel Teixeira, #26 "Wallace" (voleibol) → futebolista, #37 "dos Santos" (de José Paiva dos Santos) |
+| **duvidoso** | 1 | #32 "Campeonato Nacional" (de iniciados; competição genérica) |
+
+Precisão da amostra: **29/40 (72,5 %)**, contra 23/40 (57,5 %) na segunda. A amostra tem 40
+pares; os intervalos de confiança (Wilson, 95 %) sobrepõem-se (cerca de 57–84 % e 42–72 %).
+Mudou a composição dos erros: os 8 de tabelas e os 5 de manchetes da segunda caíram para
+1 e 2; ficaram os falsos positivos de nome (2 → 5, sem alteração de regra) e apareceram
+um menu e um comentário.
+
+### 3. Top 30 das entidades: erros evidentes
+
+Não saem do topo da segunda: "Speedway 2. Ekstraliga" (2 460 artigos; vem de "I Liga" pelo
+nome exato; igual) e "Campeonato Nacional" (2 218; competição genérica). **Resíduo de 2001/02:**
+os artigos de 2001–2002 são 13,1 % do corpus (16 962) e têm 8,4 % dos pares (51 342), mas
+nos clubes da I Liga de então a quota é 25–67 % (Beira-Mar 67,4 %, Farense 45,8 %, Varzim
+39,2 %, Belenenses 32,7 %, Marítimo 27,5 %, Vitória FC 27,3 %, Gil Vicente 25,6 %, Leiria
+25,7 %): tabelas e jornadas que continuam no corpo (as 20 frases protegidas) mais as
+notícias legítimas desses anos. Hugo Henrique e Derlei já não estão nas 30 primeiras.
+
+### 4. Origem do corpo
+
+`html:aux` 35 860 → 32 165 (−3 695); `sem_corpo` 7 034 → 10 384 (+3 350); `html:apreto12n`
+1 994 → 2 339 (+345: páginas `noticia.aspx` onde o `<aux>` era uma tabela e o `apreto12n`
+traz o corpo). Os outros contentores não mudam.
+
+### O que corrigir (proposta; não implementado)
+
+1. **Frases protegidas:** a regra "≥ 3 meses" falha nas tabelas de 2001/02 (janela estreita
+   de capturas). Sinais alternativos: proporção de números (as tabelas de jornada ficam
+   abaixo dos 25 % de `looks_like_table`) ou frases de 3+ palavras em ≥ 100 artigos sem
+   limite temporal.
+2. **Manchetes:** comparar com o título do próprio artigo **sem o sufixo** ("- Secção -
+   Jornal Record") e nunca retirar o início do corpo igual ao título.
+3. **Linhas de relatos de jogo** ("Treinador: …", "Jogo disputado no Estádio …"): a regra
+   de frases repetidas apanha-as quando o mesmo treinador ou estádio se repete em muitos
+   jogos ao longo de meses; proteger frases que começam por rótulos de ficha de jogo
+   ("Treinador:", "Árbitro:", "Assistência:", "Jogo …").
+4. **Falsos positivos de nome** (crédito "Foto:", apelido de outra pessoa, "Seleção
+   Nacional", comentários de leitores) ficam fora desta correção.

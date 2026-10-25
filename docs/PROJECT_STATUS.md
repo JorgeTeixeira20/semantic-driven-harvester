@@ -170,6 +170,8 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 detalhe (secções de `docs/experiments.md`, salvo indicação). Nenhum número
 abaixo é novo: vêm dessas secções.
 
+**Terceira corrida (2026-10-25):** os números do `por_ano` que valem para a tese passam a ser os da terceira corrida (`--sem-repetidas`; 76,5 % dos Artigos com ≥ 1 entidade na passagem 2 e 29/40 menções certas; comparação e limitações em `docs/experiments.md`, "Terceira corrida do `por_ano`"); os números abaixo, de 2026-10-23, são os da segunda corrida.
+
 **Estado (atualizado em 2026-10-23).** A recolha do corpus alargado está
 **terminada** (2026-10-22, 18:26): 129 317 Artigos de 1999–2024, 126 798 com
 texto e 123 844 com HTML ("Fim da recolha do corpus alargado"). O extrator do
