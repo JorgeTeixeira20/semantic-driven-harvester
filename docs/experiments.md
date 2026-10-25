@@ -6664,3 +6664,86 @@ ontologia), sem ligação documentada à Wikidata; esta dissertação usa uma li
 fechada tirada da Wikidata (QIDs no RDF), a abordagem híbrida, e avaliação
 documentada (precisão, cobertura, concordância). Notas para a redação em
 `docs/notas_para_escrita.md`.
+
+## Precisão e cobertura em 30 notícias anotadas
+
+Protocolo: `docs/protocolo_cobertura_30.md`. A amostra (30 Artigos do `por_ano`, semente
+20261026, 15 de 1999–2009 e 15 de 2017–2024) foi sorteada e guardada em
+`data/processed/amostra_cobertura_30.csv` **antes** de anotar (commit `c00ef3e`); a anotação da
+sessão está em `data/processed/anotacao_cobertura_30.csv` (246 entidades distintas; commit
+`0f80db5`), feita **antes** de olhar para o CSV de entidades do sistema. Os resultados da
+comparação seguem na parte final desta secção, depois da quarta corrida.
+
+### Concordância com a anotação do autor (5 primeiras notícias)
+
+O autor anotou por conta própria as 5 primeiras notícias da lista, sem ver a anotação da sessão,
+nas páginas na versão `noFrame`.
+
+| # | Notícia | Entidades do autor | Entidades da sessão | Em comum |
+| ---: | --- | ---: | ---: | ---: |
+| 1 | `noticia.asp?id=147943` (2002) | 0 ("página sem notícia") | 8 | 0 |
+| 2 | `noticia.asp?id=707970` (2006) | 2 | 2 | 2 |
+| 3 | `shownews.asp?id=87713` (2001) | 2 | 2 | 2 |
+| 4 | `noticia.asp?id=159987` (2002) | 16 | 16 | 16 |
+| 5 | `noticia.asp?id=774643` (2008) | 11 | 11 | 11 |
+| | **Total** | 31 | 39 | **31 de 39 distintas (79,5 %)** |
+
+Nas quatro notícias em que ambos encontrámos texto, a concordância é **total (31 de 31, 100 %)**,
+incluindo o que cada um deixou de fora (a sessão e o autor excluíram Federação, dirigentes,
+jornalistas, "Selecção de Malta"; "Restelo" como sinónimo do clube e "Leixões" só no caminho de
+navegação não contam em nenhuma das duas). A única diferença é a nº 1.
+
+**A nº 1 (diferença a resolver pelo autor).** O autor viu "só o marcador lateral da jornada 27" e
+anotou 0; a sessão anotou 8 entidades (Vitória de Guimarães, Boavista, Marítimo, Flamarion,
+Adelino, Augusto Inácio, Rabarivony, I Liga). Verificação feita agora na versão `noFrame`
+(`https://arquivo.pt/noFrame/replay/20020320052246/https://record.pt/noticia.asp?id=147943&idcanal=18`,
+HTTP 200, 89 662 bytes): o texto **está no HTML, em marcação normal e visível** (cabeçalho
+"BRASILEIROS SEM LIMITAÇÕES" em `<font size=3>`, título "Flamarion e Adelino regressaram" em
+`<font size=5 color=#FF0000>` e parágrafos em `<p>`, a seguir ao cabeçalho "GUIMARÃES" e depois do
+marcador lateral e da classificação) e a versão `id_` (original) tem as mesmas 826 palavras. O autor reabriu a
+nº 1 no HTML e confirmou as 8 entidades da sessão (ver "Concordância final e por estrato").
+
+**Confirmação de que nenhuma página com notícia foi marcada como "sem notícia".** Só duas das
+30 ficaram sem entidades: a **nº 8** (`noticia.asp?id=142002`, 2002): a captura arquivada **é** uma
+página de erro (HTTP 500 "Internal Server Error", 532 bytes, tanto no `noFrame` como no `id_`); e a
+**nº 25** (`/liga-nos/detalhe/dez-craques-a-seguir.html`, 2017): artigo Premium; o `noFrame` tem o
+título, o resumo ("A ter em atenção") e listas de outras notícias, mas **não o corpo** (sem
+`articleBody`, nem as marcas de assinante do site, nem os nomes dos "dez craques" fora de
+manchetes de outras notícias). A nº 5 (que o autor viu vazia com a moldura) foi anotada a partir do
+texto: 11 entidades, iguais às do autor.
+
+### Concordância final e por estrato
+
+O autor anotou às cegas (sem ver a anotação da sessão) 8 notícias: as 5 primeiras de 1999–2009
+(nº 1–5) e 3 de 2017–2024 (nº 16–18). Depois da diferença da nº 1, o autor **reabriu a nº 1 no HTML**
+e **confirmou as 8 entidades da sessão** (Vitória de Guimarães, Boavista, Marítimo — clubes; Flamarion,
+Adelino, Rabarivony — atletas; Augusto Inácio — treinador; I Liga — competição). A revisão da nº 1
+já não foi às cegas, por isso regista-se a concordância **inicial** (às cegas) e a **final** (depois
+da revisão).
+
+**Natureza da divergência:** foi de **leitura da página**, não de critério. A notícia da nº 1 estava
+no HTML, abaixo do marcador lateral da jornada, e a página renderizada parecia só ter o marcador. Em
+nenhuma das 31 entidades das outras quatro notícias houve diferença de critério (âmbito, sinónimos,
+o que conta como entidade). Na nº 1 e na nº 16 a notícia só estava acessível pelo HTML (pela moldura
+ou pela página renderizada parecia vazia).
+
+Anotação do autor para a 2017–2024 (às cegas):
+
+| # | Entidades do autor | Fora do âmbito / duvidoso (não contado) |
+| ---: | --- | --- |
+| 16 | Rafael Leão (atleta). 1 entidade | Pedro Tim 23 (YouTuber do Record); "Bola na Barra" é o nome do desafio |
+| 17 | Diogo Silva, Jota Gonçalves (atletas); Tondela (clube); Natxo González (treinador). 4 entidades | — |
+| 18 | Daniil Medvedev, Andrey Rublev, Alex de Minaur, Jack Draper (atletas); US Open (competição). 5 entidades | "Grand Slam" (nome de um grupo de torneios; duvidoso) |
+
+A sessão anotou exatamente as mesmas entidades nas três (1 + 4 + 5), e também deixou de fora o
+YouTuber e "Grand Slam" (na nº 18 a sessão excluiu "Grand Slam" como termo genérico).
+
+| Estrato | Notícias | Entidades distintas (autor ∪ sessão) | Em comum | Concordância inicial (às cegas) | Concordância final |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 1999–2009 | nº 1–5 | 39 | 31 → 39 | 31/39 (79,5 %) | **39/39 (100 %)** |
+| 2017–2024 | nº 16–18 | 10 | 10 | 10/10 (100 %) | **10/10 (100 %)** |
+| Total | 8 notícias | 49 | 41 → 49 | 41/49 (83,7 %) | **49/49 (100 %)** |
+
+Excluindo a nº 1, a concordância às cegas é 41/41. Limitação: 8 de 30 notícias (26,7 %) e 49 de
+246 entidades; as 22 restantes foram anotadas só pela sessão. A concordância mede a fiabilidade da
+anotação (leitura e critério), não a do sistema.

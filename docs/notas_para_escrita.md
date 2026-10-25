@@ -22,8 +22,11 @@ Cada nota indica a fonte; os números vêm só dessas fontes.
    local leram o texto, a concordância foi total (31 de 31 entidades nas n.º 2–5); a
    única divergência inicial (n.º 1) foi de leitura da página, não de critério:
    concordância inicial 31/39 (79,5 %), final 39/39 depois de resolvida. A revisão
-   da n.º 1 pelo autor já não foi às cegas. Concordância das n.º 16–18 (às cegas):
-   ver `experiments.md`. Mostra que as regras de anotação são claras.
+   da n.º 1 pelo autor já não foi às cegas. N.º 16–18 (2017–2024, às cegas):
+   10/10. **Total: 41/49 (83,7 %) inicial, 49/49 final**, em 8 das 30 notícias
+   (49 das 246 entidades anotadas); as outras 22 foram anotadas só pela sessão
+   local. Mede a fiabilidade da anotação, não a do sistema. Mostra que as regras
+   de anotação são claras.
 
 3. **Trabalho relacionado: Politiquices e Major Minors** (Prémio Arquivo.pt 2021).
    Os dois usam listas fechadas ou dicionários e ontologias/RDF; o Politiquices usa
