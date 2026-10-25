@@ -78,3 +78,28 @@ A anotação é feita pela sessão local. Para medir a sua fiabilidade, o autor
 anota **5 dos 30 artigos** por conta própria (os 5 primeiros da lista), sem ver
 a anotação da sessão, e regista-se a concordância (entidades em comum / total
 de entidades distintas das duas anotações). Diferenças resolvidas pelo autor.
+
+## Notas da execução (2026-10-26)
+
+- **Sorteio:** `data/processed/amostra_cobertura_30.csv` (commit `c00ef3e`, antes
+  da anotação), semente `20261026`: 15 Artigos de 1999–2009 (n.º 1–15) e 15 de
+  2017–2024 (n.º 16–30), ao acaso dentro de cada estrato, de todos os Artigos
+  retidos do `por_ano` (incluindo sem corpo e Premium). O corpus `completo` ainda
+  não existia, por isso não há estrato de 2010–2016. Anotação da sessão local:
+  commit `0f80db5`.
+- **Viés na verificação do autor:** "os 5 primeiros da lista" ficaram **todos do
+  estrato 1999–2009**, porque a lista está ordenada por estrato. A concordância
+  medida nesses 5 vale para as páginas antigas (as mais difíceis), não para as
+  recentes. Correção: o autor anota também **3 artigos do estrato 2017–2024 (n.º
+  16, 17 e 18)**, e a concordância regista-se por estrato.
+- **Páginas antigas e versão noFrame:** com a moldura do Arquivo.pt, a página n.º 5
+  (2008) parecia não ter notícia (coluna central vazia); na versão
+  `arquivo.pt/noFrame/replay/<tstamp>/<url>` a notícia existe, desformatada. A n.º 1
+  (2002) continua sem notícia também na versão noFrame (só o marcador lateral da
+  jornada). Regra: **anotar sempre na versão noFrame** e copiar o texto (Ctrl+A)
+  quando a página está desformatada; só o texto entre o título e a linha "Data:".
+- **Decisões de âmbito tomadas pelo autor na anotação:** seleções nacionais (ex.:
+  "Selecção de Malta") e o nome de um estádio usado como sinónimo do clube
+  ("ficar no Restelo") ficam como **duvidosos, não contados**; uma entidade só no
+  caminho de navegação ("Futebol > Nacional > BWIN LIGA > Leixões") não conta;
+  "M. Cláudio" e "Marco Cláudio" são a mesma entidade.
