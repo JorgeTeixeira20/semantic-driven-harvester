@@ -6588,3 +6588,54 @@ Nacional", comentários de leitores) **não** é tratada: fica na análise de er
 Na lista `corpus_entities<tag>_repetidas.csv`, "retirada = nao" passa a
 incluir as linhas de ficha de jogo. Avaliação a repetir na quarta corrida: os
 mesmos pontos 1–3 da terceira (falsos negativos, 40 pares, top 30).
+
+### Erros de nome evidentes (2026-10-25, a pedido do autor)
+
+O autor considerou que erros flagrantes (o nome do fotógrafo) não devem ficar só
+na análise de erros. Três regras, todas ligadas à opção `--sem-repetidas`, para não
+mudar a contagem das corridas anteriores (testes em `tests/test_boilerplate.py`):
+
+1. **Créditos de imagem** (`boilerplate.CREDIT_RE`): "Foto:", "Fotos:",
+   "Fotografia:", "Imagem:", "Créditos:" seguidos de um nome de **duas
+   palavras** (mais uma partícula: "Maria de Sousa") saem antes da procura.
+   Só duas palavras, porque sem pontuação o nome que começa a frase seguinte
+   ficaria colado ("Foto: Bruno Colaço Rafa Silva marcou" retira só "Bruno
+   Colaço"). Caso medido: #21 "Foto: Bruno Colaço".
+2. **Nome truncado dentro de um nome mais comprido**
+   (`corpus_entities._glued_capitals`, `count_mentions(name_context=...)`):
+   uma forma de pessoa de **uma só palavra**, ou que começa por partícula
+   (de/da/do/dos/das), não conta se estiver colada (só espaços) a outra palavra
+   em maiúscula — a anterior, fora do início de frase, ou a seguinte. "Moreno"
+   em "Érick Moreno" e "dos Santos" em "José Paiva dos Santos" deixam de contar;
+   "Moreno, aos 80 minutos" e "Ontem treinou. Moreno marcou." contam. **Nomes
+   completos não são afetados** ("o avançado do Benfica Rafa Silva" conta), para
+   não perder menções sem vírgula depois do clube. Casos medidos: #23 e #37.
+3. **Nomes genéricos na abordagem híbrida** (`wikidata_candidates.GENERIC_NAMES`,
+   decisão `forma_rejeitada`, método `generico`, sem pedido à Wikidata): "I Liga"
+   (→ Speedway 2. Ekstraliga), "Seleção Nacional"/"Selecção Nacional" (→ seleção
+   de Guernsey) e "Campeonato Nacional" (genérico). "II Liga" fica: está ligado
+   corretamente à Segunda Liga (teste anterior). Muda o vocabulário híbrido no
+   passo 2, sem pedidos novos.
+
+Fica na análise de erros: "Wallace" (voleibol → futebolista; homónimo),
+comentários de leitores no fim do corpo e menus de competições.
+
+### Modalidades: o que se pode concluir (a medir na quarta corrida)
+
+Desde 2026-10-25 a modalidade vem **só do URL**, que é a classificação editorial do
+próprio jornal (secção do site), e não de um método nosso. Duas limitações para a
+redação:
+
+- **Cobertura desigual no tempo:** os URLs de 1999–2009 sem caminho temático
+  (`noticia.asp`, `shownews.asp`, `tn0cs`/`tn1cs`) não têm modalidade; 57,3 % dos
+  artigos ficam sem modalidade (terceira corrida). Qualquer conclusão por
+  modalidade vale para os artigos com modalidade no URL (sobretudo 2017–2024 e os
+  `interior.aspx`), não para o corpus inteiro.
+- **Ainda não foi medida a precisão** da modalidade pelo URL. A avaliação da
+  quarta corrida inclui: 40 artigos com modalidade, ao acaso (exceto futebol: 20 de
+  futebol e 20 das outras), lidos para ver se a modalidade está certa; e a tabela
+  de artigos com modalidade por ano.
+
+Alternativa não implementada (trabalho futuro): inferir a modalidade dos artigos
+antigos pelas entidades mencionadas (a modalidade do atleta ou do clube no
+vocabulário), com a origem assinalada.

@@ -138,8 +138,20 @@ _YEAR = re.compile(r"(?<!\d)(19|20)\d{2}(?!\d)")
 FEDERATION_PREFIXES = ("federa", "associacao de futebol")
 
 
+# Nomes genéricos (avaliações de 2026-10-23 e 2026-10-25): o nome exato existe
+# na Wikidata, mas como outra coisa — "I Liga" → Speedway 2. Ekstraliga,
+# "Seleção Nacional" → seleção de Guernsey; "Campeonato Nacional" serve a
+# qualquer escalão e modalidade. Não são consultados.
+GENERIC_NAMES = frozenset({
+    "i liga", "selecao nacional", "seleccao nacional", "campeonato nacional",
+})
+
+
 def form_problem(candidate: str) -> str | None:
-    """Porque é que o candidato é um pedaço de frase, ou None."""
+    """Porque é que o candidato é um pedaço de frase ou um nome genérico, ou None."""
+
+    if " ".join(fold(candidate).split()) in GENERIC_NAMES:
+        return "generico"
 
     letters = [c for c in candidate if c.isalpha()]
     if letters and all(c.isupper() for c in letters):

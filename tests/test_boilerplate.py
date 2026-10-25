@@ -8,10 +8,13 @@ import unittest
 from collections import Counter
 
 from semantic_harvester.boilerplate import build, sentence_spans, title_words
-from semantic_harvester.corpus_entities import Term, analyse_article, match_tokens
+from semantic_harvester.corpus_entities import (
+    Term, analyse_article, count_mentions, match_tokens, segments_with_names,
+)
 from semantic_harvester.corpus_redundancy import Capture
 from semantic_harvester.html_body import extract_html_body, looks_like_table
 from semantic_harvester.navigation_corpus import MODALIDADE_ALIASES
+from semantic_harvester.wikidata_candidates import form_problem
 
 FOOTER = "Caso não esteja registado no site do Record, efectue o seu registo gratuito."
 QUOTE = "Vamos lutar até ao fim pelo título, disse Rui Vitória."
@@ -151,6 +154,41 @@ class AnalyseArticleTests(unittest.TestCase):
         rows = analyse_article(capture.article, [capture], [term("Vitória Guimarães")], None,
                                boilerplate=result)
         self.assertEqual([r for r in rows if r["origem"] == "texto"], [])
+
+
+class CreditAndNameTests(unittest.TestCase):
+    def mentions(self, text: str, *terms: Term) -> list[str]:
+        segments, caps, names = segments_with_names(text, None)
+        return sorted(count_mentions(segments, list(terms), caps=caps, name_context=names))
+
+    def test_photo_credit_is_removed(self) -> None:
+        result = build({}, {})
+        pieces, reasons = result.split("O Benfica treinou. Foto: Bruno Colaço Rafa Silva marcou.", "x")
+        self.assertEqual(reasons, ["credito"])
+        self.assertNotIn("Colaço", " ".join(pieces))
+        self.assertIn("Rafa Silva", " ".join(pieces))  # o nome seguinte fica
+
+    def test_one_word_name_inside_a_longer_name_does_not_count(self) -> None:
+        moreno = term("João Miguel Teixeira", "Moreno")
+        self.assertEqual(self.mentions("O golo foi de Érick Moreno, aos 80 minutos.", moreno), [])
+        self.assertEqual(self.mentions("O golo foi de Moreno, aos 80 minutos.", moreno),
+                         ["João Miguel Teixeira"])
+        # No início da frase, a palavra anterior em maiúscula não conta.
+        self.assertEqual(self.mentions("Ontem treinou. Moreno marcou.", moreno),
+                         ["João Miguel Teixeira"])
+
+    def test_particle_name_inside_a_longer_name_does_not_count(self) -> None:
+        santos = term("Jorge dos Santos", "dos Santos")
+        self.assertEqual(self.mentions("Falou José Paiva dos Santos ontem.", santos), [])
+
+    def test_full_names_are_not_affected(self) -> None:
+        rafa = term("Rafa Silva")
+        self.assertEqual(self.mentions("O avançado do Benfica Rafa Silva marcou.", rafa), ["Rafa Silva"])
+
+    def test_generic_names_are_not_queried(self) -> None:
+        for name in ("I Liga", "Seleção Nacional", "Campeonato Nacional"):
+            self.assertEqual(form_problem(name), "generico", name)
+        self.assertIsNone(form_problem("Liga dos Campeões"))
 
 
 class AuxTableTests(unittest.TestCase):

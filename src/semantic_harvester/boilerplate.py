@@ -28,6 +28,10 @@ dois tipos de trechos, que o Caminho B deixa de ler:
    (82 % dos trechos retirados na terceira corrida eram o título do próprio
    artigo, guardado com sufixo, repetido no início do corpo).
 
+3. **Créditos de imagem** ("Foto: Bruno Colaço", "Fotos: Lusa"): o nome a
+   seguir ao rótulo é de um fotógrafo, não de uma pessoa da notícia (avaliação
+   da terceira corrida).
+
 Os trechos retirados partem o texto: as palavras de um lado e do outro não se
 juntam numa menção. Sem rede; tudo calculado sobre o corpo já extraído.
 """
@@ -52,6 +56,13 @@ MIN_SENTENCE_WORDS = 3
 MIN_TITLE_WORDS = 6
 
 _WORD_RE = re.compile(r"\w+")
+# Rótulo de crédito de imagem e o nome: duas palavras (com partícula), para não
+# apanhar o nome que começa a frase seguinte quando o texto não tem pontuação.
+_NAME_WORD = r"[A-ZÀ-Ý][\w'’-]*"
+CREDIT_RE = re.compile(
+    rf"\b(?:Fotos?|Fotografias?|Imagens?|Créditos?)\s*:\s*{_NAME_WORD}"
+    rf"(?:\s+(?:(?:de|da|do|dos|das|e)\s+)?{_NAME_WORD})?"
+)
 # Fim de frase: pontuação final seguida de espaço e de maiúscula ou dígito (a
 # mesma regra do diagnóstico; as abreviaturas "V. Setúbal" também cortam).
 _SENTENCE_END = re.compile(r"(?<=[.!?…])\s+(?=[A-ZÀ-Ý0-9«\"“])")
@@ -117,6 +128,7 @@ class Boilerplate:
         text = unicodedata.normalize("NFC", text)
         found = [(a, b, "frase_repetida") for a, b in sentence_spans(text)
                  if sentence_key(text[a:b]) in self.repeated]
+        found += [(m.start(), m.end(), "credito") for m in CREDIT_RE.finditer(text)]
         matches = list(_WORD_RE.finditer(text))
         folded = [_fold_word(m.group()) for m in matches]
         i = 1  # o início do corpo nunca sai (é onde o título do próprio artigo se repete)

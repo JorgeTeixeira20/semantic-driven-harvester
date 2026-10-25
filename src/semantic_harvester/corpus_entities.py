@@ -149,6 +149,7 @@ def club_coherence(
 # Nomes de pessoas: um nome de uma só palavra precisa de maiúscula no texto e
 # não pode ser um nome próprio comum (correções de 2026-10-23, docs/experiments.md).
 PERSON_CATEGORIES = frozenset({"jogador", "atleta", "treinador"})
+NAME_PARTICLES = frozenset({"de", "da", "do", "dos", "das"})
 FIRST_NAME_MIN_OTHERS = 2
 
 
@@ -188,6 +189,7 @@ def drop_first_name_variants(
 def count_mentions(
     segments: list[list[str]], terms: list[Term], longest_match: bool = True,
     caps: list[list[bool]] | None = None,
+    name_context: list[list[tuple[bool, bool]]] | None = None,
 ) -> Counter[str]:
     """Ocorrências de cada termo (por rótulo) em segmentos de palavras já normalizadas.
 
@@ -204,6 +206,13 @@ def count_mentions(
     Com `caps` (para cada palavra, se começava por maiúscula no texto
     original), uma forma de uma só palavra de uma pessoa só conta em
     maiúscula: "Nem" é o jogador, "nem" não.
+
+    Com `name_context` (para cada palavra, se a anterior e a seguinte são
+    outra palavra em maiúscula colada a ela, fora do início de frase), uma
+    forma de pessoa de uma só palavra, ou que começa por partícula ("dos
+    Santos"), não conta quando faz parte de um nome mais comprido: "Moreno"
+    em "Érick Moreno", "dos Santos" em "José Paiva dos Santos" (avaliação da
+    terceira corrida, 2026-10-25). Nomes completos não são afetados.
     """
 
     # Índice pela primeira palavra: cada texto é percorrido uma só vez.
@@ -212,11 +221,21 @@ def count_mentions(
         for variant in term.variants:
             needs_caps = len(variant) == 1 and term.categoria in PERSON_CATEGORIES
             index[variant[0]].append((variant, term.rotulo, needs_caps))
+    person_variants = {v for term in terms if term.categoria in PERSON_CATEGORIES
+                       for v in term.variants}
+
+    def partial_name(variant: tuple[str, ...]) -> bool:
+        return len(variant) == 1 or variant[0] in NAME_PARTICLES
 
     def ok(s: int, i: int, variant: tuple[str, ...], needs_caps: bool, segment: list[str]) -> bool:
         if tuple(segment[i:i + len(variant)]) != variant:
             return False
-        return not (needs_caps and caps is not None and not caps[s][i])
+        if needs_caps and caps is not None and not caps[s][i]:
+            return False
+        if (name_context is not None and variant in person_variants and partial_name(variant)
+                and (name_context[s][i][0] or name_context[s][i + len(variant) - 1][1])):
+            return False
+        return True
 
     counts: Counter[str] = Counter()
     if not longest_match:
@@ -244,30 +263,68 @@ def count_mentions(
     return counts
 
 
+_SENTENCE_BREAK = re.compile(r"[.!?:;\n—–«»\"“”(]")
+
+
+def _glued_capitals(text: str) -> list[tuple[bool, bool]]:
+    """Para cada palavra: a anterior é uma palavra em maiúscula, colada (só
+    espaços) e fora do início de frase; a seguinte é uma palavra em maiúscula
+    colada."""
+
+    matches = list(_WORD_RE.finditer(text))
+    capital = [m.group()[:1].isupper() for m in matches]
+    glued = [False] + [not text[a.end():b.start()].strip(" \t")
+                       for a, b in zip(matches, matches[1:])]
+    starts = [True] + [bool(_SENTENCE_BREAK.search(text[a.end():b.start()]))
+                       for a, b in zip(matches, matches[1:])]
+    out = []
+    for k in range(len(matches)):
+        before = k > 0 and glued[k] and capital[k - 1] and not starts[k - 1]
+        after = k + 1 < len(matches) and glued[k + 1] and capital[k + 1]
+        out.append((before, after))
+    return out
+
+
+def segments_with_names(
+    text: str, chrome: set[tuple[str, ...]] | None, n: int = DEFAULT_N
+) -> tuple[list[list[str]], list[list[bool]], list[list[tuple[bool, bool]]]]:
+    """Palavras normalizadas, partidas onde havia chrome; se cada uma começava
+    por maiúscula no texto original; e o contexto de nome (`_glued_capitals`)."""
+
+    text = unicodedata.normalize("NFC", text)
+    words = tokens(text)
+    originals = _WORD_RE.findall(text)
+    context = _glued_capitals(text)
+    if len(originals) != len(words):  # caso raro (minúscula com outro comprimento)
+        originals = [w.upper() for w in words]
+        context = [(False, False)] * len(words)
+    covered = chrome_coverage(words, chrome, n) if chrome else [False] * len(words)
+    segments: list[list[str]] = [[]]
+    caps: list[list[bool]] = [[]]
+    names: list[list[tuple[bool, bool]]] = [[]]
+    for word, original, ctx, hit in zip(words, originals, context, covered):
+        if hit:
+            if segments[-1]:
+                segments.append([])
+                caps.append([])
+                names.append([])
+        else:
+            folded = match_tokens(word)
+            segments[-1].extend(folded)
+            caps[-1].extend([original[:1].isupper()] * len(folded))
+            names[-1].extend([ctx] * len(folded))
+    kept = [k for k, s in enumerate(segments) if s]
+    return [segments[k] for k in kept], [caps[k] for k in kept], [names[k] for k in kept]
+
+
 def segments_with_caps(
     text: str, chrome: set[tuple[str, ...]] | None, n: int = DEFAULT_N
 ) -> tuple[list[list[str]], list[list[bool]]]:
     """Palavras normalizadas, partidas onde havia chrome, e se cada uma começava
     por maiúscula no texto original."""
 
-    words = tokens(text)
-    originals = _WORD_RE.findall(unicodedata.normalize("NFC", text))
-    if len(originals) != len(words):  # caso raro (minúscula com outro comprimento)
-        originals = [w.upper() for w in words]
-    covered = chrome_coverage(words, chrome, n) if chrome else [False] * len(words)
-    segments: list[list[str]] = [[]]
-    caps: list[list[bool]] = [[]]
-    for word, original, hit in zip(words, originals, covered):
-        if hit:
-            if segments[-1]:
-                segments.append([])
-                caps.append([])
-        else:
-            folded = match_tokens(word)
-            segments[-1].extend(folded)
-            caps[-1].extend([original[:1].isupper()] * len(folded))
-    pairs = [(s, c) for s, c in zip(segments, caps) if s]
-    return [s for s, _ in pairs], [c for _, c in pairs]
+    segments, caps, _ = segments_with_names(text, chrome, n)
+    return segments, caps
 
 
 def text_segments(
@@ -344,15 +401,19 @@ def analyse_article(
             if removed is not None:
                 removed.update(reasons)
                 removed.update(["artigos_com_trechos"] if reasons else [])
-            segments, caps = [], []
+            segments, caps, names = [], [], []
             for piece in pieces:
-                piece_segments, piece_caps = segments_with_caps(piece, chrome, n)
+                piece_segments, piece_caps, piece_names = segments_with_names(piece, chrome, n)
                 segments += piece_segments
                 caps += piece_caps
+                names += piece_names
         else:
-            segments, caps = segments_with_caps(text, chrome, n)
-        per_capture.append(count_mentions(segments, terms, longest_match,
-                                          caps if name_rules else None))
+            segments, caps, names = segments_with_names(text, chrome, n)
+        # A regra dos nomes truncados vem com a limpeza (`--sem-repetidas`), para não
+        # mudar a contagem das corridas anteriores.
+        per_capture.append(count_mentions(
+            segments, terms, longest_match, caps if name_rules else None,
+            names if name_rules and boilerplate is not None else None))
     by_label = {term.rotulo: term for term in terms}
     present = sorted({label for counts in per_capture for label in counts})
     for label in present:
