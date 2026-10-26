@@ -7782,13 +7782,11 @@ entidade,jogador,Žarko Tomašević,,Q393411,futebol,Clube Desportivo Nacional|C
 entidade,competicao,Taça de Portugal,Campeonato de Portugal,Q29224,,,1,candidato,sim
 entidade,competicao,Liga dos Campeões da UEFA,Liga dos Campeões|Champions League|UEFA Champions League,Q18756,,,1,candidato,sim
 entidade,clube,Real Madrid Club de Fútbol,Real Madrid,Q8682,,,1,candidato,nao
-entidade,competicao,Speedway 2. Ekstraliga,I Liga,Q11710778,,,1,candidato,nao
 entidade,clube,Manchester United Football Club,Manchester United|Man Utd|Manchester United FC,Q18656,,,1,candidato,nao
 entidade,competicao,Jogos Olímpicos,,Q5389,,,1,candidato,sim
 entidade,estadio,Estádio da Luz,,Q7875112,,,1,candidato,sim
 entidade,treinador,Jorge Jesus,,Q527550,,,1,candidato,sim
 entidade,competicao,Taça da Liga,Carlsberg Cup,Q966559,,,1,candidato,sim
-entidade,clube,Seleção nacional de futebol de Guernsey,Seleção Nacional,Q1478243,,,1,candidato,nao
 entidade,competicao,Liga Europa da UEFA,Liga Europa|UEFA Europa League,Q18760,,,1,candidato,sim
 entidade,clube,Club Atlético de Madrid,Atlético Madrid|Atlético de Madrid,Q8701,,,1,candidato,nao
 entidade,treinador,Fernando Manuel Costa Santos,Fernando Santos,Q360687,,,1,candidato,sim
@@ -7807,7 +7805,6 @@ entidade,treinador,Paulo Sérgio Silvestre Nascimento,Paulo Sérgio,Q316229,,,1,
 entidade,estadio,Aeroporto Internacional do Rio de Janeiro Tom Jobim/Galeão,Rio de Janeiro,Q733998,,,1,candidato,nao
 entidade,treinador,Jaime Pacheco,,Q1370368,,,1,candidato,sim
 entidade,clube,São Paulo Futebol Clube,São Paulo,Q38568,,,1,candidato,nao
-entidade,competicao,Campeonato Nacional,,Q9300571,,,1,candidato,nao
 entidade,competicao,Grand Slam de tênis,Grand Slam,Q102113,,,1,candidato,nao
 entidade,treinador,Luís Castro,,Q15896123,,,1,candidato,sim
 entidade,competicao,Primeira Liga,Liga Portugal|Liga Sagres,Q182994,,,1,candidato,sim

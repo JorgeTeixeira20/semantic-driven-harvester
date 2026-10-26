@@ -14,7 +14,7 @@ RTP1 SIC TVI,3197,forma_rejeitada,,,,,maiusculas,,0
 Rio Ave,3119,variante_nova,clube,Q622432,Rio Ave Futebol Clube,sim,pesquisa,proeminencia,20
 Real Madrid,2857,aceite,clube,Q8682,Real Madrid Club de Fútbol,nao,nome_exato,proeminencia,7
 Santa Clara,2537,tipo_nao_aceite,,,,,pesquisa,,20
-I Liga,2290,aceite,competicao,Q11710778,Speedway 2. Ekstraliga,nao,nome_exato,unico,1
+I Liga,2290,forma_rejeitada,,,,,generico,,0
 Manchester United,2201,aceite,clube,Q18656,Manchester United Football Club,nao,nome_exato,unico,6
 Por Lusa Temas,2177,forma_rejeitada,,,,,comeca_por_artigo,,0
 Jogos Olímpicos,1825,aceite,competicao,Q5389,Jogos Olímpicos,sim,nome_exato,unico,2
@@ -26,7 +26,7 @@ Imprimir Classificados Alertas Rec Pesquisa Blog Facebook Digg Delicio,1686,sem_
 Jorge Jesus,1608,aceite,treinador,Q527550,Jorge Jesus,sim,nome_exato,unico,1
 Taça da Liga,1517,aceite,competicao,Q966559,Taça da Liga,sim,nome_exato,unico,2
 Estados Unidos,1408,tipo_nao_aceite,,,,,pesquisa,,20
-Seleção Nacional,1360,aceite,clube,Q1478243,Seleção nacional de futebol de Guernsey,nao,pesquisa,unico,14
+Seleção Nacional,1360,forma_rejeitada,,,,,generico,,0
 Liga Europa,1344,aceite,competicao,Q18760,Liga Europa da UEFA,sim,pesquisa,unico,20
 Federação Portuguesa de Futebol,1329,tipo_nao_aceite,,,,,pesquisa,,1
 Atlético Madrid,1212,aceite,clube,Q8701,Club Atlético de Madrid,nao,nome_exato,unico,3
@@ -50,7 +50,7 @@ Vila do Conde,719,tipo_nao_aceite,,,,,pesquisa,,16
 Liga de Honra,712,aceite,competicao,Q754488,Segunda Liga,sim,nome_exato,unico,1
 Bruno de Carvalho,707,tipo_nao_aceite,,,,,pesquisa,,3
 João Pedro,698,ambiguo,,,,,nome_exato,,13
-Selecção Nacional,679,item_rejeitado,,,,,pesquisa,,5
+Selecção Nacional,679,forma_rejeitada,,,,,generico,,0
 Sexta Feira,677,tipo_nao_aceite,,,,,pesquisa,,20
 República Checa,668,tipo_nao_aceite,,,,,pesquisa,,20
 Grupo A,660,forma_rejeitada,,,,,acaba_em_letra,,0
@@ -89,7 +89,7 @@ Rio de Janeiro,508,aceite,estadio,Q733998,Aeroporto Internacional do Rio de Jane
 Desportivo de Chaves,504,sem_correspondencia,,,,,pesquisa,,0
 Jaime Pacheco,503,aceite,treinador,Q1370368,Jaime Pacheco,sim,nome_exato,unico,4
 São Paulo,498,aceite,clube,Q38568,São Paulo Futebol Clube,nao,pesquisa,unico,20
-Campeonato Nacional,496,aceite,competicao,Q9300571,Campeonato Nacional,nao,nome_exato,proeminencia,4
+Campeonato Nacional,496,forma_rejeitada,,,,,generico,,0
 Terça Feira,493,tipo_nao_aceite,,,,,pesquisa,,12
 Grupo B,490,forma_rejeitada,,,,,acaba_em_letra,,0
 FC Porto V,486,forma_rejeitada,,,,,acaba_em_letra,,0
