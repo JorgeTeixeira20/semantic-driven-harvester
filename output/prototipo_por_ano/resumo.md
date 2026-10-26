@@ -3,33 +3,33 @@
 Gerado sem rede a partir do grafo da Fase 1 e do Caminho B. A data de cada artigo é a da captura mais antiga conhecida (aproximação da publicação). Contagens descritivas desta recolha, limitada pelo teto da descoberta (300 resultados por termo e ano).
 
 - Artigos: 129317
-- Com pelo menos uma entidade: 98891
+- Com pelo menos uma entidade: 96750
 - Modalidade pelo URL / nenhuma: 55241 / 74076
-- Clube pelo URL / pelo texto / nenhum: 25041 / 57295 / 46981
+- Clube pelo URL / pelo texto / nenhum: 25041 / 54404 / 49872
 
 ## Artigos por ano
 
 | Ano | Artigos | Com entidade |
 | --- | ---: | ---: |
-| 1999 | 294 | 285 |
-| 2000 | 4430 | 4251 |
-| 2001 | 10376 | 7001 |
-| 2002 | 6586 | 534 |
+| 1999 | 294 | 277 |
+| 2000 | 4430 | 4242 |
+| 2001 | 10376 | 5859 |
+| 2002 | 6586 | 206 |
 | 2003 | 16 | 12 |
 | 2004 | 43 | 37 |
 | 2005 | 156 | 148 |
-| 2006 | 6981 | 6248 |
-| 2007 | 10602 | 9693 |
-| 2008 | 5119 | 4665 |
-| 2009 | 3754 | 3513 |
-| 2017 | 16819 | 13555 |
-| 2018 | 14179 | 11931 |
-| 2019 | 12444 | 9847 |
-| 2020 | 10554 | 7351 |
-| 2021 | 5564 | 4112 |
-| 2022 | 6786 | 4655 |
-| 2023 | 7609 | 5661 |
-| 2024 | 7005 | 5392 |
+| 2006 | 6981 | 6228 |
+| 2007 | 10602 | 9665 |
+| 2008 | 5119 | 4649 |
+| 2009 | 3754 | 3501 |
+| 2017 | 16819 | 13474 |
+| 2018 | 14179 | 11860 |
+| 2019 | 12444 | 9780 |
+| 2020 | 10554 | 7250 |
+| 2021 | 5564 | 4020 |
+| 2022 | 6786 | 4608 |
+| 2023 | 7609 | 5593 |
+| 2024 | 7005 | 5341 |
 
 ## Origem do corpo por época do site
 
@@ -88,81 +88,81 @@ Gerado sem rede a partir do grafo da Fase 1 e do Caminho B. A data de cada artig
 
 | Clube | Artigos |
 | --- | ---: |
-| Sport Lisboa e Benfica | 27879 |
-| Sporting Clube de Portugal | 24326 |
-| Futebol Clube do Porto | 20041 |
-| Clube de Futebol Os Belenenses | 7199 |
-| Sporting Clube de Braga | 7120 |
-| Club Sport Marítimo | 6236 |
-| Vitória Futebol Clube | 5040 |
-| Rio Ave Futebol Clube | 4104 |
-| Associação Académica de Coimbra – O.A.F. | 4057 |
-| Gil Vicente Futebol Clube | 4054 |
-| Grupo Desportivo Estoril Praia | 3875 |
-| Varzim Sport Club | 3699 |
-| Real Madrid Club de Fútbol | 3550 |
-| Sporting Clube Farense | 3396 |
-| Sport Clube Beira-Mar | 3349 |
-| União Desportiva de Leiria | 3158 |
-| Leixões Sport Club | 3086 |
-| Futebol Clube Paços de Ferreira | 2886 |
-| Manchester United Football Club | 2635 |
-| Moreirense Futebol Clube | 2594 |
+| Sport Lisboa e Benfica | 25376 |
+| Sporting Clube de Portugal | 22286 |
+| Futebol Clube do Porto | 18311 |
+| Sporting Clube de Braga | 6403 |
+| Clube de Futebol Os Belenenses | 5681 |
+| Club Sport Marítimo | 5221 |
+| Associação Académica de Coimbra – O.A.F. | 4005 |
+| Vitória Futebol Clube | 4003 |
+| Rio Ave Futebol Clube | 3983 |
+| Grupo Desportivo Estoril Praia | 3719 |
+| Gil Vicente Futebol Clube | 3434 |
+| Real Madrid Club de Fútbol | 3382 |
+| Leixões Sport Club | 3074 |
+| Futebol Clube Paços de Ferreira | 2838 |
+| União Desportiva de Leiria | 2751 |
+| Varzim Sport Club | 2730 |
+| Moreirense Futebol Clube | 2520 |
+| Clube Desportivo Feirense | 2460 |
+| Manchester United Football Club | 2426 |
+| Sporting Clube Farense | 2406 |
 
 ## Atletas mais mencionados no texto
 
 | Atleta | Modalidade | Artigos |
 | --- | ---: | ---: |
-| Cristiano Ronaldo | futebol | 4053 |
-| João Carlos Rodrigues da Costa | futebol | 4004 |
-| Rui Costa | ciclismo|futebol | 2132 |
-| Moreira | futebol | 2032 |
-| Sérgio Conceição | futebol | 1848 |
-| Bruno Fernandes | futebol | 1579 |
+| Cristiano Ronaldo | futebol | 3434 |
+| João Carlos Rodrigues da Costa | futebol | 2397 |
+| Rui Costa | ciclismo|futebol | 1899 |
+| Sérgio Conceição | futebol | 1679 |
 | João Vieira Pinto | futebol | 1524 |
-| Luís Filipe Fernandes | futebol | 1481 |
-| Nem | futebol | 1460 |
-| Mota | futebol | 1452 |
-| João Félix | futebol | 1353 |
-| Pedro Mantorras | futebol | 1319 |
-| Ruben Amorim | futebol | 1312 |
-| Rodrigo José Lima dos Santos | futebol | 1297 |
-| Nuno Gomes | futebol | 1204 |
-| Paulo Bento | futebol | 1180 |
-| Pepe | futebol | 1168 |
+| Luís Filipe Fernandes | futebol | 1414 |
+| Bruno Fernandes | futebol | 1379 |
+| Paulo Bento | futebol | 1229 |
+| Nem | futebol | 1211 |
+| João Félix | futebol | 1181 |
+| Ruben Amorim | futebol | 1178 |
 | Artur Futre | futebol | 1161 |
-| João Alexandre Duarte Ferreira Fernandes | futebol | 1125 |
-| Pedro Ferreira | futebol|natação | 1083 |
+| Moreira | futebol | 1066 |
+| Nuno Gomes | futebol | 1059 |
+| Fabio Lima | basquetebol | 1024 |
+| João Paulo | futebol | 946 |
+| Pepe | futebol | 920 |
+| Manuel Fernandes | motores | 889 |
+| Miguel Ângelo Gomes Silva | futebol | 886 |
+| Kaká | futebol | 827 |
 
 ## Treinadores, estádios e competições mais mencionados
 
 | Entidade | Categoria | Artigos |
 | --- | ---: | ---: |
-| Taça de Portugal | competicao | 8058 |
-| Liga dos Campeões da UEFA | competicao | 4900 |
-| Jogos Olímpicos | competicao | 3319 |
-| Speedway 2. Ekstraliga | competicao | 2460 |
-| Campeonato Nacional | competicao | 2218 |
-| Taça da Liga | competicao | 2135 |
-| Jorge Jesus | treinador | 1938 |
-| Estádio da Luz | estadio | 1921 |
-| Segunda Liga | competicao | 1711 |
-| Primeira Liga | competicao | 1657 |
-| Liga Europa da UEFA | competicao | 1653 |
-| Campeonato do Mundo de Futebol da FIFA | competicao | 1568 |
+| Taça de Portugal | competicao | 7903 |
+| Liga dos Campeões da UEFA | competicao | 4716 |
+| Jogos Olímpicos | competicao | 3272 |
+| Taça da Liga | competicao | 2128 |
+| Jorge Jesus | treinador | 1854 |
+| Estádio da Luz | estadio | 1850 |
+| Segunda Liga | competicao | 1708 |
+| Primeira Liga | competicao | 1624 |
+| Liga Europa da UEFA | competicao | 1597 |
+| Campeonato do Mundo de Futebol da FIFA | competicao | 1562 |
 | Campeonato da Europa de Atletismo | competicao | 1395 |
-| Fernando Manuel Costa Santos | treinador | 1359 |
-| José Mourinho | treinador | 1243 |
-| Premier League | competicao | 1225 |
+| Fernando Manuel Costa Santos | treinador | 1364 |
+| José Mourinho | treinador | 1187 |
 | Campeonato Polonês de Futebol 3ª Divisão | competicao | 1107 |
-| II Divisão | competicao | 1005 |
-| Estádio do Dragão | estadio | 936 |
-| Simão Freitas | treinador | 862 |
+| Premier League | competicao | 1106 |
+| II Divisão | competicao | 1006 |
+| Estádio do Dragão | estadio | 881 |
+| Jesualdo Ferreira | treinador | 767 |
+| Copa Final Four de Voleibol | competicao | 724 |
+| Aeroporto Internacional do Rio de Janeiro Tom Jobim/Galeão | estadio | 705 |
 
 ## Origem das entidades mencionadas no vocabulário
 
 | Origem | Entidades distintas |
 | --- | ---: |
-| lista_fechada | 4256 |
-| candidato | 2781 |
+| lista_fechada | 4251 |
+| candidato | 2778 |
 | lista_fechada+candidato | 38 |

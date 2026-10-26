@@ -170,7 +170,9 @@ este resumo, o mapa em AGENTS.md, o código e a ontologia cumprem essas funçõe
 detalhe (secções de `docs/experiments.md`, salvo indicação). Nenhum número
 abaixo é novo: vêm dessas secções.
 
-**Terceira corrida (2026-10-25):** os números do `por_ano` que valem para a tese passam a ser os da terceira corrida (`--sem-repetidas`; 76,5 % dos Artigos com ≥ 1 entidade na passagem 2 e 29/40 menções certas; comparação e limitações em `docs/experiments.md`, "Terceira corrida do `por_ano`"); os números abaixo, de 2026-10-23, são os da segunda corrida.
+**Quarta corrida (2026-10-25, congelada):** os números do `por_ano` que entram na tese são os da **quarta corrida** (`06e6663`, `--sem-repetidas`): 129 317 Artigos, 74,8 % com ≥ 1 entidade na passagem 2 (63,3 % na passagem 1), 32/40 menções certas (80,0 %; Wilson 65–90 %), 39/40 modalidades certas, com modalidade só em 42,7 % dos artigos e nenhum de 1999–2009; comparação com a terceira e limitações em `docs/experiments.md`, "Quarta corrida do `por_ano` e avaliação". Não se regeneram sem decisão do autor.
+
+**Terceira corrida (2026-10-25), superada pela quarta:** os números do `por_ano` que valem para a tese passam a ser os da terceira corrida (`--sem-repetidas`; 76,5 % dos Artigos com ≥ 1 entidade na passagem 2 e 29/40 menções certas; comparação e limitações em `docs/experiments.md`, "Terceira corrida do `por_ano`"); os números abaixo, de 2026-10-23, são os da segunda corrida.
 
 **Estado (atualizado em 2026-10-23).** A recolha do corpus alargado está
 **terminada** (2026-10-22, 18:26): 129 317 Artigos de 1999–2024, 126 798 com
