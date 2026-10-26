@@ -89,6 +89,8 @@ em 2026-10-26: os valores atuais conferem com o `experiments.md`.
 | Arquivo.pt | Limitações e Desafios | lista de códigos HTTP "404, 429, 503" | rever: o `experiments.md` regista também 500 (HTML) e os 400 por acumulação de cookies, já resolvidos |
 | Motor de colheita (`motorcolheita.typ`) | Estratégia de Pesquisa e Recolha | "108 termos (39/57/5/7)", "826 mil URLs" | não muda; se o completo entrar, acrescentar a pesquisa com `siteSearch=record.xl.pt` |
 | Motor de colheita | Extração e Processamento | origem do corpo (c′ / HTML / sem corpo) — ainda sem números | quarta corrida (a correção da tabela do `<aux>` mudou `html:aux` e `sem_corpo`) |
+| Motor de colheita | Identificação e Classificação dos Recursos | padrões `/detalhe/`, `noticia.asp?id=`, `shownews.asp?id=`, `noticia.aspx?id=`, `interior.aspx?content_id=` | completo: se entrar, acrescentar `interior_premium.aspx` e a exclusão das páginas de capas (só na extensão) |
+| Motor de colheita | Extração e Processamento (contentores HTML) | `readerBody`, `text_container`, `bodybox`, `<aux>`, contentores de 1999–2000 e de 2009 | completo: se entrar, acrescentar os de 2010–2015 (`div.newsBody`, `div.areaGeralNoticiasTextBox`, `div.texto`) |
 | Motor de colheita | Tratamento da Redundância | "121 artigos … 112 com uma versão" | não muda (corpus de 125 artigos) |
 | Ontologia (`ontologia.typ`) | Identificação e Enriquecimento Semântico (por escrever) | — | quarta corrida: artigos com ≥ 1 entidade, entidades aceites na híbrida, precisão (40 pares), precisão e cobertura (30 notícias), concordância |
 | Protótipo (por escrever) | — | — | quarta corrida: modalidades (com e sem), top de entidades, tamanho do `data.js`; completo: anos |
