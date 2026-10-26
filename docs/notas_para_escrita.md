@@ -92,3 +92,32 @@ os conteúdos preservando a proveniência e suportando a exploração). **A revi
 Conclusões, uma subsecção "Resposta às questões de investigação"; na Avaliação, indicar que
 resultado responde a cada pergunta (QI1 → capítulo do Arquivo.pt; QI2 → precisão e cobertura;
 QI3 → ontologia e protótipo).
+
+## Como ler os resultados das entidades (quarta corrida e 30 notícias, 2026-10-26)
+
+Fonte: `experiments.md`, "Quarta corrida do `por_ano` e avaliação" e "Precisão e cobertura
+em 30 notícias anotadas"; dados em `data/processed/avaliacao_cobertura_30.csv`.
+
+- **Precisão alta, cobertura baixa, e porquê.** Passagem 2: precisão 74,0 % (64–82),
+  cobertura 28,9 % (24–35). A cobertura baixa vem sobretudo do **âmbito do vocabulário**
+  (desporto português, 1999–2024): 67,4 % das menções falhadas são de entidades fora do
+  vocabulário (atletas estrangeiros, escalões, modalidades menores), concentradas em
+  poucas notícias com listas longas. **Medida só sobre as entidades que existem no
+  vocabulário, a cobertura é 55,5 % (47–64), e 75,5 % (66–83) sem as notícias sem corpo.**
+  Escrever as três, por esta ordem, e explicar: o método funciona dentro do vocabulário;
+  o limite principal é o vocabulário (trabalho futuro: alargá-lo ou NER).
+- **Um artigo concentra 14 dos 25 erros** (lista lateral "Todas as notícias" dentro do
+  corpo); sem ele, precisão 86,4 % (77–92). Dizer as duas, não só a melhor.
+- **Precisão dos 40 pares:** 80,0 % (65–90) na quarta, 72,5 % (57–84) na terceira, com
+  sementes diferentes e intervalos sobrepostos: **não afirmar que a precisão subiu**, só
+  que os tipos de erro mudaram (tabelas e manchetes deram lugar a homónimos e nomes).
+- **Erros de vocabulário conhecidos** (para a análise de erros): "João Carlos Rodrigues da
+  Costa" tem a variante "Costa" e apanha Pinto da Costa, António Costa e outros (8 de 8
+  menções da amostra erradas; está no top 30); "Rui Costa" junta três pessoas; a lista
+  fechada não tem a variante "FC Porto" (só a abordagem híbrida a acrescenta).
+- **Modalidades:** 39/40 certas (97,5 %) pelo URL; nenhum artigo de 1999–2009 tem
+  modalidade; 68,2 % em 2017–2024; 42,7 % no corpus inteiro.
+- **Limpeza do texto:** 38 de 40 trechos retirados estavam certos (os 2 falsos negativos
+  sem entidade); nenhuma menção falhada nas 30 notícias se deve à limpeza.
+- **Classificação dos motivos** feita por um só anotador (a sessão local); a concordância
+  medida (41/49 às cegas, 49/49 final) é sobre as entidades, não sobre os motivos.
