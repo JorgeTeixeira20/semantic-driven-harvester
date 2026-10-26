@@ -2,11 +2,11 @@
 
 Gerado de `output/corpus_entities_por_ano.csv` (variante c′) e do vocabulário da Wikidata, sem pedidos à API; `data/processed/corpus_articles_por_ano_triples.nt` não foi alterado (checksum igual antes e depois).
 
-- Triplos: 5250087
-- Linhas de tema / de menção no CSV: 196901 / 559010
+- Triplos: 5256840
+- Linhas de tema / de menção no CSV: 196901 / 559759
 - Nós `Tema` (partilhados por categoria e valor): 179
-- Nós `EntidadeMencionada`: 7067 — 6895 com URI da Wikidata, 172 com URI próprio (homónimos)
-- Nós `Mencao`: 559010
+- Nós `EntidadeMencionada`: 7071 — 6899 com URI da Wikidata, 172 com URI próprio (homónimos)
+- Nós `Mencao`: 559759
 - Entidades vindas da abordagem híbrida (`origemVocabulario` candidato): 2778
 
 ## Exceção: rótulos homónimos
