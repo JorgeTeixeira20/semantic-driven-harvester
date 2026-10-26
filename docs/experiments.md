@@ -6865,3 +6865,94 @@ YouTuber e "Grand Slam" (na nº 18 a sessão excluiu "Grand Slam" como termo gen
 Excluindo a nº 1, a concordância às cegas é 41/41. Limitação: 8 de 30 notícias (26,7 %) e 49 de
 246 entidades; as 22 restantes foram anotadas só pela sessão. A concordância mede a fiabilidade da
 anotação (leitura e critério), não a do sistema.
+
+### Resultados: precisão e cobertura da quarta corrida (2026-10-25)
+
+Comparação, por Artigo, da anotação (246 entidades distintas, feita antes de olhar para o
+sistema) com o CSV de entidades da quarta corrida: passagem 1 (lista fechada,
+`caminho_b_por_ano_quarta_passagem1/`) e passagem 2 (híbrida, `corpus_entities_por_ano.csv`),
+só menções do texto. Resultado em `data/processed/avaliacao_cobertura_30.csv` (529 linhas: uma
+por entidade e passagem; `resultado` certa/errada/falhada, `motivo`, `sistema`, `nota`). A
+classificação das falhadas e das erradas foi feita à mão, lendo o corpo extraído (a sessão, não
+um segundo anotador; ver a limitação da concordância acima). Uma entidade encontrada com outro
+nome da mesma entidade conta como certa (3 casos: "Liga NOS" ↔ Primeira Liga, "Estádio Municipal
+Eng. Branco Teixeira" ↔ o mesmo estádio, "Wimbledon" ↔ Torneio de Wimbledon). Precisão = certas /
+(certas + erradas); cobertura = certas / (certas + falhadas); intervalos de Wilson a 95 % entre
+parênteses.
+
+| Passagem / época | Certas | Erradas | Falhadas | Precisão | Cobertura | F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **2 (híbrida), todas** | 71 | 25 | 175 | 74,0 % (64–82) | 28,9 % (24–35) | 41,5 % |
+| 2, 1999–2009 | 36 | 18 | 102 | 66,7 % (53–78) | 26,1 % (19–34) | 37,5 % |
+| 2, 2017–2024 | 35 | 7 | 73 | 83,3 % (69–92) | 32,4 % (24–42) | 46,7 % |
+| **1 (lista fechada), todas** | 43 | 12 | 203 | 78,2 % (66–87) | 17,5 % (13–23) | 28,6 % |
+| 1, 1999–2009 | 23 | 11 | 115 | 67,6 % (51–81) | 16,7 % (11–24) | 26,7 % |
+| 1, 2017–2024 | 20 | 1 | 88 | 95,2 % (77–99) | 18,5 % (12–27) | 31,0 % |
+
+A amostra tem 28 notícias com entidades anotadas (a nº 8 é uma página arquivada com erro HTTP
+500 e a nº 25 é Premium sem corpo visível: 0 entidades). Cobertura média **por notícia**
+(passagem 2): 41,5 % (mediana 50 %; 6 notícias com 0 %). Só 4 de 28 notícias (nº 2, 11, 16, 30)
+têm todas as entidades anotadas encontradas pela passagem 2. A cobertura pelo total de
+entidades está dominada por três notícias com listas longas (nº 15, andebol suíço: 39 entidades;
+nº 27, sub-20 do Nacional: 24; nº 14, sorteio da Taça da Liga: 18).
+
+**Erradas (25 na passagem 2).** 14 são de uma só notícia, a nº 7 (2005, capturada em 2009): o
+corpo extraído traz a lista lateral "Todas as notícias"/"Exclusivos" e os comentários do leitor,
+e o sistema regista 13 pessoas e clubes dessas manchetes (Cristiano Ronaldo, Mourinho, Deco,
+Benfica, …); só "Manchester United" estava na notícia. Outros 11: 3 homónimos (variante "Liga
+Espanhola" lida como a liga de basquetebol, "seleção portuguesa" de ténis lida como a de
+futebol, "Campeonatos Nacionais" de ciclismo), 3 nomes truncados ("Sporting da Horta" → Sporting
+CP, "II Divisão B" → II Divisão, "Taça das Nações Africanas de sub-20" → Taça das Nações), 2
+topónimos ("Rio de Janeiro" → aeroporto, "ciclista das Caldas da Rainha" → Caldas da Rainha
+Ladies Open), 2 termos genéricos ("Grand Slam", que a anotação excluiu) e 1 assinatura ("Por
+Diogo Matos", o jornalista, lido como o jogador). Sem a nº 7: 70 certas e 11 erradas, precisão
+**86,4 %** (77–92); em 1999–2009, 35 e 4, **89,7 %** (76–96). Na passagem 1 as erradas são 10 da
+nº 7 (widget), 1 nome truncado e 1 assinatura.
+
+**Falhadas (175 na passagem 2) e motivos:**
+
+| Motivo | Passagem 2 | 1999–2009 | 2017–2024 | Passagem 1 |
+| --- | ---: | ---: | ---: | ---: |
+| `fora_do_vocabulario` (limite do vocabulário) | **118** (67,4 %) | 56 | 62 | 144 |
+| `sem_corpo` (corpo não extraído) | 34 (19,4 %) | 30 | 4 | 34 |
+| `forma_nao_prevista` (limite do método) | 20 (11,4 %) | 13 | 7 | 22 |
+| `outro` (só o nome próprio na ficha) | 3 (1,7 %) | 3 | 0 | 3 |
+| `regra_de_nomes` | 0 | 0 | 0 | 0 |
+| `retirada_pela_limpeza` | 0 | 0 | 0 | 0 |
+| `homonimo_sem_qid` | 0 | 0 | 0 | 0 |
+| **Total** | 175 | 102 | 73 | 203 |
+
+Nenhuma das falhadas se deve à limpeza de texto (`--sem-repetidas`) nem à regra do nome
+truncado: nos 20 casos de `forma_nao_prevista` verifiquei que nenhuma forma do vocabulário
+aparece no corpo extraído. O **limite do vocabulário** pesa mais do que o do método: 118 das 175
+são entidades que não estão no vocabulário (76 atletas, 18 competições, 16 clubes, 6 treinadores,
+2 estádios). Três notícias concentram 70 delas (nº 15, 27 e 20: jogadores suíços de andebol,
+sub-20 do Nacional e andebol do Europeu). O **limite do método** (23 de 175) é o nome curto: o
+vocabulário tem o clube ou o jogador, mas a forma do texto não é uma variante — "Boavista",
+"Nacional", "Penafiel", "Tondela", "Avanca" sozinhos, "V. Guimarães", "E. Amadora", só o apelido
+("Izmailov", "Pereirinha", "Nwoko"), "Thomas Rosicky" (grafia), "liga espanhola" para La Liga,
+"Liga Betclic" para a Primeira Liga. Na passagem 1, "FC Porto" e "Gil Vicente" falham porque a
+lista fechada não tem essas variantes (só a híbrida, que lhes acrescenta "FC Porto" e "Gil
+Vicente"): é o que explica o clube mais citado do corpus só aparecer na passagem 2.
+
+**Cobertura só sobre as entidades que existem no vocabulário** (tira as `fora_do_vocabulario`
+do denominador; mede o método e a extração do corpo sem o limite do vocabulário):
+
+| Passagem / época | Todas as que existem no vocabulário | E com corpo extraído |
+| --- | ---: | ---: |
+| 2, todas | 55,5 % (47–64) | 75,5 % (66–83) |
+| 2, 1999–2009 | 43,9 % (34–55) | 69,2 % (56–80) |
+| 2, 2017–2024 | 76,1 % (62–86) | 83,3 % (69–92) |
+| 1, todas | 42,2 % (33–52) | 63,2 % (51–74) |
+| 1, 1999–2009 | 32,4 % (23–44) | 56,1 % (41–70) |
+| 1, 2017–2024 | 64,5 % (47–79) | 74,1 % (55–87) |
+
+(A segunda coluna tira também as `sem_corpo`.) Em 2017–2024 o método encontra 83 % do que está
+no vocabulário e tem corpo; em 1999–2009, 69 %, pelo peso dos nomes curtos nas fichas de jogo e
+das notícias antigas curtas. A cobertura baixa, 29 %, é sobretudo do vocabulário (que só tem
+clubes e jogadores das ligas portuguesas, mais os candidatos da Wikidata com ≥ 10 artigos) e,
+nas notícias de 1999–2009, do corpo que não foi extraído (4 notícias, 30 das 138 entidades).
+
+Limitações: 30 notícias e 246 entidades (os intervalos são largos, sobretudo por época); a
+classificação dos motivos é da sessão; a amostra não separa o desporto (futebol dominante em
+1999–2009); a concordância da anotação com o autor (8 de 30 notícias) está acima.

@@ -1,0 +1,530 @@
+artigo,epoca,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
+1,1999-2009,Vitória de Guimarães,clube,,1,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Boavista,clube,,1,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Marítimo,clube,,1,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Flamarion,atleta,,1,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Adelino,atleta,,1,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Rabarivony,atleta,,1,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Augusto Inácio,treinador,,1,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,I Liga,competicao,,1,falhada,sem_corpo,,corpo não extraído
+2,1999-2009,Marco Aurélio,atleta,,1,falhada,fora_do_vocabulario,,Marco Aurélio Moreira: só existe na híbrida (candidato)
+2,1999-2009,Belenenses,clube,,1,certa,,Clube de Futebol Os Belenenses,
+3,1999-2009,II Divisão B,competicao,,1,falhada,fora_do_vocabulario,,
+3,1999-2009,III Divisão,competicao,,1,falhada,fora_do_vocabulario,,III Divisão: só existe na híbrida (candidato)
+4,1999-2009,Salgueiros,clube,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Santa Clara,clube,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,II Liga,competicao,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Rui Correia,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Tó Ferreira,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Bodunha,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Nunes,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Nélson,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Edu Ramos,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Issuf,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Caló,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Marco Cláudio,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,João Pedro,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Rui Ferreira,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Marco Freitas,atleta,,1,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Sérgio Ribeiro,atleta,,1,falhada,sem_corpo,,corpo não extraído
+5,1999-2009,Nwoko,atleta,,1,falhada,forma_nao_prevista,,Udochukwu Nwoko: só o apelido; a variante é 'Udo Nwoko'
+5,1999-2009,Vieirinha,atleta,,1,certa,,Adelino André Vieira Freitas,
+5,1999-2009,Paulo Machado,atleta,,1,certa,,Paulo Machado,
+5,1999-2009,Ruben,atleta,,1,falhada,outro,,só o nome próprio na ficha; identidade não resolúvel pelo método
+5,1999-2009,Jorge Duarte,atleta,,1,certa,,Jorge Miguel Cordeiro Duarte,
+5,1999-2009,Pedro Cervantes,atleta,,1,certa,,Pedro Nuno Coelho Cervantes,
+5,1999-2009,Roberto,atleta,,1,falhada,outro,,só o nome próprio na ficha; identidade não resolúvel pelo método
+5,1999-2009,Jaime,atleta,,1,falhada,outro,,só o nome próprio na ficha; identidade não resolúvel pelo método
+5,1999-2009,Carlos Brito,treinador,,1,falhada,fora_do_vocabulario,,o vocabulário só tem o jogador homónimo Carlos Correia de Brito
+5,1999-2009,Gil Vicente,clube,,1,falhada,forma_nao_prevista,,Gil Vicente Futebol Clube: a variante só existe no vocabulário híbrido
+5,1999-2009,Taça de Portugal,competicao,,1,falhada,fora_do_vocabulario,,Taça de Portugal: só existe na híbrida (candidato)
+6,1999-2009,Diego Souza,atleta,,1,certa,,Diego Souza,
+6,1999-2009,Marcel,atleta,,1,falhada,forma_nao_prevista,,Marcel Augusto Ortolan: só o nome próprio
+6,1999-2009,Willian Magrão,atleta,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,Arouca,atleta,,1,falhada,fora_do_vocabulario,,jogador do Fluminense; não é o clube FC Arouca (que o sistema não registou: correto)
+6,1999-2009,Cícero,atleta,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,Tiago Cavalcanti,atleta,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,Romano,atleta,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,Benfica,clube,Q131499,1,certa,,Sport Lisboa e Benfica,
+6,1999-2009,Grémio,clube,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,América de Natal,clube,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,Fluminense,clube,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,Juventude,clube,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,Campeonato Brasileiro,competicao,,1,falhada,fora_do_vocabulario,,
+6,1999-2009,Taça Libertadores da América,competicao,,1,falhada,fora_do_vocabulario,,Copa Libertadores: só existe na híbrida (candidato)
+7,1999-2009,Carlos Queiroz,treinador,,1,falhada,fora_do_vocabulario,,
+7,1999-2009,Manchester United,clube,Q18656,1,falhada,fora_do_vocabulario,,Manchester United Football Club: só existe na híbrida (candidato)
+7,1999-2009,CAN 2010,competicao,,1,falhada,fora_do_vocabulario,,
+7,1999-2009,,jogador,Q4801610,1,errada,widget,Artur Futre,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q11571,1,errada,widget,Cristiano Ronaldo,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q659634,1,errada,widget,Deco,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q351972,1,errada,widget,João Vieira Pinto,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q31193552,1,errada,widget,Manuel Fernandes,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q131994651|Q1997778|Q628601,1,errada,widget,Miguel Oliveira,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q552239,1,errada,widget,Paulo Machado,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q503365,1,errada,widget,Ricardo Sérgio Rocha Azevedo,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,clube,Q131499|Q136823040|Q19060544|Q2029819,1,errada,widget,Sport Lisboa e Benfica,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,clube,Q112176117|Q75729,1,errada,widget,Sporting Clube de Portugal,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+9,1999-2009,Jonah Lomu,atleta,,1,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Matthew Burke,atleta,,1,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Jeff Wilson,atleta,,1,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Estádio de Carisbrook,estadio,,1,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Tri-Nations,competicao,,1,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Bledisloe Cup,competicao,,1,falhada,sem_corpo,,página arquivada sem texto extraído
+10,1999-2009,João Moutinho,atleta,,1,certa,,João Moutinho,
+10,1999-2009,Izmailov,atleta,,1,falhada,forma_nao_prevista,,Marat Izmaylov: só o apelido
+10,1999-2009,Rui Patrício,atleta,,1,certa,,Rui Patrício,
+10,1999-2009,Pereirinha,atleta,,1,falhada,forma_nao_prevista,,Bruno Pereirinha: só o apelido
+10,1999-2009,Yannick Djaló,atleta,,1,certa,,Yannick Djaló,
+10,1999-2009,Celsinho,atleta,,1,falhada,fora_do_vocabulario,,
+10,1999-2009,Ronny,atleta,,1,falhada,forma_nao_prevista,,Ronny Heberson Furtado de Araújo: só o nome próprio
+10,1999-2009,Paulo Bento,treinador,,1,certa,,Paulo Bento,
+10,1999-2009,Sporting,clube,Q75729,1,certa,,Sporting Clube de Portugal,
+11,1999-2009,Desportivo das Aves,clube,,1,certa,,Clube Desportivo das Aves,
+11,1999-2009,FC Porto,clube,Q128446,1,falhada,forma_nao_prevista,,Futebol Clube do Porto: a variante só existe no vocabulário híbrido
+12,1999-2009,Boavista,clube,,1,falhada,forma_nao_prevista,,Boavista Futebol Clube: 'Boavista' sozinho não é variante
+12,1999-2009,Estádio do Bessa,estadio,,1,falhada,fora_do_vocabulario,,Estádio do Bessa Século XXI: só existe na híbrida (candidato)
+13,1999-2009,Pavel Nedved,atleta,,1,falhada,fora_do_vocabulario,,Pavel Nedvěd: só existe na híbrida (candidato)
+13,1999-2009,Thomas Rosicky,atleta,,1,falhada,fora_do_vocabulario,,Tomáš Rosický só existe na híbrida
+13,1999-2009,Rafael Van der Vaart,atleta,,1,falhada,fora_do_vocabulario,,
+13,1999-2009,Juventus,clube,Q1422,1,falhada,fora_do_vocabulario,,
+13,1999-2009,Arsenal,clube,Q9617,1,falhada,fora_do_vocabulario,,
+13,1999-2009,Hamburgo,clube,,1,falhada,fora_do_vocabulario,,
+14,1999-2009,Sporting,clube,Q75729,1,certa,,Sporting Clube de Portugal,
+14,1999-2009,Vitória de Guimarães,clube,,1,falhada,forma_nao_prevista,,Vitória Sport Clube: o texto diz 'V. Guimarães'
+14,1999-2009,Benfica,clube,Q131499,1,certa,,Sport Lisboa e Benfica,
+14,1999-2009,Estrela da Amadora,clube,,1,falhada,forma_nao_prevista,,Clube de Futebol Estrela da Amadora: o texto diz 'E. Amadora'/'Est. Amadora'
+14,1999-2009,FC Porto,clube,Q128446,1,falhada,forma_nao_prevista,,Futebol Clube do Porto: a variante só existe no vocabulário híbrido
+14,1999-2009,Fátima,clube,,1,falhada,forma_nao_prevista,,Centro Desportivo de Fátima: 'Fátima' sozinho não é variante
+14,1999-2009,Penafiel,clube,,1,falhada,forma_nao_prevista,,Futebol Clube Penafiel: 'Penafiel' sozinho não é variante
+14,1999-2009,Nacional,clube,,1,falhada,forma_nao_prevista,,Clube Desportivo Nacional: 'Nacional' sozinho não é variante
+14,1999-2009,Leixões,clube,,1,certa,,Leixões Sport Club,
+14,1999-2009,União de Leiria,clube,,1,certa,,União Desportiva de Leiria,
+14,1999-2009,Portimonense,clube,,1,falhada,forma_nao_prevista,,Portimonense Sporting Clube: 'Portimonense' sozinho não é variante
+14,1999-2009,Belenenses,clube,,1,certa,,Clube de Futebol Os Belenenses,
+14,1999-2009,Beira-Mar,clube,,1,certa,,Sport Clube Beira-Mar,
+14,1999-2009,Paços de Ferreira,clube,,1,certa,,Futebol Clube Paços de Ferreira,
+14,1999-2009,Vitória de Setúbal,clube,,1,certa,,Vitória Futebol Clube,
+14,1999-2009,Sporting de Braga,clube,,1,certa,,Sporting Clube de Braga,
+14,1999-2009,Taça da Liga,competicao,,1,falhada,fora_do_vocabulario,,Taça da Liga: só existe na híbrida (candidato)
+14,1999-2009,Liga de Honra,competicao,,1,falhada,fora_do_vocabulario,,Segunda Liga: só existe na híbrida (candidato)
+15,1999-2009,Sporting da Horta,clube,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,BSV Bern Muri,clube,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Taça Challenge,competicao,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Pavilhão da Horta,estadio,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Telmo Correia,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Mane Lavrnic,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Gustavo Castro,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Bruno Azevedo,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Albano Lopes,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Davide Castro,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Tiago Rodrigues,atleta,,1,certa,,Tiago Rodrigues,
+15,1999-2009,Bruno Castro,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Pedro Graça,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Alberto Basto,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Milan Vucicevic,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,David Graça,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,João Freitas,atleta,,1,falhada,fora_do_vocabulario,,João Filipe Pereira Freitas: só existe na híbrida (candidato)
+15,1999-2009,Ricardo Gonçalves,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Kyunh Thai Han,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Stefan Odermatt,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Stephan Leiser,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Tobias Stalder,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,David Santenmann,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Philipp Buri,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Marc Baumgartner,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Alexander Milovanovic,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Simon Malar,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Daniel Eberhard,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Benjamin Echaud,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Benjamin Steiger,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Matthias Krebs,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Cristoph Hammerli,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Patrick Gehri,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Lorenz Malar,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Ruedi Joder,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Antoine Urech,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Peter Hlavtur,atleta,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Konstantin Dolgov,treinador,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,Martin Rubin,treinador,,1,falhada,fora_do_vocabulario,,
+15,1999-2009,,clube,Q112176117|Q75729,1,errada,nome_truncado,Sporting Clube de Portugal,o texto diz 'Sporting Clube da Horta' / 'Sporting da Horta'
+16,2017-2024,Rafael Leão,atleta,,1,certa,,Rafael Leão,
+17,2017-2024,Tondela,clube,,1,falhada,forma_nao_prevista,,Clube Desportivo de Tondela: 'Tondela' sozinho não é variante
+17,2017-2024,Diogo Silva,atleta,,1,certa,,Diogo Silva,
+17,2017-2024,Jota Gonçalves,atleta,,1,falhada,fora_do_vocabulario,,
+17,2017-2024,Natxo González,treinador,,1,falhada,fora_do_vocabulario,,Natxo González: só existe na híbrida (candidato)
+17,2017-2024,,jogador,Q5279212,1,errada,assinatura,Diogo Matos,"'Por Diogo Matos' é o jornalista, não o jogador"
+18,2017-2024,Daniil Medvedev,atleta,,1,falhada,fora_do_vocabulario,,Daniil Medvedev: só existe na híbrida (candidato)
+18,2017-2024,Andrey Rublev,atleta,,1,falhada,fora_do_vocabulario,,Andrey Rublev: só existe na híbrida (candidato)
+18,2017-2024,Alex De Minaur,atleta,,1,falhada,fora_do_vocabulario,,
+18,2017-2024,Jack Draper,atleta,,1,falhada,fora_do_vocabulario,,
+18,2017-2024,US Open,competicao,,1,falhada,fora_do_vocabulario,,US Open de ténis: só existe na híbrida (candidato)
+19,2017-2024,Atlético de Madrid,clube,,1,falhada,fora_do_vocabulario,,Club Atlético de Madrid: só existe na híbrida (candidato)
+19,2017-2024,Betis,clube,,1,falhada,fora_do_vocabulario,,
+19,2017-2024,Nico Gaitán,atleta,,1,certa,,Nicolás Gaitán,
+19,2017-2024,La Liga,competicao,,1,falhada,fora_do_vocabulario,,La Liga só existe na híbrida
+20,2017-2024,Europeu de andebol 2022,competicao,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Vincent Gerard,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Aymeric Minne,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Kevin Moller,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Niklas Landin,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Bronko Vujovic,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Milos Vujovic,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Hampus Wanne,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Jorge Maqueda,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Ferran Solé,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Agustín Casado,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Sebastian Barthold,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Sander Sagosen,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Kristian Bjornsen,atleta,,1,falhada,fora_do_vocabulario,,
+20,2017-2024,Arkadiusz Moryto,atleta,,1,falhada,fora_do_vocabulario,,
+21,2017-2024,União de Leiria,clube,,1,falhada,sem_corpo,,Premium sem corpo visível
+21,2017-2024,AVS SAD,clube,,1,falhada,sem_corpo,,Premium sem corpo visível
+21,2017-2024,Jorge Costa,treinador,,1,falhada,sem_corpo,,Premium sem corpo visível
+21,2017-2024,Nenê,atleta,,1,falhada,sem_corpo,,Premium sem corpo visível
+22,2017-2024,FC Porto,clube,Q128446,1,falhada,forma_nao_prevista,,Futebol Clube do Porto: a variante só existe no vocabulário híbrido
+22,2017-2024,Desportivo de Chaves,clube,,1,falhada,forma_nao_prevista,,Grupo Desportivo de Chaves: o texto diz 'Desportivo de Chaves'
+22,2017-2024,Real Madrid,clube,Q8682,1,falhada,fora_do_vocabulario,,Real Madrid Club de Fútbol: só existe na híbrida (candidato)
+22,2017-2024,Ourense Club de Fútbol,clube,,1,falhada,fora_do_vocabulario,,
+22,2017-2024,Sporting de Braga,clube,,1,certa,,Sporting Clube de Braga,
+22,2017-2024,San Ciprián,clube,,1,falhada,fora_do_vocabulario,,
+22,2017-2024,Liga NOS,competicao,,1,falhada,fora_do_vocabulario,,Primeira Liga: só existe na híbrida (candidato)
+22,2017-2024,Iker Casillas,atleta,,1,certa,,Iker Casillas,
+22,2017-2024,Óliver Torres,atleta,,1,certa,,Óliver Torres,
+22,2017-2024,Adrián López,atleta,,1,falhada,forma_nao_prevista,,Adrián López Álvarez: só nome e apelido curtos; a variante é 'Adrian Lopez Alvarez'
+22,2017-2024,Insuela,treinador,,1,falhada,fora_do_vocabulario,,
+22,2017-2024,Estádio Municipal Eng. Branco Teixeira,estadio,,1,falhada,fora_do_vocabulario,,Estádio Municipal Eng. Manuel Branco Teixeira: só existe na híbrida (candidato)
+23,2017-2024,FC Porto,clube,Q128446,1,falhada,forma_nao_prevista,,Futebol Clube do Porto: a variante só existe no vocabulário híbrido
+23,2017-2024,Avanca,clube,,1,falhada,forma_nao_prevista,,Associação Atlética de Avanca: 'Avanca' sozinho não é variante
+23,2017-2024,Campeonato,competicao,,1,falhada,fora_do_vocabulario,,termo genérico (anotado como competição)
+23,2017-2024,Alfredo Quintana,atleta,,1,certa,,Alfredo Quintana Bravo,
+23,2017-2024,António Areia,atleta,,1,certa,,António Areia,
+23,2017-2024,Lars Walther,treinador,,1,falhada,fora_do_vocabulario,,Lars Walther: só existe na híbrida (candidato)
+23,2017-2024,Carlos Martingo,treinador,,1,falhada,fora_do_vocabulario,,
+24,2017-2024,Billie Jean King Cup,competicao,,1,falhada,fora_do_vocabulario,,
+24,2017-2024,Complexo de Ténis do Jamor,estadio,,1,falhada,fora_do_vocabulario,,
+24,2017-2024,Angelina Voloshchuk,atleta,,1,certa,,Angelina Voloshchuk,
+24,2017-2024,Lia Karatancheva,atleta,,1,falhada,fora_do_vocabulario,,
+24,2017-2024,Francisca Jorge,atleta,,1,certa,,Francisca Jorge,
+24,2017-2024,Gergana Topalova,atleta,,1,falhada,fora_do_vocabulario,,
+24,2017-2024,Matilde Jorge,atleta,,1,certa,,Matilde Jorge,
+24,2017-2024,Isabella Shinikova,atleta,,1,falhada,fora_do_vocabulario,,
+24,2017-2024,Neuza Silva,treinador,,1,certa,,Neuza Silva,
+26,2017-2024,Petra Kvitova,atleta,,1,falhada,fora_do_vocabulario,,Petra Kvitová: só existe na híbrida (candidato)
+26,2017-2024,Donna Vekic,atleta,,1,falhada,fora_do_vocabulario,,
+26,2017-2024,WTA 500 de Berlim,competicao,,1,falhada,fora_do_vocabulario,,
+26,2017-2024,Miami Open,competicao,,1,falhada,fora_do_vocabulario,,
+26,2017-2024,Wimbledon,competicao,,1,falhada,fora_do_vocabulario,,Torneio de Wimbledon: só existe na híbrida (candidato)
+27,2017-2024,Nacional,clube,,1,falhada,forma_nao_prevista,,Clube Desportivo Nacional: 'Nacional' sozinho não é variante
+27,2017-2024,Club Africain,clube,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Chiheb Labidi,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,César Augusto,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Douglas Sequeira,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Gustavo Garcia,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Léo Santos,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Afonso Freitas,atleta,,1,certa,,Afonso de Freitas,
+27,2017-2024,José Vítor,atleta,,1,falhada,fora_do_vocabulario,,"o vocabulário só tem o homónimo José Vítor Moreira Semedo, de outros clubes"
+27,2017-2024,Matheus Dias,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Miguel Baeza,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Djibril Soumaré,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Bruno Costa,atleta,,1,certa,,Bruno Costa,
+27,2017-2024,Daniel Penha,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Nigel Thomas,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Arvin Appiah,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Gabriel Santos,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Tiago Reis,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Adrián Butzke,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Isaac Tomich,atleta,,1,falhada,fora_do_vocabulario,,
+27,2017-2024,Dyego Sousa,atleta,,1,certa,,Dyego Sousa,
+27,2017-2024,Tiago Margarido,treinador,,1,falhada,fora_do_vocabulario,,Tiago Margarido: só existe na híbrida (candidato)
+27,2017-2024,Liga Betclic,competicao,,1,falhada,fora_do_vocabulario,,Primeira Liga só existe na híbrida
+27,2017-2024,Taça das Nações Africanas de sub-20,competicao,,1,falhada,fora_do_vocabulario,,
+28,2017-2024,Tobi Amusan,atleta,,1,falhada,fora_do_vocabulario,,
+28,2017-2024,Campeonato do Mundo de Atletismo,competicao,,1,falhada,fora_do_vocabulario,,o texto diz 'Mundial'; competição sem entrada
+29,2017-2024,João Almeida,atleta,,1,certa,,João Almeida,
+29,2017-2024,Rui Costa,atleta,,1,certa,,Rui Costa,
+29,2017-2024,Rui Oliveira,atleta,,1,certa,,Rui Oliveira,
+29,2017-2024,Ivo Oliveira,atleta,,1,certa,,Ivo Oliveira,
+29,2017-2024,Tadej Pogacar,atleta,,1,falhada,fora_do_vocabulario,,Tadej Pogačar: só existe na híbrida (candidato)
+29,2017-2024,UAE Emirates,clube,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Deceuninck-QuickStep,clube,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Hagens Berman Axeon,clube,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Giro d'Itália,competicao,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Paris-Nice,competicao,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta à Catalunha,competicao,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta ao Luxemburgo,competicao,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta à Polónia,competicao,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta a França,competicao,,1,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta a Espanha,competicao,,1,falhada,fora_do_vocabulario,,
+30,2017-2024,Alex Telles,atleta,,1,certa,,Alex Telles,
+1,1999-2009,Vitória de Guimarães,clube,,2,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Boavista,clube,,2,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Marítimo,clube,,2,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Flamarion,atleta,,2,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Adelino,atleta,,2,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Rabarivony,atleta,,2,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,Augusto Inácio,treinador,,2,falhada,sem_corpo,,corpo não extraído
+1,1999-2009,I Liga,competicao,,2,falhada,sem_corpo,,corpo não extraído
+2,1999-2009,Marco Aurélio,atleta,,2,certa,,Marco Aurélio Moreira,
+2,1999-2009,Belenenses,clube,,2,certa,,Clube de Futebol Os Belenenses,
+3,1999-2009,II Divisão B,competicao,,2,falhada,fora_do_vocabulario,,
+3,1999-2009,III Divisão,competicao,,2,certa,,III Divisão,
+3,1999-2009,,competicao,Q2306612,2,errada,homonimo,Campeonatos nacionais de ciclismo em estrada,variante 'Campeonatos Nacionais' lida em 'campeonatos nacionais' de futebol
+3,1999-2009,,competicao,Q618131,2,errada,nome_truncado,II Divisão,o texto diz 'II Divisão B'
+4,1999-2009,Salgueiros,clube,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Santa Clara,clube,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,II Liga,competicao,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Rui Correia,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Tó Ferreira,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Bodunha,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Nunes,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Nélson,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Edu Ramos,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Issuf,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Caló,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Marco Cláudio,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,João Pedro,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Rui Ferreira,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Marco Freitas,atleta,,2,falhada,sem_corpo,,corpo não extraído
+4,1999-2009,Sérgio Ribeiro,atleta,,2,falhada,sem_corpo,,corpo não extraído
+5,1999-2009,Nwoko,atleta,,2,falhada,forma_nao_prevista,,Udochukwu Nwoko: só o apelido; a variante é 'Udo Nwoko'
+5,1999-2009,Vieirinha,atleta,,2,certa,,Adelino André Vieira Freitas,
+5,1999-2009,Paulo Machado,atleta,,2,certa,,Paulo Machado,
+5,1999-2009,Ruben,atleta,,2,falhada,outro,,só o nome próprio na ficha; identidade não resolúvel pelo método
+5,1999-2009,Jorge Duarte,atleta,,2,certa,,Jorge Miguel Cordeiro Duarte,
+5,1999-2009,Pedro Cervantes,atleta,,2,certa,,Pedro Nuno Coelho Cervantes,
+5,1999-2009,Roberto,atleta,,2,falhada,outro,,só o nome próprio na ficha; identidade não resolúvel pelo método
+5,1999-2009,Jaime,atleta,,2,falhada,outro,,só o nome próprio na ficha; identidade não resolúvel pelo método
+5,1999-2009,Carlos Brito,treinador,,2,falhada,fora_do_vocabulario,,o vocabulário só tem o jogador homónimo Carlos Correia de Brito
+5,1999-2009,Gil Vicente,clube,,2,certa,,Gil Vicente Futebol Clube,
+5,1999-2009,Taça de Portugal,competicao,,2,certa,,Taça de Portugal,
+6,1999-2009,Diego Souza,atleta,,2,certa,,Diego Souza,
+6,1999-2009,Marcel,atleta,,2,falhada,forma_nao_prevista,,Marcel Augusto Ortolan: só o nome próprio
+6,1999-2009,Willian Magrão,atleta,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,Arouca,atleta,,2,falhada,fora_do_vocabulario,,jogador do Fluminense; não é o clube FC Arouca (que o sistema não registou: correto)
+6,1999-2009,Cícero,atleta,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,Tiago Cavalcanti,atleta,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,Romano,atleta,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,Benfica,clube,Q131499,2,certa,,Sport Lisboa e Benfica,
+6,1999-2009,Grémio,clube,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,América de Natal,clube,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,Fluminense,clube,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,Juventude,clube,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,Campeonato Brasileiro,competicao,,2,falhada,fora_do_vocabulario,,
+6,1999-2009,Taça Libertadores da América,competicao,,2,certa,,Copa Libertadores,
+6,1999-2009,,estadio,Q733998,2,errada,toponimo,Aeroporto Internacional do Rio de Janeiro Tom Jobim/Galeão,variante 'Rio de Janeiro' lida como o aeroporto
+7,1999-2009,Carlos Queiroz,treinador,,2,falhada,fora_do_vocabulario,,
+7,1999-2009,Manchester United,clube,Q18656,2,certa,,Manchester United Football Club,
+7,1999-2009,CAN 2010,competicao,,2,falhada,fora_do_vocabulario,,
+7,1999-2009,,clube,Q2636005,2,errada,widget,Al Shabab Football Club,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q4801610,2,errada,widget,Artur Futre,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q11571,2,errada,widget,Cristiano Ronaldo,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q659634,2,errada,widget,Deco,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,treinador,Q1370368,2,errada,widget,Jaime Pacheco,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,treinador,Q79983,2,errada,widget,José Mourinho,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q351972,2,errada,widget,João Vieira Pinto,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q31193552,2,errada,widget,Manuel Fernandes,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q131994651|Q1997778|Q628601,2,errada,widget,Miguel Oliveira,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q552239,2,errada,widget,Paulo Machado,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,clube,Q8682,2,errada,widget,Real Madrid Club de Fútbol,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,jogador,Q503365,2,errada,widget,Ricardo Sérgio Rocha Azevedo,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,clube,Q131499|Q136823040|Q19060544|Q2029819,2,errada,widget,Sport Lisboa e Benfica,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+7,1999-2009,,clube,Q112176117|Q75729,2,errada,widget,Sporting Clube de Portugal,"'Todas as notícias'/'Exclusivos' da página, dentro do corpo extraído (captura de 2009)"
+9,1999-2009,Jonah Lomu,atleta,,2,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Matthew Burke,atleta,,2,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Jeff Wilson,atleta,,2,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Estádio de Carisbrook,estadio,,2,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Tri-Nations,competicao,,2,falhada,sem_corpo,,página arquivada sem texto extraído
+9,1999-2009,Bledisloe Cup,competicao,,2,falhada,sem_corpo,,página arquivada sem texto extraído
+10,1999-2009,João Moutinho,atleta,,2,certa,,João Moutinho,
+10,1999-2009,Izmailov,atleta,,2,falhada,forma_nao_prevista,,Marat Izmaylov: só o apelido
+10,1999-2009,Rui Patrício,atleta,,2,certa,,Rui Patrício,
+10,1999-2009,Pereirinha,atleta,,2,falhada,forma_nao_prevista,,Bruno Pereirinha: só o apelido
+10,1999-2009,Yannick Djaló,atleta,,2,certa,,Yannick Djaló,
+10,1999-2009,Celsinho,atleta,,2,falhada,fora_do_vocabulario,,
+10,1999-2009,Ronny,atleta,,2,falhada,forma_nao_prevista,,Ronny Heberson Furtado de Araújo: só o nome próprio
+10,1999-2009,Paulo Bento,treinador,,2,certa,,Paulo Bento,
+10,1999-2009,Sporting,clube,Q75729,2,certa,,Sporting Clube de Portugal,
+11,1999-2009,Desportivo das Aves,clube,,2,certa,,Clube Desportivo das Aves,
+11,1999-2009,FC Porto,clube,Q128446,2,certa,,Futebol Clube do Porto,
+12,1999-2009,Boavista,clube,,2,falhada,forma_nao_prevista,,Boavista Futebol Clube: 'Boavista' sozinho não é variante
+12,1999-2009,Estádio do Bessa,estadio,,2,certa,,Estádio do Bessa Século XXI,
+13,1999-2009,Pavel Nedved,atleta,,2,certa,,Pavel Nedvěd,
+13,1999-2009,Thomas Rosicky,atleta,,2,falhada,forma_nao_prevista,,Tomáš Rosický: grafia 'Thomas' (variante: 'Tomas Rosicky')
+13,1999-2009,Rafael Van der Vaart,atleta,,2,falhada,fora_do_vocabulario,,
+13,1999-2009,Juventus,clube,Q1422,2,falhada,fora_do_vocabulario,,
+13,1999-2009,Arsenal,clube,Q9617,2,falhada,fora_do_vocabulario,,
+13,1999-2009,Hamburgo,clube,,2,falhada,fora_do_vocabulario,,
+14,1999-2009,Sporting,clube,Q75729,2,certa,,Sporting Clube de Portugal,
+14,1999-2009,Vitória de Guimarães,clube,,2,falhada,forma_nao_prevista,,Vitória Sport Clube: o texto diz 'V. Guimarães'
+14,1999-2009,Benfica,clube,Q131499,2,certa,,Sport Lisboa e Benfica,
+14,1999-2009,Estrela da Amadora,clube,,2,falhada,forma_nao_prevista,,Clube de Futebol Estrela da Amadora: o texto diz 'E. Amadora'/'Est. Amadora'
+14,1999-2009,FC Porto,clube,Q128446,2,certa,,Futebol Clube do Porto,
+14,1999-2009,Fátima,clube,,2,falhada,forma_nao_prevista,,Centro Desportivo de Fátima: 'Fátima' sozinho não é variante
+14,1999-2009,Penafiel,clube,,2,falhada,forma_nao_prevista,,Futebol Clube Penafiel: 'Penafiel' sozinho não é variante
+14,1999-2009,Nacional,clube,,2,falhada,forma_nao_prevista,,Clube Desportivo Nacional: 'Nacional' sozinho não é variante
+14,1999-2009,Leixões,clube,,2,certa,,Leixões Sport Club,
+14,1999-2009,União de Leiria,clube,,2,certa,,União Desportiva de Leiria,
+14,1999-2009,Portimonense,clube,,2,falhada,forma_nao_prevista,,Portimonense Sporting Clube: 'Portimonense' sozinho não é variante
+14,1999-2009,Belenenses,clube,,2,certa,,Clube de Futebol Os Belenenses,
+14,1999-2009,Beira-Mar,clube,,2,certa,,Sport Clube Beira-Mar,
+14,1999-2009,Paços de Ferreira,clube,,2,certa,,Futebol Clube Paços de Ferreira,
+14,1999-2009,Vitória de Setúbal,clube,,2,certa,,Vitória Futebol Clube,
+14,1999-2009,Sporting de Braga,clube,,2,certa,,Sporting Clube de Braga,
+14,1999-2009,Taça da Liga,competicao,,2,certa,,Taça da Liga,
+14,1999-2009,Liga de Honra,competicao,,2,certa,,Segunda Liga,
+15,1999-2009,Sporting da Horta,clube,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,BSV Bern Muri,clube,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Taça Challenge,competicao,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Pavilhão da Horta,estadio,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Telmo Correia,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Mane Lavrnic,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Gustavo Castro,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Bruno Azevedo,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Albano Lopes,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Davide Castro,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Tiago Rodrigues,atleta,,2,certa,,Tiago Rodrigues,
+15,1999-2009,Bruno Castro,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Pedro Graça,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Alberto Basto,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Milan Vucicevic,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,David Graça,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,João Freitas,atleta,,2,certa,,João Filipe Pereira Freitas,
+15,1999-2009,Ricardo Gonçalves,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Kyunh Thai Han,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Stefan Odermatt,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Stephan Leiser,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Tobias Stalder,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,David Santenmann,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Philipp Buri,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Marc Baumgartner,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Alexander Milovanovic,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Simon Malar,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Daniel Eberhard,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Benjamin Echaud,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Benjamin Steiger,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Matthias Krebs,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Cristoph Hammerli,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Patrick Gehri,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Lorenz Malar,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Ruedi Joder,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Antoine Urech,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Peter Hlavtur,atleta,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Konstantin Dolgov,treinador,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,Martin Rubin,treinador,,2,falhada,fora_do_vocabulario,,
+15,1999-2009,,clube,Q112176117|Q75729,2,errada,nome_truncado,Sporting Clube de Portugal,o texto diz 'Sporting Clube da Horta' / 'Sporting da Horta'
+16,2017-2024,Rafael Leão,atleta,,2,certa,,Rafael Leão,
+17,2017-2024,Tondela,clube,,2,falhada,forma_nao_prevista,,Clube Desportivo de Tondela: 'Tondela' sozinho não é variante
+17,2017-2024,Diogo Silva,atleta,,2,certa,,Diogo Silva,
+17,2017-2024,Jota Gonçalves,atleta,,2,falhada,fora_do_vocabulario,,
+17,2017-2024,Natxo González,treinador,,2,certa,,Natxo González,
+17,2017-2024,,jogador,Q5279212,2,errada,assinatura,Diogo Matos,"'Por Diogo Matos' é o jornalista, não o jogador"
+18,2017-2024,Daniil Medvedev,atleta,,2,certa,,Daniil Medvedev,
+18,2017-2024,Andrey Rublev,atleta,,2,certa,,Andrey Rublev,
+18,2017-2024,Alex De Minaur,atleta,,2,falhada,fora_do_vocabulario,,
+18,2017-2024,Jack Draper,atleta,,2,falhada,fora_do_vocabulario,,
+18,2017-2024,US Open,competicao,,2,certa,,US Open de ténis,
+18,2017-2024,,competicao,Q102113,2,errada,generico,Grand Slam de tênis,'último Grand Slam da temporada' é termo genérico
+19,2017-2024,Atlético de Madrid,clube,,2,certa,,Club Atlético de Madrid,
+19,2017-2024,Betis,clube,,2,falhada,fora_do_vocabulario,,
+19,2017-2024,Nico Gaitán,atleta,,2,certa,,Nicolás Gaitán,
+19,2017-2024,La Liga,competicao,,2,falhada,forma_nao_prevista,,La Liga: o texto diz 'liga espanhola'
+19,2017-2024,,competicao,Q1126104,2,errada,homonimo,Liga Espanhola de Basquetebol,variante 'Liga Espanhola' lida em 'liga espanhola' de futebol
+20,2017-2024,Europeu de andebol 2022,competicao,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Vincent Gerard,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Aymeric Minne,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Kevin Moller,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Niklas Landin,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Bronko Vujovic,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Milos Vujovic,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Hampus Wanne,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Jorge Maqueda,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Ferran Solé,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Agustín Casado,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Sebastian Barthold,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Sander Sagosen,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Kristian Bjornsen,atleta,,2,falhada,fora_do_vocabulario,,
+20,2017-2024,Arkadiusz Moryto,atleta,,2,falhada,fora_do_vocabulario,,
+21,2017-2024,União de Leiria,clube,,2,falhada,sem_corpo,,Premium sem corpo visível
+21,2017-2024,AVS SAD,clube,,2,falhada,sem_corpo,,Premium sem corpo visível
+21,2017-2024,Jorge Costa,treinador,,2,falhada,sem_corpo,,Premium sem corpo visível
+21,2017-2024,Nenê,atleta,,2,falhada,sem_corpo,,Premium sem corpo visível
+22,2017-2024,FC Porto,clube,Q128446,2,certa,,Futebol Clube do Porto,
+22,2017-2024,Desportivo de Chaves,clube,,2,falhada,forma_nao_prevista,,Grupo Desportivo de Chaves: o texto diz 'Desportivo de Chaves'
+22,2017-2024,Real Madrid,clube,Q8682,2,certa,,Real Madrid Club de Fútbol,
+22,2017-2024,Ourense Club de Fútbol,clube,,2,falhada,fora_do_vocabulario,,
+22,2017-2024,Sporting de Braga,clube,,2,certa,,Sporting Clube de Braga,
+22,2017-2024,San Ciprián,clube,,2,falhada,fora_do_vocabulario,,
+22,2017-2024,Liga NOS,competicao,,2,certa,,Primeira Liga,mesma entidade com outro nome
+22,2017-2024,Iker Casillas,atleta,,2,certa,,Iker Casillas,
+22,2017-2024,Óliver Torres,atleta,,2,certa,,Óliver Torres,
+22,2017-2024,Adrián López,atleta,,2,falhada,forma_nao_prevista,,Adrián López Álvarez: só nome e apelido curtos; a variante é 'Adrian Lopez Alvarez'
+22,2017-2024,Insuela,treinador,,2,falhada,fora_do_vocabulario,,
+22,2017-2024,Estádio Municipal Eng. Branco Teixeira,estadio,,2,certa,,Estádio Municipal Eng. Manuel Branco Teixeira,mesma entidade com outro nome
+23,2017-2024,FC Porto,clube,Q128446,2,certa,,Futebol Clube do Porto,
+23,2017-2024,Avanca,clube,,2,falhada,forma_nao_prevista,,Associação Atlética de Avanca: 'Avanca' sozinho não é variante
+23,2017-2024,Campeonato,competicao,,2,falhada,fora_do_vocabulario,,termo genérico (anotado como competição)
+23,2017-2024,Alfredo Quintana,atleta,,2,certa,,Alfredo Quintana Bravo,
+23,2017-2024,António Areia,atleta,,2,certa,,António Areia,
+23,2017-2024,Lars Walther,treinador,,2,certa,,Lars Walther,
+23,2017-2024,Carlos Martingo,treinador,,2,falhada,fora_do_vocabulario,,
+24,2017-2024,Billie Jean King Cup,competicao,,2,falhada,fora_do_vocabulario,,
+24,2017-2024,Complexo de Ténis do Jamor,estadio,,2,falhada,fora_do_vocabulario,,
+24,2017-2024,Angelina Voloshchuk,atleta,,2,certa,,Angelina Voloshchuk,
+24,2017-2024,Lia Karatancheva,atleta,,2,falhada,fora_do_vocabulario,,
+24,2017-2024,Francisca Jorge,atleta,,2,certa,,Francisca Jorge,
+24,2017-2024,Gergana Topalova,atleta,,2,falhada,fora_do_vocabulario,,
+24,2017-2024,Matilde Jorge,atleta,,2,certa,,Matilde Jorge,
+24,2017-2024,Isabella Shinikova,atleta,,2,falhada,fora_do_vocabulario,,
+24,2017-2024,Neuza Silva,treinador,,2,certa,,Neuza Silva,
+24,2017-2024,,clube,Q267245,2,errada,homonimo,Seleção Portuguesa de Futebol,'seleção portuguesa feminina de ténis' lida como a de futebol
+26,2017-2024,Petra Kvitova,atleta,,2,certa,,Petra Kvitová,
+26,2017-2024,Donna Vekic,atleta,,2,falhada,fora_do_vocabulario,,
+26,2017-2024,WTA 500 de Berlim,competicao,,2,falhada,fora_do_vocabulario,,
+26,2017-2024,Miami Open,competicao,,2,falhada,fora_do_vocabulario,,
+26,2017-2024,Wimbledon,competicao,,2,certa,,Torneio de Wimbledon,mesma entidade com outro nome
+26,2017-2024,,competicao,Q102113,2,errada,generico,Grand Slam de tênis,'terceiro Grand Slam do ano' é termo genérico
+27,2017-2024,Nacional,clube,,2,falhada,forma_nao_prevista,,Clube Desportivo Nacional: 'Nacional' sozinho não é variante
+27,2017-2024,Club Africain,clube,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Chiheb Labidi,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,César Augusto,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Douglas Sequeira,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Gustavo Garcia,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Léo Santos,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Afonso Freitas,atleta,,2,certa,,Afonso de Freitas,
+27,2017-2024,José Vítor,atleta,,2,falhada,fora_do_vocabulario,,"o vocabulário só tem o homónimo José Vítor Moreira Semedo, de outros clubes"
+27,2017-2024,Matheus Dias,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Miguel Baeza,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Djibril Soumaré,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Bruno Costa,atleta,,2,certa,,Bruno Costa,
+27,2017-2024,Daniel Penha,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Nigel Thomas,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Arvin Appiah,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Gabriel Santos,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Tiago Reis,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Adrián Butzke,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Isaac Tomich,atleta,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,Dyego Sousa,atleta,,2,certa,,Dyego Sousa,
+27,2017-2024,Tiago Margarido,treinador,,2,certa,,Tiago Margarido,
+27,2017-2024,Liga Betclic,competicao,,2,falhada,forma_nao_prevista,,Primeira Liga: nome de patrocínio da Primeira Liga não previsto
+27,2017-2024,Taça das Nações Africanas de sub-20,competicao,,2,falhada,fora_do_vocabulario,,
+27,2017-2024,,competicao,Q1750820,2,errada,nome_truncado,Taça das Nações,o texto diz 'Taça das Nações Africanas de sub-20'
+28,2017-2024,Tobi Amusan,atleta,,2,falhada,fora_do_vocabulario,,
+28,2017-2024,Campeonato do Mundo de Atletismo,competicao,,2,falhada,fora_do_vocabulario,,o texto diz 'Mundial'; competição sem entrada
+29,2017-2024,João Almeida,atleta,,2,certa,,João Almeida,
+29,2017-2024,Rui Costa,atleta,,2,certa,,Rui Costa,
+29,2017-2024,Rui Oliveira,atleta,,2,certa,,Rui Oliveira,
+29,2017-2024,Ivo Oliveira,atleta,,2,certa,,Ivo Oliveira,
+29,2017-2024,Tadej Pogacar,atleta,,2,certa,,Tadej Pogačar,
+29,2017-2024,UAE Emirates,clube,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Deceuninck-QuickStep,clube,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Hagens Berman Axeon,clube,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Giro d'Itália,competicao,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Paris-Nice,competicao,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta à Catalunha,competicao,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta ao Luxemburgo,competicao,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta à Polónia,competicao,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta a França,competicao,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,Volta a Espanha,competicao,,2,falhada,fora_do_vocabulario,,
+29,2017-2024,,competicao,Q108410041,2,errada,toponimo,Caldas da Rainha Ladies Open,'ciclista das Caldas da Rainha' lido como o torneio
+30,2017-2024,Alex Telles,atleta,,2,certa,,Alex Telles,
