@@ -6981,3 +6981,24 @@ nas notícias de 1999–2009, do corpo que não foi extraído (3 notícias, 30 d
 Limitações: 30 notícias e 246 entidades (os intervalos são largos, sobretudo por época); a
 classificação dos motivos é da sessão; a amostra não separa o desporto (futebol dominante em
 1999–2009); a concordância da anotação com o autor (8 de 30 notícias) está acima.
+
+## Siglas com e sem pontos no vocabulário (2026-10-26, depois da quarta corrida)
+
+A avaliação da quarta corrida mostrou que a passagem 1 (lista fechada) **nunca encontra
+"FC Porto"**. O clube está no vocabulário (Q128446) com as variantes "F C Porto", "F. C.
+Porto", "F.C. Porto", "F.C.P.", "F.C.Porto", "FCP", "FCPorto"; as formas com pontos ou espaços
+leem-se como três palavras (`f c porto`) e "FC Porto", a forma mais comum nas notícias, lê-se
+`fc porto`, que não coincide com nenhuma. Só a abordagem híbrida acrescentava "FC Porto".
+Decisão do autor: o FC Porto tem de ser encontrado na lista fechada, mesmo que obrigue a
+correr de novo a cadeia.
+
+**Correção geral, não só para o FC Porto** (`corpus_entities.joined_initials`, aplicada em
+`load_vocabulary`): uma sequência de duas ou mais letras isoladas numa variante também vale
+junta ("F.C. Porto" → também `fc porto`; "S L Benfica" → também `sl benfica`). Uma só letra
+isolada não se junta ("V. Guimarães" fica). No vocabulário alargado, **104 variantes novas**,
+quase todas siglas de clubes ("AD Fafe", "AD Ovarense", "Académica OAF", "AA Avanca"). Testes
+em `tests/test_corpus_entities.py` (`JoinedInitialsTests`). Muda a passagem 1 e a 2 (o
+vocabulário híbrido é lido pela mesma função): obriga a uma **quinta corrida**.
+
+Fica como está (decisão do autor): a variante "Costa" de João Carlos Rodrigues da Costa e o
+"Rui Costa" que junta três pessoas — vão para a análise de erros.

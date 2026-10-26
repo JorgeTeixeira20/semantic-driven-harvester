@@ -9,6 +9,7 @@ from rdflib import RDF, XSD, Graph, Literal
 from semantic_harvester.corpus_chrome import ngrams, tokens
 from semantic_harvester.corpus_entities import (
     Term, analyse_article, club_coherence, count_mentions, drop_first_name_variants, fold,
+    joined_initials,
     load_vocabulary, match_tokens, run, segments_with_caps, text_segments, themes_from_url,
 )
 from semantic_harvester.corpus_redundancy import Capture
@@ -353,6 +354,26 @@ class RunOnSyntheticCorpusTests(OfflineTestCase):
         rows = run(self.root, vocab, chrome_fraction=None)
         benfica = [r for r in rows if r["rotulo"] == "Benfica" and r["origem"] == "texto"]
         self.assertEqual(len(benfica), 10)
+
+
+class JoinedInitialsTests(unittest.TestCase):
+    def test_initials_with_dots_also_match_joined(self) -> None:
+        self.assertEqual(joined_initials(("f", "c", "porto")), ("fc", "porto"))
+        self.assertEqual(joined_initials(("s", "l", "benfica")), ("sl", "benfica"))
+        # Uma só inicial fica: "V. Guimarães" não é uma sigla.
+        self.assertEqual(joined_initials(("v", "guimaraes")), ("v", "guimaraes"))
+        self.assertEqual(joined_initials(("rafa", "silva")), ("rafa", "silva"))
+
+    def test_fc_porto_is_found_from_the_dotted_variant(self) -> None:
+        import tempfile
+        from semantic_harvester.corpus_entities import load_vocabulary
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "vocab.csv"
+            path.write_text("tipo,categoria,rotulo,variantes\n"
+                            "entidade,clube,Futebol Clube do Porto,F.C. Porto\n", encoding="utf-8")
+            terms = load_vocabulary(path)
+        segments = [match_tokens("O FC Porto venceu.")]
+        self.assertEqual(count_mentions(segments, terms), {"Futebol Clube do Porto": 1})
 
 
 if __name__ == "__main__":

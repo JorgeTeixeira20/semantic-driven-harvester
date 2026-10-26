@@ -92,6 +92,28 @@ class Term:
     clubs: frozenset[str] = frozenset()
 
 
+def joined_initials(tokens: tuple[str, ...]) -> tuple[str, ...]:
+    """Siglas escritas com pontos ou espaços também valem juntas: "F.C. Porto" lê-se
+    `f c porto` e o texto escreve "FC Porto" (`fc porto`). Junta cada sequência de duas
+    ou mais letras isoladas (avaliação de 2026-10-26: a lista fechada nunca encontrava
+    "FC Porto")."""
+
+    out: list[str] = []
+    run: list[str] = []
+    for token in (*tokens, ""):
+        if len(token) == 1:
+            run.append(token)
+            continue
+        if len(run) >= 2:
+            out.append("".join(run))
+        else:
+            out.extend(run)
+        run = []
+        if token:
+            out.append(token)
+    return tuple(out)
+
+
 def load_vocabulary(path: Path) -> list[Term]:
     with path.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
@@ -106,8 +128,9 @@ def load_vocabulary(path: Path) -> list[Term]:
         variants = []
         for form in forms:
             folded = tuple(match_tokens(form))
-            if folded and folded not in variants:
-                variants.append(folded)
+            for variant in (folded, joined_initials(folded)):
+                if variant and variant not in variants:
+                    variants.append(variant)
         clubs = frozenset(c for c in (row.get("clubes") or "").split("|") if c)
         terms.append(Term(row["tipo"], row["categoria"], row["rotulo"], tuple(variants), clubs))
     return terms
