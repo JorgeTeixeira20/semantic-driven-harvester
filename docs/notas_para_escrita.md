@@ -180,6 +180,11 @@ a sensibilidade não foi estudada (trabalho futuro).
   30 notícias: "Liga Espanhola" → Liga Espanhola de Basquetebol e "Caldas da Rainha" →
   Caldas da Rainha Ladies Open (ambos `pesquisa` + `proeminencia`). "Rio de Janeiro" →
   aeroporto é da pesquisa, mas com item único (não é do desempate).
+  Outros erros da camada híbrida visíveis no painel (`prototipo_por_ano/resumo.md`): "II Liga" →
+  3.ª divisão polaca (1 107 artigos; pesquisa, item único), "Final Four" → Copa Final Four de
+  Voleibol (724; proeminência), "Rio de Janeiro" → aeroporto (705). Na lista fechada: "Nem"
+  (1 211; conjunção em início de frase), "Costa" (2 397), "Moreira", "Fabio Lima", "Manuel
+  Fernandes" (atleta de motores; o texto é quase sempre o do Sporting).
 - [ ] **Avaliação, limpeza (38/40):** é a precisão das remoções (o que se retirou estava
   certo), **não** a cobertura (não diz quanto *boilerplate* ficou). Nunca escrever "95 % de
   qualidade da extração". Exemplo do que ficou: a notícia n.º 7 das 30 (lista lateral e

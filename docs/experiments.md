@@ -6623,9 +6623,13 @@ mudar a contagem das corridas anteriores (testes em `tests/test_boilerplate.py`)
 3. **Nomes genéricos na abordagem híbrida** (`wikidata_candidates.GENERIC_NAMES`,
    decisão `forma_rejeitada`, método `generico`, sem pedido à Wikidata): "I Liga"
    (→ Speedway 2. Ekstraliga), "Seleção Nacional"/"Selecção Nacional" (→ seleção
-   de Guernsey) e "Campeonato Nacional" (genérico). "II Liga" fica: está ligado
-   corretamente à Segunda Liga (teste anterior). Muda o vocabulário híbrido no
-   passo 2, sem pedidos novos.
+   de Guernsey) e "Campeonato Nacional" (genérico). "II Liga" ficou, por se
+   julgar ligado à Segunda Liga (o teste anterior usa respostas simuladas).
+   **Correção (2026-10-26):** na quinta corrida "II Liga" foi aceite pela
+   pesquisa como `Q210262` (Campeonato Polonês de Futebol 3ª Divisão) e aparece
+   em 1 107 artigos (`output/wikidata_candidatos_por_ano.csv`;
+   `prototipo_por_ano/resumo.md`). É um erro a registar na análise de erros.
+   Muda o vocabulário híbrido no passo 2, sem pedidos novos.
 
 Fica na análise de erros: "Wallace" (voleibol → futebolista; homónimo),
 comentários de leitores no fim do corpo e menus de competições.
