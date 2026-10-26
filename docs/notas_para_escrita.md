@@ -134,3 +134,34 @@ em 30 notícias anotadas"; dados em `data/processed/avaliacao_cobertura_30.csv`.
   sem entidade); nenhuma menção falhada nas 30 notícias se deve à limpeza.
 - **Classificação dos motivos** feita por um só anotador (a sessão local); a concordância
   medida (41/49 às cegas, 49/49 final) é sobre as entidades, não sobre os motivos.
+
+## Porque cada limiar tem o valor que tem (para a escrita e a defesa, 2026-10-26)
+
+Princípio geral a escrever: regras e limiares definidos de forma iterativa a partir de
+amostras de erros e verificados em amostras independentes; não são valores otimizados;
+a sensibilidade não foi estudada (trabalho futuro).
+
+- **Candidatos com ≥ 10 artigos (abordagem híbrida):** custo. Uma consulta à Wikidata por
+  candidato (~2,5–3,4 s); 220 933 candidatos no total; ≥ 3: 36 168 (~25 h), ≥ 10: 9 473
+  (~6,6 h), ≥ 50: 1 586 (~1,1 h). Regra inicial do autor: o menor limiar com ~3 000
+  candidatos (≥ 50); passou-se a ≥ 10 porque as respostas até esse limiar já estavam
+  recolhidas (uma corrida arrancou por engano com ≥ 3 e gravou 10 065 respostas); a corrida
+  ≥ 50 ficou para comparação. Razão de fundo: nomes raros pesam pouco na navegação e são
+  mais vezes ruído. Fonte: `experiments.md`, "Limiar do `wikidata_candidates`" e
+  "Escolha final do limiar".
+- **Rejeição de épocas, edições, federações e nomes genéricos:** erros da primeira corrida
+  completa ("Liga NOS" → "Liga NOS de 2016–17", "Taça UEFA" → "Copa da UEFA de 2006-07",
+  "Federação Portuguesa" → Federação de Ginástica, "I Liga" → speedway, "Seleção Nacional"
+  → Guernsey). Fonte: "Correções depois da primeira corrida…" e "Erros de nome evidentes".
+- **Frases repetidas — 20 artigos:** corte usado no diagnóstico para listar repetições
+  sistemáticas (valor prático). **3 meses:** precaução do autor (citações e resultados
+  repetem-se perto do acontecimento; rodapés repetem-se durante meses). **100 artigos:**
+  avaliação da terceira corrida (tabelas de 2001/02 em 359–584 artigos escapavam aos 3 meses
+  por terem sido capturadas numa janela curta). **Verificação:** 38 de 40 trechos removidos
+  eram elementos auxiliares (os 2 restantes sem entidade); nenhuma entidade das 30 notícias
+  falhou por causa da limpeza.
+- **Créditos de imagem:** observado numa amostra de menções ("Foto: Bruno Colaço" contado
+  como atleta). Limitado a duas palavras para não apanhar o nome que começa a frase seguinte.
+- **Manchetes com ≥ 6 palavras e sem continuação em minúscula; título próprio protegido:**
+  um título curto pode coincidir com uma frase da notícia; na terceira corrida, 82 % dos
+  trechos "manchete" eram o título do próprio artigo (sufixo do site), daí a proteção.
