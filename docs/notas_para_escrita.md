@@ -185,7 +185,11 @@ a sensibilidade não foi estudada (trabalho futuro).
   Voleibol (724; proeminência), "Rio de Janeiro" → aeroporto (705). Na lista fechada: "Nem"
   (1 211; conjunção em início de frase), "Costa" (2 397), "Moreira", "Fabio Lima", "Manuel
   Fernandes" (atleta de motores; provável homónimo do antigo jogador do Sporting, por confirmar).
-  Vistos nas capturas do painel (2026-10-26, por confirmar no texto): "Luís Filipe Fernandes" é o
+  Vistos nas capturas do painel e **confirmados pela sessão local** (2026-10-26; 5 de 5 frases ao
+  acaso falam de Luís Filipe Vieira; a notícia de 23/09/2024 é de iniciados do FC Porto, "golos de
+  … João Fernandes", um jovem jogador sem entrada na Wikidata). A regra das maiúsculas coladas só
+  atua em formas de uma palavra; "Luís Filipe" tem duas (trabalho futuro: alargá-la às variantes
+  que são só nomes próprios). "Luís Filipe Fernandes" é o
   atleta mais mencionado nas notícias do Benfica (1 162) pela variante "Luís Filipe", que deve
   apanhar "Luís Filipe Vieira" (o presidente, fora do vocabulário, por isso a regra do nome
   truncado não atua); e a mesma menção dá duas entidades quando os rótulos só diferem nos
