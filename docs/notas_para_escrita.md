@@ -165,3 +165,15 @@ a sensibilidade não foi estudada (trabalho futuro).
 - **Manchetes com ≥ 6 palavras e sem continuação em minúscula; título próprio protegido:**
   um título curto pode coincidir com uma frase da notícia; na terceira corrida, 82 % dos
   trechos "manchete" eram o título do próprio artigo (sufixo do site), daí a proteção.
+
+## Pendentes de redação (lembretes, 2026-10-26)
+
+- [ ] **Ontologia (`ontologia.typ`), "Representação no grafo", parágrafo dos números:** substituir
+  "no capítulo dedicado à avaliação experimental" por `@chap:avaliacao` e apagar o comentário
+  `// substituir por @chap:avaliacao…`, **quando o capítulo da Avaliação existir** (pôr a etiqueta
+  `<chap:avaliacao>` no título desse capítulo).
+- [ ] **Motor de colheita:** o título da secção "Tratamento da Redundância e Seleção das Capturas"
+  tem de ter a etiqueta `<sec:redundancia>` (é referida na Ontologia por `@sec:redundancia`).
+- [ ] **Conclusões:** subsecção "Resposta às questões de investigação" (QI1–QI3).
+- [ ] **Antes da entrega:** confirmar no artigo do Koehler os números (361; 33,8 %; meia-vida ~2
+  anos) e ler o mínimo de cada referência (`docs/referencias_defesa.md`).
