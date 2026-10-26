@@ -7138,3 +7138,11 @@ arquivo". Só muda o que se mostra: o título original continua no grafo. A list
 completa dos títulos apanhados, com as contagens, sai no `resumo.md` (secção
 "Títulos repetidos…"). Os 272 títulos ilegíveis (página comprimida lida como texto)
 são todos diferentes, por isso a regra não os apanha; ficam como limitação conhecida.
+
+Resultado no `por_ano` (sessão local, 2026-10-26): **46 837 notícias (36,2 %)** com
+título repetido em 100 ou mais notícias. ":.: Jornal Record :.:" (30 241), "Record"
+(8 410), código JavaScript lido como título ("function MM_findObj(n, d) {…", 5 319),
+"Record On-Line" (2 358), um caminho de navegação ("Home Últimas Notícias Taça das
+Confederações Recor…", 377) e "Liga Record" (132). Os seis são nomes do sítio Web,
+menus ou código, nenhum é título de notícia. Em 2007 todas as 10 602 notícias ficam sem
+título. O resto do `resumo.md` não mudou; `data.js` 27,3 MB.

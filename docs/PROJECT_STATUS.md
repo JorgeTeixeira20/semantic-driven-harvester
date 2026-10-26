@@ -281,9 +281,9 @@ unicidade e ligação a Portugal.
 ao artigo, lida do URL (secção, modalidade, competição, clube; subclasses OWL
 de `Tema`); não existe nos URLs do site de 1999–2009. Entidade = nome que
 ocorre no corpo do texto, ligado ao QID da Wikidata. No painel do corpus
-alargado, modalidade e clube são preenchidos pelo URL e, sem ele, pelo termo
-de pesquisa que encontrou o artigo (modalidade) ou pelos clubes mencionados
-no texto (clube), com a origem assinalada (decisão do autor, 2026-10-22).
+alargado, a modalidade vem só do URL (o termo de pesquisa foi retirado em
+2026-10-25) e o clube vem do URL e, sem ele, dos clubes mencionados no texto,
+com a origem assinalada.
 
 **Protótipos.** O do corpus de 125 artigos fica como está (histórico de
 capturas, SPARQL sobre o grafo; estudo de caso da profundidade temporal). O
@@ -766,9 +766,8 @@ autor; sujeito a fatores externos como reuniões e aprovação do orientador).
    site e origem do corpo — todos reativos aos filtros (ano, época,
    modalidade, clube, entidade, pesquisa no título), com a lista paginada dos
    artigos e uma ficha por entidade (QID da Wikidata). O estado fica no
-   endereço, por isso cada vista é uma ligação. Modalidade e clube são
-   preenchidos pelo URL e, sem ele, pelo termo de pesquisa ou pelo texto,
-   com a origem assinalada. O protótipo do corpus de 125 artigos fica como
+   endereço, por isso cada vista é uma ligação. A modalidade vem só do URL;
+   o clube vem do URL e, sem ele, do texto, com a origem assinalada. O protótipo do corpus de 125 artigos fica como
    está (estudo de caso da profundidade temporal).
 
 **Trabalho relacionado consultado:** *Major Minors* (Martins & Costa, Prémio
