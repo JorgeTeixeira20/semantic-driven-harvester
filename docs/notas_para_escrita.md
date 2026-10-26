@@ -174,6 +174,16 @@ a sensibilidade não foi estudada (trabalho futuro).
   `<chap:avaliacao>` no título desse capítulo).
 - [ ] **Motor de colheita:** o título da secção "Tratamento da Redundância e Seleção das Capturas"
   tem de ter a etiqueta `<sec:redundancia>` (é referida na Ontologia por `@sec:redundancia`).
+- [ ] **Avaliação, análise de erros:** o desempate por proeminência (mais ligações Wikimedia)
+  não garante que é a entidade do texto. Aceitou 393 das 2 915 entidades híbridas (381 novas +
+  12 variantes; `output/wikidata_candidatos_por_ano.csv`, coluna `desempate`). Erros vistos nas
+  30 notícias: "Liga Espanhola" → Liga Espanhola de Basquetebol e "Caldas da Rainha" →
+  Caldas da Rainha Ladies Open (ambos `pesquisa` + `proeminencia`). "Rio de Janeiro" →
+  aeroporto é da pesquisa, mas com item único (não é do desempate).
+- [ ] **Avaliação, limpeza (38/40):** é a precisão das remoções (o que se retirou estava
+  certo), **não** a cobertura (não diz quanto *boilerplate* ficou). Nunca escrever "95 % de
+  qualidade da extração". Exemplo do que ficou: a notícia n.º 7 das 30 (lista lateral e
+  comentários no corpo → 14 das 25 entidades erradas da passagem 2).
 - [ ] **Conclusões:** subsecção "Resposta às questões de investigação" (QI1–QI3).
 - [ ] **Antes da entrega:** confirmar no artigo do Koehler os números (361; 33,8 %; meia-vida ~2
   anos) e ler o mínimo de cada referência (`docs/referencias_defesa.md`).
