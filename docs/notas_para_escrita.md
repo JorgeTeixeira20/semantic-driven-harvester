@@ -84,7 +84,7 @@ em 2026-10-26: os valores atuais conferem com o `experiments.md`.
 | --- | --- | --- | --- |
 | Introdução (`introducao.typ`) | Contributos da Dissertação | "[N] artigos do Record entre 1999 e 2024" (por preencher) | completo |
 | Arquivo.pt (`arquivopt.typ`) | Caracterização dos Conteúdos Arquivados | "129 317 artigos", "entre 1999 e 2024" | completo |
-| Arquivo.pt | Caracterização dos Conteúdos Arquivados | "não foram identificados artigos … entre 2010 e 2016" + frase sobre a estratégia de pesquisa | completo; acrescentar a explicação do domínio `record.xl.pt` (nota 6) em qualquer caso |
+| Arquivo.pt | Caracterização dos Conteúdos Arquivados | "não foram identificados artigos … entre 2010 e 2016" + explicação pelo domínio `record.xl.pt` e números da descoberta (feito em 2026-10-26) | completo: se entrar, reescrever o parágrafo pela ordem recolha → lacuna → investigação → pesquisas sobre `record.xl.pt` → "acrescentaram [N] artigos, corpus de [N total]" (versão do autor de 2026-10-26, com os números); se não entrar, manter e remeter a integração para trabalho futuro |
 | Arquivo.pt | Caracterização dos Conteúdos Arquivados | "126 798 possuem texto extraído", "123 844 possuem HTML" | completo |
 | Arquivo.pt | Limitações e Desafios | lista de códigos HTTP "404, 429, 503" | rever: o `experiments.md` regista também 500 (HTML) e os 400 por acumulação de cookies, já resolvidos |
 | Motor de colheita (`motorcolheita.typ`) | Estratégia de Pesquisa e Recolha | "108 termos (39/57/5/7)", "826 mil URLs" | não muda; se o completo entrar, acrescentar a pesquisa com `siteSearch=record.xl.pt` |
