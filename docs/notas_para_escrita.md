@@ -185,6 +185,12 @@ a sensibilidade não foi estudada (trabalho futuro).
   Voleibol (724; proeminência), "Rio de Janeiro" → aeroporto (705). Na lista fechada: "Nem"
   (1 211; conjunção em início de frase), "Costa" (2 397), "Moreira", "Fabio Lima", "Manuel
   Fernandes" (atleta de motores; provável homónimo do antigo jogador do Sporting, por confirmar).
+  Vistos nas capturas do painel (2026-10-26, por confirmar no texto): "Luís Filipe Fernandes" é o
+  atleta mais mencionado nas notícias do Benfica (1 162) pela variante "Luís Filipe", que deve
+  apanhar "Luís Filipe Vieira" (o presidente, fora do vocabulário, por isso a regra do nome
+  truncado não atua); e a mesma menção dá duas entidades quando os rótulos só diferem nos
+  acentos ("Joao Fernandes", ciclismo, e "João Fernandes", homónimos de motores/remo, na
+  notícia "FC Porto goleia e encurta distância para o Benfica", 23/09/2024).
 - [ ] **Avaliação, limpeza (38/40):** é a precisão das remoções (o que se retirou estava
   certo), **não** a cobertura (não diz quanto *boilerplate* ficou). Nunca escrever "95 % de
   qualidade da extração". Exemplo do que ficou: a notícia n.º 7 das 30 (lista lateral e
