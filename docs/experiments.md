@@ -5799,6 +5799,16 @@ sessão): o reconhecimento das pessoas no título, a procura de candidatos num
 citar sem confirmar no artigo ou na apresentação do autor (vídeos do Prémio e
 do "Café com o Arquivo.pt", 22.ª sessão).
 
+**Confirmado pelo autor em 2026-10-26** (página "Sobre" do politiquices.pt): títulos
+de notícias do Arquivo.pt e do Público, de 1994 a 2026 (recolha pelas APIs TextSearch e
+CDX; 1994–1995 do corpus CHAVE/CETEMPúblico); **vários classificadores de aprendizagem
+automática** identificam os nomes das personalidades políticas em cada título e a relação
+(apoio, oposição ou nenhuma); as personalidades são **ligadas à Wikidata** (partidos,
+cargos, fotografias). Corrige a suposição anterior: a identificação **não** é por lista
+fechada, é por classificadores; a lista de políticos da Wikidata serve à ligação. A página
+não refere o RDF (que se vê no repositório: `politiquices.ttl` num servidor Fuseki).
+Artigo científico: Linguamática, 2023 (PDF no sítio do autor), não lido.
+
 **Relação com este trabalho:**
 
 - mesmo princípio de **lista fechada tirada da Wikidata** (o vocabulário do

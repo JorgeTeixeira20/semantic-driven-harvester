@@ -29,12 +29,15 @@ Cada nota indica a fonte; os números vêm só dessas fontes.
    de anotação são claras.
 
 3. **Trabalho relacionado: Politiquices e Major Minors** (Prémio Arquivo.pt 2021).
-   Os dois usam listas fechadas ou dicionários e ontologias/RDF; o Politiquices usa
-   um subconjunto da Wikidata num servidor SPARQL e uma tabela manual de nomes da
-   imprensa. A abordagem desta dissertação está na mesma família (lista fechada da
-   Wikidata), acrescenta a abordagem híbrida e **tem avaliação documentada**, que
-   não foi encontrada publicada para nenhum dos dois. Fonte: `experiments.md`,
-   "Trabalho relacionado: Politiquices" e "Trabalho relacionado: Major Minors".
+   O Major Minors (artigo SLATE 2021) organiza notícias sobre minorias numa ontologia em
+   RDF. O Politiquices identifica personalidades políticas nos títulos com **classificadores
+   de aprendizagem automática** e liga-as à **Wikidata** (página "Sobre"). Contraste útil
+   com esta dissertação: mesma base de conhecimento (Wikidata), **método diferente** de
+   identificação (vocabulário fechado em vez de classificadores treinados), o que ilustra
+   as duas famílias da secção "Reconhecimento e Ligação de Entidades". Não afirmar que
+   os três usam dicionários; não afirmar que os outros não avaliaram (dizer só que esta
+   dissertação inclui uma avaliação explícita). Fonte: `experiments.md`, "Trabalho
+   relacionado: Politiquices" e "Trabalho relacionado: Major Minors".
 
 4. **Método por regras refinado por análise de erros.** Escrever como tal:
    regras e listas fechadas (como os projetos de 2021), refinadas em rondas
