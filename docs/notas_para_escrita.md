@@ -60,6 +60,14 @@ Cada nota indica a fonte; os números vêm só dessas fontes.
 7. **Teto de 300 resultados por termo e ano**: um só termo ("futebol") alcança
    cerca de 826 mil URLs sem o teto. Fonte: `experiments.md`, paginação contínua.
 
+7b. **TextSearch vs CDX** (2026-10-26). A descoberta usou a TextSearch (pesquisa por
+   termos, com título, limitada a 300 resultados por termo e ano). O CDX lista todas as
+   capturas sob um prefixo de endereço, sem depender dos termos — alternativa para uma
+   recolha mais exaustiva (o Politiquices usa os dois) —, mas devolve também páginas que
+   não são notícias, não traz o título e, nos testes, cortava o resultado por ordem de
+   endereço e dava timeouts nos filtros (`experiments.md`, "Lacuna de 2010–2016"). Não
+   acelera o download: o texto e o HTML continuam a ser pedidos um a um. Trabalho futuro.
+
 8. **Ordem c′ antes do HTML** na extração do corpo: escolha medida (HTML mais
    limpo em 25 e pior em 12 dos 37 casos de discordância), não esquecimento.
    Fonte: `experiments.md`, "Corpo do artigo pelo contentor do HTML".
