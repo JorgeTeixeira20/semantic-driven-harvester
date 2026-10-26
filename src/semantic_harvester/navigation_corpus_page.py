@@ -3,6 +3,8 @@
 Organização (revista em 2026-10-23, depois do feedback do autor): pesquisa no
 topo, barra que diz o que está a ser mostrado, separadores Notícias e
 Estatísticas, e "Sobre os dados" (versão do site e texto) em linguagem simples.
+Revisão de 2026-10-26: a caixa de entidade aceita as variantes ("Benfica") e
+avisa quando não encontra; modalidades com acentos; títulos sem o sufixo do site.
 
 Lê `data.js` (`window.SDH_DATA`, escrito por `navigation_corpus.py`) por
 `<script>`, o que funciona aberto do disco (`file://`), ao contrário de `fetch`.
@@ -55,7 +57,8 @@ h1 span { color: var(--accent); }
 button.btn { width: auto; cursor: pointer; }
 .context { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px;
   padding: 8px 12px; border-radius: 8px; background: var(--accent-soft); font-size: .92rem; }
-.context.none { background: transparent; padding-left: 0; color: var(--muted); }
+.context.none { display: block; background: transparent; padding-left: 0; color: var(--muted); }
+.context.warn { display: block; }
 .context b { font-variant-numeric: tabular-nums; }
 .tabs { display: flex; gap: 4px; margin: 16px 0 12px; border-bottom: 1px solid var(--line); }
 .tab { border: 0; background: none; font: inherit; padding: 8px 14px; cursor: pointer; color: var(--muted);
@@ -131,7 +134,7 @@ footer p { margin: 8px 0; }
   <p class="sub" id="sub"></p>
   <div class="search">
     <input type="search" id="q" placeholder="Pesquisar no título das notícias…" aria-label="Pesquisar no título">
-    <input id="fEnt" list="entList" placeholder="Atleta, clube, treinador, estádio…" aria-label="Entidade">
+    <input id="fEnt" list="entList" placeholder="Atleta, clube, competição…" aria-label="Entidade">
     <datalist id="entList"></datalist>
   </div>
 </div></header>
@@ -198,7 +201,19 @@ footer p { margin: 8px 0; }
   const titles = A.map(r => fold(r[TI]));
   const clubIdx = new Map(D.clubs.map((c, i) => [c.k, i]));
   const entIdx = new Map(D.entities.map((e, i) => [e.k, i]));
-  const entByName = new Map(D.entities.map((e, i) => [fold(e.n), i]));
+  const entCount = new Array(D.entities.length).fill(0);
+  for (const r of A) for (const e of r[ENT]) entCount[e]++;
+  // Nome completo da Wikidata e variantes ("Benfica"); uma variante partilhada
+  // fica com a entidade que aparece em mais notícias.
+  const entByName = new Map();
+  D.entities.forEach((e, i) => [e.n, ...(e.a || [])].forEach(name => {
+    const k = fold(name), prev = entByName.get(k);
+    if (prev === undefined || (fold(D.entities[prev].n) !== k && entCount[i] > entCount[prev])) entByName.set(k, i);
+  }));
+  const modName = m => (D.modalidadeNomes || D.modalidades)[m];
+  const modNameOf = v => { const i = D.modalidades.indexOf(v); return i < 0 ? v : modName(i); };
+  const entMods = e => e.m ? e.m.split("|").join(", ") : "";
+  let notFound = "";
   const years = [...new Set(A.map(r => r[T].slice(0, 4)))].filter(Boolean).sort();
   const y0 = +years[0], y1 = +years[years.length - 1];
   const allYears = []; for (let y = y0; y <= y1; y++) allYears.push(String(y));
@@ -240,8 +255,9 @@ footer p { margin: 8px 0; }
     if (S.ano) h.set("ano", S.ano); if (S.era) h.set("epoca", S.era); if (S.mod) h.set("modalidade", S.mod);
     if (S.clube) h.set("clube", S.clube); if (S.ent) h.set("entidade", S.ent); if (S.q) h.set("q", S.q);
     if (S.sort === "asc") h.set("ordem", "asc"); if (S.p) h.set("p", S.p + 1); if (S.v) h.set("vista", S.v);
-    const next = "#" + h.toString();
-    if (location.hash !== next) location.hash = next; else render();
+    // Sem filtros, o endereço fica sem "#..." e o hash vale "" (não "#").
+    const next = h.toString();
+    if (location.hash.replace(/^#/, "") !== next) location.hash = next; else render();
   }
   function set(k, v) { S[k] = S[k] === v ? "" : v; S.p = 0; writeHash(); }
 
@@ -316,7 +332,7 @@ footer p { margin: 8px 0; }
       [fmt(rows.length), "notícias"],
       [ys.length ? (ys[0] === ys[ys.length - 1] ? ys[0] : ys[0] + "–" + ys[ys.length - 1]) : "—", "anos"],
       [fmt(new Set(rows.flatMap(r => r[ENT])).size), "atletas, clubes e outras entidades"],
-      [rows.length ? Math.round(100 * withEnt / rows.length) + "%" : "—", "das notícias com pelo menos uma"],
+      [rows.length ? Math.round(100 * withEnt / rows.length) + "%" : "—", "das notícias com pelo menos uma entidade"],
     ].map(([b, s]) => `<div class="kpi"><b>${b}</b><span>${s}</span></div>`).join("");
     const ec = count(rows, r => r[ENT]);
     ec.delete(sel);
@@ -331,12 +347,12 @@ footer p { margin: 8px 0; }
     const entOn = e => D.entities[e].k === S.ent, entClick = e => set("ent", D.entities[e].k);
     rank(document.getElementById("topClubs"), ents.filter(e => isClub(e[0])).slice(0, 10), e => D.entities[e].n, entOn, entClick);
     rank(document.getElementById("topAth"), ents.filter(e => !isClub(e[0]) && !isOther(e[0])).slice(0, 10), e => D.entities[e].n, entOn, entClick,
-      e => D.entities[e].m ? ` <small class="meta">${esc(D.entities[e].m)}</small>` : "");
+      e => D.entities[e].m ? ` <small class="meta">${esc(entMods(D.entities[e]))}</small>` : "");
     rank(document.getElementById("topOther"), ents.filter(e => isOther(e[0])).slice(0, 10), e => D.entities[e].n, entOn, entClick,
       e => ` <small class="meta">${esc(CAT[D.entities[e].c] || D.entities[e].c)}</small>`);
     const mc = count(filtered("mod").map(i => A[i]), r => r[MOD]);
     rank(document.getElementById("mods"), [...mc.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10),
-      m => D.modalidades[m], m => D.modalidades[m] === S.mod, m => set("mod", D.modalidades[m]));
+      m => modName(m), m => D.modalidades[m] === S.mod, m => set("mod", D.modalidades[m]));
   }
 
   function renderAbout(rows) {
@@ -353,7 +369,7 @@ footer p { margin: 8px 0; }
     if (sel < 0) { card.hidden = true; return; }
     const e = D.entities[sel];
     card.hidden = false;
-    card.innerHTML = `<h3>${esc(e.n)}</h3><div class="meta">${esc(CAT[e.c] || e.c)}${e.m ? " · " + esc(e.m) : ""} · ` +
+    card.innerHTML = `<h3>${esc(e.n)}</h3><div class="meta">${esc(CAT[e.c] || e.c)}${e.m ? " · " + esc(entMods(e)) : ""} · ` +
       `${fmt(n)} notícias · ` +
       (e.q ? `<a href="https://www.wikidata.org/wiki/${esc(e.q)}" target="_blank" rel="noopener">ver na Wikidata (${esc(e.q)})</a>`
            : "nome partilhado por várias pessoas: sem ligação à Wikidata") +
@@ -369,7 +385,7 @@ footer p { margin: 8px 0; }
     options(document.getElementById("fAno"), allYears.slice().reverse().filter(y => yc.get(y) || y === S.ano)
       .map(y => [y, `${y} (${fmt(yc.get(y) || 0)})`]), S.ano, "Todos os anos");
     const mc = count(filtered("mod").map(i => A[i]), r => r[MOD]);
-    const mods = [...mc.entries()].sort((a, b) => b[1] - a[1]).map(([m, n]) => [D.modalidades[m], `${D.modalidades[m]} (${fmt(n)})`]);
+    const mods = [...mc.entries()].sort((a, b) => b[1] - a[1]).map(([m, n]) => [D.modalidades[m], `${modName(m)} (${fmt(n)})`]);
     if (S.mod && !mods.some(m => m[0] === S.mod)) mods.unshift([S.mod, S.mod]);
     options(document.getElementById("fMod"), mods, S.mod, "Todas as modalidades");
     const cc = count(filtered("clube").map(i => A[i]), r => r[CLU]);
@@ -388,16 +404,18 @@ footer p { margin: 8px 0; }
     if (S.q) act.push(["q", "título com “" + S.q + "”"]);
     if (S.ent) act.push(["ent", entIdx.has(S.ent) ? D.entities[entIdx.get(S.ent)].n : S.ent]);
     if (S.clube) act.push(["clube", clubIdx.has(S.clube) ? D.clubs[clubIdx.get(S.clube)].n : S.clube]);
-    if (S.mod) act.push(["mod", S.mod]);
+    if (S.mod) act.push(["mod", modNameOf(S.mod)]);
     if (S.ano) act.push(["ano", S.ano]);
     if (S.era) act.push(["era", eraLabel(S.era)]);
     const box = document.getElementById("context");
-    box.classList.toggle("none", !act.length);
-    box.innerHTML = act.length
+    box.classList.toggle("none", !act.length && !notFound);
+    box.classList.toggle("warn", !!notFound);
+    const warn = notFound ? `Nenhuma entidade com o nome “${esc(notFound)}”. A caixa da direita procura só atletas, clubes, treinadores, estádios e competições reconhecidos no texto; para outras palavras, use a pesquisa no título. ` : "";
+    box.innerHTML = warn + (act.length
       ? `A mostrar <b>${fmt(n)}</b> notícias de: ` +
         act.map(([k, l]) => `<button class="chip active" data-k="${k}" title="Retirar">${esc(l)} ×</button>`).join("") +
         `<button class="chip" data-k="*">Limpar tudo</button>`
-      : `A mostrar todas as <b>${fmt(n)}</b> notícias. Pesquise ou escolha um ano, uma modalidade ou um clube.`;
+      : `A mostrar todas as <b>${fmt(n)}</b> notícias. Pesquise ou escolha um ano, uma modalidade ou um clube.`);
     box.querySelectorAll("button").forEach(b => b.onclick = () => {
       if (b.dataset.k === "*") Object.assign(S, { ano: "", era: "", mod: "", clube: "", ent: "", q: "", p: 0 });
       else { S[b.dataset.k] = ""; S.p = 0; }
@@ -417,7 +435,7 @@ footer p { margin: 8px 0; }
     const list = document.getElementById("list");
     list.innerHTML = slice.map(i => {
       const r = A[i];
-      const mods = r[MOD].map(m => `<button class="chip" data-mod="${esc(D.modalidades[m])}">${esc(D.modalidades[m])}${r[MODO] === 2 ? " <small>· provável</small>" : ""}</button>`);
+      const mods = r[MOD].map(m => `<button class="chip" data-mod="${esc(D.modalidades[m])}">${esc(modName(m))}</button>`);
       const clubs = r[CLU].map(c => `<button class="chip club" data-clube="${esc(D.clubs[c].k)}">${esc(D.clubs[c].n)}${r[CLUO] === 2 ? " <small>· no texto</small>" : ""}</button>`);
       const shownClubs = new Set(r[CLU].map(c => D.clubs[c].k));
       const ents = r[ENT].filter(e => !shownClubs.has(D.entities[e].k)).map(e => `<button class="chip ent ${D.entities[e].k === S.ent ? "active" : ""}" data-ent="${esc(D.entities[e].k)}">${esc(D.entities[e].n)}</button>`);
@@ -436,14 +454,18 @@ footer p { margin: 8px 0; }
     `${fmt(A.length)} notícias do jornal Record guardadas no Arquivo.pt, de ${y0} a ${y1}.`;
   document.getElementById("about").textContent =
     "Cada notícia aparece uma vez, com a data da cópia mais antiga guardada no Arquivo.pt. " +
-    "A modalidade e o clube vêm do endereço da notícia; quando o endereço não os tem, vêm do texto " +
-    "(assinalado com «no texto» ou «provável»). Atletas, clubes, treinadores, estádios e competições " +
-    "foram reconhecidos no texto e ligados à Wikidata. " + gapText();
+    "A modalidade vem só do endereço da notícia (os endereços do site antigo não a indicam). " +
+    "O clube vem do endereço e, quando este não o indica, dos clubes mencionados no texto " +
+    "(assinalado com «no texto»). Atletas, clubes, treinadores, estádios e competições foram " +
+    "reconhecidos no texto e ligados à Wikidata. A pesquisa procura só no título. " + gapText();
   document.getElementById("foot").textContent =
     "Semantic Driven Harvester · cada vista é um endereço: copie-o para a guardar ou partilhar.";
   document.getElementById("gaps").textContent = gapText();
   document.getElementById("otherPanel").hidden = !D.entities.some(e => OTHER.has(e.c));
-  document.getElementById("entList").innerHTML = D.entities.map(e => `<option value="${esc(e.n)}"></option>`).join("");
+  const seen = new Set();
+  document.getElementById("entList").innerHTML = D.entities.flatMap(e => [[e.n, ""], ...(e.a || []).map(a => [a, e.n])])
+    .filter(([v]) => !seen.has(fold(v)) && seen.add(fold(v)))
+    .map(([v, full]) => `<option value="${esc(v)}"${full ? ` label="${esc(full)}"` : ""}></option>`).join("");
   let timer;
   document.getElementById("q").oninput = ev => { clearTimeout(timer); timer = setTimeout(() => { S.q = ev.target.value; S.p = 0; writeHash(); }, 250); };
   document.getElementById("fAno").onchange = ev => { S.ano = ev.target.value; S.p = 0; writeHash(); };
@@ -451,12 +473,17 @@ footer p { margin: 8px 0; }
   document.getElementById("fMod").onchange = ev => { S.mod = ev.target.value; S.p = 0; writeHash(); };
   document.getElementById("fClube").onchange = ev => { S.clube = ev.target.value; S.p = 0; writeHash(); };
   document.getElementById("fEnt").onchange = ev => {
-    const i = entByName.get(fold(ev.target.value.trim()));
+    const text = ev.target.value.trim(), i = entByName.get(fold(text));
+    notFound = text && i === undefined ? text : "";
     S.ent = i === undefined ? "" : D.entities[i].k; S.p = 0; writeHash();
   };
   document.getElementById("sort").onchange = ev => { S.sort = ev.target.value; S.p = 0; writeHash(); };
   document.getElementById("prev").onclick = () => { S.p--; writeHash(); window.scrollTo(0, document.getElementById("list").offsetTop - 120); };
   document.getElementById("next").onclick = () => { S.p++; writeHash(); window.scrollTo(0, document.getElementById("list").offsetTop - 120); };
+  // O aviso "nenhuma entidade" desaparece com qualquer outra ação na página.
+  ["input", "change", "click"].forEach(t => document.addEventListener(t, ev => {
+    if (ev.target.id !== "fEnt") notFound = "";
+  }, true));
   window.addEventListener("hashchange", () => { readHash(); render(); });
   readHash();
   render();

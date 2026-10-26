@@ -7098,3 +7098,32 @@ usadas; o texto continua a ser lido pelo nome ("Benfica", "Leixões"). "FC Porto
 **Não corrido sobre os dados:** os números congelados da quinta corrida mantêm este erro
 (documentado). A correção entra na próxima corrida da cadeia (o corpus completo); se o
 `por_ano` voltar a correr, também.
+
+### Revisão do painel antes da escrita do Protótipo (2026-10-26)
+
+Análise do painel (código, `prototipo_por_ano/resumo.md` e uma amostra sintética
+aberta no Chromium) antes de escrever o capítulo. Mudanças, sem alterar dados nem
+números (`navigation_corpus.py`, `navigation_corpus_page.py`):
+
+- **"Sobre os dados" corrigido:** dizia que a modalidade vinha do texto («provável»);
+  desde 2026-10-25 vem só do endereço. Acrescenta que a pesquisa procura só no título.
+- **Caixa de entidade:** aceitava só o rótulo da Wikidata ("Benfica" e "Fernando
+  Santos" não davam nada, sem aviso). Agora aceita também as variantes do
+  vocabulário (uma variante partilhada fica com a entidade com mais notícias) e
+  avisa quando não encontra ("chupa-chupa", "Ponte de Lima").
+- **Modalidades da entidade** com vírgulas (antes "basquetebol|futebol|…").
+- **Títulos** sem o sufixo do site ("… - Futebol - Jornal Record", também cortado:
+  "… - Jornal Re"); o título completo continua no grafo (`rdfs:label`).
+- **Modalidades com acentos** ("Hóquei em patins"); o endereço da vista continua
+  a usar o identificador do URL (`#modalidade=hoquei-em-patins`).
+- Telemóvel: a frase "A mostrar todas as…" já não se parte; indicador "com pelo
+  menos uma entidade".
+- Correção: com todos os filtros retirados, a página não se redesenhava (o hash
+  vazio é "" e não "#").
+
+Erros de identificação visíveis no separador Estatísticas ("II Liga" → 3.ª
+divisão polaca, "Nem", "Costa", …): ficam como estão (números congelados) e entram
+na análise de erros (`docs/notas_para_escrita.md`). Suite: 397 testes, todos a passar.
+
+Regenerar (sessão local, < 1 min, sem rede):
+`python -m semantic_harvester.navigation_corpus --corpus por_ano --vocabulario data/processed/caminho_b_vocabulario_hibrido_por_ano.csv`

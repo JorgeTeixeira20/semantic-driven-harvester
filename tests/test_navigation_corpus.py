@@ -11,7 +11,7 @@ from pathlib import Path
 from semantic_harvester.corpus_redundancy import corpus_graph_path
 from semantic_harvester.history_pipeline import captured_at
 from semantic_harvester.navigation_corpus import (
-    ORIGIN_FALLBACK, ORIGIN_FROM_URL, ORIGIN_NONE, era_of, run, slug,
+    ORIGIN_FALLBACK, ORIGIN_FROM_URL, ORIGIN_NONE, display_title, era_of, modalidade_label, run, slug,
 )
 from semantic_harvester.rdf_mapper import build_article_history_graph, stable_hash
 from tests.support import OfflineTestCase
@@ -33,7 +33,7 @@ class NavigationCorpusTests(OfflineTestCase):
         super().setUp()
         nt = corpus_graph_path(self.root, LABEL)
         nt.parent.mkdir(parents=True)
-        for url, tstamp, title in ((MODERN, "20190301120000", "Rafa Silva bisa na Luz"),
+        for url, tstamp, title in ((MODERN, "20190301120000", "Rafa Silva bisa na Luz - Benfica - Jornal Record"),
                                    (OLD, "20020505000000", ":.: Jornal Record :.:"),
                                    (OLDEST, "19991128140726", "Record On-Line"),
                                    (OTHER_CLUB, "20200101000000", "Viseu perde")):
@@ -125,6 +125,13 @@ class NavigationCorpusTests(OfflineTestCase):
         self.assertEqual(bodies[self.rows[OLD][9]], "html:aux")
         self.assertEqual(bodies[self.rows[OLDEST][9]], "sem_texto")
 
+    def test_title_without_site_suffix_and_entity_variants(self) -> None:
+        self.assertEqual(self.rows[MODERN][1], "Rafa Silva bisa na Luz")
+        self.assertEqual(self.rows[OLD][1], ":.: Jornal Record :.:")
+        entities = {e["k"]: e for e in self.data["entities"]}
+        self.assertEqual(entities["Q131499"]["a"], ["Benfica"])
+        self.assertEqual(self.data["modalidadeNomes"], ["Futebol"])
+
     def test_page_and_summary(self) -> None:
         page = (self.target / "index.html").read_text(encoding="utf-8")
         self.assertIn('<script src="data.js"></script>', page)
@@ -170,6 +177,21 @@ class HybridVocabularyInDashboardTests(OfflineTestCase):
         self.assertIn("| Estádio do Sport Lisboa e Benfica | estadio | 1 |", summary)
         self.assertIn("| candidato | 1 |", summary)
         self.assertNotIn("Estádio do Sport Lisboa e Benfica | futebol", summary)
+
+
+class DisplayTests(unittest.TestCase):
+    def test_display_title(self) -> None:
+        self.assertEqual(display_title("Servette-Sp. Braga, 1-2: Dois hinos - Liga Europa - Jornal Record"),
+                         "Servette-Sp. Braga, 1-2: Dois hinos")
+        self.assertEqual(display_title("Alaphilippe vence segunda etapa - Ciclismo - Jornal Re"),
+                         "Alaphilippe vence segunda etapa")
+        self.assertEqual(display_title("SC Braga x Vitória SC - Record Jogos em Direto"), "SC Braga x Vitória SC")
+        self.assertEqual(display_title("Basquetebol - Jornal Record"), "Basquetebol")
+        self.assertEqual(display_title("Benfica - Sporting: o dérbi"), "Benfica - Sporting: o dérbi")
+
+    def test_modalidade_label(self) -> None:
+        self.assertEqual(modalidade_label("hoquei-em-patins"), "Hóquei em patins")
+        self.assertEqual(modalidade_label("desportos-de-combate"), "Desportos de combate")
 
 
 class SlugTests(unittest.TestCase):

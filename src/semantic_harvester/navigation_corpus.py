@@ -68,12 +68,41 @@ MODALIDADE_ALIASES = {
     "aventura-em-mocambique": "aventura",
     "record-pela-patagonia": "aventura",
 }
+# Nome de cada modalidade para mostrar (o URL não tem acentos); as outras
+# mostram-se com a primeira letra em maiúscula e espaços (`modalidade_label`).
+MODALIDADE_LABELS = {
+    "hoquei-em-patins": "Hóquei em patins", "tenis": "Ténis", "tenis-de-mesa": "Ténis de mesa",
+    "natacao": "Natação", "ginastica": "Ginástica", "raguebi": "Râguebi", "orientacao": "Orientação",
+    "desporto-universitario": "Desporto universitário", "jogos-olimpicos": "Jogos Olímpicos",
+    "polo-aquatico": "Polo aquático", "nfl": "NFL", "mma": "MMA",
+}
+# Sufixo do site no título ("… - Futebol - Jornal Record", por vezes cortado:
+# "… - Jornal Re"): o último segmento e, antes dele, a secção (até 4 palavras).
+_SEGMENT = re.compile(r"\s+[-–|]\s+")
+SECTION_MAX_WORDS = 4
 CLUB_CATEGORY = "clube"
 OTHER_CATEGORIES = ("treinador", "estadio", "competicao")
 
 
 def slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", fold(text)).strip("-")
+
+
+def modalidade_label(value: str) -> str:
+    return MODALIDADE_LABELS.get(value) or value.replace("-", " ").capitalize()
+
+
+def display_title(title: str) -> str:
+    """Título sem o sufixo do site; o título completo continua no grafo."""
+
+    parts = _SEGMENT.split(title.strip())
+    last = parts[-1].strip()
+    if len(parts) < 2 or not ("jornal record".startswith(last.lower()) or re.search(r"\brecord\b", last, re.I)):
+        return title
+    parts = parts[:-1]
+    if len(parts) >= 2 and len(parts[-1].split()) <= SECTION_MAX_WORDS:
+        parts = parts[:-1]
+    return " - ".join(parts)
 
 
 def era_of(url: str) -> str:
@@ -103,6 +132,7 @@ class Entity:
     modalidade: str
     qid: str
     origin: str = ""
+    variants: tuple[str, ...] = ()
 
 
 def entity_key(qids: str, homonyms: int, rotulo: str) -> str:
@@ -123,6 +153,7 @@ def load_vocabulary(path: Path, club_qids: set[str] | None = None) -> dict[str, 
             key=entity_key(qid, homonyms, row["rotulo"]), name=row["rotulo"],
             categoria=row["categoria"], modalidade=row.get("modalidade") or "",
             qid=qid if homonyms == 1 else "", origin=row.get("origem") or "",
+            variants=tuple(v for v in (row.get("variantes") or "").split("|") if v and v != row["rotulo"]),
         )
     return vocabulary
 
@@ -177,7 +208,7 @@ def build_articles(
         tstamp = str(index.capture_fields[captures[0]].get("tstamp", "")) if captures else ""
         has_text = any("text_node" in index.capture_fields[c] for c in captures)
         article = Article(
-            url=url, title=str(index.labels.get(article_uri(url), "") or url), tstamp=tstamp,
+            url=url, title=display_title(str(index.labels.get(article_uri(url), "") or url)), tstamp=tstamp,
             era=era_of(url), body=bodies.get(url, "c′" if has_text else "sem_texto"),
         )
 
@@ -223,10 +254,12 @@ def build_data(
         "label": label,
         "eras": eras,
         "modalidades": modalidades,
+        "modalidadeNomes": [modalidade_label(m) for m in modalidades],
         "bodies": bodies,
         "clubs": [{"k": k, "n": club_names.get(k, k)} for k in club_keys],
         "entities": [{"k": k, "n": by_key[k].name, "c": by_key[k].categoria,
-                      "m": by_key[k].modalidade, "q": by_key[k].qid, "o": by_key[k].origin}
+                      "m": by_key[k].modalidade, "q": by_key[k].qid, "o": by_key[k].origin,
+                      "a": list(by_key[k].variants)}
                      for k in entity_keys],
         # [tstamp, título, URL, época, modalidades, origem, clubes, origem, entidades, corpo]
         "articles": [
