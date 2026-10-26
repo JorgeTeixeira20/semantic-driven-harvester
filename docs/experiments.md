@@ -7076,3 +7076,21 @@ falhadas por forma não prevista descem de 22 para 18 e as certas sobem de 43 pa
 cobertura só sobre entidades do vocabulário sobe de 42,2 % para 46,1 % (37–56). A correspondência
 do script de avaliação teve de aceitar "FC Porto" ↔ "Futebol Clube do Porto" para a passagem 1
 (já aceitava na 2).
+
+### Siglas juntas partilhadas (2026-10-26, depois da quinta corrida)
+
+A quinta corrida mostrou um efeito novo da regra das siglas: o clube de andebol "S.L.
+Benfica" passou de 10 para 488 artigos, porque "SL Benfica" (a conta oficial do Benfica, em
+tweets e legendas) coincidia com a sigla junta dele; numa amostra de 6 desses artigos,
+nenhum se referia ao clube de andebol (relatado pela sessão local; fora do top 30).
+
+Correção (`corpus_entities.load_vocabulary`): **uma sigla junta só é usada se pertencer a
+uma única entidade** (contando as formas originais e as juntas de todas as entidades). No
+vocabulário alargado, 2 das 89 siglas juntas eram partilhadas — "sl benfica" (Sport Lisboa
+e Benfica e S.L. Benfica) e "leixoes sc" (Leixões SC e Leixões Sport Club) — e deixam de ser
+usadas; o texto continua a ser lido pelo nome ("Benfica", "Leixões"). "FC Porto" fica
+(só uma entidade). Teste: `test_shared_joined_initials_are_not_used`.
+
+**Não corrido sobre os dados:** os números congelados da quinta corrida mantêm este erro
+(documentado). A correção entra na próxima corrida da cadeia (o corpus completo); se o
+`por_ano` voltar a correr, também.

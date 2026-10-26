@@ -375,6 +375,22 @@ class JoinedInitialsTests(unittest.TestCase):
         segments = [match_tokens("O FC Porto venceu.")]
         self.assertEqual(count_mentions(segments, terms), {"Futebol Clube do Porto": 1})
 
+    def test_shared_joined_initials_are_not_used(self) -> None:
+        # Quinta corrida: "SL Benfica" (a conta oficial do clube) passou a contar também
+        # para o clube de andebol "S.L. Benfica". Partilhada, a sigla junta não se usa.
+        import tempfile
+        from semantic_harvester.corpus_entities import load_vocabulary
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "vocab.csv"
+            path.write_text("tipo,categoria,rotulo,variantes\n"
+                            "entidade,clube,Sport Lisboa e Benfica,Benfica|S L Benfica\n"
+                            "entidade,clube,S.L. Benfica,\n"
+                            "entidade,clube,Futebol Clube do Porto,F.C. Porto\n", encoding="utf-8")
+            terms = load_vocabulary(path)
+        segments = [match_tokens("O SL Benfica e o FC Porto empataram.")]
+        self.assertEqual(count_mentions(segments, terms),
+                         {"Sport Lisboa e Benfica": 1, "Futebol Clube do Porto": 1})
+
 
 if __name__ == "__main__":
     unittest.main()

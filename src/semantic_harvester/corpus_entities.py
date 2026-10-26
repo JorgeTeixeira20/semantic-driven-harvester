@@ -124,11 +124,25 @@ def load_vocabulary(path: Path) -> list[Term]:
                 f"Tipo {row['tipo']!r} em {row['rotulo']!r}: o vocabulário só tem "
                 "entidades; os temas vêm do URL."
             )
-        forms = [row["rotulo"], *[v for v in (row.get("variantes") or "").split("|") if v.strip()]]
+    forms_by_row = [
+        [tuple(match_tokens(f)) for f in
+         [row["rotulo"], *[v for v in (row.get("variantes") or "").split("|") if v.strip()]]]
+        for row in rows
+    ]
+    # Uma sigla junta só vale se for de uma única entidade: "SL Benfica" é do clube
+    # principal e do de andebol ("S.L. Benfica"); partilhada, não se usa, e o texto
+    # continua a ser lido pelo nome ("Benfica"). Avaliação da quinta corrida, 2026-10-26.
+    owners: dict[tuple[str, ...], set[int]] = defaultdict(set)
+    for k, forms in enumerate(forms_by_row):
+        for folded in forms:
+            owners[folded].add(k)
+            owners[joined_initials(folded)].add(k)
+    for k, (row, forms) in enumerate(zip(rows, forms_by_row)):
         variants = []
-        for form in forms:
-            folded = tuple(match_tokens(form))
-            for variant in (folded, joined_initials(folded)):
+        for folded in forms:
+            joined = joined_initials(folded)
+            candidates = [folded] + ([joined] if joined != folded and owners[joined] == {k} else [])
+            for variant in candidates:
                 if variant and variant not in variants:
                     variants.append(variant)
         clubs = frozenset(c for c in (row.get("clubes") or "").split("|") if c)
