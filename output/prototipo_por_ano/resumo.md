@@ -3,9 +3,9 @@
 Gerado sem rede a partir do grafo da Fase 1 e do Caminho B. A data de cada artigo é a da captura mais antiga conhecida (aproximação da publicação). Contagens descritivas desta recolha, limitada pelo teto da descoberta (300 resultados por termo e ano).
 
 - Artigos: 129317
-- Com pelo menos uma entidade: 96750
+- Com pelo menos uma entidade: 96758
 - Modalidade pelo URL / nenhuma: 55241 / 74076
-- Clube pelo URL / pelo texto / nenhum: 25041 / 54404 / 49872
+- Clube pelo URL / pelo texto / nenhum: 25041 / 54420 / 49856
 
 ## Artigos por ano
 
@@ -22,14 +22,14 @@ Gerado sem rede a partir do grafo da Fase 1 e do Caminho B. A data de cada artig
 | 2007 | 10602 | 9665 |
 | 2008 | 5119 | 4649 |
 | 2009 | 3754 | 3501 |
-| 2017 | 16819 | 13474 |
-| 2018 | 14179 | 11860 |
-| 2019 | 12444 | 9780 |
-| 2020 | 10554 | 7250 |
+| 2017 | 16819 | 13475 |
+| 2018 | 14179 | 11861 |
+| 2019 | 12444 | 9784 |
+| 2020 | 10554 | 7251 |
 | 2021 | 5564 | 4020 |
 | 2022 | 6786 | 4608 |
 | 2023 | 7609 | 5593 |
-| 2024 | 7005 | 5341 |
+| 2024 | 7005 | 5342 |
 
 ## Origem do corpo por época do site
 
@@ -94,13 +94,13 @@ Gerado sem rede a partir do grafo da Fase 1 e do Caminho B. A data de cada artig
 | Sporting Clube de Braga | 6403 |
 | Clube de Futebol Os Belenenses | 5681 |
 | Club Sport Marítimo | 5221 |
+| Vitória Futebol Clube | 4052 |
 | Associação Académica de Coimbra – O.A.F. | 4005 |
-| Vitória Futebol Clube | 4003 |
 | Rio Ave Futebol Clube | 3983 |
 | Grupo Desportivo Estoril Praia | 3719 |
 | Gil Vicente Futebol Clube | 3434 |
 | Real Madrid Club de Fútbol | 3382 |
-| Leixões Sport Club | 3074 |
+| Leixões Sport Club | 3096 |
 | Futebol Clube Paços de Ferreira | 2838 |
 | União Desportiva de Leiria | 2751 |
 | Varzim Sport Club | 2730 |
@@ -163,6 +163,6 @@ Gerado sem rede a partir do grafo da Fase 1 e do Caminho B. A data de cada artig
 
 | Origem | Entidades distintas |
 | --- | ---: |
-| lista_fechada | 4251 |
+| lista_fechada | 4255 |
 | candidato | 2778 |
 | lista_fechada+candidato | 38 |

@@ -168,9 +168,9 @@ Sem pedidos à API; não altera o grafo nem o raw. Anotação por artigo. Vocabu
 
 ## Entidades mencionadas (vocabulário fechado, no texto)
 
-- Artigos com pelo menos uma entidade, regra de persistência (todas as capturas com texto): 96750
-- Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): 96750
-- Pares artigo–entidade: 559010 pela regra fraca, 559010 pela regra de persistência; destes, 559010 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
+- Artigos com pelo menos uma entidade, regra de persistência (todas as capturas com texto): 96758
+- Artigos com pelo menos uma entidade, regra fraca (≥ 1 captura): 96758
+- Pares artigo–entidade: 559759 pela regra fraca, 559759 pela regra de persistência; destes, 559759 são de artigos com uma só captura com texto, onde a persistência não filtra nada.
 
 ### Coerência de clube (sinal, não filtro)
 
@@ -178,9 +178,9 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 
 | clube_coerente | Pares (regra fraca) | Pares (persistência) |
 | --- | ---: | ---: |
-| sim | 30480 | 30480 |
-| nao | 59935 | 59935 |
-| sem_tema | 378656 | 378656 |
+| sim | 30482 | 30482 |
+| nao | 60098 | 60098 |
+| sem_tema | 379240 | 379240 |
 | nao_aplicavel | 89939 | 89939 |
 
 | Entidade | Artigos (persistência) | Artigos (≥ 1 captura) |
@@ -193,15 +193,15 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Clube de Futebol Os Belenenses | 5681 | 5681 |
 | Club Sport Marítimo | 5221 | 5221 |
 | Liga dos Campeões da UEFA | 4716 | 4716 |
+| Vitória Futebol Clube | 4052 | 4052 |
 | Associação Académica de Coimbra – O.A.F. | 4005 | 4005 |
-| Vitória Futebol Clube | 4003 | 4003 |
 | Rio Ave Futebol Clube | 3983 | 3983 |
 | Grupo Desportivo Estoril Praia | 3719 | 3719 |
 | Cristiano Ronaldo | 3434 | 3434 |
 | Gil Vicente Futebol Clube | 3434 | 3434 |
 | Real Madrid Club de Fútbol | 3382 | 3382 |
 | Jogos Olímpicos | 3272 | 3272 |
-| Leixões Sport Club | 3074 | 3074 |
+| Leixões Sport Club | 3096 | 3096 |
 | Futebol Clube Paços de Ferreira | 2838 | 2838 |
 | União Desportiva de Leiria | 2751 | 2751 |
 | Varzim Sport Club | 2730 | 2730 |
@@ -276,9 +276,9 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | João Mário | 664 | 664 |
 | Tênis de mesa nos Jogos Olímpicos | 657 | 657 |
 | Mota | 653 | 653 |
+| Clube de Futebol União | 651 | 651 |
 | Bruno Alves | 649 | 649 |
 | A.C. Milan | 648 | 648 |
-| Clube de Futebol União | 648 | 648 |
 | Santa Maria Futebol Clube | 644 | 644 |
 | Joao Rocha | 639 | 639 |
 | Associação Desportiva Ovarense | 634 | 634 |
@@ -311,6 +311,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Estádio José Alvalade | 496 | 496 |
 | João Alexandre Duarte Ferreira Fernandes | 494 | 494 |
 | Telma Monteiro | 493 | 493 |
+| S.L. Benfica | 488 | 488 |
 | Campeonatos nacionais de ciclismo em estrada | 485 | 485 |
 | Kikas | 485 | 485 |
 | Liga Jovem da UEFA | 484 | 484 |
@@ -2057,6 +2058,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | André Franco | 49 | 49 |
 | Bruno Madeira | 49 | 49 |
 | Carlos Calado | 49 | 49 |
+| Clube Desportivo de Mafra | 49 | 49 |
 | Copa Latina | 49 | 49 |
 | Corrida dos Campeões | 49 | 49 |
 | Daniel Alves | 49 | 49 |
@@ -2479,6 +2481,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Franz Beckenbauer | 38 | 38 |
 | Frédéric Maciel | 38 | 38 |
 | Gabriela Ribeiro | 38 | 38 |
+| Galitos Futebol Clube | 38 | 38 |
 | George Hincapie | 38 | 38 |
 | Gilson Costa | 38 | 38 |
 | Ivan Ljubičić | 38 | 38 |
@@ -2522,6 +2525,8 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Adriano Castanheira | 37 | 37 |
 | Andrea Pirlo | 37 | 37 |
 | Artur Filipe Bernardes Moreira | 37 | 37 |
+| Associação Desportiva Sanjoanense | 37 | 37 |
+| Basquetebol do Sport Clube Lusitânia | 37 | 37 |
 | Bruno Severino | 37 | 37 |
 | Carlos Bossio | 37 | 37 |
 | Carlos Galambas | 37 | 37 |
@@ -2953,6 +2958,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Carles Grau Tallada | 29 | 29 |
 | Celtic F.C. Women | 29 | 29 |
 | Cesc Fàbregas | 29 | 29 |
+| Clube Desportivo da Cova da Piedade | 29 | 29 |
 | Colin Edwards | 29 | 29 |
 | Corporación Deportiva Club Atlético Nacional | 29 | 29 |
 | David Caiado Dias | 29 | 29 |
@@ -3596,6 +3602,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Bauke Mollema | 21 | 21 |
 | Bodunha | 21 | 21 |
 | Carmelo Anthony | 21 | 21 |
+| Centro Desportivo de Fátima | 21 | 21 |
 | Chris Vermeulen | 21 | 21 |
 | Christian Atsu | 21 | 21 |
 | Christophe Rochus | 21 | 21 |
@@ -3858,7 +3865,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Bé Martins | 19 | 19 |
 | Caio Quiroga | 19 | 19 |
 | Carlota Cristo | 19 | 19 |
-| Clube Desportivo de Mafra | 19 | 19 |
 | Cole Houshmand | 19 | 19 |
 | Cori Gauff | 19 | 19 |
 | Damiano Caruso | 19 | 19 |
@@ -4613,6 +4619,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Gil Barros | 14 | 14 |
 | Gino Mäder | 14 | 14 |
 | Giulio Ciccone | 14 | 14 |
+| Gondomar Sport Clube | 14 | 14 |
 | Gonzalo Bergessio | 14 | 14 |
 | Gonçalo Amorim | 14 | 14 |
 | Gonçalo Franco | 14 | 14 |
@@ -4762,7 +4769,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Chris Guccione | 13 | 13 |
 | Claude Makélélé | 13 | 13 |
 | Club Cerro Porteño | 13 | 13 |
-| Clube Desportivo da Cova da Piedade | 13 | 13 |
 | Clube Fluvial Portuense | 13 | 13 |
 | Cyril Despres | 13 | 13 |
 | D. J. Mitchell | 13 | 13 |
@@ -5438,7 +5444,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Rui Guerreiro | 10 | 10 |
 | Rúben Silvestre | 10 | 10 |
 | Rúben Vieira | 10 | 10 |
-| S.L. Benfica | 10 | 10 |
 | Salvador Vassalo | 10 | 10 |
 | Sandro Costa | 10 | 10 |
 | Sara Carmo | 10 | 10 |
@@ -5584,6 +5589,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Ariza Makukula | 8 | 8 |
 | Arvid Smit | 8 | 8 |
 | Ashley Harkleroad | 8 | 8 |
+| Associação Atlética de Avanca | 8 | 8 |
 | Augusto Cardoso | 8 | 8 |
 | Aymen Tahar | 8 | 8 |
 | Bernardo Moniz da Maia | 8 | 8 |
@@ -5809,7 +5815,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Arialis Martinez | 6 | 6 |
 | Arnau García | 6 | 6 |
 | Artémis Afonso | 6 | 6 |
-| Associação Desportiva Sanjoanense | 6 | 6 |
 | Augusto Sobrinho | 6 | 6 |
 | Beatriz Jordao | 6 | 6 |
 | Bilal Ould-Chikh | 6 | 6 |
@@ -5954,6 +5959,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Clara Silva | 5 | 5 |
 | Clarisse Cruz | 5 | 5 |
 | Claudia Vicente | 5 | 5 |
+| Clube Atlético de Queluz | 5 | 5 |
 | Clube Kairós | 5 | 5 |
 | Clésio Baúque | 5 | 5 |
 | Cristian Tello | 5 | 5 |
@@ -6266,7 +6272,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Carlos Salgueiro | 3 | 3 |
 | Carolina Escorcio | 3 | 3 |
 | Catarina Leite | 3 | 3 |
-| Centro Desportivo de Fátima | 3 | 3 |
 | Christopher Olivares | 3 | 3 |
 | Cléber Monteiro | 3 | 3 |
 | César Meli | 3 | 3 |
@@ -6406,6 +6411,7 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Rúben Rodrigues | 3 | 3 |
 | Sandro Pinto | 3 | 3 |
 | Sara Guerreiro | 3 | 3 |
+| Seixal Futebol Clube | 3 | 3 |
 | Serge Kevyn | 3 | 3 |
 | Siramana Dembélé | 3 | 3 |
 | Sisínio Ambriz | 3 | 3 |
@@ -6460,7 +6466,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Antonio Robaina | 2 | 2 |
 | António Antunes | 2 | 2 |
 | António Frois | 2 | 2 |
-| Associação Atlética de Avanca | 2 | 2 |
 | Atabu | 2 | 2 |
 | Beatriz Basto | 2 | 2 |
 | Beatriz Cardoso | 2 | 2 |
@@ -6853,7 +6858,6 @@ Para cada par artigo–jogador: `sim` se um clube do jogador no vocabulário coi
 | Chidi Osuchukwu | 1 | 1 |
 | Christian Neiva Afonso | 1 | 1 |
 | Claudia Ribeiro | 1 | 1 |
-| Clube Atlético de Queluz | 1 | 1 |
 | Cláudia Figueira | 1 | 1 |
 | Crislan Henrique da Silva de Sousa | 1 | 1 |
 | Cristian Săpunaru | 1 | 1 |

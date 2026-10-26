@@ -7002,3 +7002,67 @@ vocabulário híbrido é lido pela mesma função): obriga a uma **quinta corrid
 
 Fica como está (decisão do autor): a variante "Costa" de João Carlos Rodrigues da Costa e o
 "Rui Costa" que junta três pessoas — vão para a análise de erros.
+
+## Quinta corrida do `por_ano` (2026-10-26) — números da tese, congelados
+
+Código `b6eaaff` (siglas com pontos valem também juntas, ver a secção anterior). Mesmos passos
+e opções da quarta (`--sem-repetidas` em 1a e 3a; passo 2 com `--reutilizar`, **sem pedidos
+novos** à Wikidata; os dois vocabulários em disco não mudaram, conferido por `shasum`: as
+variantes novas são geradas ao carregar). Início 10:36, fim 12:24 (1 h 48). Tempos em
+`output/cadeia_por_ano_quinta_tempos.tsv`: 1a 43 min 4 s; 1b 4 min 7 s; 1d 44 s; 2 4,6 s; 3a
+48 min 14 s; 3b 10 min 28 s; 3c 46 s; memória máxima 2,55 GB. A recolha do `xl` corria em
+paralelo. Cópias da quarta: `output/quarta_corrida_por_ano/` e
+`output/caminho_b_por_ano_quarta_passagem1/`; da quinta (passagem 1):
+`output/caminho_b_por_ano_quinta_passagem1/` (não versionadas).
+
+### Quarta vs quinta
+
+| Medida | Quarta | Quinta |
+|---|--:|--:|
+| Artigos com ≥ 1 entidade, passagem 1 | 81 832 (63,3 %) | 83 051 (64,2 %) |
+| Artigos com ≥ 1 entidade, passagem 2 | 96 750 (74,8 %) | 96 758 (74,8 %) |
+| Pares artigo–entidade, passagem 1 | 352 917 | 370 922 |
+| Pares artigo–entidade, passagem 2 | 559 010 | 559 759 |
+| Entidades distintas, passagem 1 / 2 | 4 269 / 7 067 | 4 273 / 7 071 |
+| Artigos com o FC Porto, passagem 1 | 1 108 | **18 315** |
+| Artigos com o FC Porto, passagem 2 | 18 311 | 18 311 |
+| Modalidades / sem modalidade | 40 / 74 076 | 40 / 74 076 |
+| Precisão de 40 pares | 32/40 (80,0 %) | **não repetida: fica a da quarta** |
+
+Mudam 16 entidades na passagem 1 e 14 na 2 (nas outras o número de artigos é igual). Subidas:
+FC Porto +17 207 (só p1); "S.L. Benfica" +478 (ver abaixo); Vitória Futebol Clube +49;
+Clube Desportivo Nacional +49 (p1); Galitos FC 0→38; Basquetebol do SC Lusitânia 0→37;
+AD Sanjoanense +31; CD Mafra +30; Leixões +22; CD Fátima +18; CD Cova da Piedade +16;
+Gondomar SC 0→14. Nenhuma desceu. Top 30 da passagem 2: as mesmas 30 entidades; só troca a
+ordem do 9.º e 10.º (Vitória FC 4 052, Académica 4 005).
+
+**Erro novo trazido pela correção.** "S.L. Benfica" (Q2895813, clube de **andebol**) passa de 10
+para 488 artigos, porque "SL Benfica" (a conta oficial do clube, ex.: "— SL Benfica
+(@SLBenfica)", "SL Benfica 25-16 AJ Fonte Bastardo", "[Vídeo: SL Benfica]") agora coincide com
+a sigla desse clube. Numa amostra de 6 artigos, 0 se referem ao clube de andebol como
+entidade distinta; são o Benfica em geral. Não está no top 30. **Não foi corrigido** (os números
+estão congelados); fica para a análise de erros e para decisão do autor.
+
+**Top 30: erros evidentes** — os mesmos da quarta: "João Carlos Rodrigues da Costa" (2 397
+artigos, variante "Costa") e "Rui Costa" com homónimos.
+
+### 30 notícias anotadas (mesma anotação, não alterada)
+
+Ficheiro novo `data/processed/avaliacao_cobertura_30_quinta.csv` (a da quarta fica intacta).
+Passagem 2: **idêntica** (71 certas / 25 erradas / 175 falhadas; P 74,0 %, R 28,9 %, F1 41,5 %).
+Passagem 1:
+
+| Passagem 1 | Certas | Erradas | Falhadas | Precisão | Cobertura | F1 |
+|---|--:|--:|--:|--:|--:|--:|
+| Quarta, todas | 43 | 12 | 203 | 78,2 % (66–87) | 17,5 % (13–23) | 28,6 % |
+| Quinta, todas | 47 | 12 | 199 | 79,7 % (68–88) | 19,1 % (15–24) | 30,8 % |
+| Quinta, 1999–2009 | 25 | 11 | 113 | 69,4 % (53–82) | 18,1 % (13–25) | 28,7 % |
+| Quinta, 2017–2024 | 22 | 1 | 86 | 95,7 % (79–99) | 20,4 % (14–29) | 33,6 % |
+
+Passaram a certas **4 entidades**: o "FC Porto" das notícias 11, 14, 22 e 23 (antes
+`forma_nao_prevista`: a variante só existia na híbrida). O motivo é a correção das siglas: o
+vocabulário tinha "F.C. Porto", que agora vale também `fc porto`. Nenhuma outra mudou; as
+falhadas por forma não prevista descem de 22 para 18 e as certas sobem de 43 para 47. A
+cobertura só sobre entidades do vocabulário sobe de 42,2 % para 46,1 % (37–56). A correspondência
+do script de avaliação teve de aceitar "FC Porto" ↔ "Futebol Clube do Porto" para a passagem 1
+(já aceitava na 2).
