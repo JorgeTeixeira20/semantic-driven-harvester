@@ -6898,7 +6898,7 @@ nº 27, sub-20 do Nacional: 24; nº 14, sorteio da Taça da Liga: 18).
 
 **Erradas (25 na passagem 2).** 14 são de uma só notícia, a nº 7 (2005, capturada em 2009): o
 corpo extraído traz a lista lateral "Todas as notícias"/"Exclusivos" e os comentários do leitor,
-e o sistema regista 13 pessoas e clubes dessas manchetes (Cristiano Ronaldo, Mourinho, Deco,
+e o sistema regista 14 pessoas e clubes dessas manchetes (Cristiano Ronaldo, Mourinho, Deco,
 Benfica, …); só "Manchester United" estava na notícia. Outros 11: 3 homónimos (variante "Liga
 Espanhola" lida como a liga de basquetebol, "seleção portuguesa" de ténis lida como a de
 futebol, "Campeonatos Nacionais" de ciclismo), 3 nomes truncados ("Sporting da Horta" → Sporting
@@ -6951,7 +6951,7 @@ do denominador; mede o método e a extração do corpo sem o limite do vocabulá
 no vocabulário e tem corpo; em 1999–2009, 69 %, pelo peso dos nomes curtos nas fichas de jogo e
 das notícias antigas curtas. A cobertura baixa, 29 %, é sobretudo do vocabulário (que só tem
 clubes e jogadores das ligas portuguesas, mais os candidatos da Wikidata com ≥ 10 artigos) e,
-nas notícias de 1999–2009, do corpo que não foi extraído (4 notícias, 30 das 138 entidades).
+nas notícias de 1999–2009, do corpo que não foi extraído (3 notícias, 30 das 138 entidades).
 
 Limitações: 30 notícias e 246 entidades (os intervalos são largos, sobretudo por época); a
 classificação dos motivos é da sessão; a amostra não separa o desporto (futebol dominante em
