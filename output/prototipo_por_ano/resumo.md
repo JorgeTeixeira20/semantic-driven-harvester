@@ -159,6 +159,19 @@ Gerado sem rede a partir do grafo da Fase 1 e do Caminho B. A data de cada artig
 | Copa Final Four de Voleibol | competicao | 724 |
 | Aeroporto Internacional do Rio de Janeiro Tom Jobim/Galeão | estadio | 705 |
 
+## Títulos repetidos em 100 ou mais notícias (mostrados como sem título)
+
+Notícias afetadas: 46837.
+
+| Título | Notícias |
+| --- | ---: |
+| :.: Jornal Record :.: | 30241 |
+| Record | 8410 |
+| function MM_findObj(n, d) { //v4.0 var p,i,x; if(! | 5319 |
+| Record On-Line | 2358 |
+| Home Últimas Notícias Taça das Confederações Recor | 377 |
+| Liga Record | 132 |
+
 ## Origem das entidades mencionadas no vocabulário
 
 | Origem | Entidades distintas |
