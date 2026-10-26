@@ -7127,3 +7127,14 @@ na análise de erros (`docs/notas_para_escrita.md`). Suite: 397 testes, todos a 
 
 Regenerar (sessão local, < 1 min, sem rede):
 `python -m semantic_harvester.navigation_corpus --corpus por_ano --vocabulario data/processed/caminho_b_vocabulario_hibrido_por_ano.csv`
+
+**Títulos genéricos (2026-10-26, a pedido do autor).** A sessão local contou 38 692
+títulos genéricos (30 %), sobretudo ":.: Jornal Record :.:", o título que o site
+antigo dava a todas as páginas. Regra, aplicada pelo programa a todo o corpus (não
+por escolha de exemplos): um título igual em **100 ou mais notícias**
+(`GENERIC_TITLE_MIN_ARTICLES`, o mesmo limiar das frases repetidas em
+`boilerplate.py`) não identifica a notícia e o painel mostra "Notícia sem título no
+arquivo". Só muda o que se mostra: o título original continua no grafo. A lista
+completa dos títulos apanhados, com as contagens, sai no `resumo.md` (secção
+"Títulos repetidos…"). Os 272 títulos ilegíveis (página comprimida lida como texto)
+são todos diferentes, por isso a regra não os apanha; ficam como limitação conhecida.

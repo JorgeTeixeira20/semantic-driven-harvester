@@ -11,7 +11,8 @@ from pathlib import Path
 from semantic_harvester.corpus_redundancy import corpus_graph_path
 from semantic_harvester.history_pipeline import captured_at
 from semantic_harvester.navigation_corpus import (
-    ORIGIN_FALLBACK, ORIGIN_FROM_URL, ORIGIN_NONE, display_title, era_of, modalidade_label, run, slug,
+    GENERIC_TITLE_MIN_ARTICLES, ORIGIN_FALLBACK, ORIGIN_FROM_URL, ORIGIN_NONE, Article, build_data,
+    display_title, era_of, generic_titles, modalidade_label, run, slug,
 )
 from semantic_harvester.rdf_mapper import build_article_history_graph, stable_hash
 from tests.support import OfflineTestCase
@@ -188,6 +189,18 @@ class DisplayTests(unittest.TestCase):
         self.assertEqual(display_title("SC Braga x Vitória SC - Record Jogos em Direto"), "SC Braga x Vitória SC")
         self.assertEqual(display_title("Basquetebol - Jornal Record"), "Basquetebol")
         self.assertEqual(display_title("Benfica - Sporting: o dérbi"), "Benfica - Sporting: o dérbi")
+
+    def test_title_repeated_in_many_articles_is_shown_as_untitled(self) -> None:
+        generic = ":.: Jornal Record :.:"
+        articles = [Article(f"u{i}", generic, "2002", "outro", "c′")
+                    for i in range(GENERIC_TITLE_MIN_ARTICLES)]
+        articles += [Article("a", "Benfica vence", "2002", "outro", "c′"),
+                     Article(f"r{GENERIC_TITLE_MIN_ARTICLES}", "Record", "2002", "outro", "c′")]
+        self.assertEqual(generic_titles(articles), {generic: GENERIC_TITLE_MIN_ARTICLES})
+        titles = [row[1] for row in build_data(articles, {}, {}, "t")["articles"]]
+        self.assertEqual(titles.count(""), GENERIC_TITLE_MIN_ARTICLES)
+        self.assertIn("Benfica vence", titles)
+        self.assertIn("Record", titles)  # só uma vez: fica
 
     def test_modalidade_label(self) -> None:
         self.assertEqual(modalidade_label("hoquei-em-patins"), "Hóquei em patins")

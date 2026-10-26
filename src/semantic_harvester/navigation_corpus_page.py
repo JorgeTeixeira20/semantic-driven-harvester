@@ -111,6 +111,7 @@ h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: 
 .list li:first-child { border-top: 0; }
 .list a.t { color: var(--ink); font-weight: 600; text-decoration: none; }
 .list a.t:hover { color: var(--accent); text-decoration: underline; }
+.list a.t.untitled { color: var(--muted); font-weight: 400; font-style: italic; }
 .list .chips { margin-top: 6px; }
 .tag { font-size: .72rem; padding: 0 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
 .pager { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 12px; }
@@ -442,7 +443,7 @@ footer p { margin: 8px 0; }
       const body = D.bodies[r[BODY]];
       const tag = body === "premium" ? ` <span class="tag">Premium</span>` : (body === "c′" || body.startsWith("html:") ? "" : ` <span class="tag">só título</span>`);
       return `<li><div class="meta">${dateOf(r[T])}${tag}</div>` +
-        `<a class="t" href="${esc(WAYBACK + r[T] + "/" + r[U])}" target="_blank" rel="noopener">${esc(r[TI])}</a>` +
+        `<a class="t${r[TI] ? "" : " untitled"}" href="${esc(WAYBACK + r[T] + "/" + r[U])}" target="_blank" rel="noopener">${r[TI] ? esc(r[TI]) : "Notícia sem título no arquivo"}</a>` +
         `<div class="chips">${mods.join("")}${clubs.join("")}${ents.join("")}</div></li>`;
     }).join("") || `<li class="meta">Nenhum artigo com estes filtros.</li>`;
     list.querySelectorAll("button[data-mod]").forEach(b => b.onclick = () => set("mod", b.dataset.mod));
@@ -457,7 +458,9 @@ footer p { margin: 8px 0; }
     "A modalidade vem só do endereço da notícia (os endereços do site antigo não a indicam). " +
     "O clube vem do endereço e, quando este não o indica, dos clubes mencionados no texto " +
     "(assinalado com «no texto»). Atletas, clubes, treinadores, estádios e competições foram " +
-    "reconhecidos no texto e ligados à Wikidata. A pesquisa procura só no título. " + gapText();
+    "reconhecidos no texto e ligados à Wikidata. A pesquisa procura só no título. " +
+    "Um título igual em 100 ou mais notícias (como «:.: Jornal Record :.:», o nome do site antigo) " +
+    "não identifica a notícia e aparece como «Notícia sem título no arquivo». " + gapText();
   document.getElementById("foot").textContent =
     "Semantic Driven Harvester · cada vista é um endereço: copie-o para a guardar ou partilhar.";
   document.getElementById("gaps").textContent = gapText();

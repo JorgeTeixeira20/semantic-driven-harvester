@@ -35,6 +35,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .boilerplate import MIN_ARTICLES_ANY_TIME
 from .corpus_classification import article_url_scheme
 from .corpus_entities import ORIGIN_TEXT, ORIGIN_URL, fold
 from .corpus_entities_rdf import primary_qid, url_club_qids
@@ -80,6 +81,10 @@ MODALIDADE_LABELS = {
 # "… - Jornal Re"): o último segmento e, antes dele, a secção (até 4 palavras).
 _SEGMENT = re.compile(r"\s+[-–|]\s+")
 SECTION_MAX_WORDS = 4
+# Um título igual em pelo menos tantas notícias é o nome do site (":.: Jornal
+# Record :.:"), não o da notícia: o painel mostra-a como "sem título". Mesmo
+# limiar das frases repetidas na filtragem do texto (`boilerplate.py`).
+GENERIC_TITLE_MIN_ARTICLES = MIN_ARTICLES_ANY_TIME
 CLUB_CATEGORY = "clube"
 OTHER_CATEGORIES = ("treinador", "estadio", "competicao")
 
@@ -233,6 +238,13 @@ def build_articles(
     return articles, club_names
 
 
+def generic_titles(articles: list[Article]) -> Counter:
+    """Títulos repetidos em `GENERIC_TITLE_MIN_ARTICLES` ou mais notícias, com a contagem."""
+
+    counts = Counter(a.title for a in articles)
+    return Counter({t: n for t, n in counts.items() if n >= GENERIC_TITLE_MIN_ARTICLES})
+
+
 def build_data(
     articles: list[Article], vocabulary: dict[str, Entity], club_names: dict[str, str], label: str,
 ) -> dict:
@@ -250,6 +262,7 @@ def build_data(
     used = {k for a in articles for k in a.entities}
     by_key = {e.key: e for e in vocabulary.values()}
     entity_keys, entity_index = indexer(used)
+    generic = generic_titles(articles)
     return {
         "label": label,
         "eras": eras,
@@ -261,9 +274,9 @@ def build_data(
                       "m": by_key[k].modalidade, "q": by_key[k].qid, "o": by_key[k].origin,
                       "a": list(by_key[k].variants)}
                      for k in entity_keys],
-        # [tstamp, título, URL, época, modalidades, origem, clubes, origem, entidades, corpo]
+        # [tstamp, título ("" se genérico), URL, época, modalidades, origem, clubes, origem, entidades, corpo]
         "articles": [
-            [a.tstamp, a.title, a.url, era_index[a.era], [mod_index[m] for m in a.modalidades],
+            [a.tstamp, "" if a.title in generic else a.title, a.url, era_index[a.era], [mod_index[m] for m in a.modalidades],
              a.modalidade_origin, [club_index[c] for c in a.clubs], a.club_origin,
              [entity_index[e] for e in a.entities], body_index[a.body]]
             for a in articles
@@ -330,6 +343,11 @@ def write_summary(articles: list[Article], vocabulary: dict[str, Entity],
         lines += ["## Treinadores, estádios e competições mais mencionados\n",
                   *_table(("Entidade", "Categoria", "Artigos"),
                           [(by_key[k].name, by_key[k].categoria, n) for k, n in others.most_common(20)])]
+    generic = generic_titles(articles)
+    lines += [f"## Títulos repetidos em {GENERIC_TITLE_MIN_ARTICLES} ou mais notícias "
+              "(mostrados como sem título)\n",
+              f"Notícias afetadas: {sum(generic.values())}.\n",
+              *_table(("Título", "Notícias"), generic.most_common())]
     if any(origins):  # só com um vocabulário que tem a coluna `origem` (o híbrido)
         lines += ["## Origem das entidades mencionadas no vocabulário\n",
                   *_table(("Origem", "Entidades distintas"), sorted(origins.items(), key=lambda kv: -kv[1]))]
