@@ -7532,8 +7532,7 @@ diferente de `fora_do_vocabulario`):
 | Só as com corpo (sem a n.º 15) | 38/69 (55,1 %; 43–66 %) | 68/101 (67,3 %; 58–76 %) |
 
 **Origem do corpo nas 15** (a lista completa, não só as anotadas): c′ 2; contentor do HTML 11
-(`texto` 7, `newsBody` 2, `areaGeralNoticiasTextBox` 1, …); Premium 2 (n.º 1 e 15). **Seis das
+(`texto` 8, `newsBody` 2, `areaGeralNoticiasTextBox` 1); Premium 2 (n.º 1 e 15). **Seis das
 15 não têm texto extraído mas têm HTML guardado** (n.º 3, 4, 6, 11, 12 e 15); cinco entram na
-análise pela opção `--html-sem-texto` (todas menos a Premium n.º 15). Sem a opção, 5 das 12
-notícias anotadas (4, 6, 11, 12 e a 3 que é do autor) ficariam sem menções, o que mostra o peso
-da opção nesta época.
+análise pela opção `--html-sem-texto` (todas menos a Premium n.º 15). Sem a opção, 4 das 12
+notícias anotadas (n.º 4, 6, 11 e 12) ficariam sem corpo, o que mostra o peso da opção nesta época.
