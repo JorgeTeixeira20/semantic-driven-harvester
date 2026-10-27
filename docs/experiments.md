@@ -7593,3 +7593,72 @@ duvidosas 0**. Estrato ≥ 50 artigos: 16 certas, 9 erradas; estrato 10–49: 21
 O padrão é o dos homónimos de nome comum de outra modalidade: 7 das 13 erradas são pessoas com o
 mesmo nome mas de outro desporto. A #25 e a #36 são o ponto mais fraco: a descrição dá outro
 desporto, mas não verifiquei se o homónimo jogou também o desporto do texto.
+
+### Porque é que 2002 quase não tem entidades (2026-10-28)
+
+Só 228 dos 6 586 artigos de 2002 (3,5 %) têm entidade na passagem 2, contra 93 % em 2006 e 76 %
+em 2001. **Causa: o extrator de corpo não reconhece o modelo de página de 2002, não é falta de
+conteúdo.** Origem do corpo dos 6 586 (painel `completo`):
+
+| Origem do corpo | 2001 | 2002 | 2006 |
+|---|--:|--:|--:|
+| contentor `aux` do HTML | 7 716 (com entidade 75,7 %) | 564 (40,4 %) | 6 723 (93,3 %) |
+| sem corpo (`sem_corpo`) | 2 621 | **5 579 (84,7 %)** | 258 |
+| sem texto extraído nem HTML | 39 | 443 | 0 |
+| c′ | 0 | 0 | 0 |
+
+Dos 5 579 de 2002 sem corpo, **3 091 não têm HTML guardado** (só o texto extraído) e 2 488 têm
+HTML. Três exemplos de páginas sem entidade (todos `noticia.asp?id=…`, sorteio com semente
+20261028): `…id=165189&idcanal=17` (2002-06-09), `…id=163060&idcanal=84` (2002-05-23) e
+`…id=163959&idcanal=22` (2002-06-21). Nos três, o texto extraído começa pela barra lateral
+("Campeonato 2001/02 1 SPORTING 75 2 Boavista 70 …", classificação, marcadores, próxima jornada) e a
+notícia vem **depois**, terminando em "Autor: … Data: … imprimir comentar enviar"; no exemplo
+`…id=163959` é um texto sobre o plantel do Salgueiros (Ivo, Tozé, Ricardo Fernandes…), com
+jogadores e clubes, que nunca foi lido. No HTML do mesmo exemplo o corpo está em
+`<td width="100%"><span class="record">…` com parágrafos separados por `<br />`: **nenhum
+`CONTAINERS` de `html_body.py` corresponde a este modelo** (o `aux` de 2001/2006 e o `td480` de
+1999–2000 não existem nele) e a c′ não encontra o início do corpo no texto. Dos 2 488 com HTML,
+1 511 têm "Autor:" e "Data:" (o modelo acima) e 977 não. A correção teria de acrescentar um
+contentor para `span.record` (e uma regra de texto para os 3 091 sem HTML); **não foi feita**,
+fica registada como limitação. Efeito: até 5 579 artigos de 2002 (2,8 % do `completo`) sem
+entidades por falha de extração, que baixa a percentagem global de artigos com entidade.
+
+### Texto extraído e HTML guardado no `completo` (para o capítulo do Arquivo.pt)
+
+Contagem por artigo, na captura mais antiga (a que se analisa), com o mesmo critério do `por_ano`
+(que reproduz os 126 798 e 123 844 do "Fim da recolha do corpus alargado"):
+
+| | `por_ano` | `completo` |
+|---|--:|--:|
+| Artigos | 129 317 | 200 101 |
+| Com texto extraído | 126 798 | **171 249** |
+| Com HTML guardado | 123 844 | **194 238** |
+| Com os dois | 121 832 | 166 040 |
+| Só texto | 4 966 | 5 209 |
+| Só HTML | 2 012 | 28 198 |
+| Nem texto nem HTML | 507 | 654 |
+
+Em 2010–2016 (71 663 artigos) há 45 330 com texto e 71 273 com HTML: o Arquivo.pt devolve 404
+para o texto extraído de 26 333 notícias de `record.xl.pt` mas guarda quase sempre o HTML; por
+isso o `--html-sem-texto` (28 198 só com HTML, quase todos do `xl`) é o que lhes dá corpo.
+
+### 66 696 vs 70 784: de onde vêm os números do `xl`
+
+São contagens de coisas diferentes, e os 66 696 eram uma heurística de URL, não a classificação.
+Reconstituída a heurística sobre os 103 101 recursos do `xl` (`corpus_classification_xl.csv`):
+
+| Passo | Artigos |
+|---|--:|
+| "Cara de notícia" (heurística da descoberta; 66 696 contados por ano, **66 669** URLs distintos reproduzidos: 27 URLs aparecem em dois anos) | 66 669 |
+| − heurística que a classificação rejeita: 229 `/capas/…/detalhe/` (capa do dia, sem texto) e 161 `url_nao_artigo` (inclui ~98 `interior.aspx?content_id/u003d…`, uma codificação do `=` que a regra só conhece como `/x3d`) | − 390 |
+| + `jogo_vida/` (cultura e celebridades), que a heurística excluía e a classificação mantém como Artigo | + 2 673 |
+| + `/detalhe/amp/…html` (páginas AMP), que a heurística não apanhava por o caminho ter um segmento a mais, e 1 `/detalhe/default.aspx` | + 2 863 |
+| **Artigos do `xl` na classificação final** | **71 815** |
+| − 1 031 que já estão no `por_ano` (mesma chave) | − 1 031 |
+| **Acrescentados pelo `xl` ao `completo`** | **70 784** |
+| + 879 do `por_ano` cuja captura mais antiga passa a ser do `xl` (e saem de 2017–2018) | → 71 663 em 2010–2016 |
+
+(Os 72 044 antes de retirar as 229 capas são o número que arrancou a recolha.) Das 2 862 páginas
+AMP aceites, uma parte é duplicado de uma página não-AMP (ver "AMP e não-notícias"): o `completo`
+inclui os duplicados AMP, 4,0 % do corpus, como o `por_ano` (4,4 %). Os ~98 URLs `content_id/u003d`
+são uma perda pequena, não corrigida.
