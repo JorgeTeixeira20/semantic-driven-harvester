@@ -468,8 +468,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--vocabulario", type=Path, default=DEFAULT_VOCABULARY,
                         help="o vocabulário usado no Caminho B (por omissão o alargado)")
     parser.add_argument("--clubes-url", type=Path, default=DEFAULT_CLUB_MAP)
-    parser.add_argument("--fonte", choices=(SOURCE_FILES, SOURCE_SPARQL), default=SOURCE_FILES,
-                        help="ler o grafo e o Caminho B dos ficheiros ou por SPARQL (store do sparql_corpus)")
+    parser.add_argument("--fonte", choices=(SOURCE_FILES, SOURCE_SPARQL), default=SOURCE_SPARQL,
+                        help="por omissão, consultas SPARQL ao store do sparql_corpus (desde 2026-10-27, "
+                        "depois de dar um data.js idêntico no por_ano); ficheiros: o N-Triples e o CSV")
     parser.add_argument("--destino", metavar="PASTA",
                         help="pasta em output/ (por omissão prototipo_<etiqueta>)")
     parser.add_argument("--recarregar", action="store_true", help="refaz a carga do store SPARQL")

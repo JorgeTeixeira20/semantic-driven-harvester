@@ -7334,3 +7334,17 @@ Os pedidos novos fazem-se um de cada vez, com a pausa por omissão (1 s). Ritmo 
 minutos: cerca de 6 s por consulta nova (38 respostas em 4 min); a pesquisa mais larga só corre quando a
 exata não dá resultado, por isso o número total de consultas novas só se sabe no fim. Decisão do autor:
 manter o limite de 10 artigos (comparável ao `por_ano`), em vez de o subir para encurtar o passo.
+
+### Resultado do SPARQL no `por_ano` (2026-10-27, sessão local)
+
+Store com o grafo dos artigos e o do Caminho B: **7 576 991 triplos distintos**, carga
+**15,2 s**. Comparação com o painel: 85 linhas "igual", nenhuma diferente.
+**Painel gerado por SPARQL (`--fonte sparql`) idêntico ao gerado pelos ficheiros:** `cmp`
+de `data.js` e de `resumo.md` sem diferenças; 0 artigos com mais de um título no grafo.
+Tempos das consultas do painel: `artigos` 20,1 s, `temas` 6,3 s, `mencoes` 25,5 s (geração
+total 57 s). Consultas de análise: `entidade_por_ano` 4,16 s, `entidades_mais_mencionadas`
+4,67 s, `coocorrencias` 2,21 s, `entidades_por_origem` 0,20 s; `artigos_por_ano` 10 541 s
+(2 h 56) na versão com `EXISTS` por linha, tempo quadrático no pyoxigraph (num grafo
+sintético: 7,5 s com 3 000 artigos). Reescrita sem `EXISTS` (commit `4847709`): mesmos
+resultados no grafo sintético, 0,3 s com 26 000 artigos; o tempo no `por_ano` está por
+medir. **Decisão:** a fonte por omissão do `navigation_corpus` passa a ser `sparql`.
