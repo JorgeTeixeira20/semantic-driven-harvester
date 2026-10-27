@@ -7568,3 +7568,28 @@ Erradas da passagem 2: "Luz Asprilla", "Mario Almeida", "Sporting Clube de Portu
 entidades que existem no vocabulário: passagem 1, 45/89 (50,6 %; 40–61) e, só com corpo, 45/76
 (59,2 %; 48–70); passagem 2, 79/127 (62,2 %; 54–70) e, só com corpo, 79/114 (69,3 %; 60–77). Nas
 12 anotadas: passagem 2, 69/117 (59,0 %) e 69/104 (66,3 %).
+
+#### Passo 9: as 10 duvidosas, com a descrição na Wikidata (2026-10-28)
+
+Consultei a descrição (`wbgetentities`, `labels|descriptions`, pt e en) de cada um dos 10 QIDs,
+um pedido de cada vez, com pausa de 2 s (10 pedidos, todos 200). Nenhuma ficou duvidosa:
+**2 certas e 8 erradas**.
+
+| # | Entidade (QID) | Descrição na Wikidata | Resultado |
+|--:|---|---|---|
+| 2 | Grande Prémio do Japão (Q8000) | Formula 1 auto race held in Japan | errada (o texto é de motocrosse) |
+| 6 | António Soares (Q4777609) | futebolista português | errada (o texto é de atletismo) |
+| 20 | Luis Sousa Pinto (Q22279681) | volleyball player | errada (conselho de arbitragem) |
+| 24 | Diana Chaves (Q136536937) | Colombian soccer player | errada (a atriz portuguesa) |
+| 25 | Luís Viana (Q10321680) | Portuguese ice hockey player (born 1976) | errada (jogo de formação) |
+| 26 | Inês Silva (Q27855588) | futebolista portuguesa | **certa** (futebol feminino) |
+| 34 | Leandro Perez (Q3297527) | futebolista brasileiro | **certa** (Feirense) |
+| 36 | Marc Gual (Q27916801) | Spanish association football player | errada (hóquei em patins) |
+| 44 | Fernando Lopes (Q28810439) | Angolan swimmer | errada (andebol do Benfica) |
+| 48 | José Ruiz Aguilar (Q641832) | futebolista mexicano | errada (futsal de Espanha) |
+
+Tabela final da amostra de 50 (substitui a de cima): **certas 37 (74 %), erradas 13 (26 %),
+duvidosas 0**. Estrato ≥ 50 artigos: 16 certas, 9 erradas; estrato 10–49: 21 certas, 4 erradas.
+O padrão é o dos homónimos de nome comum de outra modalidade: 7 das 13 erradas são pessoas com o
+mesmo nome mas de outro desporto. A #25 e a #36 são o ponto mais fraco: a descrição dá outro
+desporto, mas não verifiquei se o homónimo jogou também o desporto do texto.
