@@ -1,0 +1,19 @@
+# Painel do corpus da Fase 1 (navigation_corpus.py --fonte sparql): uma linha
+# por recurso Web, com o título do Artigo, a captura mais antiga (aproximação
+# da data de publicação) e quantas capturas têm texto extraído. "titulos"
+# conta os rótulos distintos: mais de um indicaria um artigo repetido no grafo.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?url (SAMPLE(?rotulo) AS ?titulo) (COUNT(DISTINCT ?rotulo) AS ?titulos)
+       (MIN(?tstamp) AS ?primeira) (COUNT(DISTINCT ?texto) AS ?textos)
+WHERE {
+  ?recurso a sdh:RecursoWeb ;
+           sdh:originalURL ?url .
+  OPTIONAL { ?artigo sdh:temRecursoWeb ?recurso ;
+                     rdfs:label ?rotulo . }
+  OPTIONAL { ?recurso sdh:temCaptura ?captura .
+             ?captura sdh:tstamp ?tstamp .
+             OPTIONAL { ?captura sdh:temTextoExtraido ?texto } }
+}
+GROUP BY ?recurso ?url

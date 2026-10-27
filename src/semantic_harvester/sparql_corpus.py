@@ -139,9 +139,9 @@ class QueryResult:
     seconds: float
 
 
-def run_query(store, name: str, entity: str | None = None) -> QueryResult:
+def run_query(store, name: str, entity: str | None = None, queries_dir: Path = QUERIES_DIR) -> QueryResult:
     ox = require_pyoxigraph()
-    text = (QUERIES_DIR / f"{name}.rq").read_text(encoding="utf-8")
+    text = (queries_dir / f"{name}.rq").read_text(encoding="utf-8")
     substitutions = {ox.Variable("entidade"): ox.NamedNode(entity)} if entity else None
     start = time.perf_counter()
     solutions = store.query(text, substitutions=substitutions)

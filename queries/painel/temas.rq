@@ -1,0 +1,12 @@
+# Painel: os temas de cada artigo lidos do endereço (secção, modalidade,
+# competição, clube), como categoria e valor do nó Tema (corpus_entities_rdf.py).
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+
+SELECT ?url ?categoria ?valor
+WHERE {
+  ?artigo sdh:temTema ?tema ;
+          sdh:temRecursoWeb ?recurso .
+  ?recurso sdh:originalURL ?url .
+  ?tema sdh:categoriaTema ?categoria ;
+        sdh:valorTema ?valor .
+}

@@ -23,6 +23,13 @@ termo estava no título ou no corpo em só 6 de 100 artigos ("Diagnóstico de
 falhas no painel", `docs/experiments.md`).
 
 Também escreve `resumo.md`, com as tabelas para as conclusões.
+
+Com `--fonte sparql`, os artigos, as capturas, os títulos, os temas e as menções
+vêm de consultas SPARQL (`queries/painel/*.rq`) ao store do grafo completo
+(`sparql_corpus.py`, artigos + Caminho B) em vez do N-Triples e do CSV; o
+vocabulário, a tabela de clubes e a origem do corpo continuam a vir dos
+ficheiros (não estão no grafo). As duas fontes têm de dar o mesmo `data.js`
+(teste em `tests/test_sparql_corpus.py`).
 """
 
 from __future__ import annotations
@@ -31,6 +38,7 @@ import argparse
 import csv
 import json
 import re
+import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -38,15 +46,18 @@ from pathlib import Path
 from .boilerplate import MIN_ARTICLES_ANY_TIME
 from .corpus_classification import article_url_scheme
 from .corpus_entities import ORIGIN_TEXT, ORIGIN_URL, fold
-from .corpus_entities_rdf import primary_qid, url_club_qids
+from .corpus_entities_rdf import mencao_uri, primary_qid, url_club_qids
 from .corpus_redundancy import corpus_graph_path, read_graph_index
 from .navigation_corpus_page import PAGE
 from .rdf_mapper import article_uri
+from .sparql_corpus import MissingDependencyError, open_store, run_query
 
 DEFAULT_LABEL = "por_ano"
 DEFAULT_VOCABULARY = Path("data") / "processed" / "caminho_b_vocabulario_wikidata_alargado.csv"
 DEFAULT_CLUB_MAP = Path("data") / "processed" / "caminho_b_clubes_url.csv"
 WAYBACK = "https://arquivo.pt/wayback/"
+PAINEL_QUERIES = Path(__file__).resolve().parents[2] / "queries" / "painel"
+SOURCE_SPARQL, SOURCE_FILES = "sparql", "ficheiros"
 
 # Épocas do site pelo esquema do URL. Os esquemas ASP.NET (`interior.aspx`,
 # `noticia.aspx`) vão de 2000 a 2015 e o `/detalhe/` começa em 2015 (corpus
@@ -181,24 +192,72 @@ def load_body_sources(path: Path) -> dict[str, str]:
     return sources
 
 
+@dataclass
+class Sources:
+    """O que o painel lê do grafo e do Caminho B, venha dos ficheiros ou do SPARQL."""
+
+    resources: list[tuple[str, str, str, bool]] = field(default_factory=list)  # URL, título, tstamp, texto
+    themes: dict[str, dict[str, list[str]]] = field(
+        default_factory=lambda: defaultdict(lambda: defaultdict(list)))
+    mentions: dict[str, list[str]] = field(default_factory=lambda: defaultdict(list))
+
+
+def read_sources_files(graph_path: Path, entities_csv: Path) -> Sources:
+    """Grafo dos artigos em streaming e o CSV do Caminho B (`--fonte ficheiros`)."""
+
+    index = read_graph_index(graph_path)
+    sources = Sources()
+    for resource in index.resources:
+        url = str(index.original_url[resource])
+        captures = sorted(index.captures.get(resource, ()),
+                          key=lambda c: str(index.capture_fields[c].get("tstamp", "")))
+        tstamp = str(index.capture_fields[captures[0]].get("tstamp", "")) if captures else ""
+        has_text = any("text_node" in index.capture_fields[c] for c in captures)
+        sources.resources.append((url, str(index.labels.get(article_uri(url), "") or url), tstamp, has_text))
+    with entities_csv.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            if row["origem"] == ORIGIN_URL:
+                sources.themes[row["artigo"]][row["categoria"]].append(row["rotulo"])
+            elif row["origem"] == ORIGIN_TEXT:
+                sources.mentions[row["artigo"]].append(row["rotulo"])
+    return sources
+
+
+def read_sources_sparql(store) -> tuple[Sources, dict[str, float], int]:
+    """As mesmas fontes por consultas SPARQL (`queries/painel/*.rq`) ao store do
+    grafo completo (`sparql_corpus.open_store`). Devolve também o tempo de cada
+    consulta e quantos artigos têm mais de um título no grafo."""
+
+    sources, seconds = Sources(), {}
+    result = run_query(store, "artigos", queries_dir=PAINEL_QUERIES)
+    seconds["artigos"] = result.seconds
+    several_titles = 0
+    for row in result.rows:
+        url = row["url"]
+        several_titles += (row["titulos"] or 0) > 1
+        sources.resources.append((url, row["titulo"] or url, row["primeira"] or "", (row["textos"] or 0) > 0))
+    result = run_query(store, "temas", queries_dir=PAINEL_QUERIES)
+    seconds["temas"] = result.seconds
+    for row in result.rows:
+        sources.themes[row["url"]][row["categoria"]].append(row["valor"])
+    result = run_query(store, "mencoes", queries_dir=PAINEL_QUERIES)
+    seconds["mencoes"] = result.seconds
+    for row in result.rows:
+        # A entidade pode ter vários rótulos; o da menção é o que gerou o seu URI.
+        if row["mencao"] == str(mencao_uri(row["url"], row["rotulo"])):
+            sources.mentions[row["url"]].append(row["rotulo"])
+    return sources, seconds, several_titles
+
+
 def build_articles(
-    graph_path: Path,
-    entities_csv: Path,
+    sources: Sources,
     body_csv: Path,
     vocabulary: dict[str, Entity],
     club_map: dict[str, tuple[str, str]],
 ) -> tuple[list[Article], dict[str, str]]:
     """Artigos com o preenchimento feito, e nome de cada chave de clube."""
 
-    index = read_graph_index(graph_path)
-    themes: dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
-    mentions: dict[str, list[str]] = defaultdict(list)
-    with entities_csv.open(encoding="utf-8", newline="") as handle:
-        for row in csv.DictReader(handle):
-            if row["origem"] == ORIGIN_URL:
-                themes[row["artigo"]][row["categoria"]].append(row["rotulo"])
-            elif row["origem"] == ORIGIN_TEXT:
-                mentions[row["artigo"]].append(row["rotulo"])
+    themes, mentions = sources.themes, sources.mentions
     bodies = load_body_sources(body_csv)
 
     club_names: dict[str, str] = {}
@@ -206,14 +265,9 @@ def build_articles(
         if entity.categoria == CLUB_CATEGORY:
             club_names[entity.key] = entity.name
     articles = []
-    for resource in index.resources:
-        url = str(index.original_url[resource])
-        captures = sorted(index.captures.get(resource, ()),
-                          key=lambda c: str(index.capture_fields[c].get("tstamp", "")))
-        tstamp = str(index.capture_fields[captures[0]].get("tstamp", "")) if captures else ""
-        has_text = any("text_node" in index.capture_fields[c] for c in captures)
+    for url, title, tstamp, has_text in sources.resources:
         article = Article(
-            url=url, title=display_title(str(index.labels.get(article_uri(url), "") or url)), tstamp=tstamp,
+            url=url, title=display_title(title), tstamp=tstamp,
             era=era_of(url), body=bodies.get(url, "c′" if has_text else "sem_texto"),
         )
 
@@ -354,23 +408,49 @@ def write_summary(articles: list[Article], vocabulary: dict[str, Entity],
     path.write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8")
 
 
+def write_sparql_note(path: Path, label: str, load, seconds: dict[str, float], several_titles: int) -> None:
+    """Como foram obtidos os dados do painel por SPARQL (fora do `resumo.md`, que fica igual)."""
+
+    lines = [
+        f"# Dados do painel `prototipo_{label}` obtidos por SPARQL\n",
+        "Artigos, capturas, títulos, temas e menções lidos por consultas SPARQL "
+        "(`queries/painel/*.rq`) ao store com o grafo dos artigos e o do Caminho B "
+        "(`sparql_corpus.py`). Vêm de ficheiros só o vocabulário (categoria, modalidade e "
+        "variantes das entidades), a tabela dos clubes do URL e a origem do corpo.\n",
+        f"- Triplos no store: {load.triples}",
+        f"- Carga do store: {load.seconds:.1f} s" + (f" (reutilizado, carregado em {load.loaded_at})" if load.reused else ""),
+        *(f"- Consulta `{name}`: {value:.1f} s" for name, value in seconds.items()),
+        f"- Artigos com mais de um título no grafo: {several_titles}",
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def run(
     project_root: Path | None = None,
     label: str = DEFAULT_LABEL,
     vocabulary_path: Path | None = None,
     club_map_path: Path | None = None,
+    source: str = SOURCE_FILES,
+    target_name: str | None = None,
+    reload: bool = False,
 ) -> Path:
     root = project_root or Path(__file__).resolve().parents[2]
     output = root / "output"
     club_map_file = root / (club_map_path or DEFAULT_CLUB_MAP)
     vocabulary = load_vocabulary(root / (vocabulary_path or DEFAULT_VOCABULARY), url_club_qids(club_map_file))
     club_map = load_club_map(club_map_file)
-    articles, club_names = build_articles(
-        corpus_graph_path(root, label), output / f"corpus_entities_{label}.csv",
-        output / f"corpus_entities_{label}_corpo.csv", vocabulary, club_map,
-    )
-    target = output / f"prototipo_{label}"
+    target = output / (target_name or f"prototipo_{label}")
     target.mkdir(parents=True, exist_ok=True)
+    if source == SOURCE_SPARQL:
+        store, load = open_store(root, label, reload)
+        sources, seconds, several_titles = read_sources_sparql(store)
+        del store
+        write_sparql_note(target / "fonte_sparql.md", label, load, seconds, several_titles)
+    else:
+        sources = read_sources_files(corpus_graph_path(root, label), output / f"corpus_entities_{label}.csv")
+    articles, club_names = build_articles(
+        sources, output / f"corpus_entities_{label}_corpo.csv", vocabulary, club_map,
+    )
     data = build_data(articles, vocabulary, club_names, label)
     (target / "data.js").write_text(
         "window.SDH_DATA = " + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";\n",
@@ -388,8 +468,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--vocabulario", type=Path, default=DEFAULT_VOCABULARY,
                         help="o vocabulário usado no Caminho B (por omissão o alargado)")
     parser.add_argument("--clubes-url", type=Path, default=DEFAULT_CLUB_MAP)
+    parser.add_argument("--fonte", choices=(SOURCE_FILES, SOURCE_SPARQL), default=SOURCE_FILES,
+                        help="ler o grafo e o Caminho B dos ficheiros ou por SPARQL (store do sparql_corpus)")
+    parser.add_argument("--destino", metavar="PASTA",
+                        help="pasta em output/ (por omissão prototipo_<etiqueta>)")
+    parser.add_argument("--recarregar", action="store_true", help="refaz a carga do store SPARQL")
     args = parser.parse_args(argv)
-    target = run(label=args.corpus, vocabulary_path=args.vocabulario, club_map_path=args.clubes_url)
+    try:
+        target = run(label=args.corpus, vocabulary_path=args.vocabulario, club_map_path=args.clubes_url,
+                     source=args.fonte, target_name=args.destino, reload=args.recarregar)
+    except (MissingDependencyError, FileNotFoundError, RuntimeError) as error:
+        print(f"Erro: {error}", file=sys.stderr)
+        return 1
     print(f"Protótipo: {target / 'index.html'} (resumo em {target / 'resumo.md'})")
     return 0
 

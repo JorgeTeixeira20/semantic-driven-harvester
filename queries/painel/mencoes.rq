@@ -1,0 +1,14 @@
+# Painel: as entidades mencionadas no texto de cada artigo. Uma entidade da
+# Wikidata pode ter mais de um rótulo no vocabulário; o rótulo de cada menção
+# é o que gera o URI da Mencao (navigation_corpus.py confirma-o).
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?url ?mencao ?rotulo
+WHERE {
+  ?artigo sdh:temMencao ?mencao ;
+          sdh:temRecursoWeb ?recurso .
+  ?recurso sdh:originalURL ?url .
+  ?mencao sdh:sobreEntidade ?entidade .
+  ?entidade rdfs:label ?rotulo .
+}

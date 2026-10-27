@@ -7184,3 +7184,19 @@ vocabulário do painel):
 **Resultados e tempos: pendentes da execução local** (os grafos não estão neste
 clone). Testes: `tests/test_sparql_corpus.py` (grafo sintético; o resumo do painel é
 gerado pelo próprio `navigation_corpus` e a comparação dá "igual" em tudo).
+
+### Geração do painel por SPARQL (2026-10-27, decisão do autor)
+
+`navigation_corpus --fonte sparql` lê os artigos (URL, título, captura mais antiga,
+se há texto), os temas e as menções por três consultas SPARQL (`queries/painel/`)
+ao store do `sparql_corpus` (grafo dos artigos + grafo do Caminho B). Do grafo não
+saem, por não estarem lá: a categoria, a modalidade e as variantes das entidades
+(vocabulário), a tabela slug → clube e a origem do corpo (`_corpo.csv`). A
+navegação continua estática, sem servidor. Uma entidade da Wikidata pode ter dois
+rótulos no vocabulário: o rótulo de cada menção é o que gera o URI da `Mencao`
+(`corpus_entities_rdf.mencao_uri`), e é esse que se usa. Teste: com os mesmos dados
+sintéticos, `data.js` e `resumo.md` iguais pelas duas fontes (inclui um clube pelo
+URL e uma entidade com dois rótulos de categorias diferentes; o teste falha se se
+retirar a verificação do rótulo). A fonte por omissão continua `ficheiros` até a
+sessão local confirmar a igualdade no `por_ano`; `fonte_sparql.md` regista os
+tempos e quantos artigos têm mais de um título no grafo. Suite: 406 testes.

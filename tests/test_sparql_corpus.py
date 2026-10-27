@@ -146,6 +146,34 @@ class SparqlCorpusTests(OfflineTestCase):
         text = sparql_corpus.run(self.root, LABEL, "Q131499", reload=True).read_text(encoding="utf-8")
         self.assertIn("Carga: nesta execução", text)
 
+    def test_dashboard_from_sparql_is_identical(self) -> None:
+        vocab = Path("data/processed/vocab.csv")
+        clubs = Path("data/processed/caminho_b_clubes_url.csv")
+        # Casos que o SPARQL tem de reproduzir: um clube pelo URL e uma entidade
+        # da Wikidata com dois rótulos de categorias diferentes (o da menção
+        # decide: C menciona o estádio, por isso não ganha o clube pelo texto).
+        with (self.root / vocab).open("a", encoding="utf-8") as handle:
+            handle.write("entidade,estadio,Estádio (teste),,Q131499,,,1,lista_fechada\n")
+        entities_csv = self.root / "output" / f"corpus_entities_{LABEL}.csv"
+        with entities_csv.open(encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        rows += [{**rows[-1], "artigo": D, "categoria": "clube", "rotulo": "benfica"},
+                 {**rows[0], "artigo": C, "categoria": "estadio", "rotulo": "Estádio (teste)"}]
+        with entities_csv.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
+        entities_rdf_run(self.root, LABEL, vocab)
+        navigation_run(self.root, LABEL, vocab, clubs)
+        target = navigation_run(self.root, LABEL, vocab, clubs, source="sparql", target_name="prototipo_sparql")
+        gc.collect()
+        files = self.root / "output" / f"prototipo_{LABEL}"
+        for name in ("data.js", "resumo.md"):
+            self.assertEqual((target / name).read_text(encoding="utf-8"),
+                             (files / name).read_text(encoding="utf-8"), name)
+        note = (target / "fonte_sparql.md").read_text(encoding="utf-8")
+        self.assertIn("Artigos com mais de um título no grafo: 0", note)
+
     def test_difference_is_reported(self) -> None:
         summary = self.root / "output" / f"prototipo_{LABEL}" / "resumo.md"
         summary.write_text(summary.read_text(encoding="utf-8").replace("| 2019 | 1 | 1 |", "| 2019 | 2 | 1 |"),
