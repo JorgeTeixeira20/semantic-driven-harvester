@@ -7596,7 +7596,7 @@ desporto, mas não verifiquei se o homónimo jogou também o desporto do texto.
 
 ### Porque é que 2002 quase não tem entidades (2026-10-28)
 
-Só 228 dos 6 586 artigos de 2002 (3,5 %) têm entidade na passagem 2, contra 93 % em 2006 e 76 %
+Só 228 dos 6 586 artigos de 2002 (3,5 %) têm entidade na passagem 2, contra 93 % em 2006 e 56 %
 em 2001. **Causa: o extrator de corpo não reconhece o modelo de página de 2002, não é falta de
 conteúdo.** Origem do corpo dos 6 586 (painel `completo`):
 
