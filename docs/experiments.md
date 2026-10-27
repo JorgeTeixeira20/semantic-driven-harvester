@@ -7346,5 +7346,5 @@ total 57 s). Consultas de análise: `entidade_por_ano` 4,16 s, `entidades_mais_m
 4,67 s, `coocorrencias` 2,21 s, `entidades_por_origem` 0,20 s; `artigos_por_ano` 10 541 s
 (2 h 56) na versão com `EXISTS` por linha, tempo quadrático no pyoxigraph (num grafo
 sintético: 7,5 s com 3 000 artigos). Reescrita sem `EXISTS` (commit `4847709`): mesmos
-resultados no grafo sintético, 0,3 s com 26 000 artigos; o tempo no `por_ano` está por
-medir. **Decisão:** a fonte por omissão do `navigation_corpus` passa a ser `sparql`.
+resultados no grafo sintético, 0,3 s com 26 000 artigos; no `por_ano`, **10,6 s** (antes
+10 541 s), com a comparação igual (85 linhas "igual"). **Decisão:** a fonte por omissão do `navigation_corpus` passa a ser `sparql`.
