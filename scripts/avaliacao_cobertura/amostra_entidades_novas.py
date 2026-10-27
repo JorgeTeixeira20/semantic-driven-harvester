@@ -41,11 +41,12 @@ def vocabulary(label: str) -> list[dict[str, str]]:
 def body_of(url: str, tstamp: str) -> str:
     name = ArquivoClient._text_filename({"originalURL": url, "tstamp": tstamp})
     text_path = ROOT / "data/raw/texts" / name
-    if not text_path.is_file():
-        return ""
     html_path = ROOT / "data/raw/original_html" / (text_path.stem + ".html")
+    if not text_path.is_file() and not html_path.is_file():
+        return ""
+    # `--html-sem-texto`: sem texto extraído, o corpo vem só do HTML.
     capture = Capture(article=url, tstamp=tstamp, digest=None, content_length=None, status_code=None,
-                      text=text_path.read_text(encoding="utf-8"),
+                      text=text_path.read_text(encoding="utf-8") if text_path.is_file() else "",
                       html_path=html_path if html_path.is_file() else None)
     return _body_with_html(capture).text or ""
 

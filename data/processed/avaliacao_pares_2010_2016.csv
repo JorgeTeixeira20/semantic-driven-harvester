@@ -1,0 +1,41 @@
+n,url,entidade,categoria,resultado,motivo
+1,https://record.xl.pt/noticia.aspx?id=9b2c242b-f10f-42bb-83fb-57954151bde1&idcanal=00000122-0000-0000-0000-000000000122,Carlos Fidalgo,jogador,sim,
+2,https://record.xl.pt/noticia.aspx?id=1551f239-e1a2-4689-9171-3ada80026251&idcanal=00000011-0000-0000-0000-000000000011&h=2,Carlos Daniel,jogador,não,"widget lateral 'EXCLUSIVOS JORNAL RECORD' (o jornalista Carlos Daniel, não um jogador)"
+3,https://record.xl.pt/noticia.aspx?id=4c921abb-896e-4872-9499-566c2f4f7f3f&idcanal=00000026-0000-0000-0000-000000000026&h=7,Micael Sequeira,treinador,sim,
+4,https://record.xl.pt/futebol/futebol-nacional/liga-nos/academica/detalhe/nuno-piloto-exibicao-com-o-benfica-nao-abala-a-nossa-conviccao.html,Associação Académica de Coimbra – O.A.F.,clube,sim,
+5,https://record.xl.pt/noticia.aspx?id=41033a82-a772-438c-ae43-17d8a0351382&idcanal=00000025-0000-0000-0000-000000000025,João Carlos Amaral Marques Coimbra,jogador,sim,
+6,https://record.xl.pt/futebol/nacional/1a_liga/pacos_ferreira/interior.aspx?content_id=918732,Hélder Filipe Oliveira Lopes,jogador,sim,
+7,https://record.xl.pt/futebol/futebol-nacional/2--liga/portimonense/detalhe/jose-augusto-conta-com-os-mesmos-20-do-jogo-com-o-benfica-b.html,André Ferreira,jogador,duvidoso,"André Ferreira, lesionado de um clube algarvio; nome comum, não confirmo que é o da ficha"
+8,https://record.xl.pt/modalidades/outras/interior.aspx?content_id=739714,Mike Ribeiro,jogador,sim,
+9,https://record.xl.pt/modalidades/triatlo/interior.aspx?content_id=825170,Jonathan Brownlee,jogador,sim,
+10,https://record.xl.pt/futebol/nacional/1a-liga/porto/detalhe/maxi-pereira-o-fc-porto-valoriza-me-mais-983744.html,Sport Lisboa e Benfica,clube,sim,
+11,https://record.xl.pt/futebol/nacional/futebol_feminino/interior.aspx?content_id=879205,Mónica Mendes,jogador,sim,
+12,https://record.xl.pt/futebol/arbitragem/interior.aspx?content_id=932944,Clube de Futebol Os Belenenses,clube,sim,
+13,https://record.xl.pt/modalidades/jogos-olimpicos/rio2016/atletismo/detalhe/almaz-ayana-bate-recorde-mundial-na-vitoria-nos-10000-metros.html,Carla Salomé Rocha,jogador,sim,
+14,https://record.xl.pt/futebol/nacional/1a_liga/sporting/interior.aspx?content_id=685165,Estádio José Alvalade,estadio,sim,
+15,https://record.xl.pt/noticia.aspx?id=6847fd94-9942-4560-8e6d-3b94e98e5e48&idcanal=00000117-0000-0000-0000-000000000117&h=7,Lucie Šafářová,jogador,sim,
+16,https://record.xl.pt/futebol/nacional/1a_liga/porto/interior.aspx?content_id=461552,Futebol Clube do Porto,clube,sim,
+17,https://record.xl.pt/noticia.aspx?id=4ec7942d-5bff-4f73-90f1-08a1725fd446&idcanal=00002448-0000-0000-0000-000000002448,Leixões Sport Club,clube,sim,
+18,https://record.xl.pt/noticia.aspx?id=ec39120e-f608-4472-9670-a29abe22a434&idcanal=00000093-0000-0000-0000-000000000093,Tony Martin,jogador,não,"widget lateral de outras notícias ('Volta à Califórnia: Tony Martin vence'), fora do corpo da notícia"
+19,https://record.xl.pt/futebol/futebol-nacional/2--liga/detalhe/vizela-gil-vicente-2-2-dois-golos-nos-instantes-finais.html,Pedro Lemos,jogador,sim,
+20,https://record.xl.pt/noticia.aspx?id=4f61dd1d-6699-4042-b1b2-e357d4c41ed4&idcanal=00001171-0000-0000-0000-000000001171,Segunda Liga,competicao,não,"widget lateral de outras notícias ('LIGA DE HONRA - Portimonense sobe…'), fora do corpo"
+21,https://record.xl.pt/fora_campo/interior.aspx?content_id=455040,Cristiano Ronaldo,jogador,sim,
+22,https://record.xl.pt/futebol/nacional/1a_liga/pacos_ferreira/interior.aspx?content_id=955056,Sheffield Wednesday Football Club,clube,sim,
+23,https://record.xl.pt/modalidades/jogos-olimpicos/paralimpicos/rio2016/atletismo/detalhe/luis-goncalves-quer-fechar-ciclo-em-beleza.html,Jogos Paralímpicos,competicao,sim,
+24,https://record.xl.pt/modalidades/atletismo/interior.aspx?content_id=852150,Maratona de Londres,competicao,sim,
+25,https://record.xl.pt/futebol/nacional/taca_portugal/interior.aspx?content_id=906849,Luís Cortez,jogador,sim,
+26,https://record.xl.pt/noticia.aspx?id=f1b6af19-86af-43d3-995d-6fb1f07c8a6c&idcanal=00000021-0000-0000-0000-000000000021,Siaka Bamba,jogador,não,"widget lateral de outras notícias ('Siaka Bamba está na agenda'), fora do corpo"
+27,https://record.xl.pt/futebol/nacional/1a_liga/olhanense/interior.aspx?content_id=838505,Futebol Clube Paços de Ferreira,clube,sim,
+28,https://record.xl.pt/futebol/nacional/1a_liga/portimonense/interior.aspx?content_id=469336,Liga dos Campeões da UEFA,competicao,sim,
+29,https://record.xl.pt/modalidades/judo/interior.aspx?content_id=451266,Telma Monteiro,jogador,sim,
+30,https://record.xl.pt/futebol/futebol-nacional/liga-nos/tondela/detalhe/nuno-santos-nao-desiste.html,Nuno Santos,jogador,sim,
+31,https://record.xl.pt/noticia.aspx?id=88577a26-11c9-4dcd-aec2-50aac4bce678&idcanal=00003082-0000-0000-0000-000000003082,Luís Miguel da Fonseca Silva,jogador,duvidoso,só 'Luís Miguel' (guarda-redes da Covilhã); não confirmo que é Luís Miguel da Fonseca Silva
+32,https://record.xl.pt/futebol/nacional/1a_liga/pacos_ferreira/interior.aspx?content_id=838334,Bebé,jogador,sim,
+33,https://record.xl.pt/futebol/futebol-nacional/2--liga/portimonense/detalhe/manafa-e-arrondel-voltam-as-opcoes.html,Pedro Sá,jogador,duvidoso,"Pedro Sá nos convocados do Portimonense; nome comum, não confirmo o homónimo"
+34,https://record.xl.pt/futebol/futebol-nacional/liga-nos/sporting/detalhe/jesus-schelotto-tem-me-dito-que-esta-feliz-no-sporting.html,Jorge Jesus,treinador,sim,
+35,https://record.xl.pt/futebol/nacional/1a_liga/nacional/interior.aspx?content_id=848350,Taça de Portugal,competicao,sim,
+36,https://record.xl.pt/modalidades/olimpismo/interior.aspx?content_id=877024,Cao,jogador,não,sigla 'CAO' (Comissão de Atletas Olímpicos) lida como o jogador 'Cao'
+37,https://record.xl.pt/futebol/futebol-nacional/liga-nos/boavista/detalhe/dispensas-equacionadas.html,Filipe Joaquim Melo Silva,jogador,sim,
+38,https://record.xl.pt/noticia.aspx?id=e8ff4bff-d392-4b08-b044-0ca5790fb28a&idcanal=00000313-0000-0000-0000-000000000313,Rui Santos,jogador,não,"widget lateral ('Rui Santos: «Gestor de nicas»', o comentador), não o nadador"
+39,https://record.xl.pt/modalidades/tenis/us_open/interior.aspx?content_id=461824,US Open de ténis,competicao,sim,
+40,https://record.xl.pt/futebol/nacional/taca_liga/interior.aspx?content_id=835599,Jonas,jogador,não,"homónimo: Jonas, suplente do Beira-Mar, lido como o avançado Jonas (Benfica)"

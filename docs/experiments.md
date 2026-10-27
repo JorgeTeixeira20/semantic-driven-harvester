@@ -7451,3 +7451,25 @@ artigos, nº 27). O "Rui Costa" já não está no top 30 (2 837 artigos, fora). 
 andebol (29) também não. Fora do top 30, na lista do painel: "Campeonato Polonês de Futebol 3ª
 Divisão" (1 487 artigos) e "Aeroporto Internacional do Rio de Janeiro Tom Jobim/Galeão" (1 430),
 dois erros evidentes novos.
+
+### Amostra A: precisão de 40 pares artigo–entidade de 2010–2016 (passagem 2 do `completo`)
+
+Semente 20261028. Universo: 353 525 pares (artigo, entidade) com menção no texto de 56 857
+artigos cuja captura mais antiga é de 2010–2016. A lista (`data/processed/amostra_pares_2010_2016.csv`,
+commit `d4ffda5`) foi versionada antes de avaliar; a avaliação está em
+`data/processed/avaliacao_pares_2010_2016.csv`. Lida no trecho do corpo (o corpo vem do
+HTML quando não há texto extraído: `body_of` do `scripts/avaliacao_cobertura/` passou a tratar
+esse caso depois do sorteio; os pares não mudam, só os trechos que o script escreve).
+
+| Resultado | Pares | Quais |
+|---|--:|---|
+| sim | 30 | menção no texto, com a entidade certa |
+| não | 7 | 5 em widgets laterais fora do corpo (#2 Carlos Daniel, #18 Tony Martin, #20 Segunda Liga, #26 Siaka Bamba, #38 Rui Santos); #36 sigla "CAO" lida como o jogador Cao; #40 Jonas (suplente do Beira-Mar) lido como o avançado Jonas |
+| duvidoso | 3 | #7 André Ferreira, #31 Luís Miguel da Fonseca Silva (só "Luís Miguel"), #33 Pedro Sá: nomes comuns, não confirmo o homónimo |
+
+Precisão: **30/40 (75,0 %)**, Wilson 95 % 60–86 %, contando as duvidosas como erradas;
+30/37 (81,1 %, 66–91 %) sem elas. A da quarta corrida (`por_ano`) foi 32/40 (80,0 %, 65–90 %):
+os intervalos sobrepõem-se. O erro dominante em 2010–2016 são os **widgets laterais** da
+época ASP.NET que ficam no corpo ("EXCLUSIVOS JORNAL RECORD", "TODAS AS NOTÍCIAS" com
+manchetes de outras notícias): 5 dos 7 "não", contra 3 de 8 em tabelas laterais no `por_ano`.
+A categoria não foi avaliada.
