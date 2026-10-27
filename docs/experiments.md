@@ -7221,3 +7221,47 @@ tenham HTML guardado seriam recuperados. No `completo` aplica-se a todos os anos
 (incluindo os artigos do `por_ano`), por isso o `completo` é coerente consigo
 mesmo. Testes: a captura sem texto fica de fora sem a opção e entra com ela
 (`html:aux`); o nome calculado é igual ao do ficheiro de texto. Suite: 408 testes.
+
+## `completo`: corpo dos artigos por época e duas verificações (2026-10-27)
+
+Passos 6 e 1a do `completo` (200 101 Artigos = 129 317 do `por_ano` + 71 815 do `xl` − 1 031 nos
+dois). Decisão do autor (2026-10-27): usar o corpo do HTML nos artigos sem texto extraído
+(`--html-sem-texto`, em `corpus_entities` e `corpus_candidate_entities`; por omissão fica
+desligado, como no `por_ano`). A primeira tentativa, sem a opção, considerava 142 658 artigos
+(`output/cadeia_completo_sem_html_tempos.tsv`); com a opção, **167 131** (+24 473, 93 % dos
+26 201 artigos do `xl` com HTML e sem texto; o resto tem o HTML sem corpo extraível). 1a:
+1 h 16 min, memória máxima 2,98 GB. Passo 7 (`club_url_map --corpus completo`): 0 sugestões novas,
+nada a aplicar.
+
+### Origem do corpo por época (corrigida)
+
+A tabela anterior contava os 654 artigos sem texto nem HTML (origem `sem_texto`) na coluna
+"HTML sem texto" (25 127). Estão agora numa coluna própria; "HTML sem texto" fica em 24 473, igual
+ao aumento de artigos considerados. A época é a do ano da captura mais antiga.
+
+| Época | Artigos | Texto (c′) | HTML, com texto | HTML, sem texto | Sem texto nem HTML | Premium | Sem corpo |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| 1999–2009 | 48 357 | 1 732 | 36 856 | 460 | 497 | 0 | 8 812 |
+| 2010–2016 | 71 663 | 13 571 | 24 220 | 22 898 | 147 | 6 713 | 4 114 |
+| 2017–2024 | 80 081 | 59 865 | 6 414 | 1 115 | 10 | 11 011 | 1 666 |
+| Todas | 200 101 | 75 168 | 67 490 | 24 473 | 654 | 17 724 | 14 592 |
+
+Com corpo: 75 168 + 67 490 + 24 473 = 167 131 (= artigos considerados). Sem corpo: 654 + 17 724 +
+14 592 = 32 970. "HTML, com texto" é o contentor do HTML usado quando a c′ não encontra corpo
+num artigo que tem texto extraído; "HTML, sem texto" é o caso novo. Os 460 + 1 115 artigos do
+`por_ano` sem texto mas com HTML (1 575) também entram agora no `completo`; por isso a parte
+antiga do `completo` não é idêntica à do `por_ano`. O número de artigos do `por_ano` com texto
+era 105 521.
+
+### Mudança de época dos artigos
+
+O `completo` tem 80 081 artigos em 2017–2024 contra 80 960 no `por_ano`, e 71 663 em 2010–2016
+contra 70 784 acrescentados pelo `xl`. Confirmado: são **879 artigos do `por_ano` cuja captura
+mais antiga passou a ser uma de `record.xl.pt` de 2010–2016** (80 960 − 879 = 80 081; 70 784 +
+879 = 71 663). Todas as 129 317 chaves do `por_ano` estão no `completo`, e as 879 são as únicas
+com captura diferente; os 152 artigos restantes dos 1 031 comuns ficam com a do `por_ano`. Exemplos
+(URL do `por_ano`, data nele → URL no `xl`, data):
+
+1. `https://record.pt/estatuto-editorial/detalhe/estatuto-editorial-de-record.html`, 2017-01-18 → `https://record.xl.pt/estatuto-editorial/detalhe/estatuto-editorial-de-record.html`, 2015-12-30
+2. `https://record.pt/fora-de-campo/e-de-homem/detalhe/amp/padel-na-margem-sul.html`, 2017-08-26 → `https://record.xl.pt/fora-de-campo/e-de-homem/detalhe/amp/padel-na-margem-sul.html`, 2016-06-06
+3. `https://record.pt/fora-de-campo/e-de-homem/detalhe/padel-na-margem-sul.html`, 2017-08-26 → `https://record.xl.pt/fora-de-campo/e-de-homem/detalhe/padel-na-margem-sul.html`, 2016-06-06
