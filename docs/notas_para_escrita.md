@@ -202,3 +202,24 @@ a sensibilidade não foi estudada (trabalho futuro).
 - [ ] **Conclusões:** subsecção "Resposta às questões de investigação" (QI1–QI3).
 - [ ] **Antes da entrega:** confirmar no artigo do Koehler os números (361; 33,8 %; meia-vida ~2
   anos) e ler o mínimo de cada referência (`docs/referencias_defesa.md`).
+
+## Possíveis acrescentos (decidir depois de Protótipo, Avaliação e Conclusões; 2026-10-28)
+
+Pedido do autor: ver primeiro quantas páginas há, e só depois escolher. Trabalho feito e
+documentado no `experiments.md` que ainda não está na tese:
+
+1. Construção do vocabulário na Wikidata (consultas SPARQL ao serviço da Wikidata; regra das
+   datas 1999–2024; atletas "ativos" pela data de nascimento; homónimos fundidos; clubes com
+   nome de cidade excluídos) → Ontologia, "Vocabulário fechado" (1,5–2 p.).
+2. Descoberta testada e descartada (RSS, página inicial, páginas de secção, CDX) e
+   comportamento da API (estimativa 2,6 M vs ~826 mil alcançáveis; `next_page` em páginas
+   vazias) → Arquivo.pt, responde à QI1 (1,5–2 p.).
+3. Premium e origem do texto em números (deteção; tabela por versão do sítio) → Motor (1 p.).
+4. Evolução da identificação de entidades nas cinco corridas (erro → correção → efeito)
+   → Avaliação (1,5 p.).
+5. Desempenho: tempos e memória por passo, `data.js`, SPARQL → Avaliação (1 p.).
+6. Exemplo de utilização do painel (ex.: Benfica em 2007, ano sem títulos) → Protótipo (1 p.).
+7. Implementação e reprodutibilidade (módulos, cache, retoma, testes automáticos, consultas
+   versionadas, registo de experiências) → Motor ou anexo (1–1,5 p.).
+
+Recomendação: 1, 2, 4, 5, 6; 3 e 7 se houver tempo.
