@@ -199,6 +199,12 @@ a sensibilidade não foi estudada (trabalho futuro).
   certo), **não** a cobertura (não diz quanto *boilerplate* ficou). Nunca escrever "95 % de
   qualidade da extração". Exemplo do que ficou: a notícia n.º 7 das 30 (lista lateral e
   comentários no corpo → 14 das 25 entidades erradas da passagem 2).
+- [ ] **Motor, "Identificação e Classificação dos Recursos" + Avaliação, limitações (2026-10-28):**
+  a normalização não junta as versões AMP: 5 712 artigos do `por_ano` (4,4 %) são a versão
+  `/detalhe/amp/` de outro artigo do corpus (8 078, 4,0 %, no `completo`); sem eles, 123 605 e
+  192 023 artigos distintos. Há também páginas `/detalhe/` que não são notícias (por padrão
+  evidente: 7 no `por_ano`, 19 no `completo`, ex. "estatuto editorial", "resultados e
+  classificações"). Não corrigido (números congelados); `experiments.md`, commit `f94f9ac`.
 - [ ] **Conclusões:** subsecção "Resposta às questões de investigação" (QI1–QI3).
 - [ ] **Antes da entrega:** confirmar no artigo do Koehler os números (361; 33,8 %; meia-vida ~2
   anos) e ler o mínimo de cada referência (`docs/referencias_defesa.md`).
