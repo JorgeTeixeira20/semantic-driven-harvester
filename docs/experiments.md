@@ -7421,3 +7421,33 @@ muda alguns números (ex.: "S.L. Benfica" 488 → 29). A percentagem do `complet
 artigos, a do `por_ano` sobre 129 317. Os 29 artigos do "S.L. Benfica" são 29 URLs (alguns do
 mesmo artigo em URLs diferentes); não verificei um a um se falam do clube de andebol. A amostra de
 50 entidades e os erros do top 30 do `completo` estão por fazer (passo 9).
+
+### Passo 9: amostra de 50 entidades novas e top 30 do `completo`
+
+**Amostra** (`scripts/avaliacao_cobertura/amostra_entidades_novas.py`, semente 20261031):
+entidades com origem `candidato` no híbrido do `completo` e QID ausente do híbrido do
+`por_ano`: 1 345, das quais 81 com ≥ 50 artigos (passagem 2, menção no texto) e 1 245 com 10–49.
+Sorteio de 25 + 25 (`data/processed/amostra_entidades_novas_completo.csv`, com artigo de exemplo
+e trecho). Avaliação a olho, pelo trecho do artigo e pela categoria e QID do vocabulário; **não
+consultei a descrição na Wikidata** (a cache guarda só o tipo e o número de ligações), por isso
+os casos de nome comum ficam "duvidosa" (`data/processed/avaliacao_entidades_novas_completo.csv`).
+
+| Estrato | Certas | Erradas | Duvidosas |
+|---|--:|--:|--:|
+| ≥ 50 artigos | 16 | 4 | 5 |
+| 10–49 artigos | 19 | 1 | 5 |
+| Total | **35 (70 %)** | **5 (10 %)** | **10 (20 %)** |
+
+Erradas: "Luís Marques" (lido em "Luís Marques Guedes"); "Grande Prémio de San Remo" ("EPT San
+Remo", poker); "Boxing Day Test" ("boxing day" no futebol); "Maria João" (a procuradora Maria João
+Morgado); "São Jorge" ("Judo Clube São Jorge"). As certas são sobretudo atletas em listas de
+resultados (ténis, F1, ciclismo, surf). Padrão dos erros: variantes curtas de nomes comuns e
+nomes de eventos lidos como expressões gerais. Na do ≥ 50 ainda há "Diego Forlán" com a
+categoria "treinador" (a pessoa é a certa).
+
+**Top 30 do `completo`** (artigos por entidade, passagem 2): 29 sem erro evidente; 1 erro
+evidente, o mesmo da quarta e da quinta corrida: "João Carlos Rodrigues da Costa" (3 578
+artigos, nº 27). O "Rui Costa" já não está no top 30 (2 837 artigos, fora). O "S.L. Benfica" do
+andebol (29) também não. Fora do top 30, na lista do painel: "Campeonato Polonês de Futebol 3ª
+Divisão" (1 487 artigos) e "Aeroporto Internacional do Rio de Janeiro Tom Jobim/Galeão" (1 430),
+dois erros evidentes novos.
