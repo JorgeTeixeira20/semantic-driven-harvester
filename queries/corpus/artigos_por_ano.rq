@@ -3,9 +3,12 @@
 # (navigation_corpus.py: `tstamp[:4]`). "comEntidade" conta os artigos com
 # pelo menos uma entidade mencionada no texto (sdh:mencionaEntidade, grafo do
 # Caminho B). Artigos sem captura não têm ano e ficam de fora.
+# Os recursos com entidade vêm de uma subconsulta juntada por OPTIONAL: com um
+# FILTER/BIND EXISTS por linha, o pyoxigraph avaliava a consulta em tempo
+# quadrático (horas no por_ano; 2026-10-27).
 PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
 
-SELECT ?ano (COUNT(?recurso) AS ?artigos) (SUM(?temEntidade) AS ?comEntidade)
+SELECT ?ano (COUNT(?recurso) AS ?artigos) (COUNT(?comEntidade) AS ?comEntidade)
 WHERE {
   {
     SELECT ?recurso (MIN(?tstamp) AS ?primeira)
@@ -16,9 +19,14 @@ WHERE {
     }
     GROUP BY ?recurso
   }
+  OPTIONAL {
+    SELECT DISTINCT ?recurso (?recurso AS ?comEntidade)
+    WHERE {
+      ?artigo sdh:temRecursoWeb ?recurso ;
+              sdh:mencionaEntidade ?qualquer .
+    }
+  }
   BIND(SUBSTR(STR(?primeira), 1, 4) AS ?ano)
-  BIND(IF(EXISTS { ?artigo sdh:temRecursoWeb ?recurso ;
-                           sdh:mencionaEntidade ?qualquer }, 1, 0) AS ?temEntidade)
 }
 GROUP BY ?ano
 ORDER BY ?ano
