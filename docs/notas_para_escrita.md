@@ -217,9 +217,9 @@ documentado no `experiments.md` que ainda não está na tese:
 1. Construção do vocabulário na Wikidata (consultas SPARQL ao serviço da Wikidata; regra das
    datas 1999–2024; atletas "ativos" pela data de nascimento; homónimos fundidos; clubes com
    nome de cidade excluídos) → Ontologia, "Vocabulário fechado" (1,5–2 p.).
-2. Descoberta testada e descartada (RSS, página inicial, páginas de secção, CDX) e
-   comportamento da API (estimativa 2,6 M vs ~826 mil alcançáveis; `next_page` em páginas
-   vazias) → Arquivo.pt, responde à QI1 (1,5–2 p.).
+2. Descoberta testada e descartada (RSS, página inicial, páginas de secção, CDX) → Arquivo.pt,
+   responde à QI1 (1–1,5 p.). (O comportamento da API — estimativa 2,6 M vs ~826 mil
+   alcançáveis, `next_page` em páginas vazias — **já está** no capítulo do Arquivo.pt.)
 3. Premium e origem do texto em números (deteção; tabela por versão do sítio) → Motor (1 p.).
 4. Evolução da identificação de entidades nas cinco corridas (erro → correção → efeito)
    → Avaliação (1,5 p.).
