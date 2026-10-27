@@ -1,0 +1,295 @@
+artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
+4,interior.aspx?content_id,Benfica,clube,,1,certa,,Sport Lisboa e Benfica,
+4,interior.aspx?content_id,Marítimo,clube,,1,certa,,Club Sport Marítimo,
+4,interior.aspx?content_id,Estádio da Luz,estadio,,1,falhada,fora_do_vocabulario,,
+4,interior.aspx?content_id,Liga Zon Sagres,competicao,,1,falhada,fora_do_vocabulario,,Primeira Liga só existe na híbrida
+4,interior.aspx?content_id,Taça da Liga,competicao,,1,falhada,fora_do_vocabulario,,
+5,/detalhe/,João de Macedo,jogador,,1,falhada,fora_do_vocabulario,,
+5,/detalhe/,António Silva,jogador,,1,falhada,fora_do_vocabulario,,
+5,/detalhe/,Nicolau Von Rupp,jogador,,1,certa,,Nic von Rupp,
+5,/detalhe/,Alex Botelho,jogador,,1,falhada,fora_do_vocabulario,,
+5,/detalhe/,Hugo Vau,jogador,,1,falhada,fora_do_vocabulario,,
+5,/detalhe/,Nazaré Challenge,competicao,,1,falhada,fora_do_vocabulario,,
+5,/detalhe/,Big Wave Tour,competicao,,1,falhada,fora_do_vocabulario,,
+5,/detalhe/,,jogador,Q136382091,1,errada,homonimo,Mario Almeida,"'Mário Almeida', responsável do projeto EDP Mar Sem Fim, não é um desportista"
+6,interior.aspx?content_id,Portimonense,clube,,1,falhada,forma_nao_prevista,,'Portimonense' sozinho não é variante
+6,interior.aspx?content_id,Boavista,clube,,1,falhada,forma_nao_prevista,,'Boavista' sozinho não é variante
+6,interior.aspx?content_id,Sporting B,clube,,1,falhada,forma_nao_prevista,,o texto diz 'Sporting B'
+6,interior.aspx?content_id,Taça de Portugal,competicao,,1,falhada,fora_do_vocabulario,,
+6,interior.aspx?content_id,Lázaro Oliveira,treinador,,1,certa,,Lázaro Oliveira,
+6,interior.aspx?content_id,Ricardo Pessoa,jogador,,1,certa,,Ricardo Jorge Rodrigues Pessoa,
+6,interior.aspx?content_id,Márcio Ramos,jogador,,1,certa,,Márcio Ramos,
+6,interior.aspx?content_id,André Luís,jogador,,1,certa,,André Luís,
+6,interior.aspx?content_id,Bruno Gonzalez,jogador,,1,falhada,fora_do_vocabulario,,
+6,interior.aspx?content_id,Renatinho,jogador,,1,falhada,fora_do_vocabulario,,
+6,interior.aspx?content_id,Carlos,jogador,,1,falhada,regra_de_nomes,,nome próprio comum sozinho
+6,interior.aspx?content_id,Kanazaki,jogador,,1,falhada,forma_nao_prevista,,só o apelido; a variante é 'Mu Kanazaki'
+6,interior.aspx?content_id,Juninho,jogador,,1,falhada,outro,,"só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Fabrício,jogador,,1,falhada,outro,,"só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Luís Pedro,jogador,,1,falhada,fora_do_vocabulario,,
+6,interior.aspx?content_id,Anselmo,jogador,,1,falhada,outro,,"só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Ricardo Ferreira,jogador,,1,certa,,Ricardo Ferreira,
+6,interior.aspx?content_id,Ivo Nicolau,jogador,,1,certa,,Ivo Nicolau,
+6,interior.aspx?content_id,Rui Correia,jogador,,1,certa,,Rui Manuel da Silva Correia,
+6,interior.aspx?content_id,Hugo Gomes,jogador,,1,certa,,Hugo Gomes,
+6,interior.aspx?content_id,Nelsinho,jogador,,1,falhada,fora_do_vocabulario,,
+6,interior.aspx?content_id,Moreno,jogador,,1,certa,,João Miguel da Cunha Teixeira,
+6,interior.aspx?content_id,Mica,jogador,,1,falhada,outro,,alcunha; identidade não resolúvel pelo método
+6,interior.aspx?content_id,Ricardo Alves,jogador,,1,falhada,outro,,3 candidatos com 'Ricardo ... Alves'; identidade não resolúvel pelo método
+6,interior.aspx?content_id,Landinho,jogador,,1,certa,,Landinho,
+6,interior.aspx?content_id,Theo,jogador,,1,falhada,outro,,"só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Semedo,jogador,,1,falhada,outro,,"só o apelido, 25 candidatos no vocabulário; identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Dyego Sousa,jogador,,1,certa,,Dyego Sousa,
+6,interior.aspx?content_id,Quinaz,jogador,,1,falhada,forma_nao_prevista,,só o apelido
+6,interior.aspx?content_id,Anderson,jogador,,1,falhada,regra_de_nomes,,nome próprio comum sozinho
+6,interior.aspx?content_id,Zambujo,jogador,,1,falhada,forma_nao_prevista,,só o apelido
+6,interior.aspx?content_id,,clube,Q112176117|Q75729,1,errada,nome_truncado,Sporting Clube de Portugal,'Sporting B' lido como o Sporting
+7,interior.aspx?content_id,Marítimo,clube,,1,certa,,Club Sport Marítimo,
+7,interior.aspx?content_id,Bordéus,clube,,1,falhada,fora_do_vocabulario,,
+7,interior.aspx?content_id,Liga Europa,competicao,,1,falhada,fora_do_vocabulario,,
+7,interior.aspx?content_id,Francis Gillot,treinador,,1,falhada,fora_do_vocabulario,,
+7,interior.aspx?content_id,Estádio dos Barreiros,estadio,,1,falhada,fora_do_vocabulario,,
+7,interior.aspx?content_id,Pedro Martins,treinador,,1,certa,,Pedro Martins,
+7,interior.aspx?content_id,Heldon,jogador,,1,falhada,forma_nao_prevista,,só o nome de guerra
+8,interior.aspx?content_id,Circuito Mundial de Sevens,competicao,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Jules Bianchi,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Felipe Massa,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Romain Grosjean,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Fernando Alonso,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Michael Schumacher,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Mika Häkkinen,jogador,,1,falhada,fora_do_vocabulario,,Mika Häkkinen só existe na híbrida
+9,interior.aspx?content_id,Robert Kubica,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Mark Webber,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Heikki Kovalainen,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Rubens Barrichello,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Roland Ratzenberger,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Ayrton Senna,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Marussia,clube,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Williams,clube,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Ferrari,clube,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Lotus,clube,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,BMW,clube,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Red Bull,clube,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,GP Inglaterra,competicao,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,GP França,competicao,,1,falhada,fora_do_vocabulario,,
+10,/detalhe/,Benfica,clube,,1,certa,,Sport Lisboa e Benfica,
+10,/detalhe/,Pescara,clube,,1,falhada,fora_do_vocabulario,,
+10,/detalhe/,Joel Rocha,treinador,,1,falhada,fora_do_vocabulario,,
+10,/detalhe/,Juanjo,jogador,,1,falhada,fora_do_vocabulario,,
+10,/detalhe/,UEFA Futsal Cup,competicao,,1,falhada,fora_do_vocabulario,,
+11,interior.aspx?content_id,Feirense,clube,,1,falhada,forma_nao_prevista,,o corpo só diz 'fogaceiro'; o nome está nas etiquetas
+11,interior.aspx?content_id,Rio Ave,clube,,1,falhada,fora_do_vocabulario,,
+11,interior.aspx?content_id,Oliveirense,clube,,1,falhada,forma_nao_prevista,,'Oliveirense' sozinho não é variante
+11,interior.aspx?content_id,Taça de Portugal,competicao,,1,falhada,fora_do_vocabulario,,
+11,interior.aspx?content_id,Quim Machado,treinador,,1,certa,,Quim Machado,
+11,interior.aspx?content_id,Galhano,jogador,,1,falhada,forma_nao_prevista,,só o apelido
+11,interior.aspx?content_id,Gonçalo Abreu,jogador,,1,certa,,Gonçalo Abreu,
+11,interior.aspx?content_id,Joel Neves,jogador,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Farense,clube,,1,certa,,Sporting Clube Farense,
+12,/detalhe/,Freamunde,clube,,1,falhada,forma_nao_prevista,,'Freamunde' sozinho não é variante
+12,/detalhe/,Rio Tinto,clube,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Taça de Portugal,competicao,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Segunda Liga,competicao,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Jorge Paixão,treinador,,1,certa,,Jorge Paixão,
+12,/detalhe/,São Bento,jogador,,1,falhada,forma_nao_prevista,,só o apelido
+12,/detalhe/,Diogo Silva,jogador,,1,certa,,Diogo Silva,
+12,/detalhe/,Diogo Coelho,jogador,,1,falhada,outro,,3 candidatos 'Diogo ... Coelho'; identidade não resolúvel pelo método
+12,/detalhe/,Thomas Agyiri,jogador,,1,certa,,Thomas Agyiri,
+12,/detalhe/,Harramiz,jogador,,1,falhada,forma_nao_prevista,,só o apelido
+12,/detalhe/,Miguel Carvalho,jogador,,1,certa,,Miguel Carvalho,
+12,/detalhe/,Celsinho,jogador,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Bruno Loureiro,jogador,,1,certa,,Bruno Loureiro,
+12,/detalhe/,Castaño,jogador,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Ubay Luzardo,jogador,,1,certa,,Ubay Luzardo,
+12,/detalhe/,Iuri Gomes,jogador,,1,certa,,Iuri Gomes,
+12,/detalhe/,Felipe Barros,jogador,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Julián Montenegro,jogador,,1,certa,,Julián Montenegro,
+12,/detalhe/,Delmiro,jogador,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Matthew,jogador,,1,falhada,outro,,só o nome próprio; vários homónimos no vocabulário
+12,/detalhe/,Ricardo,jogador,,1,falhada,regra_de_nomes,,nome próprio comum sozinho
+12,/detalhe/,Hugo Ventosa,jogador,,1,certa,,Hugo Ventosa,
+12,/detalhe/,Saeed,jogador,,1,falhada,forma_nao_prevista,,só o nome próprio
+12,/detalhe/,Rony,jogador,,1,falhada,outro,,só o nome próprio; vários homónimos no vocabulário
+12,/detalhe/,Carlos,jogador,,1,falhada,regra_de_nomes,,nome próprio comum sozinho
+12,/detalhe/,Bilro,jogador,,1,falhada,forma_nao_prevista,,só o apelido
+12,/detalhe/,Osama Rashid,jogador,,1,certa,,Osama Rashid,
+12,/detalhe/,Márcio Sousa,jogador,,1,certa,,Márcio Sousa,
+12,/detalhe/,Irobiso,jogador,,1,falhada,forma_nao_prevista,,só o apelido
+12,/detalhe/,Rambé,jogador,,1,certa,,Ramilton Jorge Santos do Rosário,
+12,/detalhe/,Edinho Júnior,jogador,,1,certa,,Edinho Júnior,
+12,/detalhe/,Tiago de Leonço,jogador,,1,falhada,fora_do_vocabulario,,
+12,/detalhe/,Pasiov,jogador,,1,falhada,fora_do_vocabulario,,
+13,interior.aspx?content_id,Beira-Mar,clube,,1,certa,,Sport Clube Beira-Mar,
+13,interior.aspx?content_id,Leonardo Jardim,treinador,,1,falhada,fora_do_vocabulario,,
+13,interior.aspx?content_id,Hugo,jogador,,1,falhada,outro,,só o nome próprio do capitão; 79 candidatos no vocabulário
+13,interior.aspx?content_id,Sp. Braga,clube,,1,certa,,Sporting Clube de Braga,
+13,interior.aspx?content_id,Sporting,clube,,1,certa,,Sporting Clube de Portugal,
+13,interior.aspx?content_id,V. Setúbal,clube,,1,certa,,Vitória Futebol Clube,
+13,interior.aspx?content_id,U. Leiria,clube,,1,certa,,União Desportiva de Leiria,
+13,interior.aspx?content_id,Liga de Honra,competicao,,1,falhada,fora_do_vocabulario,,
+14,interior.aspx?content_id,Ferrari,clube,,1,falhada,fora_do_vocabulario,,
+14,interior.aspx?content_id,Fernando Alonso,jogador,,1,falhada,fora_do_vocabulario,,
+14,interior.aspx?content_id,Kimi Räikkönen,jogador,,1,falhada,fora_do_vocabulario,,
+14,interior.aspx?content_id,GP do Bahrain,competicao,,1,falhada,fora_do_vocabulario,,
+15,outro,Sporting,clube,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Iván Piris,jogador,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Jefferson,jogador,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Leonardo Jardim,treinador,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Santa Clara,clube,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Portimonense,clube,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Tondela,clube,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Estoril,clube,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,V. Setúbal,clube,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,FC Porto,clube,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,SC Alba,clube,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Taça de Portugal,competicao,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Liga,competicao,,1,falhada,sem_corpo,,origem do corpo: premium
+4,interior.aspx?content_id,Benfica,clube,,2,certa,,Sport Lisboa e Benfica,
+4,interior.aspx?content_id,Marítimo,clube,,2,certa,,Club Sport Marítimo,
+4,interior.aspx?content_id,Estádio da Luz,estadio,,2,certa,,Estádio da Luz,
+4,interior.aspx?content_id,Liga Zon Sagres,competicao,,2,falhada,forma_nao_prevista,,nome de patrocínio da Primeira Liga não previsto
+4,interior.aspx?content_id,Taça da Liga,competicao,,2,certa,,Taça da Liga,
+4,interior.aspx?content_id,,jogador,Q135376102,2,errada,nome_truncado,Luz Asprilla,'à Luz' (estádio) lido como o jogador 'Luz Asprilla'
+5,/detalhe/,João de Macedo,jogador,,2,falhada,fora_do_vocabulario,,
+5,/detalhe/,António Silva,jogador,,2,certa,,António Silva,
+5,/detalhe/,Nicolau Von Rupp,jogador,,2,certa,,Nic von Rupp,
+5,/detalhe/,Alex Botelho,jogador,,2,falhada,fora_do_vocabulario,,
+5,/detalhe/,Hugo Vau,jogador,,2,certa,,Hugo Vau,
+5,/detalhe/,Nazaré Challenge,competicao,,2,falhada,fora_do_vocabulario,,
+5,/detalhe/,Big Wave Tour,competicao,,2,falhada,fora_do_vocabulario,,
+5,/detalhe/,,jogador,Q136382091,2,errada,homonimo,Mario Almeida,"'Mário Almeida', responsável do projeto EDP Mar Sem Fim, não é um desportista"
+6,interior.aspx?content_id,Portimonense,clube,,2,falhada,forma_nao_prevista,,'Portimonense' sozinho não é variante
+6,interior.aspx?content_id,Boavista,clube,,2,falhada,forma_nao_prevista,,'Boavista' sozinho não é variante
+6,interior.aspx?content_id,Sporting B,clube,,2,falhada,forma_nao_prevista,,o texto diz 'Sporting B'
+6,interior.aspx?content_id,Taça de Portugal,competicao,,2,certa,,Taça de Portugal,
+6,interior.aspx?content_id,Lázaro Oliveira,treinador,,2,certa,,Lázaro Oliveira,
+6,interior.aspx?content_id,Ricardo Pessoa,jogador,,2,certa,,Ricardo Jorge Rodrigues Pessoa,
+6,interior.aspx?content_id,Márcio Ramos,jogador,,2,certa,,Márcio Ramos,
+6,interior.aspx?content_id,André Luís,jogador,,2,certa,,André Luís,
+6,interior.aspx?content_id,Bruno Gonzalez,jogador,,2,certa,,Bruno González Cabrera,
+6,interior.aspx?content_id,Renatinho,jogador,,2,falhada,fora_do_vocabulario,,
+6,interior.aspx?content_id,Carlos,jogador,,2,falhada,regra_de_nomes,,nome próprio comum sozinho
+6,interior.aspx?content_id,Kanazaki,jogador,,2,falhada,forma_nao_prevista,,só o apelido; a variante é 'Mu Kanazaki'
+6,interior.aspx?content_id,Juninho,jogador,,2,falhada,outro,,"só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Fabrício,jogador,,2,falhada,outro,,"só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Luís Pedro,jogador,,2,certa,,Luís Pedro,
+6,interior.aspx?content_id,Anselmo,jogador,,2,falhada,outro,,"só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Ricardo Ferreira,jogador,,2,certa,,Ricardo Ferreira,
+6,interior.aspx?content_id,Ivo Nicolau,jogador,,2,certa,,Ivo Nicolau,
+6,interior.aspx?content_id,Rui Correia,jogador,,2,certa,,Rui Manuel da Silva Correia,
+6,interior.aspx?content_id,Hugo Gomes,jogador,,2,certa,,Hugo Gomes,
+6,interior.aspx?content_id,Nelsinho,jogador,,2,falhada,fora_do_vocabulario,,
+6,interior.aspx?content_id,Moreno,jogador,,2,certa,,João Miguel da Cunha Teixeira,
+6,interior.aspx?content_id,Mica,jogador,,2,falhada,outro,,alcunha; identidade não resolúvel pelo método
+6,interior.aspx?content_id,Ricardo Alves,jogador,,2,falhada,outro,,3 candidatos com 'Ricardo ... Alves'; identidade não resolúvel pelo método
+6,interior.aspx?content_id,Landinho,jogador,,2,certa,,Landinho,
+6,interior.aspx?content_id,Theo,jogador,,2,falhada,outro,,"só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Semedo,jogador,,2,falhada,outro,,"só o apelido, 25 candidatos no vocabulário; identidade não resolúvel pelo método"
+6,interior.aspx?content_id,Dyego Sousa,jogador,,2,certa,,Dyego Sousa,
+6,interior.aspx?content_id,Quinaz,jogador,,2,falhada,forma_nao_prevista,,só o apelido
+6,interior.aspx?content_id,Anderson,jogador,,2,falhada,regra_de_nomes,,nome próprio comum sozinho
+6,interior.aspx?content_id,Zambujo,jogador,,2,falhada,forma_nao_prevista,,só o apelido
+6,interior.aspx?content_id,,clube,Q112176117|Q75729,2,errada,nome_truncado,Sporting Clube de Portugal,'Sporting B' lido como o Sporting
+7,interior.aspx?content_id,Marítimo,clube,,2,certa,,Club Sport Marítimo,
+7,interior.aspx?content_id,Bordéus,clube,,2,falhada,fora_do_vocabulario,,
+7,interior.aspx?content_id,Liga Europa,competicao,,2,certa,,Liga Europa da UEFA,
+7,interior.aspx?content_id,Francis Gillot,treinador,,2,falhada,fora_do_vocabulario,,
+7,interior.aspx?content_id,Estádio dos Barreiros,estadio,,2,certa,,Estádio do Marítimo,
+7,interior.aspx?content_id,Pedro Martins,treinador,,2,certa,,Pedro Martins,
+7,interior.aspx?content_id,Heldon,jogador,,2,falhada,forma_nao_prevista,,só o nome de guerra
+8,interior.aspx?content_id,Circuito Mundial de Sevens,competicao,,2,falhada,fora_do_vocabulario,,
+8,interior.aspx?content_id,,clube,Q324523,2,errada,toponimo,Las Vegas Raiders,'em Las Vegas' (local da etapa) lido como a equipa de futebol americano
+8,interior.aspx?content_id,,clube,Q267245,2,errada,homonimo,Seleção Portuguesa de Futebol,'seleção portuguesa de râguebi' lida como a de futebol
+9,interior.aspx?content_id,Jules Bianchi,jogador,,2,certa,,Jules Bianchi,
+9,interior.aspx?content_id,Felipe Massa,jogador,,2,certa,,Felipe Massa,
+9,interior.aspx?content_id,Romain Grosjean,jogador,,2,certa,,Romain Grosjean,
+9,interior.aspx?content_id,Fernando Alonso,jogador,,2,certa,,Fernando Alonso,
+9,interior.aspx?content_id,Michael Schumacher,jogador,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Mika Häkkinen,jogador,,2,falhada,forma_nao_prevista,,"o texto diz 'Hakkinen', só o apelido"
+9,interior.aspx?content_id,Robert Kubica,jogador,,2,certa,,Robert Kubica,
+9,interior.aspx?content_id,Mark Webber,jogador,,2,certa,,Mark Webber,
+9,interior.aspx?content_id,Heikki Kovalainen,jogador,,2,certa,,Heikki Kovalainen,
+9,interior.aspx?content_id,Rubens Barrichello,jogador,,2,certa,,Rubens Barrichello,
+9,interior.aspx?content_id,Roland Ratzenberger,jogador,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Ayrton Senna,jogador,,2,certa,,Ayrton Senna,
+9,interior.aspx?content_id,Marussia,clube,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Williams,clube,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Ferrari,clube,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Lotus,clube,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,BMW,clube,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Red Bull,clube,,2,certa,,FC Red Bull Salzburg,
+9,interior.aspx?content_id,GP Inglaterra,competicao,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,GP França,competicao,,2,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,,jogador,Q172843,2,errada,omissao_da_anotacao,Jacques Villeneuve,"menção real no corpo ('o ex-campeão do Mundo Jacques Villeneuve'): a anotação, feita sobre uma leitura parcial do artigo, não a tinha"
+10,/detalhe/,Benfica,clube,,2,certa,,Sport Lisboa e Benfica,
+10,/detalhe/,Pescara,clube,,2,falhada,fora_do_vocabulario,,
+10,/detalhe/,Joel Rocha,treinador,,2,falhada,fora_do_vocabulario,,
+10,/detalhe/,Juanjo,jogador,,2,falhada,fora_do_vocabulario,,
+10,/detalhe/,UEFA Futsal Cup,competicao,,2,falhada,fora_do_vocabulario,,
+11,interior.aspx?content_id,Feirense,clube,,2,falhada,forma_nao_prevista,,o corpo só diz 'fogaceiro'; o nome está nas etiquetas
+11,interior.aspx?content_id,Rio Ave,clube,,2,certa,,Rio Ave Futebol Clube,
+11,interior.aspx?content_id,Oliveirense,clube,,2,falhada,forma_nao_prevista,,'Oliveirense' sozinho não é variante
+11,interior.aspx?content_id,Taça de Portugal,competicao,,2,certa,,Taça de Portugal,
+11,interior.aspx?content_id,Quim Machado,treinador,,2,certa,,Quim Machado,
+11,interior.aspx?content_id,Galhano,jogador,,2,falhada,forma_nao_prevista,,só o apelido
+11,interior.aspx?content_id,Gonçalo Abreu,jogador,,2,certa,,Gonçalo Abreu,
+11,interior.aspx?content_id,Joel Neves,jogador,,2,falhada,fora_do_vocabulario,,
+12,/detalhe/,Farense,clube,,2,certa,,Sporting Clube Farense,
+12,/detalhe/,Freamunde,clube,,2,falhada,forma_nao_prevista,,'Freamunde' sozinho não é variante
+12,/detalhe/,Rio Tinto,clube,,2,certa,,Rio Tinto Stadium,
+12,/detalhe/,Taça de Portugal,competicao,,2,certa,,Taça de Portugal,
+12,/detalhe/,Segunda Liga,competicao,,2,certa,,Segunda Liga,
+12,/detalhe/,Jorge Paixão,treinador,,2,certa,,Jorge Paixão,
+12,/detalhe/,São Bento,jogador,,2,falhada,forma_nao_prevista,,só o apelido
+12,/detalhe/,Diogo Silva,jogador,,2,certa,,Diogo Silva,
+12,/detalhe/,Diogo Coelho,jogador,,2,falhada,outro,,3 candidatos 'Diogo ... Coelho'; identidade não resolúvel pelo método
+12,/detalhe/,Thomas Agyiri,jogador,,2,certa,,Thomas Agyiri,
+12,/detalhe/,Harramiz,jogador,,2,falhada,forma_nao_prevista,,só o apelido
+12,/detalhe/,Miguel Carvalho,jogador,,2,certa,,Miguel Carvalho,
+12,/detalhe/,Celsinho,jogador,,2,falhada,fora_do_vocabulario,,
+12,/detalhe/,Bruno Loureiro,jogador,,2,certa,,Bruno Loureiro,
+12,/detalhe/,Castaño,jogador,,2,falhada,fora_do_vocabulario,,
+12,/detalhe/,Ubay Luzardo,jogador,,2,certa,,Ubay Luzardo,
+12,/detalhe/,Iuri Gomes,jogador,,2,certa,,Iuri Gomes,
+12,/detalhe/,Felipe Barros,jogador,,2,certa,,Felipe Barros,
+12,/detalhe/,Julián Montenegro,jogador,,2,certa,,Julián Montenegro,
+12,/detalhe/,Delmiro,jogador,,2,falhada,fora_do_vocabulario,,
+12,/detalhe/,Matthew,jogador,,2,falhada,outro,,só o nome próprio; vários homónimos no vocabulário
+12,/detalhe/,Ricardo,jogador,,2,falhada,regra_de_nomes,,nome próprio comum sozinho
+12,/detalhe/,Hugo Ventosa,jogador,,2,certa,,Hugo Ventosa,
+12,/detalhe/,Saeed,jogador,,2,falhada,forma_nao_prevista,,só o nome próprio
+12,/detalhe/,Rony,jogador,,2,falhada,outro,,só o nome próprio; vários homónimos no vocabulário
+12,/detalhe/,Carlos,jogador,,2,falhada,regra_de_nomes,,nome próprio comum sozinho
+12,/detalhe/,Bilro,jogador,,2,falhada,forma_nao_prevista,,só o apelido
+12,/detalhe/,Osama Rashid,jogador,,2,certa,,Osama Rashid,
+12,/detalhe/,Márcio Sousa,jogador,,2,certa,,Márcio Sousa,
+12,/detalhe/,Irobiso,jogador,,2,falhada,forma_nao_prevista,,só o apelido
+12,/detalhe/,Rambé,jogador,,2,certa,,Ramilton Jorge Santos do Rosário,
+12,/detalhe/,Edinho Júnior,jogador,,2,certa,,Edinho Júnior,
+12,/detalhe/,Tiago de Leonço,jogador,,2,certa,,Tiago Leonço,
+12,/detalhe/,Pasiov,jogador,,2,falhada,fora_do_vocabulario,,
+13,interior.aspx?content_id,Beira-Mar,clube,,2,certa,,Sport Clube Beira-Mar,
+13,interior.aspx?content_id,Leonardo Jardim,treinador,,2,certa,,Leonardo Jardim,
+13,interior.aspx?content_id,Hugo,jogador,,2,falhada,outro,,só o nome próprio do capitão; 79 candidatos no vocabulário
+13,interior.aspx?content_id,Sp. Braga,clube,,2,certa,,Sporting Clube de Braga,
+13,interior.aspx?content_id,Sporting,clube,,2,certa,,Sporting Clube de Portugal,
+13,interior.aspx?content_id,V. Setúbal,clube,,2,certa,,Vitória Futebol Clube,
+13,interior.aspx?content_id,U. Leiria,clube,,2,certa,,União Desportiva de Leiria,
+13,interior.aspx?content_id,Liga de Honra,competicao,,2,certa,,Segunda Liga,
+14,interior.aspx?content_id,Ferrari,clube,,2,falhada,fora_do_vocabulario,,
+14,interior.aspx?content_id,Fernando Alonso,jogador,,2,certa,,Fernando Alonso,
+14,interior.aspx?content_id,Kimi Räikkönen,jogador,,2,certa,,Kimi Räikkönen,
+14,interior.aspx?content_id,GP do Bahrain,competicao,,2,falhada,fora_do_vocabulario,,
+15,outro,Sporting,clube,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Iván Piris,jogador,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Jefferson,jogador,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Leonardo Jardim,treinador,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Santa Clara,clube,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Portimonense,clube,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Tondela,clube,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Estoril,clube,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,V. Setúbal,clube,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,FC Porto,clube,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,SC Alba,clube,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Taça de Portugal,competicao,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Liga,competicao,,2,falhada,sem_corpo,,origem do corpo: premium

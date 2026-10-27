@@ -7348,3 +7348,191 @@ total 57 s). Consultas de análise: `entidade_por_ano` 4,16 s, `entidades_mais_m
 sintético: 7,5 s com 3 000 artigos). Reescrita sem `EXISTS` (commit `4847709`): mesmos
 resultados no grafo sintético, 0,3 s com 26 000 artigos; no `por_ano`, **10,6 s** (antes
 10 541 s), com a comparação igual (85 linhas "igual"). **Decisão:** a fonte por omissão do `navigation_corpus` passa a ser `sparql`.
+
+## Cadeia do `completo`: resultados (2026-10-27)
+
+Cadeia do `completo` (200 101 artigos) com `--html-sem-texto` em 1a, 1b e 3a e a correção das
+siglas partilhadas (primeira vez que corre sobre dados). Passo 2: 16 175 candidatos, 5 h 11 (18 650 s,
+88 MB), `--min-artigos 10 --reutilizar`: aceite 4 272, variante nova 44, sem correspondência 6 158,
+forma rejeitada 2 800, tipo não aceite 1 945, item rejeitado 733, ambíguo 223. Passagem 2: 3a
+87 min (1,76 GB), 3b 87 min (2,32 GB; o processo ficou ~45 min a sair, a trocar memória para o
+disco), SPARQL 40 s (2,77 GB; 12 126 814 triplos, carga 19,0 s), painel por SPARQL 53 s e por ficheiros
+64 s. Os dois `data.js` (42 822 227 bytes) e os dois `resumo.md` são idênticos (`cmp`); a comparação
+do `sparql_corpus` com o painel tem 89 linhas "igual" e nenhuma diferente. Tempos em
+`output/cadeia_completo_tempos.tsv`.
+
+### Artigos por ano, 1999–2024
+
+"Com modalidade" = modalidade pelo URL (nos esquemas antigos, até 2009, o URL não a tem). "Com
+entidade" = passagem 2 (vocabulário híbrido). Em 2017–2018 o `completo` tem menos artigos que o
+`por_ano` porque 879 passam à captura mais antiga do `xl` (2010–2016).
+
+| Ano | `por_ano` artigos | `completo` artigos | `completo` com modalidade (URL) | `completo` com ≥ 1 entidade (p2) | `por_ano` com ≥ 1 entidade (p2) |
+|---|--:|--:|--:|--:|--:|
+| 1999 | 294 | 294 | 0 | 277 | 277 |
+| 2000 | 4 430 | 4 430 | 0 | 4 257 | 4 242 |
+| 2001 | 10 376 | 10 376 | 0 | 5 841 | 5 859 |
+| 2002 | 6 586 | 6 586 | 0 | 228 | 206 |
+| 2003 | 16 | 16 | 0 | 12 | 12 |
+| 2004 | 43 | 43 | 0 | 37 | 37 |
+| 2005 | 156 | 156 | 0 | 148 | 148 |
+| 2006 | 6 981 | 6 981 | 0 | 6 273 | 6 228 |
+| 2007 | 10 602 | 10 602 | 0 | 9 753 | 9 665 |
+| 2008 | 5 119 | 5 119 | 0 | 4 700 | 4 649 |
+| 2009 | 3 754 | 3 754 | 0 | 3 531 | 3 501 |
+| 2010 | 0 | 13 928 | 7 350 | 12 910 | 0 |
+| 2011 | 0 | 9 323 | 7 733 | 8 229 | 0 |
+| 2012 | 0 | 6 803 | 5 614 | 5 957 | 0 |
+| 2013 | 0 | 9 612 | 8 690 | 7 007 | 0 |
+| 2014 | 0 | 8 634 | 7 749 | 6 032 | 0 |
+| 2015 | 0 | 9 528 | 8 454 | 7 335 | 0 |
+| 2016 | 0 | 13 835 | 11 830 | 9 387 | 0 |
+| 2017 | 16 819 | 15 942 | 12 238 | 12 920 | 13 475 |
+| 2018 | 14 179 | 14 177 | 9 873 | 11 965 | 11 861 |
+| 2019 | 12 444 | 12 444 | 9 280 | 9 882 | 9 784 |
+| 2020 | 10 554 | 10 554 | 6 717 | 7 348 | 7 251 |
+| 2021 | 5 564 | 5 564 | 2 928 | 4 090 | 4 020 |
+| 2022 | 6 786 | 6 786 | 3 971 | 5 153 | 4 608 |
+| 2023 | 7 609 | 7 609 | 4 718 | 5 735 | 5 593 |
+| 2024 | 7 005 | 7 005 | 4 697 | 5 442 | 5 342 |
+| **Total** | **129 317** | **200 101** | **111 842** | **154 449** | **96 758** |
+
+### `por_ano` (quinta corrida) vs `completo`
+
+| Medida | `por_ano` | `completo` |
+|---|--:|--:|
+| Artigos | 129 317 | 200 101 |
+| Artigos 2010–2016 | 0 | 71 663 |
+| Com texto (Camada 1, considerados) | 105 521 | 167 131 |
+| Sem corpo / Premium | 10 384 / 10 893 | 14 592 / 17 724 |
+| Com ≥ 1 entidade, passagem 1 | 83 051 (64,2 %) | 130 365 (65,1 %) |
+| Com ≥ 1 entidade, passagem 2 | 96 758 (74,8 %) | 154 449 (77,2 %) |
+| Pares artigo–entidade, passagem 1 / 2 | 370 922 / 559 759 | 494 981 / 916 582 |
+| Entidades distintas, passagem 1 / 2 | 4 273 / 7 071 | 4 616 / 8 904 |
+| Entidades vindas da híbrida | 2 778 | 4 103 |
+| Candidatos Wikidata aceites (passo 2) | 2 877 | 4 272 |
+| Modalidade pelo URL / sem | 55 241 / 74 076 | 111 842 / 88 259 |
+| Artigos com "S.L. Benfica" (Q2895813, andebol), passagem 2 | 488 | 29 |
+| Tempo da cadeia | 1 h 48 | ≈ 11 h 30 (soma dos passos, `output/cadeia_completo_tempos.tsv`; o passo 2 pesa 5 h 11) |
+
+A parte antiga do `completo` (1999–2009 e 2017–2024) não é igual à do `por_ano`: o
+`--html-sem-texto` junta 24 473 artigos (dos quais 1 575 do `por_ano`) e a correção das siglas
+muda alguns números (ex.: "S.L. Benfica" 488 → 29). A percentagem do `completo` é sobre 200 101
+artigos, a do `por_ano` sobre 129 317. Os 29 artigos do "S.L. Benfica" são 29 URLs (alguns do
+mesmo artigo em URLs diferentes); não verificei um a um se falam do clube de andebol. A amostra de
+50 entidades e os erros do top 30 do `completo` estão por fazer (passo 9).
+
+### Passo 9: amostra de 50 entidades novas e top 30 do `completo`
+
+**Amostra** (`scripts/avaliacao_cobertura/amostra_entidades_novas.py`, semente 20261031):
+entidades com origem `candidato` no híbrido do `completo` e QID ausente do híbrido do
+`por_ano`: 1 345, das quais 81 com ≥ 50 artigos (passagem 2, menção no texto) e 1 245 com 10–49.
+Sorteio de 25 + 25 (`data/processed/amostra_entidades_novas_completo.csv`, com artigo de exemplo
+e trecho). Avaliação a olho, pelo trecho do artigo e pela categoria e QID do vocabulário; **não
+consultei a descrição na Wikidata** (a cache guarda só o tipo e o número de ligações), por isso
+os casos de nome comum ficam "duvidosa" (`data/processed/avaliacao_entidades_novas_completo.csv`).
+
+| Estrato | Certas | Erradas | Duvidosas |
+|---|--:|--:|--:|
+| ≥ 50 artigos | 16 | 4 | 5 |
+| 10–49 artigos | 19 | 1 | 5 |
+| Total | **35 (70 %)** | **5 (10 %)** | **10 (20 %)** |
+
+Erradas: "Luís Marques" (lido em "Luís Marques Guedes"); "Grande Prémio de San Remo" ("EPT San
+Remo", poker); "Boxing Day Test" ("boxing day" no futebol); "Maria João" (a procuradora Maria João
+Morgado); "São Jorge" ("Judo Clube São Jorge"). As certas são sobretudo atletas em listas de
+resultados (ténis, F1, ciclismo, surf). Padrão dos erros: variantes curtas de nomes comuns e
+nomes de eventos lidos como expressões gerais. Na do ≥ 50 ainda há "Diego Forlán" com a
+categoria "treinador" (a pessoa é a certa).
+
+**Top 30 do `completo`** (artigos por entidade, passagem 2): 29 sem erro evidente; 1 erro
+evidente, o mesmo da quarta e da quinta corrida: "João Carlos Rodrigues da Costa" (3 578
+artigos, nº 27). O "Rui Costa" já não está no top 30 (2 837 artigos, fora). O "S.L. Benfica" do
+andebol (29) também não. Fora do top 30, na lista do painel: "Campeonato Polonês de Futebol 3ª
+Divisão" (1 487 artigos) e "Aeroporto Internacional do Rio de Janeiro Tom Jobim/Galeão" (1 430),
+dois erros evidentes novos.
+
+### Amostra A: precisão de 40 pares artigo–entidade de 2010–2016 (passagem 2 do `completo`)
+
+Semente 20261028. Universo: 353 525 pares (artigo, entidade) com menção no texto de 56 857
+artigos cuja captura mais antiga é de 2010–2016. A lista (`data/processed/amostra_pares_2010_2016.csv`,
+commit `d4ffda5`) foi versionada antes de avaliar; a avaliação está em
+`data/processed/avaliacao_pares_2010_2016.csv`. Lida no trecho do corpo (o corpo vem do
+HTML quando não há texto extraído: `body_of` do `scripts/avaliacao_cobertura/` passou a tratar
+esse caso depois do sorteio; os pares não mudam, só os trechos que o script escreve).
+
+| Resultado | Pares | Quais |
+|---|--:|---|
+| sim | 30 | menção no texto, com a entidade certa |
+| não | 7 | 5 em widgets laterais fora do corpo (#2 Carlos Daniel, #18 Tony Martin, #20 Segunda Liga, #26 Siaka Bamba, #38 Rui Santos); #36 sigla "CAO" lida como o jogador Cao; #40 Jonas (suplente do Beira-Mar) lido como o avançado Jonas |
+| duvidoso | 3 | #7 André Ferreira, #31 Luís Miguel da Fonseca Silva (só "Luís Miguel"), #33 Pedro Sá: nomes comuns, não confirmo o homónimo |
+
+Precisão: **30/40 (75,0 %)**, Wilson 95 % 60–86 %, contando as duvidosas como erradas;
+30/37 (81,1 %, 66–91 %) sem elas. A da quarta corrida (`por_ano`) foi 32/40 (80,0 %, 65–90 %):
+os intervalos sobrepõem-se. O erro dominante em 2010–2016 são os **widgets laterais** da
+época ASP.NET que ficam no corpo ("EXCLUSIVOS JORNAL RECORD", "TODAS AS NOTÍCIAS" com
+manchetes de outras notícias): 5 dos 7 "não", contra 3 de 8 em tabelas laterais no `por_ano`.
+A categoria não foi avaliada.
+
+### Amostra B: precisão e cobertura em 12 notícias de 2010–2016 (anotadas)
+
+Protocolo `docs/protocolo_cobertura_30.md`, semente 20261029: 15 Artigos de 2010–2016 ao acaso
+(incluindo Premium e sem texto extraído), lista em `data/processed/amostra_cobertura_2010_2016.csv`
+(commit `76505f2`, antes de anotar, **sem** a origem do corpo). As **n.º 1, 2 e 3 ficam para o
+autor** anotar às cegas; anotei as n.º 4–15 (12 notícias, 143 entidades distintas,
+`data/processed/anotacao_cobertura_2010_2016.csv`, commit `842d4c0`, antes da comparação) lendo
+a versão `noFrame` da página arquivada. Comparação com
+`scripts/avaliacao_cobertura/comparar_2010_2016.py` (e `..._manual.json` com as equivalências e
+os motivos, decididos depois de ver as falhas) → `data/processed/avaliacao_cobertura_2010_2016.csv`.
+Escolhas de âmbito: seleções nacionais não contam; equipas de F1 (Ferrari, Williams…) anotadas
+como clube (são "equipa de F1" na coluna de notas); Taça Shield e Taça Bowl (fases de um torneio)
+não contadas.
+
+| Passagem | Certas | Erradas | Falhadas | Precisão (Wilson 95 %) | Cobertura (Wilson 95 %) | F1 |
+|---|--:|--:|--:|---|---|--:|
+| 1 (lista fechada) | 38 | 2 | 105 | 95,0 % (83–99 %) | 26,6 % (20–34 %) | 41,5 % |
+| 2 (híbrida) | 68 | 6 | 75 | 91,9 % (83–96 %) | 47,6 % (40–56 %) | 62,7 % |
+
+Para comparar, no `por_ano` (30 notícias, quinta corrida) a passagem 2 teve precisão 74,0 %,
+cobertura 28,9 % e F1 41,5 %, mas com 15+15 notícias de outras épocas e 12 aqui: **não é a mesma
+amostra nem o mesmo tamanho**, os intervalos de Wilson mal se tocam e não se deve concluir que
+2010–2016 é "melhor". Notícias longas pesam muito: a n.º 6 (convocados, 26 jogadores) e a n.º 12
+(33 jogadores) são 63 das 143 anotadas.
+
+Erradas (passagem 2): "Luz Asprilla" (n.º 4, "à Luz" = estádio), "Mario Almeida" (n.º 5, o
+responsável de um projeto), "Sporting Clube de Portugal" (n.º 6, "Sporting B"), "Las Vegas Raiders"
+(n.º 8, "em Las Vegas"), "Seleção Portuguesa de Futebol" (n.º 8, a de râguebi) e "Jacques
+Villeneuve" (n.º 9), que **é uma menção real** que a minha anotação, feita sobre uma leitura
+parcial do artigo, não tinha: sem esta, a precisão da passagem 2 é 68/73 (93,2 %). A passagem 1
+tem 2 erradas (Mario Almeida, Sporting). Na passagem 1 a "Nic von Rupp" conta como certa para o
+"Nicolau Von Rupp" anotado (mesma pessoa).
+
+Falhadas (motivo; entre parênteses, passagem 1 se diferente):
+
+| Motivo | Passagem 2 | Passagem 1 |
+|---|--:|--:|
+| `fora_do_vocabulario` (limite do vocabulário) | 29 | 61 |
+| `forma_nao_prevista` | 18 | 16 |
+| `outro` (nome próprio/apelido com vários homónimos; identidade não resolúvel) | 11 | 11 |
+| `regra_de_nomes` ("Carlos", "Ricardo", "Anderson": nomes próprios comuns) | 4 | 4 |
+| `sem_corpo` (a n.º 15, Premium: só o início visível) | 13 | 13 |
+| Total | 75 | 105 |
+
+O limite do vocabulário é o maior: equipas de F1 (Ferrari, Williams, Lotus), competições
+(Liga Zon Sagres, UEFA Futsal Cup, GP Inglaterra), clubes estrangeiros (Bordéus, Pescara) e
+muitos jogadores de 2.ª Liga. Na passagem 1, mais 32 entidades estão só na híbrida
+(pilotos de F1, tenistas, etc.).
+
+**Cobertura só sobre as entidades que existem no vocabulário** (certas + falhadas por motivo
+diferente de `fora_do_vocabulario`):
+
+| | Passagem 1 | Passagem 2 |
+|---|---|---|
+| Todas as notícias anotadas | 38/82 (46,3 %; 36–57 %) | 68/114 (59,6 %; 50–68 %) |
+| Só as com corpo (sem a n.º 15) | 38/69 (55,1 %; 43–66 %) | 68/101 (67,3 %; 58–76 %) |
+
+**Origem do corpo nas 15** (a lista completa, não só as anotadas): c′ 2; contentor do HTML 11
+(`texto` 8, `newsBody` 2, `areaGeralNoticiasTextBox` 1); Premium 2 (n.º 1 e 15). **Seis das
+15 não têm texto extraído mas têm HTML guardado** (n.º 3, 4, 6, 11, 12 e 15); cinco entram na
+análise pela opção `--html-sem-texto` (todas menos a Premium n.º 15). Sem a opção, 4 das 12
+notícias anotadas (n.º 4, 6, 11 e 12) ficariam sem corpo, o que mostra o peso da opção nesta época.

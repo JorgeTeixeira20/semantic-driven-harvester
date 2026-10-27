@@ -1,0 +1,51 @@
+n,estrato,rotulo,categoria,qid,artigos,resultado,motivo,url_exemplo
+1,≥50,Jules Bianchi,jogador,Q281294,63,certa,,https://record.xl.pt/modalidades/motores/f1/interior.aspx?content_id=884839
+2,≥50,Grande Prémio do Japão,competicao,Q8000,57,duvidosa,"o texto fala do GP do Japão de motocrosse; o evento pode não ser o da ficha (não consultei a descrição)",https://record.pt/noticia.asp?id=707267&idcanal=126
+3,≥50,Luis Marques,jogador,Q20804599,62,errada,"'Luís Marques' lido em 'Luís Marques Guedes', ministro",https://record.xl.pt/modalidades/interior.aspx?content_id=840872
+4,≥50,Bernard Tomic,jogador,Q288326,70,certa,,https://record.xl.pt/modalidades/tenis/detalhe/atp-rosmalen-holandesa-resultados.html
+5,≥50,Pastor Maldonado,jogador,Q82845,82,certa,,https://record.xl.pt/modalidades/motores/f1/interior.aspx?content_id=939137
+6,≥50,António Soares,jogador,Q4777609,68,duvidosa,"nome comum; atletismo, não consigo confirmar que é o homónimo da ficha",https://record.pt/noticia.asp?id=779339&idcanal=85
+7,≥50,Federico del Bonis,jogador,Q367654,59,certa,,https://record.pt/modalidades/tenis/detalhe/joao-sousa-na-segunda-ronda-do-torneio-de-marraquexe?ref=t%c3%a9nis_destaquesprincipais
+8,≥50,Héctor Barberá,jogador,Q526395,52,certa,,https://record.xl.pt/modalidades/motores/motociclismo/interior.aspx?content_id=466349
+9,≥50,Misaki Doi,jogador,Q34256,53,certa,,https://record.xl.pt/modalidades/tenis/interior.aspx?content_id=947717
+10,≥50,Francisco Javier Gómez Noya,jogador,Q464327,56,certa,,https://record.xl.pt/modalidades/triatlo/interior.aspx?content_id=692181
+11,≥50,Daniel Gimeno-Traver,jogador,Q457051,66,certa,,https://record.xl.pt/noticia.aspx?id=9262a6c9-d7bb-4182-a0ef-559f580e0603&idcanal=00000117-0000-0000-0000-000000000117&h=7
+12,≥50,Campeonato Nacional de Iniciados,competicao,Q108685167,141,certa,competição de futebol; identidade da ficha não confirmada,https://record.pt/shownews.asp?id=70576
+13,≥50,Andreas Klöden,jogador,Q157917,54,certa,,https://record.xl.pt/modalidades/ciclismo/interior.aspx?content_id=689284
+14,≥50,Jaime Alguersuari,jogador,Q171355,54,certa,,https://record.xl.pt/noticia.aspx?id=96de42d3-e7c5-46cf-8ec0-dd725592c9aa&idcanal=00000100-0000-0000-0000-000000000100
+15,≥50,Grande Prémio de San Remo,competicao,Q2341353,77,errada,"'San Remo' lido em 'EPT San Remo' (poker), não a prova de ciclismo",https://record.xl.pt/noticia.aspx?id=4e1ea1fc-99ec-47eb-8bd1-118d8336e8c9&idcanal=00003593-0000-0000-0000-000000003593
+16,≥50,Boxing Day Test,competicao,Q4951733,63,errada,'boxing day' (dia de jogos em Inglaterra) lido como o Boxing Day Test de críquete,https://record.pt/noticia.aspx?id=d15576fe-4873-4fdb-90c6-d1a2436a715b&idcanal=00000292-0000-0000-0000-000000000292
+17,≥50,Polona Hercog,jogador,Q229079,53,certa,,https://record.xl.pt/modalidades/tenis/interior.aspx?content_id=455307
+18,≥50,Taj Burrow,jogador,Q2735568,95,certa,,https://record.xl.pt/modalidades/outras/interior.aspx?content_id=721341
+19,≥50,Bruno González Cabrera,jogador,Q17335434,78,certa,,https://record.pt/futebol/futebol-nacional/liga-nos/portimonense/detalhe/algarvios-perdem-com-o-getafe-nos-penaltis-na-meia-final-da-copa-iberica
+20,≥50,Luis Sousa Pinto,jogador,Q22279681,58,duvidosa,'Luís Sousa' num conselho de arbitragem; nome muito comum,https://record.xl.pt/modalidades/tenis_mesa/interior.aspx?content_id=769991
+21,≥50,Diego Forlán,treinador,Q261534,63,certa,a pessoa é a certa; a categoria 'treinador' do vocabulário é discutível,https://record.xl.pt/futebol/internacional/interior.aspx?content_id=455929
+22,≥50,Maria João,jogador,Q97765739,77,errada,"'Maria João Morgado', procuradora, lida como a jogadora 'Maria João'",https://record.xl.pt/futebol/arbitragem/apito_dourado/interior.aspx?content_id=450940
+23,≥50,Kai Otton,jogador,Q3191922,63,certa,,https://record.xl.pt/modalidades/outras/interior.aspx?content_id=707131
+24,≥50,Diana Chaves,jogador,Q136536937,79,duvidosa,'Diana Chaves' é a atriz/apresentadora no texto; a ficha é de 'jogador',https://record.xl.pt/noticia.aspx?id=328967ba-6d6f-437d-95bf-59cb59465d2b&idcanal=00002477-0000-0000-0000-000000002477&h=10
+25,≥50,Luís Viana,jogador,Q10321680,89,duvidosa,'Luís Viana' marcador de um jogo de formação; nome comum,https://record.xl.pt/modalidades/hoquei_patins/interior.aspx?content_id=918803
+26,10–49,Inês Silva,jogador,Q27855588,16,duvidosa,'Inês Silva' reforço do Torreense feminino; nome comum,https://liga.record.pt/futebol/futebol-feminino/detalhe/torreense-recruta-na-madeira?ref=futebol%20feminino_destaquesprincipais
+27,10–49,Clube Naval de Cascais,clube,Q27654203,36,certa,,https://record.xl.pt/modalidades/vela/interior.aspx?content_id=878830
+28,10–49,Andy Sullivan,jogador,Q18763813,20,certa,,https://record.xl.pt/modalidades/golfe/detalhe/portugal-masters-ingles-andy-sullivan-confirma-triunfo-981551.html
+29,10–49,Nikoloz Basilashvili,jogador,Q16297666,15,certa,,https://record.xl.pt/modalidades/tenis/detalhe/pedro-sousa-na-segunda-ronda-em-biella-965287.html
+30,10–49,Egoitz García,jogador,Q1298398,19,certa,,https://record.xl.pt/modalidades/ciclismo/detalhe/volta-ao-pais-basco-gavazzi-vence-5-etapa-691962.html
+31,10–49,Neil Lennon,treinador,Q437993,12,certa,,https://record.pt/shownews.asp?id=79983
+32,10–49,Roman Kreuziger,jogador,Q347184,43,certa,,https://record.xl.pt/noticia.aspx?id=1192076f-f195-4b0d-846b-022dd0afcb18&idcanal=a4748789-0023-4474-88a8-af884b443062
+33,10–49,São Jorge,jogador,Q48438,36,errada,"'São Jorge' lido em 'Judo Clube São Jorge', clube e não pessoa",https://record.pt/modalidades/judo/detalhe/andre-soares-com-prata-no-open-panamericano-do-chile?ref=detalhe_blocoultimasarea
+34,10–49,Leandro Perez,jogador,Q3297527,18,duvidosa,"'Leandro Perez' (Feirense); nome comum, não confirmei o homónimo",https://record.xl.pt/noticia.aspx?id=d86154df-b75b-440d-89f0-d92d51d463e8&idcanal=00000025-0000-0000-0000-000000000025
+35,10–49,Philipp Petzschner,jogador,Q77180,32,certa,,https://record.xl.pt/modalidades/tenis/interior.aspx?content_id=677698
+36,10–49,Marc Gual,jogador,Q27916801,18,duvidosa,'Marc Gual' num jogo de hóquei em patins; a ficha pode ser de um futebolista,https://record.xl.pt/modalidades/hoquei_patins/mundial/2013/interior.aspx?content_id=846223
+37,10–49,Matti Breschel,jogador,Q471567,11,certa,,https://record.pt/noticia.aspx?id=39242c87-40e7-4c17-b760-5a41cda640e2&idcanal=00000093-0000-0000-0000-000000000093
+38,10–49,Marinko Matosevic,jogador,Q122745,23,certa,,https://record.xl.pt/modalidades/tenis/interior.aspx?content_id=780778
+39,10–49,Michael Zorc,jogador,Q598387,12,certa,,https://record.pt/mercado/detalhe/primeiro-grande-negocio-de-2019-foi-feito-entre-chelsea-e-dortmund-por-64-milhoes?ref=capas_vistas
+40,10–49,Marco Trungelliti,jogador,Q3183203,11,certa,,https://record.pt/modalidades/tenis/detalhe/pedro-sousa-avanca-para-os-quartos-de-final-em-barcelona
+41,10–49,Damien Hardman,jogador,Q3012780,15,certa,,https://record.xl.pt/noticia.aspx?id=fa882e75-de5a-40bb-8e59-a36f3829887e&idcanal=63d50b28-57c6-4173-a6c0-6e48dc3945d9
+42,10–49,Thiemo de Bakker,jogador,Q512712,27,certa,,https://record.pt/noticia.aspx?id=9b38e471-f5fe-4a32-a276-9e9466c079c7&idcanal=00000117-0000-0000-0000-000000000117
+43,10–49,Jamie Donaldson,jogador,Q2133288,13,certa,,https://record.pt/modalidades/golfe/detalhe/jose-filipe-lima-passa-cut-do-nordea-masters.html
+44,10–49,Fernando Lopes,jogador,Q28810439,33,duvidosa,'Fernando Lopes' (andebol do Benfica?) na manchete; nome comum,https://record.xl.pt/noticia.aspx?id=29eeb5d7-f518-45af-b868-a8f3e81c07e3&idcanal=00000084-0000-0000-0000-000000000084
+45,10–49,Annika Beck,jogador,Q77157,34,certa,,https://record.xl.pt/modalidades/tenis/detalhe/20160221_1411_wta-doha-qatar-resultados.html
+46,10–49,Pablo Urtasun,jogador,Q738702,23,certa,,https://record.xl.pt/modalidades/ciclismo/vuelta/classificacoes/interior.aspx?content_id=459933
+47,10–49,Borut Božič,jogador,Q461559,17,certa,,https://record.pt/noticia.aspx?id=e35c7894-a12c-4a76-9182-94022d34ea0b&idcanal=25590e2a-558c-41ca-9f0e-7fd363b43bfb
+48,10–49,José Ruiz Aguilar,jogador,Q641832,11,duvidosa,'José Ruiz' no futsal de Espanha; variante curta de um nome comum,https://record.pt/futebol/futsal/europeu-de-futsal2016/detalhe/portugal-espanha-em-direto?ref=europeu%20de%20futsal
+49,10–49,Marko Jarić,jogador,Q471576,29,certa,,https://record.pt/noticia.asp?id=767471&idcanal=272
+50,10–49,Daiya Seto,jogador,Q1027123,10,certa,,https://record.pt/modalidades/natacao/amp/joao-vital-foi-8-na-final-dos-mundiais-de-piscina-curta
