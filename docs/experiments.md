@@ -7473,3 +7473,67 @@ os intervalos sobrepõem-se. O erro dominante em 2010–2016 são os **widgets l
 época ASP.NET que ficam no corpo ("EXCLUSIVOS JORNAL RECORD", "TODAS AS NOTÍCIAS" com
 manchetes de outras notícias): 5 dos 7 "não", contra 3 de 8 em tabelas laterais no `por_ano`.
 A categoria não foi avaliada.
+
+### Amostra B: precisão e cobertura em 12 notícias de 2010–2016 (anotadas)
+
+Protocolo `docs/protocolo_cobertura_30.md`, semente 20261029: 15 Artigos de 2010–2016 ao acaso
+(incluindo Premium e sem texto extraído), lista em `data/processed/amostra_cobertura_2010_2016.csv`
+(commit `76505f2`, antes de anotar, **sem** a origem do corpo). As **n.º 1, 2 e 3 ficam para o
+autor** anotar às cegas; anotei as n.º 4–15 (12 notícias, 143 entidades distintas,
+`data/processed/anotacao_cobertura_2010_2016.csv`, commit `842d4c0`, antes da comparação) lendo
+a versão `noFrame` da página arquivada. Comparação com
+`scripts/avaliacao_cobertura/comparar_2010_2016.py` (e `..._manual.json` com as equivalências e
+os motivos, decididos depois de ver as falhas) → `data/processed/avaliacao_cobertura_2010_2016.csv`.
+Escolhas de âmbito: seleções nacionais não contam; equipas de F1 (Ferrari, Williams…) anotadas
+como clube (são "equipa de F1" na coluna de notas); Taça Shield e Taça Bowl (fases de um torneio)
+não contadas.
+
+| Passagem | Certas | Erradas | Falhadas | Precisão (Wilson 95 %) | Cobertura (Wilson 95 %) | F1 |
+|---|--:|--:|--:|---|---|--:|
+| 1 (lista fechada) | 38 | 2 | 105 | 95,0 % (83–99 %) | 26,6 % (20–34 %) | 41,5 % |
+| 2 (híbrida) | 68 | 6 | 75 | 91,9 % (83–96 %) | 47,6 % (40–56 %) | 62,7 % |
+
+Para comparar, no `por_ano` (30 notícias, quinta corrida) a passagem 2 teve precisão 74,0 %,
+cobertura 28,9 % e F1 41,5 %, mas com 15+15 notícias de outras épocas e 12 aqui: **não é a mesma
+amostra nem o mesmo tamanho**, os intervalos de Wilson mal se tocam e não se deve concluir que
+2010–2016 é "melhor". Notícias longas pesam muito: a n.º 6 (convocados, 26 jogadores) e a n.º 12
+(33 jogadores) são 63 das 143 anotadas.
+
+Erradas (passagem 2): "Luz Asprilla" (n.º 4, "à Luz" = estádio), "Mario Almeida" (n.º 5, o
+responsável de um projeto), "Sporting Clube de Portugal" (n.º 6, "Sporting B"), "Las Vegas Raiders"
+(n.º 8, "em Las Vegas"), "Seleção Portuguesa de Futebol" (n.º 8, a de râguebi) e "Jacques
+Villeneuve" (n.º 9), que **é uma menção real** que a minha anotação, feita sobre uma leitura
+parcial do artigo, não tinha: sem esta, a precisão da passagem 2 é 68/73 (93,2 %). A passagem 1
+tem 2 erradas (Mario Almeida, Sporting). Na passagem 1 a "Nic von Rupp" conta como certa para o
+"Nicolau Von Rupp" anotado (mesma pessoa).
+
+Falhadas (motivo; entre parênteses, passagem 1 se diferente):
+
+| Motivo | Passagem 2 | Passagem 1 |
+|---|--:|--:|
+| `fora_do_vocabulario` (limite do vocabulário) | 29 | 61 |
+| `forma_nao_prevista` | 18 | 16 |
+| `outro` (nome próprio/apelido com vários homónimos; identidade não resolúvel) | 11 | 11 |
+| `regra_de_nomes` ("Carlos", "Ricardo", "Anderson": nomes próprios comuns) | 4 | 4 |
+| `sem_corpo` (a n.º 15, Premium: só o início visível) | 13 | 13 |
+| Total | 75 | 105 |
+
+O limite do vocabulário é o maior: equipas de F1 (Ferrari, Williams, Lotus), competições
+(Liga Zon Sagres, UEFA Futsal Cup, GP Inglaterra), clubes estrangeiros (Bordéus, Pescara) e
+muitos jogadores de 2.ª Liga. Na passagem 1, mais 32 entidades estão só na híbrida
+(pilotos de F1, tenistas, etc.).
+
+**Cobertura só sobre as entidades que existem no vocabulário** (certas + falhadas por motivo
+diferente de `fora_do_vocabulario`):
+
+| | Passagem 1 | Passagem 2 |
+|---|---|---|
+| Todas as notícias anotadas | 38/82 (46,3 %; 36–57 %) | 68/114 (59,6 %; 50–68 %) |
+| Só as com corpo (sem a n.º 15) | 38/69 (55,1 %; 43–66 %) | 68/101 (67,3 %; 58–76 %) |
+
+**Origem do corpo nas 15** (a lista completa, não só as anotadas): c′ 2; contentor do HTML 11
+(`texto` 7, `newsBody` 2, `areaGeralNoticiasTextBox` 1, …); Premium 2 (n.º 1 e 15). **Seis das
+15 não têm texto extraído mas têm HTML guardado** (n.º 3, 4, 6, 11, 12 e 15); cinco entram na
+análise pela opção `--html-sem-texto` (todas menos a Premium n.º 15). Sem a opção, 5 das 12
+notícias anotadas (4, 6, 11, 12 e a 3 que é do autor) ficariam sem menções, o que mostra o peso
+da opção nesta época.

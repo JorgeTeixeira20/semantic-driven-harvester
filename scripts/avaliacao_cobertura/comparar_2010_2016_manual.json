@@ -1,0 +1,198 @@
+{
+ "equiv": {
+  "5|Nicolau Von Rupp": "Nic von Rupp"
+ },
+ "falhada": {
+  "4|Liga Zon Sagres": [
+   "Primeira Liga",
+   "forma_nao_prevista",
+   "nome de patrocínio da Primeira Liga não previsto"
+  ],
+  "6|Portimonense": [
+   "Portimonense Sporting Clube",
+   "forma_nao_prevista",
+   "'Portimonense' sozinho não é variante"
+  ],
+  "6|Boavista": [
+   "Boavista Futebol Clube",
+   "forma_nao_prevista",
+   "'Boavista' sozinho não é variante"
+  ],
+  "6|Sporting B": [
+   "Sporting Clube de Portugal B",
+   "forma_nao_prevista",
+   "o texto diz 'Sporting B'"
+  ],
+  "6|Carlos": [
+   "Carlos",
+   "regra_de_nomes",
+   "nome próprio comum sozinho"
+  ],
+  "6|Anderson": [
+   "Anderson",
+   "regra_de_nomes",
+   "nome próprio comum sozinho"
+  ],
+  "6|Kanazaki": [
+   "Mū Kanazaki",
+   "forma_nao_prevista",
+   "só o apelido; a variante é 'Mu Kanazaki'"
+  ],
+  "6|Quinaz": [
+   "Gonçalo Quinaz",
+   "forma_nao_prevista",
+   "só o apelido"
+  ],
+  "6|Zambujo": [
+   "Luís Zambujo",
+   "forma_nao_prevista",
+   "só o apelido"
+  ],
+  "6|Juninho": [
+   "",
+   "outro",
+   "só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+  ],
+  "6|Fabrício": [
+   "",
+   "outro",
+   "só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+  ],
+  "6|Anselmo": [
+   "",
+   "outro",
+   "só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+  ],
+  "6|Mica": [
+   "",
+   "outro",
+   "alcunha; identidade não resolúvel pelo método"
+  ],
+  "6|Theo": [
+   "",
+   "outro",
+   "só o nome próprio; vários homónimos no vocabulário, identidade não resolúvel pelo método"
+  ],
+  "6|Semedo": [
+   "",
+   "outro",
+   "só o apelido, 25 candidatos no vocabulário; identidade não resolúvel pelo método"
+  ],
+  "6|Ricardo Alves": [
+   "",
+   "outro",
+   "3 candidatos com 'Ricardo ... Alves'; identidade não resolúvel pelo método"
+  ],
+  "7|Heldon": [
+   "Héldon Augusto Almeida Ramos",
+   "forma_nao_prevista",
+   "só o nome de guerra"
+  ],
+  "9|Mika Häkkinen": [
+   "Mika Häkkinen",
+   "forma_nao_prevista",
+   "o texto diz 'Hakkinen', só o apelido"
+  ],
+  "11|Feirense": [
+   "Clube Desportivo Feirense",
+   "forma_nao_prevista",
+   "o corpo só diz 'fogaceiro'; o nome está nas etiquetas"
+  ],
+  "11|Oliveirense": [
+   "União Desportiva Oliveirense",
+   "forma_nao_prevista",
+   "'Oliveirense' sozinho não é variante"
+  ],
+  "11|Galhano": [
+   "Mario Leandro Silva Galhano",
+   "forma_nao_prevista",
+   "só o apelido"
+  ],
+  "12|Freamunde": [
+   "Sport Clube de Freamunde",
+   "forma_nao_prevista",
+   "'Freamunde' sozinho não é variante"
+  ],
+  "12|São Bento": [
+   "Vítor São Bento",
+   "forma_nao_prevista",
+   "só o apelido"
+  ],
+  "12|Harramiz": [
+   "Harramiz Soares",
+   "forma_nao_prevista",
+   "só o apelido"
+  ],
+  "12|Saeed": [
+   "Saeed Al Mowalad",
+   "forma_nao_prevista",
+   "só o nome próprio"
+  ],
+  "12|Bilro": [
+   "Gualter Bilro",
+   "forma_nao_prevista",
+   "só o apelido"
+  ],
+  "12|Irobiso": [
+   "Christian Irobiso",
+   "forma_nao_prevista",
+   "só o apelido"
+  ],
+  "12|Carlos": [
+   "Carlos",
+   "regra_de_nomes",
+   "nome próprio comum sozinho"
+  ],
+  "12|Ricardo": [
+   "Ricardo",
+   "regra_de_nomes",
+   "nome próprio comum sozinho"
+  ],
+  "12|Diogo Coelho": [
+   "",
+   "outro",
+   "3 candidatos 'Diogo ... Coelho'; identidade não resolúvel pelo método"
+  ],
+  "12|Matthew": [
+   "",
+   "outro",
+   "só o nome próprio; vários homónimos no vocabulário"
+  ],
+  "12|Rony": [
+   "",
+   "outro",
+   "só o nome próprio; vários homónimos no vocabulário"
+  ],
+  "13|Hugo": [
+   "",
+   "outro",
+   "só o nome próprio do capitão; 79 candidatos no vocabulário"
+  ]
+ },
+ "errada": {
+  "4|Luz Asprilla": [
+   "nome_truncado",
+   "'à Luz' (estádio) lido como o jogador 'Luz Asprilla'"
+  ],
+  "5|Mario Almeida": [
+   "homonimo",
+   "'Mário Almeida', responsável do projeto EDP Mar Sem Fim, não é um desportista"
+  ],
+  "6|Sporting Clube de Portugal": [
+   "nome_truncado",
+   "'Sporting B' lido como o Sporting"
+  ],
+  "8|Las Vegas Raiders": [
+   "toponimo",
+   "'em Las Vegas' (local da etapa) lido como a equipa de futebol americano"
+  ],
+  "8|Seleção Portuguesa de Futebol": [
+   "homonimo",
+   "'seleção portuguesa de râguebi' lida como a de futebol"
+  ],
+  "9|Jacques Villeneuve": [
+   "omissao_da_anotacao",
+   "menção real no corpo ('o ex-campeão do Mundo Jacques Villeneuve'): a anotação, feita sobre uma leitura parcial do artigo, não a tinha"
+  ]
+ }
+}
