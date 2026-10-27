@@ -7536,3 +7536,35 @@ diferente de `fora_do_vocabulario`):
 15 não têm texto extraído mas têm HTML guardado** (n.º 3, 4, 6, 11, 12 e 15); cinco entram na
 análise pela opção `--html-sem-texto` (todas menos a Premium n.º 15). Sem a opção, 4 das 12
 notícias anotadas (n.º 4, 6, 11 e 12) ficariam sem corpo, o que mostra o peso da opção nesta época.
+
+#### Amostra B, versão corrigida (n.º 9) e com as 15 notícias
+
+**Correção da anotação (n.º 9).** "Jacques Villeneuve" não era um erro do sistema mas da anotação:
+a minha primeira leitura da n.º 9 (artigo longo sobre o acidente de Bianchi) parou antes do fim do
+corpo. Relida a página inteira, a anotação passa a incluir **Jacques Villeneuve, Lewis Hamilton e
+Adrian Sutil**, menções reais (Hamilton e Sutil só pelo apelido: "como Hamilton", "despiste de
+Sutil", falhadas por `forma_nao_prevista`). Foi feita depois de ver a comparação, pelo que se
+regista aqui; não corrigi mais nada nas outras notícias. A tabela acima (precisão 91,9 % na
+passagem 2) fica **substituída** pela de baixo.
+
+**Anotação às cegas das n.º 1–3** pela sessão, commit `bf351c0`, antes da anotação do autor
+(que as anota amanhã). Não a mostro ao autor até ele enviar a sua; as linhas da comparação das
+n.º 1–3 ficam fora do Git até lá (`avaliacao_cobertura_2010_2016_n1a3.csv`), e os motivos das
+falhadas das n.º 1–3 são provisórios (automáticos: sem forma exata no vocabulário →
+`fora_do_vocabulario`).
+
+| Passagem | Notícias | Certas | Erradas | Falhadas | Precisão (Wilson 95 %) | Cobertura (Wilson 95 %) | F1 |
+|---|---|--:|--:|--:|---|---|--:|
+| 1 | 12 (n.º 4–15) | 38 | 2 | 108 | 95,0 % (83–99) | 26,0 % (20–34) | 40,9 % |
+| 2 | 12 (n.º 4–15) | 69 | 5 | 77 | 93,2 % (85–97) | 47,3 % (39–55) | 62,7 % |
+| 1 | **15** | 45 | 2 | 116 | 95,7 % (86–99) | 28,0 % (22–35) | 43,3 % |
+| 2 | **15** | 79 | 5 | 82 | 94,0 % (87–97) | 49,1 % (41–57) | 64,5 % |
+
+(A n.º 1, Premium e de opinião, não tem entidades no âmbito na parte visível.) Motivos das
+falhadas, 15 notícias (passagem 2; entre parênteses a 1): `fora_do_vocabulario` 34 (72);
+`forma_nao_prevista` 20 (16); `outro` 11 (11); `regra_de_nomes` 4 (4); `sem_corpo` 13 (13).
+Erradas da passagem 2: "Luz Asprilla", "Mario Almeida", "Sporting Clube de Portugal"
+("Sporting B"), "Las Vegas Raiders", "Seleção Portuguesa de Futebol". Cobertura só sobre as
+entidades que existem no vocabulário: passagem 1, 45/89 (50,6 %; 40–61) e, só com corpo, 45/76
+(59,2 %; 48–70); passagem 2, 79/127 (62,2 %; 54–70) e, só com corpo, 79/114 (69,3 %; 60–77). Nas
+12 anotadas: passagem 2, 69/117 (59,0 %) e 69/104 (66,3 %).

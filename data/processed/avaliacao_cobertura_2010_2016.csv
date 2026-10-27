@@ -72,6 +72,9 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 9,interior.aspx?content_id,Red Bull,clube,,1,falhada,fora_do_vocabulario,,
 9,interior.aspx?content_id,GP Inglaterra,competicao,,1,falhada,fora_do_vocabulario,,
 9,interior.aspx?content_id,GP França,competicao,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Jacques Villeneuve,jogador,,1,falhada,fora_do_vocabulario,,
+9,interior.aspx?content_id,Lewis Hamilton,jogador,,1,falhada,fora_do_vocabulario,,Lewis Hamilton só existe na híbrida
+9,interior.aspx?content_id,Adrian Sutil,jogador,,1,falhada,fora_do_vocabulario,,Adrian Sutil só existe na híbrida
 10,/detalhe/,Benfica,clube,,1,certa,,Sport Lisboa e Benfica,
 10,/detalhe/,Pescara,clube,,1,falhada,fora_do_vocabulario,,
 10,/detalhe/,Joel Rocha,treinador,,1,falhada,fora_do_vocabulario,,
@@ -220,7 +223,9 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 9,interior.aspx?content_id,Red Bull,clube,,2,certa,,FC Red Bull Salzburg,
 9,interior.aspx?content_id,GP Inglaterra,competicao,,2,falhada,fora_do_vocabulario,,
 9,interior.aspx?content_id,GP França,competicao,,2,falhada,fora_do_vocabulario,,
-9,interior.aspx?content_id,,jogador,Q172843,2,errada,omissao_da_anotacao,Jacques Villeneuve,"menção real no corpo ('o ex-campeão do Mundo Jacques Villeneuve'): a anotação, feita sobre uma leitura parcial do artigo, não a tinha"
+9,interior.aspx?content_id,Jacques Villeneuve,jogador,,2,certa,,Jacques Villeneuve,
+9,interior.aspx?content_id,Lewis Hamilton,jogador,,2,falhada,forma_nao_prevista,,só o apelido ('como Hamilton')
+9,interior.aspx?content_id,Adrian Sutil,jogador,,2,falhada,forma_nao_prevista,,só o apelido ('despiste de Sutil')
 10,/detalhe/,Benfica,clube,,2,certa,,Sport Lisboa e Benfica,
 10,/detalhe/,Pescara,clube,,2,falhada,fora_do_vocabulario,,
 10,/detalhe/,Joel Rocha,treinador,,2,falhada,fora_do_vocabulario,,

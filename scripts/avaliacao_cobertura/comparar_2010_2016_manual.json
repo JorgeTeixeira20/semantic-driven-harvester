@@ -167,6 +167,16 @@
    "",
    "outro",
    "só o nome próprio do capitão; 79 candidatos no vocabulário"
+  ],
+  "9|Lewis Hamilton": [
+   "Lewis Hamilton",
+   "forma_nao_prevista",
+   "só o apelido ('como Hamilton')"
+  ],
+  "9|Adrian Sutil": [
+   "Adrian Sutil",
+   "forma_nao_prevista",
+   "só o apelido ('despiste de Sutil')"
   ]
  },
  "errada": {
@@ -189,10 +199,6 @@
   "8|Seleção Portuguesa de Futebol": [
    "homonimo",
    "'seleção portuguesa de râguebi' lida como a de futebol"
-  ],
-  "9|Jacques Villeneuve": [
-   "omissao_da_anotacao",
-   "menção real no corpo ('o ex-campeão do Mundo Jacques Villeneuve'): a anotação, feita sobre uma leitura parcial do artigo, não a tinha"
   ]
  }
 }
