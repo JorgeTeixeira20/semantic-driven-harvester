@@ -656,6 +656,7 @@ def run(
     use_html: bool = False,
     name_rules: bool = True,
     drop_repeated: bool = False,
+    html_without_text: bool = False,
 ) -> list[dict[str, str]]:
     """Sem `corpus_label`, o corpus de 125 artigos e as saídas oficiais; com
     uma etiqueta (ex. `por_ano`), o N-Triples desse corpus da Fase 1 e saídas
@@ -667,7 +668,8 @@ def run(
     output = root / "output"
     tag = f"_{corpus_label}" if corpus_label else ""
     titles: dict[str, str] = {}
-    corpus = load_corpus(corpus_graph_path(root, corpus_label), root, titles)
+    corpus = load_corpus(corpus_graph_path(root, corpus_label), root, titles,
+                         html_without_text=html_without_text)
     terms = load_vocabulary(vocabulary_path)
     dropped_names: list[str] = []
     if name_rules:
@@ -777,7 +779,13 @@ def main(argv: list[str] | None = None) -> int:
                         help="não procura entidades em frases repetidas (≥ 20 artigos e ≥ 3 "
                         "meses, ou ≥ 100 artigos; nunca linhas de ficha de jogo) nem em manchetes de outras notícias dentro do corpo "
                         "(diagnóstico de 2026-10-25)")
+    parser.add_argument("--html-sem-texto", action="store_true",
+                        help="com --texto corpo-html: capturas sem texto extraído mas com HTML "
+                        "guardado também entram, com o corpo do HTML (decisão de 2026-10-28; "
+                        "por omissão ficam de fora, como no por_ano)")
     args = parser.parse_args(argv)
+    if args.html_sem_texto and args.texto != "corpo-html":
+        parser.error("--html-sem-texto só funciona com --texto corpo-html")
     fraction = args.fracao_chrome if args.texto == "sem-chrome" else None
     if fraction is not None and not 0.0 < fraction <= 1.0:
         parser.error("--fracao-chrome tem de estar em ]0, 1]")
@@ -786,7 +794,8 @@ def main(argv: list[str] | None = None) -> int:
                club_map_path=args.clubes_url, use_body=args.texto in ("corpo", "corpo-html"),
                use_html=args.texto == "corpo-html",
                longest_match=not args.correspondencia_simples, corpus_label=args.corpus,
-               name_rules=not args.sem_regras_nomes, drop_repeated=args.sem_repetidas)
+               name_rules=not args.sem_regras_nomes, drop_repeated=args.sem_repetidas,
+               html_without_text=args.html_sem_texto)
     tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Linhas (temas e entidades por artigo): {len(rows)}")
     print(f"Saídas: output/corpus_entities{tag}.csv, output/corpus_entities{tag}_summary.md")

@@ -13,7 +13,7 @@ from rdflib import Graph
 from semantic_harvester import corpus_candidate_entities, corpus_entities, corpus_entities_rdf
 from semantic_harvester.corpus_entities import Term, club_coherence
 from semantic_harvester.corpus_rdf import rdf_paths
-from semantic_harvester.corpus_redundancy import Capture, corpus_graph_path, load_corpus
+from semantic_harvester.corpus_redundancy import Capture, corpus_graph_path, html_file_for, load_corpus
 from semantic_harvester.history_pipeline import captured_at
 from semantic_harvester.rdf_mapper import SDH
 from semantic_harvester.rdf_mapper import build_article_history_graph, stable_hash
@@ -172,6 +172,38 @@ class RunOnPhase1CorpusTests(Phase1Corpus):
         corpo = (self.root / "output" / f"corpus_entities_{LABEL}_corpo.csv").read_text("utf-8")
         self.assertIn(f"{old},20020101000000,html:aux", corpo)
         self.assertIn(f"{BENFICA},20190101000000,c′", corpo)
+
+    def test_capture_without_text_uses_its_html_only_with_the_option(self) -> None:
+        xl = "https://www.record.pt/noticia.aspx?id=3"
+        self.write_article(xl, "20120101000000", None,
+                           html="<html><body><aux>Rafa Silva marcou.</aux></body></html>")
+        rows = corpus_entities.run(self.root, self.vocab, use_body=True, corpus_label=LABEL,
+                                   use_html=True)
+        self.assertNotIn(xl, {r["artigo"] for r in rows})  # como no por_ano
+        corpo = (self.root / "output" / f"corpus_entities_{LABEL}_corpo.csv").read_text("utf-8")
+        self.assertIn(f"{xl},20120101000000,sem_texto", corpo)
+
+        rows = corpus_entities.run(self.root, self.vocab, use_body=True, corpus_label=LABEL,
+                                   use_html=True, html_without_text=True)
+        self.assertIn((xl, "Rafa Silva"), {(r["artigo"], r["rotulo"]) for r in rows})
+        corpo = (self.root / "output" / f"corpus_entities_{LABEL}_corpo.csv").read_text("utf-8")
+        self.assertIn(f"{xl},20120101000000,html:aux", corpo)
+        self.assertIn(f"{BENFICA},20190101000000,c′", corpo)  # as outras não mudam
+
+        # Sem o HTML do corpo (c′) nem `use_html`, a captura continua sem texto.
+        rows = corpus_entities.run(self.root, self.vocab, use_body=True, corpus_label=LABEL,
+                                   html_without_text=True)
+        self.assertNotIn(xl, {r["artigo"] for r in rows})
+        candidates = corpus_candidate_entities.run(self.root, self.vocab, corpus_label=LABEL,
+                                                   use_html=True, html_without_text=True)
+        self.assertIsInstance(candidates, list)
+
+    def test_html_file_name_matches_the_text_file_name(self) -> None:
+        url = "https://www.record.pt/noticia.asp?id=4"
+        self.write_article(url, "20020101000000", "texto", html=True)
+        (capture,) = load_corpus(corpus_graph_path(self.root, LABEL), self.root)[url]
+        self.assertIsNotNone(capture.html_path)
+        self.assertEqual(html_file_for(self.root, url, "20020101000000"), capture.html_path)
 
     def test_hybrid_vocabulary_origin_reaches_rdf_and_stadium_has_no_coherence(self) -> None:
         stadium_url = "https://www.record.pt/futebol/futebol-nacional/liga-nos/benfica/detalhe/c.html"

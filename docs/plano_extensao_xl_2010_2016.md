@@ -153,6 +153,11 @@ Os mesmos passos e opções da segunda corrida do `por_ano`, com
 Registar tempos e memória máxima por passo, como no relatório da segunda
 corrida.
 
+**Atualização de 2026-10-28 (decisão do autor):** no `completo`, os passos 1a, 1b
+e 3a levam também `--html-sem-texto`: uma captura sem texto extraído mas com o
+HTML guardado entra na análise, com o corpo do HTML. Sem a opção, 26 201 artigos
+do `xl` com HTML ficavam de fora. Desligada por omissão: o `por_ano` não muda.
+
 ### 9. Avaliação
 
 - Amostra de **50 entidades aceites novas** da abordagem híbrida (só as que

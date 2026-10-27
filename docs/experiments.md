@@ -7200,3 +7200,24 @@ URL e uma entidade com dois rótulos de categorias diferentes; o teste falha se 
 retirar a verificação do rótulo). A fonte por omissão continua `ficheiros` até a
 sessão local confirmar a igualdade no `por_ano`; `fonte_sparql.md` regista os
 tempos e quantos artigos têm mais de um título no grafo. Suite: 406 testes.
+
+### Capturas sem texto extraído, mas com HTML (2026-10-28, decisão do autor)
+
+Diagnóstico da sessão local no passo 1a do `completo` (opção 1, ainda sem a
+correção): considerados 142 658 de 200 101 artigos (105 521 no `por_ano`); 26 201
+artigos do `xl` têm HTML guardado mas não têm texto extraído (mais 147 sem nenhum
+dos dois). Numa amostra de 30 falhas de texto, 12 já davam 200 e 18 continuavam 404.
+
+Causa: o HTML de uma captura era procurado **pelo nome do ficheiro de texto**
+(`load_corpus`); sem texto, nem se procurava, e a captura ficava `sem_texto`. O
+recurso ao HTML já existia (`--texto corpo-html`, `html:<contentor>`), só não
+chegava a estas capturas. Correção: `--html-sem-texto` (`corpus_entities` e
+`corpus_candidate_entities`) constrói o nome do HTML a partir da data e do URL
+(`corpus_redundancy.html_file_for`, o mesmo `ArquivoClient._capture_filename` do
+download) e `to_body_corpus` passa a tratar estas capturas, com o corpo só do HTML
+(Premium e sem corpo como antes). Desligada por omissão: o `por_ano` (congelado)
+não muda; nele, ficaram `sem_texto` até 2 519 artigos (1,9 %), dos quais só os que
+tenham HTML guardado seriam recuperados. No `completo` aplica-se a todos os anos
+(incluindo os artigos do `por_ano`), por isso o `completo` é coerente consigo
+mesmo. Testes: a captura sem texto fica de fora sem a opção e entra com ela
+(`html:aux`); o nome calculado é igual ao do ficheiro de texto. Suite: 408 testes.

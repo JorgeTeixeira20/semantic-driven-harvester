@@ -44,6 +44,7 @@ from pathlib import Path
 from rdflib import RDF, RDFS, Graph
 from rdflib.plugins.parsers.ntriples import W3CNTriplesParser
 
+from .arquivo_client import ArquivoClient
 from .article_body import extract_body
 from .html_body import extract_html_body
 
@@ -367,8 +368,17 @@ def _optional_int(value: object) -> int | None:
     return None if value is None else int(value)
 
 
+def html_file_for(project_root: Path, original_url: str, tstamp: str) -> Path:
+    """Onde o `ArquivoClient` guardou o HTML em bruto da captura: o nome sai da
+    data e do URL (o mesmo nome do ficheiro de texto, com outra extensão)."""
+
+    name = ArquivoClient._capture_filename({"tstamp": tstamp, "originalURL": original_url}, "html")
+    return project_root / HTML_DIR / name
+
+
 def load_corpus(
-    graph_path: Path, project_root: Path, titles: dict[str, str] | None = None
+    graph_path: Path, project_root: Path, titles: dict[str, str] | None = None,
+    html_without_text: bool = False,
 ) -> dict[str, list[Capture]]:
     """Capturas por artigo (`originalURL`), em ordem temporal.
 
@@ -376,7 +386,10 @@ def load_corpus(
     N-Triples de um corpus da Fase 1, em streaming. O HTML em bruto de uma
     captura com texto é procurado em `data/raw/original_html/` com o nome do
     ficheiro de texto (a mesma convenção do `ArquivoClient`). Com `titles`,
-    preenche-o com o título (`rdfs:label`) de cada artigo.
+    preenche-o com o título (`rdfs:label`) de cada artigo. Com
+    `html_without_text` (decisão do autor, 2026-10-28), uma captura sem texto
+    extraído também fica com o HTML, se existir no disco: sem isso, o HTML só é
+    procurado pelo nome do ficheiro de texto e estas capturas ficam de fora.
     """
 
     index = read_graph_index(graph_path)
@@ -394,6 +407,9 @@ def load_corpus(
                     raise FileNotFoundError(f"Texto referenciado no grafo em falta: {file_path}")
                 text = file_path.read_text(encoding="utf-8")
                 candidate = project_root / HTML_DIR / f"{file_path.stem}.html"
+                html_path = candidate if candidate.is_file() else None
+            elif html_without_text:
+                candidate = html_file_for(project_root, article, str(fields["tstamp"]))
                 html_path = candidate if candidate.is_file() else None
             digest = fields.get("digest")
             captures.append(
@@ -435,14 +451,16 @@ def to_body_corpus(
     Capturas com texto mas sem corpo localizável ficam `body_missing` (fora da
     Camada 1, sem deixarem de ter texto). Com `use_html` (decisão de
     2026-10-19): uma captura cujo HTML marca Premium fica sem corpo; se a c′
-    não encontrar corpo, usa-se o contentor do HTML (`html_body.py`).
+    não encontrar corpo, usa-se o contentor do HTML (`html_body.py`). Uma
+    captura sem texto só passa por aqui se tiver HTML (`load_corpus` com
+    `html_without_text`); o corpo vem então só do HTML.
     """
 
     result = {}
     for article, captures in corpus.items():
         converted = []
         for capture in captures:
-            if capture.text is None:
+            if capture.text is None and not (use_html and capture.html_path):
                 converted.append(capture)
                 continue
             if use_html:

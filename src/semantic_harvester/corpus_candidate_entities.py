@@ -193,13 +193,15 @@ def run(
     use_body: bool = True,
     corpus_label: str | None = None,
     use_html: bool = False,
+    html_without_text: bool = False,
 ) -> list[dict[str, str]]:
     root = project_root or Path(__file__).resolve().parents[2]
     if vocabulary_path is None:
         raise ValueError("É preciso indicar o vocabulário fechado (--vocabulario).")
     output = root / "output"
     tag = f"_{corpus_label}" if corpus_label else ""
-    corpus = load_corpus(corpus_graph_path(root, corpus_label), root)
+    corpus = load_corpus(corpus_graph_path(root, corpus_label), root,
+                         html_without_text=html_without_text)
     terms = load_vocabulary(vocabulary_path)
     variants = frozenset(variant for term in terms for variant in term.variants)
     if use_body:
@@ -226,11 +228,16 @@ def main(argv: list[str] | None = None) -> int:
                         "sem corpo, o contentor do HTML, com Premium sem corpo; ou texto completo")
     parser.add_argument("--corpus", metavar="ETIQUETA",
                         help="corpus da Fase 1 (ex. por_ano); por omissão, o de 125 artigos")
+    parser.add_argument("--html-sem-texto", action="store_true",
+                        help="com --texto corpo-html: capturas sem texto extraído mas com HTML "
+                        "guardado também entram (como em corpus_entities)")
     args = parser.parse_args(argv)
+    if args.html_sem_texto and args.texto != "corpo-html":
+        parser.error("--html-sem-texto só funciona com --texto corpo-html")
 
     rows = run(vocabulary_path=args.vocabulario, use_body=args.texto != "completo",
                use_html=args.texto == "corpo-html",
-               corpus_label=args.corpus)
+               corpus_label=args.corpus, html_without_text=args.html_sem_texto)
     tag = f"_{args.corpus}" if args.corpus else ""
     print(f"Candidatos distintos fora do vocabulário: {len(rows)}")
     print(f"Saídas: output/corpus_candidate_entities{tag}.csv, "
