@@ -7348,3 +7348,76 @@ total 57 s). Consultas de análise: `entidade_por_ano` 4,16 s, `entidades_mais_m
 sintético: 7,5 s com 3 000 artigos). Reescrita sem `EXISTS` (commit `4847709`): mesmos
 resultados no grafo sintético, 0,3 s com 26 000 artigos; o tempo no `por_ano` está por
 medir. **Decisão:** a fonte por omissão do `navigation_corpus` passa a ser `sparql`.
+
+## Cadeia do `completo`: resultados (2026-10-27)
+
+Cadeia do `completo` (200 101 artigos) com `--html-sem-texto` em 1a, 1b e 3a e a correção das
+siglas partilhadas (primeira vez que corre sobre dados). Passo 2: 16 175 candidatos, 5 h 11 (18 650 s,
+88 MB), `--min-artigos 10 --reutilizar`: aceite 4 272, variante nova 44, sem correspondência 6 158,
+forma rejeitada 2 800, tipo não aceite 1 945, item rejeitado 733, ambíguo 223. Passagem 2: 3a
+87 min (1,76 GB), 3b 87 min (2,32 GB; o processo ficou ~45 min a sair, a trocar memória para o
+disco), SPARQL 40 s (2,77 GB; 12 126 814 triplos, carga 19,0 s), painel por SPARQL 53 s e por ficheiros
+64 s. Os dois `data.js` (42 822 227 bytes) e os dois `resumo.md` são idênticos (`cmp`); a comparação
+do `sparql_corpus` com o painel tem 89 linhas "igual" e nenhuma diferente. Tempos em
+`output/cadeia_completo_tempos.tsv`.
+
+### Artigos por ano, 1999–2024
+
+"Com modalidade" = modalidade pelo URL (nos esquemas antigos, até 2009, o URL não a tem). "Com
+entidade" = passagem 2 (vocabulário híbrido). Em 2017–2018 o `completo` tem menos artigos que o
+`por_ano` porque 879 passam à captura mais antiga do `xl` (2010–2016).
+
+| Ano | `por_ano` artigos | `completo` artigos | `completo` com modalidade (URL) | `completo` com ≥ 1 entidade (p2) | `por_ano` com ≥ 1 entidade (p2) |
+|---|--:|--:|--:|--:|--:|
+| 1999 | 294 | 294 | 0 | 277 | 277 |
+| 2000 | 4 430 | 4 430 | 0 | 4 257 | 4 242 |
+| 2001 | 10 376 | 10 376 | 0 | 5 841 | 5 859 |
+| 2002 | 6 586 | 6 586 | 0 | 228 | 206 |
+| 2003 | 16 | 16 | 0 | 12 | 12 |
+| 2004 | 43 | 43 | 0 | 37 | 37 |
+| 2005 | 156 | 156 | 0 | 148 | 148 |
+| 2006 | 6 981 | 6 981 | 0 | 6 273 | 6 228 |
+| 2007 | 10 602 | 10 602 | 0 | 9 753 | 9 665 |
+| 2008 | 5 119 | 5 119 | 0 | 4 700 | 4 649 |
+| 2009 | 3 754 | 3 754 | 0 | 3 531 | 3 501 |
+| 2010 | 0 | 13 928 | 7 350 | 12 910 | 0 |
+| 2011 | 0 | 9 323 | 7 733 | 8 229 | 0 |
+| 2012 | 0 | 6 803 | 5 614 | 5 957 | 0 |
+| 2013 | 0 | 9 612 | 8 690 | 7 007 | 0 |
+| 2014 | 0 | 8 634 | 7 749 | 6 032 | 0 |
+| 2015 | 0 | 9 528 | 8 454 | 7 335 | 0 |
+| 2016 | 0 | 13 835 | 11 830 | 9 387 | 0 |
+| 2017 | 16 819 | 15 942 | 12 238 | 12 920 | 13 475 |
+| 2018 | 14 179 | 14 177 | 9 873 | 11 965 | 11 861 |
+| 2019 | 12 444 | 12 444 | 9 280 | 9 882 | 9 784 |
+| 2020 | 10 554 | 10 554 | 6 717 | 7 348 | 7 251 |
+| 2021 | 5 564 | 5 564 | 2 928 | 4 090 | 4 020 |
+| 2022 | 6 786 | 6 786 | 3 971 | 5 153 | 4 608 |
+| 2023 | 7 609 | 7 609 | 4 718 | 5 735 | 5 593 |
+| 2024 | 7 005 | 7 005 | 4 697 | 5 442 | 5 342 |
+| **Total** | **129 317** | **200 101** | **111 842** | **154 449** | **96 758** |
+
+### `por_ano` (quinta corrida) vs `completo`
+
+| Medida | `por_ano` | `completo` |
+|---|--:|--:|
+| Artigos | 129 317 | 200 101 |
+| Artigos 2010–2016 | 0 | 71 663 |
+| Com texto (Camada 1, considerados) | 105 521 | 167 131 |
+| Sem corpo / Premium | 10 384 / 10 893 | 14 592 / 17 724 |
+| Com ≥ 1 entidade, passagem 1 | 83 051 (64,2 %) | 130 365 (65,1 %) |
+| Com ≥ 1 entidade, passagem 2 | 96 758 (74,8 %) | 154 449 (77,2 %) |
+| Pares artigo–entidade, passagem 1 / 2 | 370 922 / 559 759 | 494 981 / 916 582 |
+| Entidades distintas, passagem 1 / 2 | 4 273 / 7 071 | 4 616 / 8 904 |
+| Entidades vindas da híbrida | 2 778 | 4 103 |
+| Candidatos Wikidata aceites (passo 2) | 2 877 | 4 272 |
+| Modalidade pelo URL / sem | 55 241 / 74 076 | 111 842 / 88 259 |
+| Artigos com "S.L. Benfica" (Q2895813, andebol), passagem 2 | 488 | 29 |
+| Tempo da cadeia | 1 h 48 | ≈ 11 h 30 (soma dos passos, `output/cadeia_completo_tempos.tsv`; o passo 2 pesa 5 h 11) |
+
+A parte antiga do `completo` (1999–2009 e 2017–2024) não é igual à do `por_ano`: o
+`--html-sem-texto` junta 24 473 artigos (dos quais 1 575 do `por_ano`) e a correção das siglas
+muda alguns números (ex.: "S.L. Benfica" 488 → 29). A percentagem do `completo` é sobre 200 101
+artigos, a do `por_ano` sobre 129 317. Os 29 artigos do "S.L. Benfica" são 29 URLs (alguns do
+mesmo artigo em URLs diferentes); não verificei um a um se falam do clube de andebol. A amostra de
+50 entidades e os erros do top 30 do `completo` estão por fazer (passo 9).
