@@ -245,6 +245,16 @@ Recomendação: 1, 2, 4, 5, 6; 3 e 7 se houver tempo.
 - [ ] Ontologia (opcional): "designação curta *de uma só palavra*".
 - [ ] Anexo "Consultas SPARQL": as 8 consultas com `#raw(read(...))`.
 
+- [ ] Ontologia: subsecção "Papel da Ontologia no Processo" (pedido do orientador, 2026-10-27):
+  tabela etapa → como a ontologia intervém (pesquisa: categorias dos termos = classes de `Tema`;
+  extração: temas nas subclasses, entidades com os tipos previstos; armazenamento: Artigo /
+  RecursoWeb / CapturaArquivada / TextoExtraido; consulta: SPARQL; protótipo gerado por SPARQL).
+  Mais um parágrafo sobre onde ficam os dados e como se consultam, e uma frase sobre o uso das
+  entidades (navegar, ligar à Wikidata, contar, co-ocorrências, avaliar a identificação).
+- [ ] Ponto fraco a conhecer: a categoria da entidade (clube, atleta…) não está no grafo, só
+  no vocabulário (acrescentar = gerar de novo o grafo das entidades; só se houver tempo).
+- [ ] Resumo e Abstract (dependem do `[N]`); retirar os apêndices vazios (autor).
+
 ### Depois do `completo` (Wikidata → passagem 2 → painel → avaliação)
 - [ ] Introdução e Conclusões: `[N]` notícias; frase da síntese sobre a extensão.
 - [ ] Arquivo.pt: parágrafo da lacuna 2010–2016 (versão com a recolha no `record.xl.pt` e os números).
