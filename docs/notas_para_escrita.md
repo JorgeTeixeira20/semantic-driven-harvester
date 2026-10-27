@@ -229,3 +229,30 @@ documentado no `experiments.md` que ainda não está na tese:
    versionadas, registo de experiências) → Motor ou anexo (1–1,5 p.).
 
 Recomendação: 1, 2, 4, 5, 6; 3 e 7 se houver tempo.
+
+## Checklist de fecho (2026-10-27)
+
+### Agora (não depende do `completo`)
+- [ ] Protótipo, arquitetura: tirar o `[PENDENTE SPARQL]` (confirmado: `data.js` idêntico), tabela das 3 consultas do painel e figura com a `artigos.rq`.
+- [ ] Avaliação, Metodologia: versão corrigida (parágrafo de abertura + frase dos intervalos de Wilson).
+- [ ] Avaliação, Evolução: trocar a frase antiga pelo parágrafo do autor ("Uma vez que as amostras… estatisticamente significativa…").
+- [ ] Avaliação, Análise de erros: versão final (aspas retas na frase das regras).
+- [ ] Avaliação, 7.6: texto com a validação no `por_ano` (cmp idêntico, 85 "igual", carga 15,2 s, consultas < 11 s, painel 57 s); tempos do `completo` depois.
+- [ ] Avaliação: retirar os comentários `// Nota:`.
+- [ ] Conclusões: rever o rascunho; QI3 com a frase do SPARQL (já confirmada).
+- [ ] Motor, extração: frase "O HTML revelou-se útil para recuperar notícias sem texto" → dizer que no corpus final o HTML é usado também nas capturas sem texto extraído.
+- [ ] Motor, normalização: frase sobre as versões AMP não juntas (limitação).
+- [ ] Ontologia (opcional): "designação curta *de uma só palavra*".
+- [ ] Anexo "Consultas SPARQL": as 8 consultas com `#raw(read(...))`.
+
+### Depois do `completo` (Wikidata → passagem 2 → painel → avaliação)
+- [ ] Introdução e Conclusões: `[N]` notícias; frase da síntese sobre a extensão.
+- [ ] Arquivo.pt: parágrafo da lacuna 2010–2016 (versão com a recolha no `record.xl.pt` e os números).
+- [ ] Motor: contentores HTML de 2010–2015 (`newsBody`, `areaGeralNoticiasTextBox`, `texto`), `interior_premium.aspx`, exclusão das capas (se se mantiverem).
+- [ ] Protótipo: total de notícias, % modalidade e clube, títulos repetidos, tamanho do ficheiro, tempo de geração, frase do período sem notícias, figuras do painel principal e do Braga.
+- [ ] Avaliação, introdução e metodologia: frase "descritivo no corpus completo, amostras no corpus de `record.pt`".
+- [ ] Avaliação, Composição: distribuição por ano; tabela da origem do texto por época (já medida); duplicados AMP no completo (8 078, 4,0 %); frases dependentes (ex. 68,2 %).
+- [ ] Avaliação, tabela 4: modalidade por ano com todos os anos.
+- [ ] Avaliação, 7.6: tempos do SPARQL do `completo` e o `cmp` do painel do `completo`.
+- [ ] Avaliação, 7.8: tabela por_ano vs completo, 24 473 notícias recuperadas pelo HTML, 879 que mudaram de época, 50 entidades novas (passo 9), e os 40 pares de 2010–2016 se o autor decidir.
+- [ ] Conclusões: limitação sobre a qualidade em 2010–2016 (ou o resultado dos 40 pares).
