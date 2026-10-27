@@ -1,0 +1,15 @@
+# Corpus da Fase 1 (sparql_corpus.py): nº de entidades distintas mencionadas
+# por origem no vocabulário (sdh:origemVocabulario: lista_fechada, candidato,
+# ...); "" quando o vocabulário não tem a coluna `origem`. Uma entidade com
+# rótulos de origens diferentes conta em cada uma.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+
+SELECT ?origem (COUNT(DISTINCT ?entidade) AS ?entidades)
+WHERE {
+  ?entidade a sdh:EntidadeMencionada .
+  FILTER EXISTS { ?artigo sdh:mencionaEntidade ?entidade }
+  OPTIONAL { ?entidade sdh:origemVocabulario ?o }
+  BIND(COALESCE(STR(?o), "") AS ?origem)
+}
+GROUP BY ?origem
+ORDER BY DESC(?entidades) ?origem

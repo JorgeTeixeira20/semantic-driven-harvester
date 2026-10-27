@@ -7146,3 +7146,41 @@ título repetido em 100 ou mais notícias. ":.: Jornal Record :.:" (30 241), "Re
 Confederações Recor…", 377) e "Liga Record" (132). Os seis são nomes do sítio Web,
 menus ou código, nenhum é título de notícia. Em 2007 todas as 10 602 notícias ficam sem
 título. O resto do `resumo.md` não mudou; `data.js` 27,3 MB.
+
+### Consultas SPARQL sobre o grafo do corpus alargado (2026-10-26/27)
+
+**Objetivo.** Mostrar que o grafo RDF do `por_ano` (129 317 artigos; o N-Triples dos
+artigos e `output/corpus_entities_por_ano.ttl`, que partilham os URIs de `Artigo`)
+responde às perguntas do painel à escala do corpus, e que o painel
+(`navigation_corpus.py`, calculado dos CSV) é uma vista pré-calculada com os mesmos
+números. Não altera o painel nem as saídas existentes.
+
+**Motor.** `pyoxigraph` (Oxigraph, em Rust): store em disco com carga em massa. O
+RDFLib, usado no protótipo de 125 artigos, é demasiado lento para ~10 M de triplos
+(só as entidades têm 5 256 840). Dependência **opcional** (`pip install -e ".[sparql]"`);
+sem ela, o módulo termina com uma mensagem a dizer como instalar. Sem rede (nenhum
+`SERVICE` à Wikidata).
+
+**Consultas** (`queries/corpus/*.rq`, comentadas): `artigos_por_ano` (ano da captura
+mais antiga, menor `sdh:tstamp`, a mesma definição do painel; também os artigos com
+pelo menos uma entidade), `entidade_por_ano` (artigos que mencionam um QID, ligado
+por substituição e validado com `^Q\d+$`), `entidades_mais_mencionadas` (artigos
+distintos, com rótulo e `sdh:origemVocabulario`; a categoria não está no grafo de
+entidades), `coocorrencias` (entidades nos mesmos artigos que o QID) e
+`entidades_por_origem` (entidades distintas por origem no vocabulário).
+
+**Relatório** (`output/sparql_por_ano/relatorio.md`): nº de triplos no store, tempo
+de carga, tempo de cada consulta, as tabelas e a comparação com
+`output/prototipo_por_ano/resumo.md` (artigos por ano e totais, clubes/atletas/outras
+entidades pelo rótulo, entidades por origem), linha a linha "igual" ou "diferente (x
+vs y)", com as razões possíveis de diferença (mesmo CSV e vocabulário nos dois,
+artigos sem captura, rótulos em mais de um nó, origem por rótulo vs por entidade).
+
+Correr (sessão local, depois de `corpus_entities_rdf --corpus por_ano` com o mesmo
+vocabulário do painel):
+`python -m semantic_harvester.sparql_corpus --corpus por_ano --entidade Q131499`
+(`--recarregar` refaz o store; `--top N` muda o tamanho das tabelas).
+
+**Resultados e tempos: pendentes da execução local** (os grafos não estão neste
+clone). Testes: `tests/test_sparql_corpus.py` (grafo sintético; o resumo do painel é
+gerado pelo próprio `navigation_corpus` e a comparação dá "igual" em tudo).

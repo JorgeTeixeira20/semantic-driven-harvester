@@ -81,6 +81,9 @@ Não afirmar comportamento, resultados ou decisões sem verificar as fontes.
   principal do corpus da Fase 1 — painel com filtros e entidades em
   `output/prototipo_<etiqueta>/`, a partir do N-Triples e das saídas
   etiquetadas do Caminho B; sem rede nem servidor.
+- `sparql_corpus.py`: as perguntas do painel em SPARQL (`queries/corpus/*.rq`) sobre o
+  grafo completo de um corpus (artigos + Caminho B), com `pyoxigraph` (opcional,
+  `.[sparql]`) e store em `output/sparql_<etiqueta>/`; compara com o `resumo.md`; sem rede.
 - [ontology/semantic_harvester.ttl](ontology/semantic_harvester.ttl): vocabulário.
 - `tests/`: suite offline, transporte simulado e fixtures sintéticas.
 - `data/raw/`: artefactos locais ignorados pelo Git, salvo `.gitkeep`.
@@ -93,7 +96,7 @@ produzem relatórios separados. Não existe serviço Web nem base de dados.
 ## Ambiente e comandos
 
 Python >=3.11; dependências em `pyproject.toml`: RDFLib >=7.6,<8 e
-requests >=2.31,<3; empacotamento setuptools com layout `src/`.
+requests >=2.31,<3 (opcional `.[sparql]`: pyoxigraph, só para `sparql_corpus`); empacotamento setuptools com layout `src/`.
 Na raiz, criar `.venv` com `python -m venv .venv` (`python3` em sistemas que
 assim designam o Python). Ativar com `.venv\Scripts\Activate.ps1` no PowerShell
 ou `source .venv/bin/activate` em shells POSIX. Depois:
@@ -136,6 +139,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.club_url_map [--corpus por_ano] [--aplicar]` | Sem rede; sugere o clube (QID) de cada slug de clube do URL sem mapa, a partir dos clubes do vocabulário alargado; grava `output/clubes_url_sugestao_por_ano.csv`; com `--aplicar`, acrescenta as sugestões únicas a `data/processed/caminho_b_clubes_url.csv`. |
 | `python -m semantic_harvester.wikidata_candidates [--corpus por_ano] [--min-artigos 3] [--so-portugal] [--reutilizar]` | Rede (um pedido SPARQL por candidato, à Wikidata); depois do `corpus_candidate_entities --corpus por_ano`; grava `output/wikidata_candidatos_por_ano.csv` e `data/processed/caminho_b_vocabulario_hibrido_por_ano.csv`, sem tocar no vocabulário alargado. |
 | `python -m semantic_harvester.navigation_corpus [--corpus por_ano] [--vocabulario CSV]` | Sem rede; depois do `corpus_entities --corpus por_ano --texto corpo-html`; lê o N-Triples, `output/corpus_entities_por_ano{,_corpo}.csv`, o vocabulário, a tabela de clubes e `output/corpus_phase1_por_ano_captures.csv`; gera `output/prototipo_por_ano/` (`index.html`, `data.js`, `resumo.md`). |
+| `python -m semantic_harvester.sparql_corpus [--corpus por_ano] [--entidade QID] [--top N] [--recarregar]` | Sem rede; requer `pip install -e ".[sparql]"`; carrega o N-Triples e `output/corpus_entities_por_ano.ttl` num store em `output/sparql_por_ano/store/` (reutilizado), corre `queries/corpus/*.rq` e grava `output/sparql_por_ano/relatorio.md` (tempos, tabelas, comparação com o painel). |
 
 Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.

@@ -1,0 +1,16 @@
+# Corpus da Fase 1 (sparql_corpus.py): entidades mencionadas nos mesmos
+# artigos que uma entidade, por nº de artigos em comum. ?entidade é ligada na
+# execução, como em entidade_por_ano.rq. O relatório mostra os N primeiros.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?entidade ?outra
+       (GROUP_CONCAT(DISTINCT ?r; separator=" | ") AS ?rotulo)
+       (COUNT(DISTINCT ?artigo) AS ?artigos)
+WHERE {
+  ?artigo sdh:mencionaEntidade ?entidade , ?outra .
+  FILTER(?outra != ?entidade)
+  OPTIONAL { ?outra rdfs:label ?r }
+}
+GROUP BY ?entidade ?outra
+ORDER BY ?entidade DESC(?artigos) ?rotulo

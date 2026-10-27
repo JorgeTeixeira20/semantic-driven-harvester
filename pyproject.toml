@@ -13,6 +13,10 @@ dependencies = [
     "requests>=2.31,<3",
 ]
 
+[project.optional-dependencies]
+# Consultas SPARQL ao grafo completo de um corpus da Fase 1 (sparql_corpus.py).
+sparql = ["pyoxigraph>=0.5,<0.6"]
+
 [project.scripts]
 harvester-smoke-test = "semantic_harvester.smoke_test:main"
 harvester-rdf-sample = "semantic_harvester.rdf_mapper:main"

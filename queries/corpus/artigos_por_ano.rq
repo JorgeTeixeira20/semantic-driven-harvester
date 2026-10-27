@@ -1,0 +1,24 @@
+# Corpus da Fase 1 (sparql_corpus.py): artigos por ano. A data de cada artigo
+# é a da captura mais antiga conhecida (menor sdh:tstamp), como no painel
+# (navigation_corpus.py: `tstamp[:4]`). "comEntidade" conta os artigos com
+# pelo menos uma entidade mencionada no texto (sdh:mencionaEntidade, grafo do
+# Caminho B). Artigos sem captura não têm ano e ficam de fora.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+
+SELECT ?ano (COUNT(?recurso) AS ?artigos) (SUM(?temEntidade) AS ?comEntidade)
+WHERE {
+  {
+    SELECT ?recurso (MIN(?tstamp) AS ?primeira)
+    WHERE {
+      ?recurso a sdh:RecursoWeb ;
+               sdh:temCaptura ?captura .
+      ?captura sdh:tstamp ?tstamp .
+    }
+    GROUP BY ?recurso
+  }
+  BIND(SUBSTR(STR(?primeira), 1, 4) AS ?ano)
+  BIND(IF(EXISTS { ?artigo sdh:temRecursoWeb ?recurso ;
+                           sdh:mencionaEntidade ?qualquer }, 1, 0) AS ?temEntidade)
+}
+GROUP BY ?ano
+ORDER BY ?ano

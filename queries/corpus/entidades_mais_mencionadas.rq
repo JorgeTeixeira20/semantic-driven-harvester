@@ -1,0 +1,19 @@
+# Corpus da Fase 1 (sparql_corpus.py): entidades por nº de artigos distintos
+# que as mencionam no texto, com rótulo(s) e origem no vocabulário
+# (sdh:origemVocabulario, só no vocabulário híbrido). Sem LIMIT: o relatório
+# mostra os N primeiros (--top) e compara todas com o painel. A categoria
+# (clube, jogador, ...) não está no grafo de entidades, só no vocabulário CSV.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?entidade
+       (GROUP_CONCAT(DISTINCT ?r; separator=" | ") AS ?rotulo)
+       (GROUP_CONCAT(DISTINCT ?o; separator=" | ") AS ?origem)
+       (COUNT(DISTINCT ?artigo) AS ?artigos)
+WHERE {
+  ?artigo sdh:mencionaEntidade ?entidade .
+  OPTIONAL { ?entidade rdfs:label ?r }
+  OPTIONAL { ?entidade sdh:origemVocabulario ?o }
+}
+GROUP BY ?entidade
+ORDER BY DESC(?artigos) ?rotulo

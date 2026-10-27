@@ -1,0 +1,23 @@
+# Corpus da Fase 1 (sparql_corpus.py): artigos que mencionam uma entidade, por
+# ano (captura mais antiga, como em artigos_por_ano.rq). ?entidade é ligada na
+# execução (substituição do pyoxigraph, que exige a variável na projeção) ao
+# URI da Wikidata do QID pedido, validado antes (^Q\d+$); sem ligação, dá
+# todas as entidades.
+PREFIX sdh: <urn:semantic-driven-harvester:prototype:>
+
+SELECT ?entidade ?ano (COUNT(?recurso) AS ?artigos)
+WHERE {
+  {
+    SELECT ?entidade ?recurso (MIN(?tstamp) AS ?primeira)
+    WHERE {
+      ?artigo sdh:mencionaEntidade ?entidade ;
+              sdh:temRecursoWeb ?recurso .
+      ?recurso sdh:temCaptura ?captura .
+      ?captura sdh:tstamp ?tstamp .
+    }
+    GROUP BY ?entidade ?recurso
+  }
+  BIND(SUBSTR(STR(?primeira), 1, 4) AS ?ano)
+}
+GROUP BY ?entidade ?ano
+ORDER BY ?entidade ?ano
