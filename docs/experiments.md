@@ -7308,3 +7308,29 @@ Não se encontraram `ficha-tecnica`, `contactos`, `publicidade`, `termos` ou `fa
 segmento. Uma pesquisa mais larga por palavras no slug (`equipa`, `ajuda`, `condicoes`…) dá
 2 301 (`por_ano`) e 2 706 (`completo`), mas quase todos são títulos de notícias (por exemplo "…equipa…"),
 por isso não são contados. Outros padrões menos evidentes ficam por identificar.
+
+## `completo`: cache da Wikidata reconstruída pelo conteúdo da consulta (2026-10-27)
+
+`wikidata_candidates` guarda as respostas por posição na lista (`candidato_00046.json`). A lista
+do `completo` (16 175 candidatos com 10+ artigos; no `por_ano` 9 473, logo **6 992 novos**) tem outra
+ordem, por isso copiar a cache do `por_ano` tal como está faria repetir pedidos já feitos (o
+`--reutilizar` só reaproveita se o `.rq` coincidir, e as posições deslocadas não coincidem). Arrancou
+assim e fez cerca de 50 candidatos novos sem necessidade; foi parado antes de escrever resultados.
+
+Solução, sem mexer no código do pipeline: `scripts/wikidata_cache_por_conteudo.py` procura cada
+consulta do `completo` nas respostas do `por_ano` pelo texto da consulta e copia-as para a posição
+certa de `data/raw/wikidata/candidatos_completo/`. Resultado:
+
+| | |
+|---|--:|
+| Respostas em cache no `por_ano` (consultas distintas) | 17 275 |
+| Candidatos do `completo` com 10+ artigos | 16 175 |
+| Candidatos sem consulta (forma inválida, p. ex. pedaço de frase) | 2 800 |
+| Consultas possíveis (exata + pesquisa, 13 375 candidatos) | 26 750 |
+| **Consultas reaproveitadas** | **13 881** |
+| Candidatos com pedido novo na consulta exata | **5 053** |
+
+Os pedidos novos fazem-se um de cada vez, com a pausa por omissão (1 s). Ritmo medido nos primeiros
+minutos: cerca de 6 s por consulta nova (38 respostas em 4 min); a pesquisa mais larga só corre quando a
+exata não dá resultado, por isso o número total de consultas novas só se sabe no fim. Decisão do autor:
+manter o limite de 10 artigos (comparável ao `por_ano`), em vez de o subir para encurtar o passo.
