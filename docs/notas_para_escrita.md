@@ -255,6 +255,16 @@ Recomendação: 1, 2, 4, 5, 6; 3 e 7 se houver tempo.
   no vocabulário (acrescentar = gerar de novo o grafo das entidades; só se houver tempo).
 - [ ] Resumo e Abstract (dependem do `[N]`); retirar os apêndices vazios (autor).
 
+- [ ] Avaliação: **retirar a secção "Desempenho"** (decisão do autor, 2026-10-28) e pôr nas Limitações
+  uma frase: todo o processo correu num computador pessoal; a etapa mais demorada foi a ligação dos
+  candidatos à Wikidata, um pedido de cada vez (várias horas na primeira execução, segundos com as
+  respostas guardadas).
+- [ ] Avaliação/Limitações: modelo de página de 2002 não reconhecido pelo extrator (84,7 % das notícias
+  de 2002 sem corpo; o texto existe no HTML; pelo menos 1 511 seguem o modelo `td width=100% /
+  span.record`). Usar 1 511, não "até 5 100".
+- [ ] Arquivo.pt: no `completo`, 171 249 com texto extraído e 194 238 com HTML guardado; usar 70 784
+  (artigos acrescentados pelo `xl`), não os 66 696 da contagem preliminar.
+
 ### Depois do `completo` (Wikidata → passagem 2 → painel → avaliação)
 - [ ] Introdução e Conclusões: `[N]` notícias; frase da síntese sobre a extensão.
 - [ ] Arquivo.pt: parágrafo da lacuna 2010–2016 (versão com a recolha no `record.xl.pt` e os números).
