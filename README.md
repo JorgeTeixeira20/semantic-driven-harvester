@@ -469,3 +469,34 @@ juntos dá o grafo completo. Termos novos da ontologia: `sdh:versaoDe`,
 `sdh:similaridade`, `sdh:Mencao`, `sdh:temMencao`, `sdh:sobreEntidade`,
 `sdh:capturasComMencao`, `sdh:capturasComTexto`, `sdh:ocorrencias`,
 `sdh:persistente`, `sdh:clubeCoerente`, `sdh:categoriaTema`, `sdh:valorTema`.
+
+## Dados e protótipo do corpus completo
+
+Os dados do corpus completo (200 101 notícias do Record, 2001–2020) estão na
+[página de releases](https://github.com/JorgeTeixeira20/semantic-driven-harvester/releases)
+(versão `v1.0-tese`), em dois ZIP:
+
+- `prototipo_completo.zip`: o protótipo já gerado. Descomprimir e abrir
+  `prototipo_completo/index.html` no browser (sem servidor nem rede).
+- `dados_completo.zip`: o grafo RDF e as tabelas de entidades de que o painel
+  precisa, com o caminho relativo à raiz do repositório.
+
+Para gerar o protótipo a partir dos dados, num clone limpo:
+
+```bash
+git clone https://github.com/JorgeTeixeira20/semantic-driven-harvester.git
+cd semantic-driven-harvester
+python3 -m venv .venv
+.venv/bin/pip install -e ".[sparql]"
+unzip /caminho/para/dados_completo.zip   # na raiz do clone
+.venv/bin/python -m semantic_harvester.navigation_corpus --corpus completo \
+  --vocabulario data/processed/caminho_b_vocabulario_hibrido_completo.csv \
+  --fonte sparql --destino prototipo_verificacao
+```
+
+O resultado fica em `output/prototipo_verificacao/` (cerca de 4 minutos; o
+`data.js` é idêntico, byte a byte, ao de `prototipo_completo.zip`).
+
+Os textos e o HTML descarregados do Arquivo.pt não são publicados: para refazer
+todo o processo, desde a recolha, é preciso voltar a descarregá-los (muitas
+horas de pedidos).
