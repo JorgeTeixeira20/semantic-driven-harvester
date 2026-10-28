@@ -103,8 +103,8 @@ e no corpus alargado há uma captura por artigo. Como justifica esta escolha?"
   ao longo do trabalho, mas não foram medidas com uma amostra. É uma limitação declarada
   na tese, a par das páginas que não são notícias identificadas por padrões evidentes.
 - A regra dos vídeos e fotogalerias não foi aplicada a `record.pt` para não mudar o
-  corpus já fechado e avaliado; essas páginas têm, na maior parte, pouco ou nenhum texto,
-  pelo que contribuem pouco para as entidades.
+  corpus já fechado e avaliado. Quantas são e quanto texto têm não foi medido (a
+  confirmar antes da defesa, se houver tempo).
 
 ## 9. Intervalos de Wilson com notícias agrupadas
 
