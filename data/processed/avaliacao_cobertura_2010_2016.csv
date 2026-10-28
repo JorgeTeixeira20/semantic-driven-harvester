@@ -1,4 +1,18 @@
 artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
+2,interior.aspx?content_id,Maria Odete Fiuza,jogador,,1,certa,,Odete Fiúza,
+2,interior.aspx?content_id,Maratona Clube de Portugal,clube,,1,falhada,fora_do_vocabulario,,
+2,interior.aspx?content_id,João Campos,treinador,,1,falhada,fora_do_vocabulario,,
+2,interior.aspx?content_id,Mundiais IBSA,competicao,,1,falhada,fora_do_vocabulario,,
+2,interior.aspx?content_id,Europeus de Dublin,competicao,,1,falhada,fora_do_vocabulario,,
+3,interior.aspx?content_id,Adrien Silva,jogador,,1,certa,,Adrien Silva,
+3,interior.aspx?content_id,Sporting,clube,,1,certa,,Sporting Clube de Portugal,
+3,interior.aspx?content_id,Rio Ave,clube,,1,falhada,fora_do_vocabulario,,
+3,interior.aspx?content_id,Wilson Eduardo,jogador,,1,certa,,Wilson Eduardo,
+3,interior.aspx?content_id,Tarantini,jogador,,1,certa,,Ricardo José Vaz Alves Monteiro,
+3,interior.aspx?content_id,Marcelo,jogador,,1,falhada,forma_nao_prevista,,só o nome próprio; a variante é o nome completo
+3,interior.aspx?content_id,Sp. Braga,clube,,1,certa,,Sporting Clube de Braga,
+3,interior.aspx?content_id,Leonardo Jardim,treinador,,1,falhada,fora_do_vocabulario,,
+3,interior.aspx?content_id,Nuno Espírito Santo,treinador,,1,certa,,Nuno Espírito Santo,
 4,interior.aspx?content_id,Benfica,clube,,1,certa,,Sport Lisboa e Benfica,
 4,interior.aspx?content_id,Marítimo,clube,,1,certa,,Club Sport Marítimo,
 4,interior.aspx?content_id,Estádio da Luz,estadio,,1,falhada,fora_do_vocabulario,,
@@ -146,7 +160,20 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 15,outro,FC Porto,clube,,1,falhada,sem_corpo,,origem do corpo: premium
 15,outro,SC Alba,clube,,1,falhada,sem_corpo,,origem do corpo: premium
 15,outro,Taça de Portugal,competicao,,1,falhada,sem_corpo,,origem do corpo: premium
-15,outro,Liga,competicao,,1,falhada,sem_corpo,,origem do corpo: premium
+2,interior.aspx?content_id,Maria Odete Fiuza,jogador,,2,certa,,Odete Fiúza,
+2,interior.aspx?content_id,Maratona Clube de Portugal,clube,,2,falhada,fora_do_vocabulario,,
+2,interior.aspx?content_id,João Campos,treinador,,2,certa,,João Campos,
+2,interior.aspx?content_id,Mundiais IBSA,competicao,,2,falhada,fora_do_vocabulario,,
+2,interior.aspx?content_id,Europeus de Dublin,competicao,,2,falhada,fora_do_vocabulario,,
+3,interior.aspx?content_id,Adrien Silva,jogador,,2,certa,,Adrien Silva,
+3,interior.aspx?content_id,Sporting,clube,,2,certa,,Sporting Clube de Portugal,
+3,interior.aspx?content_id,Rio Ave,clube,,2,certa,,Rio Ave Futebol Clube,
+3,interior.aspx?content_id,Wilson Eduardo,jogador,,2,certa,,Wilson Eduardo,
+3,interior.aspx?content_id,Tarantini,jogador,,2,certa,,Ricardo José Vaz Alves Monteiro,
+3,interior.aspx?content_id,Marcelo,jogador,,2,falhada,forma_nao_prevista,,só o nome próprio; a variante é o nome completo
+3,interior.aspx?content_id,Sp. Braga,clube,,2,certa,,Sporting Clube de Braga,
+3,interior.aspx?content_id,Leonardo Jardim,treinador,,2,certa,,Leonardo Jardim,
+3,interior.aspx?content_id,Nuno Espírito Santo,treinador,,2,certa,,Nuno Espírito Santo,
 4,interior.aspx?content_id,Benfica,clube,,2,certa,,Sport Lisboa e Benfica,
 4,interior.aspx?content_id,Marítimo,clube,,2,certa,,Club Sport Marítimo,
 4,interior.aspx?content_id,Estádio da Luz,estadio,,2,certa,,Estádio da Luz,
@@ -297,4 +324,3 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 15,outro,FC Porto,clube,,2,falhada,sem_corpo,,origem do corpo: premium
 15,outro,SC Alba,clube,,2,falhada,sem_corpo,,origem do corpo: premium
 15,outro,Taça de Portugal,competicao,,2,falhada,sem_corpo,,origem do corpo: premium
-15,outro,Liga,competicao,,2,falhada,sem_corpo,,origem do corpo: premium

@@ -14,7 +14,6 @@ n,entidade,categoria,qid,nota
 3,Sp. Braga,clube,,
 3,Leonardo Jardim,treinador,,
 3,Nuno Espírito Santo,treinador,,
-3,Liga,competicao,,
 4,Benfica,clube,,
 4,Marítimo,clube,,
 4,Estádio da Luz,estadio,,
@@ -160,4 +159,3 @@ n,entidade,categoria,qid,nota
 15,FC Porto,clube,,
 15,SC Alba,clube,,
 15,Taça de Portugal,competicao,,
-15,Liga,competicao,,'jogos da Liga' = Primeira Liga

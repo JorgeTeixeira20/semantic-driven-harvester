@@ -107,16 +107,11 @@ def main() -> None:
                 else:
                     target, reason, note = "", "fora_do_vocabulario", ""
                     if names[number].get(nf(a["entidade"])):
-                        if n <= 3:   # motivo por classificar (anotação do autor ainda por enviar)
-                            reason, note = "por_classificar", "existe no vocabulário; motivo por rever"
-                        else:
-                            print("ATENÇÃO existe no vocabulário e não foi marcada:", number, key, names[number][nf(a["entidade"])])
+                        print("ATENÇÃO existe no vocabulário e não foi marcada:", number, key, names[number][nf(a["entidade"])])
                 out.append({**base, "resultado": "falhada", "motivo": reason, "sistema": "", "nota": note})
             for label in sorted(system - used):
                 reason, note = WRONG.get((n, label), ("?", ""))
-                if reason == "?" and n <= 3:
-                    reason = "por_classificar"
-                elif reason == "?":
+                if reason == "?":
                     print("ERRADA sem motivo:", number, n, label)
                 row = by_label[number].get(label, {})
                 out.append(dict(artigo=n, esquema=s["esquema"], entidade="", categoria=row.get("categoria", ""),
@@ -124,13 +119,11 @@ def main() -> None:
                                 motivo=reason, sistema=label, nota=note))
     out.sort(key=lambda o: (o["passagem"], o["artigo"]))
     fields = ["artigo", "esquema", "entidade", "categoria", "qid", "passagem", "resultado", "motivo", "sistema", "nota"]
-    # As n.º 1–3 têm as linhas à parte (versionadas depois de o autor enviar a sua anotação).
-    for name, subset in (("avaliacao_cobertura_2010_2016.csv", [o for o in out if o["artigo"] > 3]),
-                         ("avaliacao_cobertura_2010_2016_n1a3.csv", [o for o in out if o["artigo"] <= 3])):
-        with (ROOT / "data/processed" / name).open("w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
-            writer.writeheader()
-            writer.writerows(subset)
+    target = ROOT / "data/processed/avaliacao_cobertura_2010_2016.csv"
+    with target.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(out)
     print(len(out), sorted(collections.Counter((o["passagem"], o["resultado"]) for o in out).items()))
 
 

@@ -7662,3 +7662,56 @@ Reconstituída a heurística sobre os 103 101 recursos do `xl` (`corpus_classifi
 AMP aceites, uma parte é duplicado de uma página não-AMP (ver "AMP e não-notícias"): o `completo`
 inclui os duplicados AMP, 4,0 % do corpus, como o `por_ano` (4,4 %). Os ~98 URLs `content_id/u003d`
 são uma perda pequena, não corrigida.
+
+#### Amostra B: anotação do autor das n.º 1–3 e concordância (2026-10-28)
+
+Anotação do autor (`data/processed/anotacao_cobertura_2010_2016_autor_n1a3.csv`), às cegas
+(sem ver a da sessão, commit `bf351c0`): n.º 1, 0 entidades (Premium); n.º 2, 0 entidades (a página
+mostrava o erro "não conseguimos encontrar a página" do Arquivo.pt); n.º 3, 9 entidades (Adrien
+Silva, Wilson Eduardo, Tarantini, Marcelo, Sporting, Rio Ave, Sp. Braga, Leonardo Jardim, Nuno
+Espírito Santo), com o árbitro Carlos Xistra fora do âmbito e "Liga" como genérico duvidoso, não
+contado. **Revisão da n.º 2** depois de abrir a captura original
+(`arquivo.pt/wayback/20130810035809id_/…`): Maria Odete Fiúza, João Campos (atleta-guia), Maratona
+Clube de Portugal, Mundiais IBSA e Europeus de Dublin.
+
+Concordância = entidades em comum / entidades distintas das duas anotações (protocolo), com
+"João Campos" igual nas duas (a sessão pôs `treinador`, o autor `atleta-guia`: a entidade é a mesma):
+
+| Notícia | Sessão | Autor, às cegas | Em comum | Concordância inicial | Autor, final | Concordância final |
+|--:|--:|--:|--:|--:|--:|--:|
+| 1 | 0 | 0 | 0 | sem entidades nas duas | 0 | sem entidades nas duas |
+| 2 | 5 | 0 | 0 | 0/5 (0 %) | 5 | **5/5 (100 %)** |
+| 3 | 10 | 9 | 9 | 9/10 (90 %) | 9 | 9/10 (90 %) |
+| **Total** | 15 | 9 | 9 | **9/15 (60,0 %)** | 14 | **14/15 (93,3 %)** |
+
+**Diferenças.** (1) **N.º 2:** divergência de **acesso à página, não de critério.** A sessão leu a
+versão `noFrame` do replay (página com a notícia); o autor viu a moldura do replay com o erro do
+Arquivo.pt e só depois abriu a captura original; com a mesma página as duas anotações coincidem
+nas 5 entidades. (2) **N.º 3, "Liga":** a sessão anotou-a (Primeira Liga, por "assumir a liderança
+da Liga"), o autor não a contou por ser genérica; é uma diferença de **critério**. Fica a decisão do
+autor, aplicada de forma uniforme: **"Liga" genérica não conta**, o que também a retira da n.º 15
+(Premium, "jogos da Liga"). (3) João Campos: categoria `treinador` vs `atleta-guia`, sem efeito
+(a categoria não entra na comparação). Registo, como na n.º 1 do `por_ano`: a anotação final das
+n.º 1–3 é a do autor com a n.º 2 revista; **a concordância inicial de 60 % mede o acesso à página
+e não o critério** (nos dois pontos em que os dois leram a mesma página, 9/10 e uma diferença
+conhecida de critério).
+
+**Tabela final das 15** (anotação final; motivos definitivos das n.º 1–3: n.º 2 Maratona Clube de
+Portugal, Mundiais IBSA e Europeus de Dublin `fora_do_vocabulario`, e João Campos só existe na
+híbrida; n.º 3 "Marcelo" `forma_nao_prevista` — o vocabulário tem "Marcelo dos Santos Ferreira",
+do Rio Ave, mas "Marcelo" sozinho não é variante —, e Rio Ave e Leonardo Jardim só na híbrida).
+Substitui as de cima.
+
+| Passagem | Notícias | Certas | Erradas | Falhadas | Precisão (Wilson 95 %) | Cobertura (Wilson 95 %) | F1 |
+|---|---|--:|--:|--:|---|---|--:|
+| 1 | 12 (n.º 4–15) | 38 | 2 | 107 | 95,0 % (83–99) | 26,2 % (20–34) | 41,1 % |
+| 2 | 12 (n.º 4–15) | 69 | 5 | 76 | 93,2 % (85–97) | 47,6 % (40–56) | 63,0 % |
+| 1 | **15** | 45 | 2 | 114 | 95,7 % (86–99) | 28,3 % (22–36) | 43,7 % |
+| 2 | **15** | 79 | 5 | 80 | 94,0 % (87–97) | 49,7 % (42–57) | 65,0 % |
+
+(As falhadas descem 1 por tirar a "Liga" da n.º 15.) Motivos das falhadas, 15 notícias, passagem 2
+(entre parênteses a 1): `fora_do_vocabulario` 32 (70); `forma_nao_prevista` 21 (17); `outro` 11 (11);
+`regra_de_nomes` 4 (4); `sem_corpo` 12 (12). Erradas (passagem 2): as 5 de antes, sem alteração.
+Cobertura só sobre as entidades do vocabulário: passagem 2, 79/127 (62,2 %; 54–70) e, só com corpo,
+79/115 (68,7 %; 60–76); passagem 1, 45/89 (50,6 %; 40–61) e 45/77 (58,4 %; 47–69). Por notícia
+(passagem 2, certas/erradas/falhadas): n.º 1 0/0/0; 2 2/0/3; 3 8/0/1.
