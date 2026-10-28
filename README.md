@@ -472,7 +472,7 @@ juntos dá o grafo completo. Termos novos da ontologia: `sdh:versaoDe`,
 
 ## Dados e protótipo do corpus completo
 
-Os dados do corpus completo (200 101 notícias do Record, 2001–2020) estão na
+Os dados do corpus completo (200 101 notícias do Record, 2001–2021) estão na
 [página de releases](https://github.com/JorgeTeixeira20/semantic-driven-harvester/releases)
 (versão `v1.0-tese`), em dois ZIP:
 
