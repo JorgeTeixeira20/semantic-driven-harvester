@@ -7715,3 +7715,55 @@ Substitui as de cima.
 Cobertura só sobre as entidades do vocabulário: passagem 2, 79/127 (62,2 %; 54–70) e, só com corpo,
 79/115 (68,7 %; 60–76); passagem 1, 45/89 (50,6 %; 40–61) e 45/77 (58,4 %; 47–69). Por notícia
 (passagem 2, certas/erradas/falhadas): n.º 1 0/0/0; 2 2/0/3; 3 8/0/1.
+
+#### Amostra B: critério do "Liga" fixado pelo autor; concordância final 15/15 e tabela das 15 refeita (2026-10-28)
+
+**Critério (autor).** O "Liga" da n.º 3 ("assumir a liderança da Liga") é a Primeira Liga, por isso
+conta como competição; o autor reviu a sua anotação e concorda com a da sessão. **Regra uniforme:**
+"Liga" conta como competição quando o contexto identifica qual é (a liderança da Liga num texto sobre
+o campeonato português); quando não identifica, é duvidosa e não conta. Isto **substitui** a decisão
+do parágrafo anterior ("'Liga' genérica não conta", que também tirava a n.º 15), que era da sessão e
+estava errada para estes contextos.
+
+**Concordância, registada assim.** (1) *Entre anotações independentes, com acesso à mesma página:*
+**14/15 (93,3 %)**, sendo a única diferença o "Liga" da n.º 3 (critério). A anotação do autor da
+n.º 2 foi feita sem ver a lista da sessão (só sabia que a sessão tinha encontrado entidades), depois
+de aceder à versão original da captura; **na primeira leitura a n.º 2 apareceu como página de erro
+do Arquivo.pt** e só foi acessível pela captura original (a primeira concordância, às cegas, de
+9/15, 60,0 %, mede esse acesso e não o critério). (2) *Final, depois de fixado o critério do "Liga":*
+**15/15 (100 %)** (n.º 1: sem entidades nas duas; n.º 2: 5/5; n.º 3: 10/10). O "João Campos" conta
+como a mesma entidade (`treinador` vs `atleta-guia`).
+
+**Aplicação da regra às 15 (pelo contexto).** Contam como Primeira Liga: n.º 3 (liderança da
+Liga), **n.º 15** ("três jogos seguidos… em jogos da Liga", Premium, só o início visível) e
+**n.º 13** ("11 as épocas em que jogou na Liga, ao serviço de Sp. Braga, Sporting e V. Setúbal"), que a
+primeira anotação não tinha. Não há mais casos: nas outras notícias a competição vem sempre com
+o nome (Liga Zon Sagres, Liga Europa, Segunda Liga, Liga de Honra). Alteração à anotação
+(`anotacao_cobertura_2010_2016.csv`): +1 entidade em cada uma das n.º 3, 13 e 15. Motivos: n.º 3 e 13,
+`forma_nao_prevista` ("Liga" sozinha não é variante da Primeira Liga); n.º 15, `sem_corpo`.
+
+**Tabela das 15 (substitui as anteriores):**
+
+| Passagem | Notícias | Certas | Erradas | Falhadas | Precisão (Wilson 95 %) | Cobertura (Wilson 95 %) | F1 |
+|---|---|--:|--:|--:|---|---|--:|
+| 1 | 12 (n.º 4–15) | 38 | 2 | 109 | 95,0 % (83–99) | 25,9 % (19–33) | 40,6 % |
+| 2 | 12 (n.º 4–15) | 69 | 5 | 78 | 93,2 % (85–97) | 46,9 % (39–55) | 62,4 % |
+| 1 | **15** | 45 | 2 | 117 | 95,7 % (86–99) | 27,8 % (21–35) | 43,1 % |
+| 2 | **15** | 79 | 5 | 83 | 94,0 % (87–97) | 48,8 % (41–56) | 64,2 % |
+
+Motivos das falhadas, 15 notícias, passagem 2 (entre parênteses a 1): `fora_do_vocabulario` 32 (72);
+`forma_nao_prevista` 23 (17); `outro` 11 (11); `regra_de_nomes` 4 (4); `sem_corpo` 13 (13). Cobertura só
+sobre as entidades do vocabulário: passagem 2, 79/130 (60,8 %; 52–69) e, só com corpo, 79/117
+(67,5 %; 59–75); passagem 1, 45/90 (50,0 %; 40–60) e 45/77 (58,4 %; 47–69). Erradas: as mesmas 5.
+
+**O "Liga" sozinho nas 30 notícias do `por_ano`.** Nenhuma das 30 tem um "Liga" sozinho como
+competição: a anotação só tem competições com o nome (I Liga, II Liga, Liga de Honra, Taça da Liga,
+La Liga, Liga NOS, Liga Betclic; as duas últimas e "La Liga" são nomes de patrocínio ou formas
+diferentes das variantes e estão como `forma_nao_prevista`/`fora_do_vocabulario`, não como "Liga"
+sozinho). Procurei a palavra "Liga/liga" nos corpos das 30: 11 ocorrências, todas em nomes
+compostos ou "liga espanhola", exceto **uma**, n.º 3 ("O calendário é discutido a tempo e horas com
+a Liga"), que é a entidade organizadora (Liga de Clubes) e **não uma competição**, por isso não
+conta pela regra nova. **Casos com critério diferente: 0; efeito na tabela das 30: nenhum**, não
+alterei nada. Limite da verificação: nas quatro sem corpo extraído (n.º 1, 4, 9 e 21) li o texto
+da página (com menus): só há "I Liga", "II Liga", "Liga Betclic" e semelhantes nomeados; a n.º 9
+não tem texto extraído (só HTML) e não a verifiquei.

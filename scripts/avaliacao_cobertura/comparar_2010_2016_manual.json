@@ -182,6 +182,16 @@
    "Marcelo dos Santos Ferreira",
    "forma_nao_prevista",
    "só o nome próprio; a variante é o nome completo"
+  ],
+  "3|Liga": [
+   "Primeira Liga",
+   "forma_nao_prevista",
+   "'Liga' sozinha identificada pelo contexto; não é variante"
+  ],
+  "13|Liga": [
+   "Primeira Liga",
+   "forma_nao_prevista",
+   "'Liga' sozinha identificada pelo contexto; não é variante"
   ]
  },
  "errada": {

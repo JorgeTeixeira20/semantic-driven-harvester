@@ -13,6 +13,7 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 3,interior.aspx?content_id,Sp. Braga,clube,,1,certa,,Sporting Clube de Braga,
 3,interior.aspx?content_id,Leonardo Jardim,treinador,,1,falhada,fora_do_vocabulario,,
 3,interior.aspx?content_id,Nuno Espírito Santo,treinador,,1,certa,,Nuno Espírito Santo,
+3,interior.aspx?content_id,Liga,competicao,,1,falhada,fora_do_vocabulario,,Primeira Liga só existe na híbrida
 4,interior.aspx?content_id,Benfica,clube,,1,certa,,Sport Lisboa e Benfica,
 4,interior.aspx?content_id,Marítimo,clube,,1,certa,,Club Sport Marítimo,
 4,interior.aspx?content_id,Estádio da Luz,estadio,,1,falhada,fora_do_vocabulario,,
@@ -144,6 +145,7 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 13,interior.aspx?content_id,V. Setúbal,clube,,1,certa,,Vitória Futebol Clube,
 13,interior.aspx?content_id,U. Leiria,clube,,1,certa,,União Desportiva de Leiria,
 13,interior.aspx?content_id,Liga de Honra,competicao,,1,falhada,fora_do_vocabulario,,
+13,interior.aspx?content_id,Liga,competicao,,1,falhada,fora_do_vocabulario,,Primeira Liga só existe na híbrida
 14,interior.aspx?content_id,Ferrari,clube,,1,falhada,fora_do_vocabulario,,
 14,interior.aspx?content_id,Fernando Alonso,jogador,,1,falhada,fora_do_vocabulario,,
 14,interior.aspx?content_id,Kimi Räikkönen,jogador,,1,falhada,fora_do_vocabulario,,
@@ -160,6 +162,7 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 15,outro,FC Porto,clube,,1,falhada,sem_corpo,,origem do corpo: premium
 15,outro,SC Alba,clube,,1,falhada,sem_corpo,,origem do corpo: premium
 15,outro,Taça de Portugal,competicao,,1,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Liga,competicao,,1,falhada,sem_corpo,,origem do corpo: premium
 2,interior.aspx?content_id,Maria Odete Fiuza,jogador,,2,certa,,Odete Fiúza,
 2,interior.aspx?content_id,Maratona Clube de Portugal,clube,,2,falhada,fora_do_vocabulario,,
 2,interior.aspx?content_id,João Campos,treinador,,2,certa,,João Campos,
@@ -174,6 +177,7 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 3,interior.aspx?content_id,Sp. Braga,clube,,2,certa,,Sporting Clube de Braga,
 3,interior.aspx?content_id,Leonardo Jardim,treinador,,2,certa,,Leonardo Jardim,
 3,interior.aspx?content_id,Nuno Espírito Santo,treinador,,2,certa,,Nuno Espírito Santo,
+3,interior.aspx?content_id,Liga,competicao,,2,falhada,forma_nao_prevista,,'Liga' sozinha identificada pelo contexto; não é variante
 4,interior.aspx?content_id,Benfica,clube,,2,certa,,Sport Lisboa e Benfica,
 4,interior.aspx?content_id,Marítimo,clube,,2,certa,,Club Sport Marítimo,
 4,interior.aspx?content_id,Estádio da Luz,estadio,,2,certa,,Estádio da Luz,
@@ -308,6 +312,7 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 13,interior.aspx?content_id,V. Setúbal,clube,,2,certa,,Vitória Futebol Clube,
 13,interior.aspx?content_id,U. Leiria,clube,,2,certa,,União Desportiva de Leiria,
 13,interior.aspx?content_id,Liga de Honra,competicao,,2,certa,,Segunda Liga,
+13,interior.aspx?content_id,Liga,competicao,,2,falhada,forma_nao_prevista,,'Liga' sozinha identificada pelo contexto; não é variante
 14,interior.aspx?content_id,Ferrari,clube,,2,falhada,fora_do_vocabulario,,
 14,interior.aspx?content_id,Fernando Alonso,jogador,,2,certa,,Fernando Alonso,
 14,interior.aspx?content_id,Kimi Räikkönen,jogador,,2,certa,,Kimi Räikkönen,
@@ -324,3 +329,4 @@ artigo,esquema,entidade,categoria,qid,passagem,resultado,motivo,sistema,nota
 15,outro,FC Porto,clube,,2,falhada,sem_corpo,,origem do corpo: premium
 15,outro,SC Alba,clube,,2,falhada,sem_corpo,,origem do corpo: premium
 15,outro,Taça de Portugal,competicao,,2,falhada,sem_corpo,,origem do corpo: premium
+15,outro,Liga,competicao,,2,falhada,sem_corpo,,origem do corpo: premium

@@ -14,6 +14,7 @@ n,entidade,categoria,qid,nota
 3,Sp. Braga,clube,,
 3,Leonardo Jardim,treinador,,
 3,Nuno Espírito Santo,treinador,,
+3,Liga,competicao,,"Primeira Liga pelo contexto (""assumir a liderança da Liga""); critério fixado pelo autor"
 4,Benfica,clube,,
 4,Marítimo,clube,,
 4,Estádio da Luz,estadio,,
@@ -143,6 +144,7 @@ n,entidade,categoria,qid,nota
 13,V. Setúbal,clube,,
 13,U. Leiria,clube,,
 13,Liga de Honra,competicao,,
+13,Liga,competicao,,"Primeira Liga pelo contexto (""épocas em que jogou na Liga, ao serviço de Sp. Braga, Sporting e V. Setúbal""); critério ""Liga"" com contexto"
 14,Ferrari,clube,,equipa de F1
 14,Fernando Alonso,jogador,,
 14,Kimi Räikkönen,jogador,,
@@ -159,3 +161,4 @@ n,entidade,categoria,qid,nota
 15,FC Porto,clube,,
 15,SC Alba,clube,,
 15,Taça de Portugal,competicao,,
+15,Liga,competicao,,"Primeira Liga pelo contexto (""em jogos da Liga""); só o início visível (Premium)"
