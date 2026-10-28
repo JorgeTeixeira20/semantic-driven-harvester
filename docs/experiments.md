@@ -7536,3 +7536,234 @@ diferente de `fora_do_vocabulario`):
 15 não têm texto extraído mas têm HTML guardado** (n.º 3, 4, 6, 11, 12 e 15); cinco entram na
 análise pela opção `--html-sem-texto` (todas menos a Premium n.º 15). Sem a opção, 4 das 12
 notícias anotadas (n.º 4, 6, 11 e 12) ficariam sem corpo, o que mostra o peso da opção nesta época.
+
+#### Amostra B, versão corrigida (n.º 9) e com as 15 notícias
+
+**Correção da anotação (n.º 9).** "Jacques Villeneuve" não era um erro do sistema mas da anotação:
+a minha primeira leitura da n.º 9 (artigo longo sobre o acidente de Bianchi) parou antes do fim do
+corpo. Relida a página inteira, a anotação passa a incluir **Jacques Villeneuve, Lewis Hamilton e
+Adrian Sutil**, menções reais (Hamilton e Sutil só pelo apelido: "como Hamilton", "despiste de
+Sutil", falhadas por `forma_nao_prevista`). Foi feita depois de ver a comparação, pelo que se
+regista aqui; não corrigi mais nada nas outras notícias. A tabela acima (precisão 91,9 % na
+passagem 2) fica **substituída** pela de baixo.
+
+**Anotação às cegas das n.º 1–3** pela sessão, commit `bf351c0`, antes da anotação do autor
+(que as anota amanhã). Não a mostro ao autor até ele enviar a sua; as linhas da comparação das
+n.º 1–3 ficam fora do Git até lá (`avaliacao_cobertura_2010_2016_n1a3.csv`), e os motivos das
+falhadas das n.º 1–3 são provisórios (automáticos: sem forma exata no vocabulário →
+`fora_do_vocabulario`).
+
+| Passagem | Notícias | Certas | Erradas | Falhadas | Precisão (Wilson 95 %) | Cobertura (Wilson 95 %) | F1 |
+|---|---|--:|--:|--:|---|---|--:|
+| 1 | 12 (n.º 4–15) | 38 | 2 | 108 | 95,0 % (83–99) | 26,0 % (20–34) | 40,9 % |
+| 2 | 12 (n.º 4–15) | 69 | 5 | 77 | 93,2 % (85–97) | 47,3 % (39–55) | 62,7 % |
+| 1 | **15** | 45 | 2 | 116 | 95,7 % (86–99) | 28,0 % (22–35) | 43,3 % |
+| 2 | **15** | 79 | 5 | 82 | 94,0 % (87–97) | 49,1 % (41–57) | 64,5 % |
+
+(A n.º 1, Premium e de opinião, não tem entidades no âmbito na parte visível.) Motivos das
+falhadas, 15 notícias (passagem 2; entre parênteses a 1): `fora_do_vocabulario` 34 (72);
+`forma_nao_prevista` 20 (16); `outro` 11 (11); `regra_de_nomes` 4 (4); `sem_corpo` 13 (13).
+Erradas da passagem 2: "Luz Asprilla", "Mario Almeida", "Sporting Clube de Portugal"
+("Sporting B"), "Las Vegas Raiders", "Seleção Portuguesa de Futebol". Cobertura só sobre as
+entidades que existem no vocabulário: passagem 1, 45/89 (50,6 %; 40–61) e, só com corpo, 45/76
+(59,2 %; 48–70); passagem 2, 79/127 (62,2 %; 54–70) e, só com corpo, 79/114 (69,3 %; 60–77). Nas
+12 anotadas: passagem 2, 69/117 (59,0 %) e 69/104 (66,3 %).
+
+#### Passo 9: as 10 duvidosas, com a descrição na Wikidata (2026-10-28)
+
+Consultei a descrição (`wbgetentities`, `labels|descriptions`, pt e en) de cada um dos 10 QIDs,
+um pedido de cada vez, com pausa de 2 s (10 pedidos, todos 200). Nenhuma ficou duvidosa:
+**2 certas e 8 erradas**.
+
+| # | Entidade (QID) | Descrição na Wikidata | Resultado |
+|--:|---|---|---|
+| 2 | Grande Prémio do Japão (Q8000) | Formula 1 auto race held in Japan | errada (o texto é de motocrosse) |
+| 6 | António Soares (Q4777609) | futebolista português | errada (o texto é de atletismo) |
+| 20 | Luis Sousa Pinto (Q22279681) | volleyball player | errada (conselho de arbitragem) |
+| 24 | Diana Chaves (Q136536937) | Colombian soccer player | errada (a atriz portuguesa) |
+| 25 | Luís Viana (Q10321680) | Portuguese ice hockey player (born 1976) | errada (jogo de formação) |
+| 26 | Inês Silva (Q27855588) | futebolista portuguesa | **certa** (futebol feminino) |
+| 34 | Leandro Perez (Q3297527) | futebolista brasileiro | **certa** (Feirense) |
+| 36 | Marc Gual (Q27916801) | Spanish association football player | errada (hóquei em patins) |
+| 44 | Fernando Lopes (Q28810439) | Angolan swimmer | errada (andebol do Benfica) |
+| 48 | José Ruiz Aguilar (Q641832) | futebolista mexicano | errada (futsal de Espanha) |
+
+Tabela final da amostra de 50 (substitui a de cima): **certas 37 (74 %), erradas 13 (26 %),
+duvidosas 0**. Estrato ≥ 50 artigos: 16 certas, 9 erradas; estrato 10–49: 21 certas, 4 erradas.
+O padrão é o dos homónimos de nome comum de outra modalidade: 7 das 13 erradas são pessoas com o
+mesmo nome mas de outro desporto. A #25 e a #36 são o ponto mais fraco: a descrição dá outro
+desporto, mas não verifiquei se o homónimo jogou também o desporto do texto.
+
+### Porque é que 2002 quase não tem entidades (2026-10-28)
+
+Só 228 dos 6 586 artigos de 2002 (3,5 %) têm entidade na passagem 2, contra 93 % em 2006 e 56 %
+em 2001. **Causa: o extrator de corpo não reconhece o modelo de página de 2002, não é falta de
+conteúdo.** Origem do corpo dos 6 586 (painel `completo`):
+
+| Origem do corpo | 2001 | 2002 | 2006 |
+|---|--:|--:|--:|
+| contentor `aux` do HTML | 7 716 (com entidade 75,7 %) | 564 (40,4 %) | 6 723 (93,3 %) |
+| sem corpo (`sem_corpo`) | 2 621 | **5 579 (84,7 %)** | 258 |
+| sem texto extraído nem HTML | 39 | 443 | 0 |
+| c′ | 0 | 0 | 0 |
+
+Dos 5 579 de 2002 sem corpo, **3 091 não têm HTML guardado** (só o texto extraído) e 2 488 têm
+HTML. Três exemplos de páginas sem entidade (todos `noticia.asp?id=…`, sorteio com semente
+20261028): `…id=165189&idcanal=17` (2002-06-09), `…id=163060&idcanal=84` (2002-05-23) e
+`…id=163959&idcanal=22` (2002-06-21). Nos três, o texto extraído começa pela barra lateral
+("Campeonato 2001/02 1 SPORTING 75 2 Boavista 70 …", classificação, marcadores, próxima jornada) e a
+notícia vem **depois**, terminando em "Autor: … Data: … imprimir comentar enviar"; no exemplo
+`…id=163959` é um texto sobre o plantel do Salgueiros (Ivo, Tozé, Ricardo Fernandes…), com
+jogadores e clubes, que nunca foi lido. No HTML do mesmo exemplo o corpo está em
+`<td width="100%"><span class="record">…` com parágrafos separados por `<br />`: **nenhum
+`CONTAINERS` de `html_body.py` corresponde a este modelo** (o `aux` de 2001/2006 e o `td480` de
+1999–2000 não existem nele) e a c′ não encontra o início do corpo no texto. Dos 2 488 com HTML,
+1 511 têm "Autor:" e "Data:" (o modelo acima) e 977 não. A correção teria de acrescentar um
+contentor para `span.record` (e uma regra de texto para os 3 091 sem HTML); **não foi feita**,
+fica registada como limitação. Efeito: até 5 579 artigos de 2002 (2,8 % do `completo`) sem
+entidades por falha de extração, que baixa a percentagem global de artigos com entidade.
+
+### Texto extraído e HTML guardado no `completo` (para o capítulo do Arquivo.pt)
+
+Contagem por artigo, na captura mais antiga (a que se analisa), com o mesmo critério do `por_ano`
+(que reproduz os 126 798 e 123 844 do "Fim da recolha do corpus alargado"):
+
+| | `por_ano` | `completo` |
+|---|--:|--:|
+| Artigos | 129 317 | 200 101 |
+| Com texto extraído | 126 798 | **171 249** |
+| Com HTML guardado | 123 844 | **194 238** |
+| Com os dois | 121 832 | 166 040 |
+| Só texto | 4 966 | 5 209 |
+| Só HTML | 2 012 | 28 198 |
+| Nem texto nem HTML | 507 | 654 |
+
+Em 2010–2016 (71 663 artigos) há 45 330 com texto e 71 273 com HTML: o Arquivo.pt devolve 404
+para o texto extraído de 26 333 notícias de `record.xl.pt` mas guarda quase sempre o HTML; por
+isso o `--html-sem-texto` (28 198 só com HTML, quase todos do `xl`) é o que lhes dá corpo.
+
+### 66 696 vs 70 784: de onde vêm os números do `xl`
+
+São contagens de coisas diferentes, e os 66 696 eram uma heurística de URL, não a classificação.
+Reconstituída a heurística sobre os 103 101 recursos do `xl` (`corpus_classification_xl.csv`):
+
+| Passo | Artigos |
+|---|--:|
+| "Cara de notícia" (heurística da descoberta; 66 696 contados por ano, **66 669** URLs distintos reproduzidos: 27 URLs aparecem em dois anos) | 66 669 |
+| − heurística que a classificação rejeita: 229 `/capas/…/detalhe/` (capa do dia, sem texto) e 161 `url_nao_artigo` (inclui ~98 `interior.aspx?content_id/u003d…`, uma codificação do `=` que a regra só conhece como `/x3d`) | − 390 |
+| + `jogo_vida/` (cultura e celebridades), que a heurística excluía e a classificação mantém como Artigo | + 2 673 |
+| + `/detalhe/amp/…html` (páginas AMP), que a heurística não apanhava por o caminho ter um segmento a mais, e 1 `/detalhe/default.aspx` | + 2 863 |
+| **Artigos do `xl` na classificação final** | **71 815** |
+| − 1 031 que já estão no `por_ano` (mesma chave) | − 1 031 |
+| **Acrescentados pelo `xl` ao `completo`** | **70 784** |
+| + 879 do `por_ano` cuja captura mais antiga passa a ser do `xl` (e saem de 2017–2018) | → 71 663 em 2010–2016 |
+
+(Os 72 044 antes de retirar as 229 capas são o número que arrancou a recolha.) Das 2 862 páginas
+AMP aceites, uma parte é duplicado de uma página não-AMP (ver "AMP e não-notícias"): o `completo`
+inclui os duplicados AMP, 4,0 % do corpus, como o `por_ano` (4,4 %). Os ~98 URLs `content_id/u003d`
+são uma perda pequena, não corrigida.
+
+#### Amostra B: anotação do autor das n.º 1–3 e concordância (2026-10-28)
+
+Anotação do autor (`data/processed/anotacao_cobertura_2010_2016_autor_n1a3.csv`), às cegas
+(sem ver a da sessão, commit `bf351c0`): n.º 1, 0 entidades (Premium); n.º 2, 0 entidades (a página
+mostrava o erro "não conseguimos encontrar a página" do Arquivo.pt); n.º 3, 9 entidades (Adrien
+Silva, Wilson Eduardo, Tarantini, Marcelo, Sporting, Rio Ave, Sp. Braga, Leonardo Jardim, Nuno
+Espírito Santo), com o árbitro Carlos Xistra fora do âmbito e "Liga" como genérico duvidoso, não
+contado. **Revisão da n.º 2** depois de abrir a captura original
+(`arquivo.pt/wayback/20130810035809id_/…`): Maria Odete Fiúza, João Campos (atleta-guia), Maratona
+Clube de Portugal, Mundiais IBSA e Europeus de Dublin.
+
+Concordância = entidades em comum / entidades distintas das duas anotações (protocolo), com
+"João Campos" igual nas duas (a sessão pôs `treinador`, o autor `atleta-guia`: a entidade é a mesma):
+
+| Notícia | Sessão | Autor, às cegas | Em comum | Concordância inicial | Autor, final | Concordância final |
+|--:|--:|--:|--:|--:|--:|--:|
+| 1 | 0 | 0 | 0 | sem entidades nas duas | 0 | sem entidades nas duas |
+| 2 | 5 | 0 | 0 | 0/5 (0 %) | 5 | **5/5 (100 %)** |
+| 3 | 10 | 9 | 9 | 9/10 (90 %) | 9 | 9/10 (90 %) |
+| **Total** | 15 | 9 | 9 | **9/15 (60,0 %)** | 14 | **14/15 (93,3 %)** |
+
+**Diferenças.** (1) **N.º 2:** divergência de **acesso à página, não de critério.** A sessão leu a
+versão `noFrame` do replay (página com a notícia); o autor viu a moldura do replay com o erro do
+Arquivo.pt e só depois abriu a captura original; com a mesma página as duas anotações coincidem
+nas 5 entidades. (2) **N.º 3, "Liga":** a sessão anotou-a (Primeira Liga, por "assumir a liderança
+da Liga"), o autor não a contou por ser genérica; é uma diferença de **critério**. Fica a decisão do
+autor, aplicada de forma uniforme: **"Liga" genérica não conta**, o que também a retira da n.º 15
+(Premium, "jogos da Liga"). (3) João Campos: categoria `treinador` vs `atleta-guia`, sem efeito
+(a categoria não entra na comparação). Registo, como na n.º 1 do `por_ano`: a anotação final das
+n.º 1–3 é a do autor com a n.º 2 revista; **a concordância inicial de 60 % mede o acesso à página
+e não o critério** (nos dois pontos em que os dois leram a mesma página, 9/10 e uma diferença
+conhecida de critério).
+
+**Tabela final das 15** (anotação final; motivos definitivos das n.º 1–3: n.º 2 Maratona Clube de
+Portugal, Mundiais IBSA e Europeus de Dublin `fora_do_vocabulario`, e João Campos só existe na
+híbrida; n.º 3 "Marcelo" `forma_nao_prevista` — o vocabulário tem "Marcelo dos Santos Ferreira",
+do Rio Ave, mas "Marcelo" sozinho não é variante —, e Rio Ave e Leonardo Jardim só na híbrida).
+Substitui as de cima.
+
+| Passagem | Notícias | Certas | Erradas | Falhadas | Precisão (Wilson 95 %) | Cobertura (Wilson 95 %) | F1 |
+|---|---|--:|--:|--:|---|---|--:|
+| 1 | 12 (n.º 4–15) | 38 | 2 | 107 | 95,0 % (83–99) | 26,2 % (20–34) | 41,1 % |
+| 2 | 12 (n.º 4–15) | 69 | 5 | 76 | 93,2 % (85–97) | 47,6 % (40–56) | 63,0 % |
+| 1 | **15** | 45 | 2 | 114 | 95,7 % (86–99) | 28,3 % (22–36) | 43,7 % |
+| 2 | **15** | 79 | 5 | 80 | 94,0 % (87–97) | 49,7 % (42–57) | 65,0 % |
+
+(As falhadas descem 1 por tirar a "Liga" da n.º 15.) Motivos das falhadas, 15 notícias, passagem 2
+(entre parênteses a 1): `fora_do_vocabulario` 32 (70); `forma_nao_prevista` 21 (17); `outro` 11 (11);
+`regra_de_nomes` 4 (4); `sem_corpo` 12 (12). Erradas (passagem 2): as 5 de antes, sem alteração.
+Cobertura só sobre as entidades do vocabulário: passagem 2, 79/127 (62,2 %; 54–70) e, só com corpo,
+79/115 (68,7 %; 60–76); passagem 1, 45/89 (50,6 %; 40–61) e 45/77 (58,4 %; 47–69). Por notícia
+(passagem 2, certas/erradas/falhadas): n.º 1 0/0/0; 2 2/0/3; 3 8/0/1.
+
+#### Amostra B: critério do "Liga" fixado pelo autor; concordância final 15/15 e tabela das 15 refeita (2026-10-28)
+
+**Critério (autor).** O "Liga" da n.º 3 ("assumir a liderança da Liga") é a Primeira Liga, por isso
+conta como competição; o autor reviu a sua anotação e concorda com a da sessão. **Regra uniforme:**
+"Liga" conta como competição quando o contexto identifica qual é (a liderança da Liga num texto sobre
+o campeonato português); quando não identifica, é duvidosa e não conta. Isto **substitui** a decisão
+do parágrafo anterior ("'Liga' genérica não conta", que também tirava a n.º 15), que era da sessão e
+estava errada para estes contextos.
+
+**Concordância, registada assim.** (1) *Entre anotações independentes, com acesso à mesma página:*
+**14/15 (93,3 %)**, sendo a única diferença o "Liga" da n.º 3 (critério). A anotação do autor da
+n.º 2 foi feita sem ver a lista da sessão (só sabia que a sessão tinha encontrado entidades), depois
+de aceder à versão original da captura; **na primeira leitura a n.º 2 apareceu como página de erro
+do Arquivo.pt** e só foi acessível pela captura original (a primeira concordância, às cegas, de
+9/15, 60,0 %, mede esse acesso e não o critério). (2) *Final, depois de fixado o critério do "Liga":*
+**15/15 (100 %)** (n.º 1: sem entidades nas duas; n.º 2: 5/5; n.º 3: 10/10). O "João Campos" conta
+como a mesma entidade (`treinador` vs `atleta-guia`).
+
+**Aplicação da regra às 15 (pelo contexto).** Contam como Primeira Liga: n.º 3 (liderança da
+Liga), **n.º 15** ("três jogos seguidos… em jogos da Liga", Premium, só o início visível) e
+**n.º 13** ("11 as épocas em que jogou na Liga, ao serviço de Sp. Braga, Sporting e V. Setúbal"), que a
+primeira anotação não tinha. Não há mais casos: nas outras notícias a competição vem sempre com
+o nome (Liga Zon Sagres, Liga Europa, Segunda Liga, Liga de Honra). Alteração à anotação
+(`anotacao_cobertura_2010_2016.csv`): +1 entidade em cada uma das n.º 3, 13 e 15. Motivos: n.º 3 e 13,
+`forma_nao_prevista` ("Liga" sozinha não é variante da Primeira Liga); n.º 15, `sem_corpo`.
+
+**Tabela das 15 (substitui as anteriores):**
+
+| Passagem | Notícias | Certas | Erradas | Falhadas | Precisão (Wilson 95 %) | Cobertura (Wilson 95 %) | F1 |
+|---|---|--:|--:|--:|---|---|--:|
+| 1 | 12 (n.º 4–15) | 38 | 2 | 109 | 95,0 % (83–99) | 25,9 % (19–33) | 40,6 % |
+| 2 | 12 (n.º 4–15) | 69 | 5 | 78 | 93,2 % (85–97) | 46,9 % (39–55) | 62,4 % |
+| 1 | **15** | 45 | 2 | 117 | 95,7 % (86–99) | 27,8 % (21–35) | 43,1 % |
+| 2 | **15** | 79 | 5 | 83 | 94,0 % (87–97) | 48,8 % (41–56) | 64,2 % |
+
+Motivos das falhadas, 15 notícias, passagem 2 (entre parênteses a 1): `fora_do_vocabulario` 32 (72);
+`forma_nao_prevista` 23 (17); `outro` 11 (11); `regra_de_nomes` 4 (4); `sem_corpo` 13 (13). Cobertura só
+sobre as entidades do vocabulário: passagem 2, 79/130 (60,8 %; 52–69) e, só com corpo, 79/117
+(67,5 %; 59–75); passagem 1, 45/90 (50,0 %; 40–60) e 45/77 (58,4 %; 47–69). Erradas: as mesmas 5.
+
+**O "Liga" sozinho nas 30 notícias do `por_ano`.** Nenhuma das 30 tem um "Liga" sozinho como
+competição: a anotação só tem competições com o nome (I Liga, II Liga, Liga de Honra, Taça da Liga,
+La Liga, Liga NOS, Liga Betclic; as duas últimas e "La Liga" são nomes de patrocínio ou formas
+diferentes das variantes e estão como `forma_nao_prevista`/`fora_do_vocabulario`, não como "Liga"
+sozinho). Procurei a palavra "Liga/liga" nos corpos das 30: 11 ocorrências, todas em nomes
+compostos ou "liga espanhola", exceto **uma**, n.º 3 ("O calendário é discutido a tempo e horas com
+a Liga"), que é a entidade organizadora (Liga de Clubes) e **não uma competição**, por isso não
+conta pela regra nova. **Casos com critério diferente: 0; efeito na tabela das 30: nenhum**, não
+alterei nada. Limite da verificação: nas quatro sem corpo extraído (n.º 1, 4, 9 e 21) li o texto
+da página (com menus): só há "I Liga", "II Liga", "Liga Betclic" e semelhantes nomeados; a n.º 9
+não tem texto extraído (só HTML) e não a verifiquei.

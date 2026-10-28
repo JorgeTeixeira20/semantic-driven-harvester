@@ -62,6 +62,7 @@ def main() -> None:
     annotation = [r for r in csv.DictReader(
         (ROOT / "data/processed/anotacao_cobertura_2010_2016.csv").open(encoding="utf-8"))]
     done = {int(r["n"]) for r in annotation}
+    annotation = [r for r in annotation if r["entidade"].strip()]   # n.º anotada sem entidades: só entra em `done`
     data = (ROOT / "output/prototipo_completo/data.js").read_text(encoding="utf-8")
     d = json.loads(data.removeprefix("window.SDH_DATA = ").rstrip().rstrip(";"))
     body_origin = {a[2]: d["bodies"][a[9]] for a in d["articles"]}
