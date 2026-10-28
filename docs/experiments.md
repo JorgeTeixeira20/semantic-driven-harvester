@@ -7767,3 +7767,24 @@ conta pela regra nova. **Casos com critério diferente: 0; efeito na tabela das 
 alterei nada. Limite da verificação: nas quatro sem corpo extraído (n.º 1, 4, 9 e 21) li o texto
 da página (com menus): só há "I Liga", "II Liga", "Liga Betclic" e semelhantes nomeados; a n.º 9
 não tem texto extraído (só HTML) e não a verifiquei.
+
+## Publicação dos dados do corpus completo (2026-10-28)
+
+ZIP criados fora do repositório, em `~/Desktop/release_tese/`:
+
+| Ficheiro | Conteúdo | Tamanho |
+|---|---|--:|
+| `prototipo_completo.zip` | `prototipo_completo/{index.html,data.js,resumo.md}` | 10 225 206 bytes (9,8 MB) |
+| `dados_completo.zip` | `data/processed/corpus_articles_completo_triples.nt`, `output/corpus_entities_completo.ttl`, `output/corpus_entities_completo_corpo.csv` | 164 999 326 bytes (157 MB; 1,79 GB descomprimido) |
+
+O vocabulário `caminho_b_vocabulario_hibrido_completo.csv` e `caminho_b_clubes_url.csv`
+já estão no Git. Verificação num clone limpo (pasta temporária): `git clone`, `python3 -m venv .venv`,
+`.venv/bin/pip install -e ".[sparql]"` (9 s), `unzip dados_completo.zip` na raiz e
+`python -m semantic_harvester.navigation_corpus --corpus completo --vocabulario
+data/processed/caminho_b_vocabulario_hibrido_completo.csv --fonte sparql --destino
+prototipo_verificacao` (238 s). Não faltou nenhum ficheiro. **`cmp` do `data.js`
+(42 822 227 bytes) com o de `output/prototipo_completo/`: idêntico**; o `index.html`
+também. Os comandos estão na secção nova do `README.md`.
+
+Release: o `gh` não está instalado, por isso não foi criada; os ZIP ficam para carregar
+pela página do GitHub (tag `v1.0-tese`).
