@@ -276,3 +276,27 @@ Recomendação: 1, 2, 4, 5, 6; 3 e 7 se houver tempo.
 - [ ] Avaliação, 7.6: tempos do SPARQL do `completo` e o `cmp` do painel do `completo`.
 - [ ] Avaliação, 7.8: tabela por_ano vs completo, 24 473 notícias recuperadas pelo HTML, 879 que mudaram de época, 50 entidades novas (passo 9), e os 40 pares de 2010–2016 se o autor decidir.
 - [ ] Conclusões: limitação sobre a qualidade em 2010–2016 (ou o resultado dos 40 pares).
+
+## Números finais para a escrita (2026-10-28)
+
+**Corpus (descritivo, `completo`):** 200 101 notícias (129 317 de `record.pt` + 70 784 do
+`record.xl.pt`); 171 249 com texto extraído, 194 238 com HTML; por época: 1999–2009 48 357,
+2010–2016 71 663, 2017–2024 80 081. Origem do corpo (tabela corrigida): c′ 75 168, HTML com
+texto 67 490, HTML sem texto 24 473, sem texto nem HTML 654, Premium 17 724, sem corpo 14 592.
+Com modalidade 111 842 (55,9 %): 0 % / 80,1 % / 68,0 % por época. Com entidade 154 449
+(77,2 %): 72,5 % / 79,3 % / 78,1 %. Clube: URL 31 471 (15,7 %), texto 89 913 (44,9 %), nenhum
+78 717 (39,3 %). Títulos repetidos 46 846 (23,4 %). AMP duplicados 8 078 (4,0 %). 2002: 84,7 %
+sem corpo (modelo não reconhecido; ≥ 1 511 recuperáveis). Entidades distintas 8 904 (4 103 da
+híbrida); 4 272 candidatos aceites. Grafo: 12 126 814 triplos, carga 19 s; data.js 42,8 MB,
+preparação 53 s, cmp idêntico; 89 valores "igual"; consultas ≤ 14 s.
+
+**Qualidade (`por_ano`):** como já escrito na Avaliação (P 74,0 / R 28,9; 40 pares 80,0 %; etc.).
+
+**Qualidade 2010–2016:** 40 pares 30/40 = 75,0 % (60–86), duvidosas como erradas (30/37 =
+81,1 % sem elas). 15 notícias, passagem 2: 79 certas, 5 erradas, 83 falhadas; P 94,0 % (87–97),
+R 48,8 % (41–56), F1 64,2; passagem 1: P 95,7 % (86–99), R 27,8 % (21–35), F1 43,1. Cobertura
+no vocabulário 60,8 % (52–69); só com corpo 67,5 % (59–75). Falhadas p2: fora do vocabulário
+32, forma não prevista 23, outro 11, regra de nomes 4, sem corpo 13. Concordância entre
+anotações independentes 14/15 (93,3 %), final 15/15; a n.º 2 só acessível pela versão
+original da captura. 50 entidades novas: 37 certas (74 %), 13 erradas (sobretudo homónimos
+noutro desporto).
