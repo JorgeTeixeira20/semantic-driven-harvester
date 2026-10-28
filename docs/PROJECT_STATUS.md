@@ -5,7 +5,7 @@ não o Caminho B), a partir do código, testes, documentação e histórico; a
 última revisão integral foi até `a3208f4`.
 Este documento é um retrato datado, não substitui a inspeção do checkout
 atual. Regras de trabalho: [AGENTS.md](../AGENTS.md); comandos:
-[README.md](../README.md).
+[guia de comandos](guia_comandos.md).
 
 ## Objetivo e âmbito implementado
 

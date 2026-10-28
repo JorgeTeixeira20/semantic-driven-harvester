@@ -7,7 +7,7 @@ Arquivo.pt e representar recursos Web e capturas temporais em RDF.
 ## Antes de trabalhar
 
 1. Inspecionar `git status --short`, `git log -5 --oneline` e o diff existente.
-2. Ler [README.md](README.md) e [estado do projeto](docs/PROJECT_STATUS.md).
+2. Ler [README.md](README.md), [guia de comandos](docs/guia_comandos.md) e [estado do projeto](docs/PROJECT_STATUS.md).
 3. Para dados/experiências, ler [observações](docs/observations.md) e
    [experiências e decisões](docs/experiments.md).
 4. Para testes, ler [política das fixtures](tests/fixtures/README.md).
@@ -141,7 +141,7 @@ Comandos de execução, apenas quando a tarefa pedir essa operação:
 | `python -m semantic_harvester.navigation_corpus [--corpus por_ano] [--vocabulario CSV] [--fonte ficheiros\|sparql] [--destino PASTA]` | Sem rede; depois do `corpus_entities --corpus por_ano --texto corpo-html`; lê o N-Triples, `output/corpus_entities_por_ano{,_corpo}.csv`, o vocabulário, a tabela de clubes e `output/corpus_phase1_por_ano_captures.csv`; gera `output/prototipo_por_ano/` (`index.html`, `data.js`, `resumo.md`). Com `--fonte sparql` (requer `.[sparql]`), lê artigos, temas e menções por `queries/painel/*.rq` do store do `sparql_corpus` e grava também `fonte_sparql.md`. |
 | `python -m semantic_harvester.sparql_corpus [--corpus por_ano] [--entidade QID] [--top N] [--recarregar]` | Sem rede; requer `pip install -e ".[sparql]"`; carrega o N-Triples e `output/corpus_entities_por_ano.ttl` num store em `output/sparql_por_ano/store/` (reutilizado), corre `queries/corpus/*.rq` e grava `output/sparql_por_ano/relatorio.md` (tempos, tabelas, comparação com o painel). |
 
-Os detalhes e parâmetros estão no README e nos módulos. Estes comandos reais
+Os detalhes e parâmetros estão no [guia de comandos](docs/guia_comandos.md) e nos módulos. Estes comandos reais
 não são pré-requisitos da suite unitária nem devem ser executados para a reparar.
 
 ## Regras de trabalho e dados
