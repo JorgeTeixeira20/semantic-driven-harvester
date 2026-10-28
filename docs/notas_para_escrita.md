@@ -300,3 +300,10 @@ no vocabulário 60,8 % (52–69); só com corpo 67,5 % (59–75). Falhadas p2: f
 anotações independentes 14/15 (93,3 %), final 15/15; a n.º 2 só acessível pela versão
 original da captura. 50 entidades novas: 37 certas (74 %), 13 erradas (sobretudo homónimos
 noutro desporto).
+
+## Convenção de nomes (2026-10-28)
+
+"Corpus alargado" = os 200 101 artigos (`record.pt` + `record.xl.pt`); "corpus de `record.pt`" =
+os 129 317, só onde se fala da avaliação de qualidade. A rever: Ontologia, "Representação no
+grafo" (passa a 130 365 (65,1 %) / 154 449 (77,2 %) / 8 904 entidades / 916 582 associações);
+Motor; Protótipo; Avaliação (introdução e composição).
